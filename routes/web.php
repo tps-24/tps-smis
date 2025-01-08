@@ -7,14 +7,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 
-Route::get('/', function () {
-    return view('layouts/main');
-});
-
 require __DIR__.'/auth.php';
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('dashboard/dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Route::middleware('auth')->group(function () {
@@ -23,6 +19,9 @@ Route::get('/dashboard', function () {
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
 Route::group(['middleware' => ['auth']], function() {
+    Route::get('/', function () {
+        return view('dashboard/dashboard');
+    });
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
     Route::resource('products', ProductController::class);

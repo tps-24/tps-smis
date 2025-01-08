@@ -1,6 +1,6 @@
 
           <!-- App footer starts -->
           <div class="app-footer" >
-          <span class="" style="background-color:red; z-index: 3;">© Bootstrap Gallery 2024</span>
+          <span style="display: block; text-align: right !important;">All rights reserved © TPS MOSHI - <?php echo date("Y"); ?></span>
           </div>
           <!-- App footer ends -->

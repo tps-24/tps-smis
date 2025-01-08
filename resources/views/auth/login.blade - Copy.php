@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <!DOCTYPE html>
 <html lang="en">
 <meta charset="utf-8">
@@ -41,35 +44,25 @@
               <h4 class="mb-4" style="text-align:center; color: #072A6C">TPS - RMS</h4>
 
               <div class="mb-3">
-                <label class="form-label" for="email">{{ __('Username') }} <span class="text-danger">*</span></label>
+                <label class="form-label" for="email">Username <span class="text-danger">*</span></label>
                 <div class="input-group">
                   <span class="input-group-text">
                     <i class="bi bi-envelope"></i>
                   </span>
-                  <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}"   placeholder="Enter your username" required autocomplete="email" autofocus>
-                  @error('email')
-                      <span class="invalid-feedback" role="alert">
-                          <strong>{{ $message }}</strong>
-                      </span>
-                  @enderror
+                  <input type="text" id="email" class="form-control" placeholder="Enter your username">
                 </div>
               </div>
 
               <div class="mb-2">
-                <label class="form-label" for="password">{{ __('Password') }} <span class="text-danger">*</span></label>
+                <label class="form-label" for="password">Password <span class="text-danger">*</span></label>
                 <div class="input-group">
                   <span class="input-group-text">
                     <i class="bi bi-lock"></i>
                   </span>
-                  <input type="password" id="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Enter password" required autocomplete="current-password">
+                  <input type="password" id="password" class="form-control" placeholder="Enter password">
                   <button class="btn btn-outline-secondary" type="button">
                     <i class="bi bi-eye"></i>
                   </button>
-                  @error('password')
-                      <span class="invalid-feedback" role="alert">
-                          <strong>{{ $message }}</strong>
-                      </span>
-                  @enderror
                 </div>
               </div>
 
@@ -78,16 +71,8 @@
               </div>
 
               <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Login</button>
                 <!-- <a href="#" class="btn btn-outline-dark">Not registered? Signup</a> -->
-                  <button type="submit" class="btn btn-primary">
-                  {{ __('Login') }}
-                  </button>
-
-                  @if (Route::has('password.request'))
-                  <a class="btn btn-link" href="{{ route('password.request') }}">
-                      {{ __('Forgot Your Password?') }}
-                  </a>
-                  @endif
               </div>
             </div>
             <!-- Authbox ends -->
@@ -106,3 +91,5 @@
   </body>
 
 </html>
+
+@endsection
