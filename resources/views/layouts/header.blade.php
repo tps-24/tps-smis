@@ -25,7 +25,9 @@
             <!-- App brand sm ends -->
 
             <!-- Page title starts -->
-            <h5 class="m-0 ms-2 fw-semibold">Default Layout</h5>
+             @if(isset($page_name))
+            <h5 class="m-0 ms-2 fw-semibold">{{$page_name}}</h5>
+            @endif
             <!-- Page title ends -->
 
             <!-- App header actions starts -->

@@ -1,7 +1,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin Templates & Dashboards - Cube Admin Template</title>
+    <title>TPS-rms</title>
 
     <!-- Meta -->
     <meta name="description" content="Marketplace for Bootstrap Admin Dashboards" />
@@ -26,4 +26,10 @@
 
     <!-- Scrollbar CSS -->
     <link rel="stylesheet" href="resources/assets/vendor/overlay-scroll/OverlayScrollbars.min.css" />
+    <style>
+      .error{
+        color: red;
+        font-size: 15px;
+      }
+    </style>
   </head>

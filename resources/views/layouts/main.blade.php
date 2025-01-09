@@ -31,9 +31,7 @@
                 <div class="card mb-4">
                   <div class="card-header">
                     <h5 class="card-title">
-                        <!-- content -->
-                    
-                    Card Header</h5>
+                    @yield('content')
                   </div>
                   <div class="card-body"></div>
                 </div>
