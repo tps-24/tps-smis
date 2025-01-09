@@ -5,7 +5,7 @@
 <div class="row">
     <div class="col-lg-12 margin-tb">
         <div class="pull-right">
-                    <a class="btn btn-success mb-2" href="{{url('students/create')}}"><i class="bi bi-file-earmark-plus-fill"></i></a>
+                    <a class="btn btn-success mb-2" href="{{url('students/registration')}}"><i class="bi bi-file-earmark-plus-fill"></i></a>
         </div>
     </div>
 </div>
@@ -22,8 +22,8 @@
                           <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Name</th>
                                 <th>Force Number</th>
+                                <th>Name</th>
                                 <th>Company</th>
                                 <th>Platoon</th>
                                 <th>Phone</th>
@@ -37,8 +37,8 @@
 
                                 <tr>
                                     <td>{{++$i}}</td>
-                                    <td>{{$student->first_name}} {{$student->last_name}}</td>
                                     <td>{{$student->force_number}}</td>
+                                    <td>{{$student->first_name}} {{$student->last_name}}</td>
                                     <td>{{$student->company}}</td>
                                     <td>{{$student->platoon}}</td>
                                     <td>{{$student->phone}}</td>

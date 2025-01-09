@@ -1,17 +1,17 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TPS-rms</title>
+    <title>TPS - RMS</title>
 
     <!-- Meta -->
-    <meta name="description" content="Marketplace for Bootstrap Admin Dashboards" />
-    <meta name="author" content="Bootstrap Gallery" />
-    <link rel="canonical" href="https://www.bootstrap.gallery/">
-    <meta property="og:url" content="https://www.bootstrap.gallery/">
-    <meta property="og:title" content="Admin Templates - Dashboard Templates | Bootstrap Gallery">
-    <meta property="og:description" content="Marketplace for Bootstrap Admin Dashboards">
-    <meta property="og:type" content="Website">
-    <meta property="og:site_name" content="Bootstrap Gallery">
+    <meta name="description" content="System for facilitating essential functions of TPS Administration" />
+    <meta name="author" content="Tanzania Police School" />
+    <link rel="canonical" href="http://localhost:8081/tps-rms/">
+    <meta property="og:url" content="http://localhost:8081/tps-rms/">
+    <meta property="og:title" content="TPS - Moshi | Tanzania Police School">
+    <meta property="og:description" content="System for facilitating essential functions of TPS Administration">
+    <meta property="og:type" content="Management System">
+    <meta property="og:site_name" content="TPS - Moshi">
     <link rel="shortcut icon" href="resources/assets/images/favicon.svg" />
 
     <!-- *************
@@ -19,6 +19,7 @@
 		************* -->
     <link rel="stylesheet" href="resources/assets/fonts/bootstrap/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="resources/assets/css/main.min.css" />
+    <link rel="stylesheet" href="resources/assets/css/custom.css" />
 
     <!-- *************
 			************ Vendor Css Files *************
