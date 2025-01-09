@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.app')
 
 @section('content')
 <div class="row">
@@ -67,4 +67,6 @@
         </div>
     </div>
 </form>
+
+<p class="text-center text-primary"><small>TPS-RMS</small></p>
 @endsection

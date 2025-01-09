@@ -17,14 +17,14 @@
     <!-- *************
 			************ CSS Files *************
 		************* -->
-    <link rel="stylesheet" href="resources/assets/fonts/bootstrap/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="resources/assets/css/main.min.css" />
-    <link rel="stylesheet" href="resources/assets/css/custom.css" />
+    <link rel="stylesheet" href="/tps-rms/resources/assets/fonts/bootstrap/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/tps-rms/resources/assets/css/main.min.css" />
+    <link rel="stylesheet" href="/tps-rms/resources/assets/css/custom.css" />
 
     <!-- *************
 			************ Vendor Css Files *************
 		************ -->
 
     <!-- Scrollbar CSS -->
-    <link rel="stylesheet" href="resources/assets/vendor/overlay-scroll/OverlayScrollbars.min.css" />
+    <link rel="stylesheet" href="/tps-rms/resources/assets/vendor/overlay-scroll/OverlayScrollbars.min.css" />
   </head>
