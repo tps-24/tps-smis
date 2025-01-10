@@ -1,5 +1,20 @@
 @extends('layouts.main')
-
+@section('scrumb')
+<!-- Scrumb starts -->
+<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
+        <li class="breadcrumb-item"><a href="/tps-rms/students/">Students</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Create</a></li>
+      </ol>
+    </nav>
+  </div>
+</nav>
+<!-- Scrumb ends -->
+ 
+@endsection
 @section('content')
 @session('success')
     <div class="alert alert-success alert-dismissible " role="alert">
@@ -169,7 +184,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc3">Date of Birth</label>
                         <div class="input-group">
-                            <input type="date" id="abc3" required name="dob" class="form-control datepicker" />
+                            <input type="date" id="abc3" max="2007-07-01" required name="dob" class="form-control datepicker" />
                         </div>
 
                     </div>
@@ -262,7 +277,7 @@
                             <option value="A+">A+</option>
                             <option value="A">A</option>
                             <option value="B">B</option>
-                            <option value="O">O+</option>
+                            <option value="O+">O+</option>
                         </select>
                     </div>
                     
@@ -276,5 +291,6 @@
         </div>
     </div>
 </form>
+
 
 @endsection

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Student;
+use App\Imports\BulkImportStudents;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -124,7 +126,7 @@ class StudentController extends Controller
         if ($validator->errors()->any()){
             return redirect()->back()->withErrors($validator->errors());//->with('success',$validator->errors());
         }
-
+//dd($request->all());
         $student->update([
             'force_number' => $request->force_number,
             'education_level'=> $request->education_level,
@@ -143,17 +145,37 @@ class StudentController extends Controller
             'platoon' => $request->platoon,
             'blood_group' => $request->blood_group,
         ]);
+        //dd($request->all());
         return redirect('students')->with('success', "Student updated successfully.");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request,$id)
+    public function destroy($id)
     {
         $student = Student::find($id);
         $student->delete();
         return redirect('students')->with('success', "Student deleted successfully.");
 
+    }
+
+    public function import(Request $request)
+    {
+      $validator=   Validator::make($request->all(),[
+            'import_file' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (!in_array($value->getClientOriginalExtension(), ['csv', 'xls', 'xlsx'])) {
+                        $fail('Incorrect :attribute type choose.');
+                    }
+                }
+            ],
+        ]);
+        if($validator->fails()){
+            return back()->with('success',$validator->errors()->first());
+        }
+        Excel::import(new BulkImportStudents, filePath: $request->file('import_file'));
+        return back()->with('success', 'Students Uploaded  successfully.');
     }
 }

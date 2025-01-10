@@ -25,9 +25,7 @@
     <!-- App brand sm ends -->
 
             <!-- Page title starts -->
-             @if(isset($page_name))
-            <h5 class="m-0 ms-2 fw-semibold">{{$page_name}}</h5>
-            @endif
+
             <!-- Page title ends -->
     <!-- Session starts -->
         <span style="font-size:18px; margin-left: 1%; text-color:blue; color:#00008b; font-weight:500">Active Session:</span>
@@ -211,5 +209,6 @@
     <!-- App header actions ends -->
 
 </div>
+@yield('scrumb')
 </div>
 <!-- App header ends -->

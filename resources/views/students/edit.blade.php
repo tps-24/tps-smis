@@ -1,5 +1,20 @@
 @extends('layouts.main')
-
+@section('scrumb')
+<!-- Scrumb starts -->
+<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
+        <li class="breadcrumb-item"><a href="/tps-rms/students/">Students</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Edit</a></li>
+      </ol>
+    </nav>
+  </div>
+</nav>
+<!-- Scrumb ends -->
+ 
+@endsection
 @section('content')
 @session('success')
     <div class="alert alert-success alert-dismissible " role="alert">
@@ -15,7 +30,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Force Number </label>
-                        <input type="text" class="form-control" id="force_number" name="force_number"
+                        <input @if(isset($student->force_number)) value = "{{$student->force_number}}" @endif type="text" class="form-control" id="force_number" name="force_number"
                             placeholder="Enter force number">
                     </div>
                 </div>
@@ -284,4 +299,5 @@
         </div>
     </div>
 </form>
+
 @endsection

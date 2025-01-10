@@ -22,18 +22,19 @@ Route::get('/', function () {
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
 Route::group(['middleware' => ['auth']], function() {
-    
-Route::post('students/bulkimport', [ImportExportStudentsController::class, 'import']);
-Route::post('create-new-student', [StudentController::class, 'store']);
-//Route::get('students/{id}/edit', [StudentController::class, 'edit']);
-Route::controller(StudentController::class)->prefix('students')->group(function(){
-    Route::get('', 'index');
-    Route::get('{id}/show', 'show');
-    Route::get('registration','create');
-    Route::get('{id}/edit','edit');
+    Route::get('/', function () {
+        return view('dashboard/dashboard');
+    });
+    Route::resource('roles', RoleController::class);
+    Route::resource('users', UserController::class);
+    Route::resource('products', ProductController::class);
+    Route::resource('students', StudentController::class);
+
+
+    Route::controller(StudentController::class)->prefix('students')->group(function(){
     Route::post('{id}/update','update');
     Route::post('{id}/delete','destroy');
-    Route::post('create-new-student','store');
+    Route::post('bulkimport','import');
 
 });
 

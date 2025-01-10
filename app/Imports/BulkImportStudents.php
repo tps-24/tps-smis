@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 use App\Models\Student;
-
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -21,21 +21,23 @@ class BulkImportStudents implements ToCollection, ToModel
     {
         $this->num++;
         if($this->num>1){
+
             $student = new Student();
             $student->force_number = $row[0];
             $student->first_name = $row[1];
             $student->middle_name = $row[2];
             $student->last_name = $row[3];
             $student->gender = $row[4];
-            $student->dob = $row[5];
-            $student->nin = $row[6];
-            $student->blood_group = $row[7];
-            $student->home_region = $row[8];
-            $student->company = $row[9];
-            $student->platoon = $row[10];
-            $student->education_level = $row[11];
-            $student->height = $row[12];
-            $student->weight = $row[13];
+            $student->phone = $row[5];
+            $student->dob = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[6]))->format('Y-m-d');
+            $student->nin = $row[7];
+            $student->blood_group = $row[8];
+            $student->home_region = $row[9];
+            $student->company = $row[10];
+            $student->platoon = $row[11];
+            $student->education_level = $row[12];
+            $student->height = $row[13];
+            $student->weight = $row[14];
                 $student->save();
         }
         

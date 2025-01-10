@@ -1,5 +1,20 @@
 @extends('layouts.main')
-
+@section('scrumb')
+<!-- Scrumb starts -->
+<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
+        <li class="breadcrumb-item"><a href="/tps-rms/students/">Students</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">List</a></li>
+      </ol>
+    </nav>
+  </div>
+</nav>
+<!-- Scrumb ends -->
+ 
+@endsection
 </table>
 @section('content')
 <div class="row">
@@ -16,12 +31,9 @@
         </form>
       </div>
 
-      <div class="col-3">
-        <a class="btn btn-success mb-2" href="{{url('students/registration')}}"><i
-            class="bi bi-file-earmark-plus-fill"></i></a>
+      <div class="col-6">
+        <a class="btn btn-success mb-2" href="{{url('students/create')}}">Create Student</a>
       </div>
-    </div>
-    <div class="">
     </div>
   </div>
 </div>
@@ -60,15 +72,14 @@
         <td>{{$student->phone}}</td>
         <td>{{$student->home_region}}</td>
         <td>
-          <a class="btn btn-info btn-sm" href=<?php  echo ("students/" . $student->id . "/show")?>><i
-            class="fa-solid fa-list"></i> Show</a>
-          <a class="btn btn-primary btn-sm" href="{{url('students/' . $student->id . '/edit')}}"><i
-            class="bi bi-pencil"></i></a>
+          <a class="btn btn-info btn-sm" href="{{ route('students.show',$student->id) }}">
+             Show</a>
+          <a class="btn btn-primary btn-sm"  href="{{ route('students.edit',$student->id) }}">Edit</a>
           <form method="POST" action="{{url('students/' . $student->id . '/delete')}}" style="display:inline">
           @csrf
           @method('POST')
 
-          <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+          <button type="submit" class="btn btn-danger btn-sm">Delete</i></button>
           </form>
         </td>
         </tr>
@@ -78,6 +89,7 @@
     </div>
   </div>
 </div>
+
 {!! $students->links('pagination::bootstrap-5') !!}
 
 @endsection

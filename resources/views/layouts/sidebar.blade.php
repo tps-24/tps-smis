@@ -1,4 +1,4 @@
- <!-- Sidebar wrapper starts -->
+c <!-- Sidebar wrapper starts -->
  <nav id="sidebar" class="sidebar-wrapper">
 
 <!-- App brand starts -->
@@ -26,10 +26,10 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="students">Student Details</a>
+          <a href="/tps-rms/students">Student Details</a>
         </li>
         <li>
-          <a href="students/registration">Student Registration</a>
+          <a href="students/create">Student Registration</a>
         </li>
       </ul>
     </li>
@@ -119,27 +119,10 @@
         </li>
       </ul>
     </li>
-    <li class="treeview">
-      <a href="#!">
-        <i class="bi bi-window-sidebar"></i>
-        <span class="menu-text">Invoices</span>
-      </a>
-      <ul class="treeview-menu">
-        <li>
-          <a href="#">Create Invoice</a>
-        </li>
-        <li>
-          <a href="#">View Invoice</a>
-        </li>
-        <li>
-          <a href="#">Invoice List</a>
-        </li>
-      </ul>
-    </li>
     <li>
-      <a href="tables.html">
+      <a href="users">
         <i class="bi bi-border-all"></i>
-        <span class="menu-text">Reports</span>
+        <span class="menu-text">Users</span>
       </a>
     </li>
     <li class="treeview">
@@ -149,12 +132,18 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">Roles</a>
+          <a href="roles">Roles</a>
         </li>
         <li>
           <a href="#">Permission</a>
         </li>
       </ul>
+    </li>
+    <li>
+      <a href="tables.html">
+        <i class="bi bi-border-all"></i>
+        <span class="menu-text">Reports</span>
+      </a>
     </li>
     <li class="treeview">
       <a href="#!">
