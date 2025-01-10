@@ -82,8 +82,8 @@ class StudentController extends Controller
     public function show($id)
     {
         $student = Student::find($id);
-
-        return view('students.show',compact('student'));
+        $page_name = "More Student Details";
+        return view('students.show',compact('student','page_name'));
     }
 
     /**
@@ -92,7 +92,8 @@ class StudentController extends Controller
     public function edit($id)
     {
         $student = Student::find($id);
-        return view('students.edit',compact('student'));
+        $page_name = "Edit Student Details";
+        return view('students.edit',compact('student', 'page_name'));
     }
 
     /**

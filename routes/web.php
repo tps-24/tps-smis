@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ImportExportStudentsController;
 
 
 require __DIR__.'/auth.php';
@@ -22,7 +23,7 @@ Route::get('/', function () {
 // });
 Route::group(['middleware' => ['auth']], function() {
     
-Route::get('registration', [StudentController::class, 'create']);
+Route::post('students/bulkimport', [ImportExportStudentsController::class, 'import']);
 Route::post('create-new-student', [StudentController::class, 'store']);
 //Route::get('students/{id}/edit', [StudentController::class, 'edit']);
 Route::controller(StudentController::class)->prefix('students')->group(function(){

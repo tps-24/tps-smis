@@ -12,14 +12,14 @@
     <meta property="og:description" content="System for facilitating essential functions of TPS Administration">
     <meta property="og:type" content="Management System">
     <meta property="og:site_name" content="TPS - Moshi">
-    <link rel="shortcut icon" href="resources/assets/images/favicon.svg" />
+    <link rel="shortcut icon" href="/tps-rms/resources/assets/images/favicon.svg" />
 
     <!-- *************
 			************ CSS Files *************
 		************* -->
-    <link rel="stylesheet" href="resources/assets/fonts/bootstrap/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="resources/assets/css/main.min.css" />
-    <link rel="stylesheet" href="resources/assets/css/custom.css" />
+    <link rel="stylesheet" href="/tps-rms/resources/assets/fonts/bootstrap/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/tps-rms/resources/assets/css/main.min.css" />
+    <link rel="stylesheet" href="/tps-rms/resources/assets/css/custom.css" />
 
     <!-- *************
 			************ Vendor Css Files *************
