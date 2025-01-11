@@ -38,6 +38,8 @@
     <script src="/tps-rms/resources/assets/js/jquery.min.js"></script>
     <script src="/tps-rms/resources/assets/js/bootstrap.bundle.min.js"></script>
     <script src="/tps-rms/assets/js/moment.min.js"></script>
+    <!-- Custom JS files -->
+    <script src="/tps-rms/resources/assets/js/custom.js"></script>
 
     <!-- Vendor Js Files -->
     <!-- Overlay Scroll JS -->
@@ -61,10 +63,6 @@
 
     <!-- Rating -->
     <script src="/tps-rms/resources/assets/vendor/rating/raty.js"></script>
-    <script src="/tps-rms/resources/assets/vendor/rating/raty-custom.js"></script>
-    
-    <!-- Custom JS files -->
-    <script src="/tps-rms/resources/assets/js/custom.js"></script>
- 
+    <script src="/tps-rms/resources/assets/vendor/rating/raty-custom.js"></script> 
   </body>
 </html>

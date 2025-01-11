@@ -206,6 +206,6 @@
     <!-- App header actions ends -->
 
 </div>
-@yield('scrumb')
+    @yield('scrumb')
 </div>
 <!-- App header ends -->

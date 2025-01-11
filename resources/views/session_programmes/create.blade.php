@@ -6,8 +6,8 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Users</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">Register Users</a></li>
+        <li class="breadcrumb-item"><a href="#">Session Programmes</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Register Programme Session</a></li>
       </ol>
     </nav>
   </div>
@@ -22,10 +22,10 @@
                 <div class="row">
                     <div class="col-lg-12 margin-tb">
                         <div class="pull-left">
-                            <h2>Create New User</h2>
+                            <h2>Create New Session</h2>
                         </div>
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('users.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('session_programmes.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -39,45 +39,37 @@
                     </ul>
                     </div>
                 @endif
-            <form method="POST" action="{{ route('users.store') }}">
+            <form method="POST" action="{{ route('session_programmes.store') }}">
                 @csrf
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Name:</strong>
-                            <input type="text" name="name" placeholder="Name" class="form-control">
+                            <strong>Session Name:</strong>
+                            <input type="text" name="programme_name" placeholder="Enter Session Programme" class="form-control">
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Email:</strong>
-                            <input type="email" name="email" placeholder="Email" class="form-control">
+                            <strong>Description:</strong>
+                            <textarea type="text" name="description" placeholder="Enter Descriptions" class="form-control"></textarea>
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
+                    <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
-                            <strong>Password:</strong>
-                            <input type="password" name="password" placeholder="Password" class="form-control">
+                            <strong>Year:</strong>
+                            <input type="text" name="year" placeholder="Enter Year of Admission" class="form-control">
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
+                    <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
-                            <strong>Confirm Password:</strong>
-                            <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Role:</strong>
-                            <select name="roles[]" class="form-control" multiple="multiple">
-                                @foreach ($roles as $value => $label)
-                                    <option value="{{ $value }}">
-                                        {{ $label }}
-                                    </option>
-                                @endforeach
+                            <strong>Is Current:</strong>
+                            <select name="is_current" class="form-control">
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
                             </select>
                         </div>
                     </div>
+                    <input type="number" name="is_active" value="0" class="form-control" hidden>
                     <div class="col-xs-12 col-sm-12 col-md-12 text-center">
                         <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
                     </div>

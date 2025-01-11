@@ -7,8 +7,8 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Users</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">Modify Users</a></li>
+        <li class="breadcrumb-item"><a href="#">Session Programmes</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Edit Programme Session</a></li>
       </ol>
     </nav>
   </div>
@@ -24,10 +24,10 @@
                 <div class="row">
                     <div class="col-lg-12 margin-tb">
                         <div class="pull-left">
-                            <h2>Edit User</h2>
+                            <h2>Edit Programme Session</h2>
                         </div>
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('users.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('Session_programmes.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -42,44 +42,40 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('users.update', $user->id) }}">
+                <form method="POST" action="{{ route('Session_programmes.update', $session_programme->id) }}">
                     @csrf
                     @method('PUT')
 
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
-                                <strong>Name:</strong>
-                                <input type="text" name="name" placeholder="Name" class="form-control" value="{{ $user->name }}">
+                                <strong>Session Name:</strong>
+                                <input type="text" name="programme_name" placeholder="Enter Session Programme" class="form-control" value="{{ $session_programme->programme_name }}">
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
-                                <strong>Email:</strong>
-                                <input type="email" name="email" placeholder="Email" class="form-control" value="{{ $user->email }}">
+                                <strong>Description:</strong>
+                                <textarea type="text" name="description" placeholder="Enter Descriptions" class="form-control" value="{{ $session_programme->description }}">
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="col-xs-6 col-sm-6 col-md-12">
                             <div class="form-group">
-                                <strong>Password:</strong>
-                                <input type="password" name="password" placeholder="Password" class="form-control">
+                                <strong>Year:</strong>
+                                <input type="text" name="year" placeholder="Enter Year of Admission" class="form-control" value="{{ $session_programme->year }}">
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="col-xs-6 col-sm-6 col-md-12">
                             <div class="form-group">
-                                <strong>Confirm Password:</strong>
-                                <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control">
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-sm-12 col-md-12">
-                            <div class="form-group">
-                                <strong>Role:</strong>
-                                <select name="roles[]" class="form-control" multiple="multiple">
-                                    @foreach ($roles as $value => $label)
-                                        <option value="{{ $value }}" {{ isset($userRole[$value]) ? 'selected' : ''}}>
-                                            {{ $label }}
-                                        </option>
-                                    @endforeach
+                                <strong>Is Current:</strong>
+                                <select name="is_current" class="form-control">
+                                    if($session_programme->is_current == 1){
+                                        <option value="1" selected>Yes</option>
+                                        <option value="0">No</option>
+                                    }else{
+                                        <option value="1">Yes</option>
+                                        <option value="0" selected>No</option>
+                                    }
                                 </select>
                             </div>
                         </div>

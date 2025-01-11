@@ -120,7 +120,7 @@ c <!-- Sidebar wrapper starts -->
       </ul>
     </li>
     <li>
-      <a href="users">
+      <a href="{{ route('users.index') }}">
         <i class="bi bi-border-all"></i>
         <span class="menu-text">Users</span>
       </a>
@@ -132,7 +132,7 @@ c <!-- Sidebar wrapper starts -->
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="roles">Roles</a>
+          <a href="{{ route('roles.index') }}">Roles</a>
         </li>
         <li>
           <a href="#">Permission</a>
@@ -155,7 +155,7 @@ c <!-- Sidebar wrapper starts -->
           <a href="#">General Settings</a>
         </li>
         <li>
-          <a href="#">Session Settings</a>
+          <a href="{{ route('session_programmes.index') }}">Session Settings</a>
         </li>
         <li>
           <a href="#">Notification Setting</a>
