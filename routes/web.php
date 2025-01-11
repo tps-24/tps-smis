@@ -8,10 +8,13 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SessionProgrammeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ImportExportStudentsController;
+
 
 require __DIR__.'/auth.php';
 
-Route::get('/dashboard', function () {
+Route::get('/', function () {
     return view('dashboard/dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -29,9 +32,16 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('users', UserController::class);
     Route::resource('session_programmes', SessionProgrammeController::class);
     Route::resource('products', ProductController::class);
+    Route::resource('students', StudentController::class);
+
+
+    Route::controller(StudentController::class)->prefix('students')->group(function(){
+    Route::post('{id}/update','update');
+    Route::post('{id}/delete','destroy');
+    Route::post('bulkimport','import');
+
 });
 
-
+});
 Auth::routes();
-
 Route::get('/home', [HomeController::class, 'index'])->name('home');

@@ -15,7 +15,17 @@
           <!-- App body starts -->
           <div class="app-body">
             <!-- Row starts -->
-              @yield('content')
+            <div class="row gx-4">
+              <div class="col-sm-12 col-12">
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h5 class="card-title">
+                    @yield('content')
+                  </div>
+                  <div class="card-body"></div>
+                </div>
+              </div>
+            </div>
             <!-- Row ends -->
           </div>
           <!-- App body ends -->

@@ -24,6 +24,9 @@
     </div>
     <!-- App brand sm ends -->
 
+            <!-- Page title starts -->
+
+            <!-- Page title ends -->
     <!-- Session starts -->
         <span style="font-size:18px; margin-left: 1%; text-color:blue; color:#00008b; font-weight:500">Active Session:</span>
         <!-- <input type="text" class="form-control activeSession" id="activeSession" value="BASIC RECRUIT COURSE NO.1/2024/2025 " /> -->

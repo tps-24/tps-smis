@@ -26,10 +26,10 @@ c <!-- Sidebar wrapper starts -->
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="students">Student Details</a>
+          <a href="/tps-rms/students">Student Details</a>
         </li>
         <li>
-          <a href="students/registration">Student Registration</a>
+          <a href="students/create">Student Registration</a>
         </li>
       </ul>
     </li>

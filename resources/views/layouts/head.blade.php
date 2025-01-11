@@ -12,7 +12,7 @@
     <meta property="og:description" content="System for facilitating essential functions of TPS Administration">
     <meta property="og:type" content="Management System">
     <meta property="og:site_name" content="TPS - Moshi">
-    <link rel="shortcut icon" href="resources/assets/images/favicon.svg" />
+    <link rel="shortcut icon" href="/tps-rms/resources/assets/images/favicon.svg" />
 
     <!-- *************
 			************ CSS Files *************
@@ -27,4 +27,10 @@
 
     <!-- Scrollbar CSS -->
     <link rel="stylesheet" href="/tps-rms/resources/assets/vendor/overlay-scroll/OverlayScrollbars.min.css" />
+    <style>
+      .error{
+        color: red;
+        font-size: 15px;
+      }
+    </style>
   </head>
