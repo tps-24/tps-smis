@@ -75,7 +75,7 @@ class StudentController extends Controller
             'platoon' => $request->platoon,
             'blood_group' => $request->blood_group,
         ]);
-        return redirect()->back()->with('success', "Student created successfully.");
+        return redirect()->route('students.index')->with('success', "Student created successfully.");
     }
 
     /**
@@ -177,5 +177,78 @@ class StudentController extends Controller
         }
         Excel::import(new BulkImportStudents, filePath: $request->file('import_file'));
         return back()->with('success', 'Students Uploaded  successfully.');
+    }
+
+    public function postStepOne(Request $request)
+    {
+        $validatedData = $request->validate([
+            'education_level' => 'required',
+            'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
+            'last_name'=> 'required|max:30|alpha|regex:/^[A-Z]/',
+            'middle_name'=> 'required|max:30|alpha|regex:/^[A-Z]/',
+            'home_region' => 'required|string|min:4',
+        ]);
+  
+        if(empty($request->session()->get('student'))){
+            $student = new Student();
+            $student->fill($validatedData);
+            $request->session()->put('student', $student);
+        }else{
+            $student = $request->session()->get('student');
+            $student->fill($validatedData);
+            $request->session()->put('student', $student);
+        }
+        
+        return redirect('students/create/step-two');
+    }
+
+    public function createStepTwo(Request $request)
+    {
+        $student = $request->session()->get('student');
+  
+        return view('students.wizards.stepTwo',compact('student'));
+    }
+
+    public function postStepTwo(Request $request)
+    {
+        $validatedData = $request->validate([
+            'phone' => 'nullable|numeric|digits:10|unique:students',
+            'nin'=> 'required|numeric|unique:students',
+            'dob' => 'required|string',
+            'gender' => 'required|max:1|alpha|regex:/^[M,F]/',
+            'company' => 'required|max:2|alpha',
+            'platoon' => 'required|max:1',
+        ]);
+        $student = $request->session()->get('student');
+        $student->fill($validatedData);
+       $request->session()->put('student', $student);
+        return redirect('students/create/step-three');
+        
+    }
+
+    public function createStepThree(Request $request)
+    {
+        $student = $request->session()->get('student');
+  
+        return view('students.create-step-three',compact('student'));
+    }
+ 
+    public function postStepThree(Request $request)
+    {
+        $validatedData = $request->validate([
+            'next_kin_phone' => 'nullable|numeric|digits:10',
+             'next_kin_names'=> 'required|max:30',
+             'next_kin_address' => 'required|string|min:4',
+             'next_kin_relationship' => 'required|string|min:4',
+        ]);
+  
+        $student = $request->session()->get('student');
+        $student->fill($validatedData);
+        $request->session()->put('student', $student);
+        $student = $request->session()->get('student');
+        $student->save();
+  
+        $request->session()->forget('student');
+        return redirect()->route('students.index')->with('success','Student created successfully.');
     }
 }

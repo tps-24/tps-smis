@@ -31,6 +31,10 @@ return new class extends Migration
             $table->double('height')->nullable();
             $table->double('weight')->nullable();
             $table->char('platoon')->nullable();
+            $table->string('next_kin_names')->nullable();
+            $table->string('next_kin_phone')->nullable();
+            $table->string('next_kin_relationship')->nullable();
+            $table->string('next_kin_address')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onupdate('update')->ondelete('null');
 
             $table->timestamps();

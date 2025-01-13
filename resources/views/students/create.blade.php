@@ -21,8 +21,10 @@
         {{ $value }}
     </div>
 @endsession
-<form name="add-blog-post-form" id="add-blog-post-form" method="post" action="{{url('students/create-new-student')}}">
+<!-- Form wizard starts -->
+<form name="add-blog-post-form" id="add-blog-post-form" method="POST" action="{{url('students/store')}}">
     @csrf
+    @method('POST')
     <div class="row gx-4">
         <div class="col-sm-4 col-12">
             <div class="card mb-2">
@@ -43,9 +45,9 @@
                         <select class="form-select" id="abc4" name="rank" required
                             aria-label="Default select example">
                             <!-- <option selected="">select gender</option> -->
-                            <option value="RC">Recruit</option>
-                            <option value="CPL">Copral</option>
-                            <option value="SGT">Copral</option>
+                            <option value="Recruit">Recruit</option>
+                            <option value="Copral">Copral</option>
+                            <option value="Sergent">Copral</option>
                         </select>
                     </div>
                     @error('rank')
@@ -291,6 +293,7 @@
         </div>
     </div>
 </form>
+
 
 
 @endsection

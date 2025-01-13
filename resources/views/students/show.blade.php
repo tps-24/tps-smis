@@ -16,133 +16,66 @@
  
 @endsection
 @section('content')
-<div class="row">
-    <div class="col-lg-12 margin-tb">
 
-        <div class="pull-right">
-            <a class="btn btn-primary" href=""> Back</a>
+<div class="row gx-4 mt-1">
+    <!-- Attendence starts -->
+    <div class="col-xxl-3 col-sm-4 col-12">
+        <div class="card ">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="  me-3">
+                        <img src="/tps-rms/resources/assets/images/profile.png" style="height:50 !important; width:50"
+                            alt="attendence image" />
+                        <p>{{ $student->force_number }}, {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</p>
+                        <p>{{$student->rank}}</p>
+                        <p> Company: {{$student->company}}</p>
+                        <p>Platoon: {{$student->platoon}}</p>
+                    </div>
+                </div>
+
+            </div>
         </div>
+    </div>
+    <div class="col-xxl-3 col-sm-4 col-12">
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="p-3  me-3">
+                        <p>Date of birth: {{$student->dob}}</p>
+                        <p>Education: {{$student->education_level}}</p>
+                        
+                        <p>NIDA: {{$student->nin}}</p>
+                        <p>Phone: {{$student->phone}}</p>
+                        <p>Home: {{$student->home_region}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-xxl-3 col-sm-4 col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="p-4  me-3">
+                    <p>Gender: Male</p>
+                        <p>Blood Group: {{$student->blood_group}}</p>
+                        <p>height: {{$student->height}} ft</p>
+                        <p>Weight: {{$student->weight}} kg</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <h4>Next Of Kin Informations</h4>
+        <p>Names: {{$student->next_kin_names}}</p>
+        <p>Relationship: {{$student->next_kin_relationship}}</p>
+        <p>Phone: {{$student->next_kin_phone}}</p>
+        <p>Address: {{$student->next_kin_address}}</p>
     </div>
 </div>
-
-
-<div class="row gx-2">
-    <div class="col-sm-4 col-6">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Force Number:</strong>
-                {{ $student->force_number }}
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Rank:</strong>
-                {{ $student->rank }}
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Names:</strong>
-                {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-
-            <div class="form-group">
-                <strong>Company:</strong>
-                {{ $student->company }}
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Platoon:</strong>
-                {{ $student->platoon }}
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Gender</strong>
-                @if($student->gender === 'M')
-                Male
-            @elseif($student->gender === 'F')
-                Female
-            @endif
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Education level:</strong>
-                {{ $student->education_level }}
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Home Region:</strong>
-                {{ $student->home_region }}
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Height:</strong>
-                {{ $student->height }} @if (isset($student->height))
-                    ft
-                @endif 
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Weight:</strong>
-                {{ $student->weight }} @if (isset($student->weight))
-                    Kg
-                @endif 
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Blood Group:</strong>
-                {{ $student->blood_group }}
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Nida:</strong>
-                {{ $student->nin }}
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-4 col-12">
-        <div class=" mb-2">
-            <div class="form-group">
-                <strong>Date of birth:</strong>
-                {{ $student->dob }}
-            </div>
-        </div>
-    </div>
-
 
 </div>
 @endsection
