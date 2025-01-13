@@ -31,8 +31,11 @@
         </form>
       </div>
 
-      <div class="col-6">
+      <!-- <div class="col-6">
         <a class="btn btn-success mb-2" href="{{url('students/create')}}">Create Student</a>
+      </div> -->
+      <div class="pull-right" >
+          <a class="btn btn-success mb-2" href="{{ route('students.create') }}" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Student</a>
       </div>
     </div>
   </div>

@@ -32,5 +32,9 @@
         color: red;
         font-size: 15px;
       }
+      .table-responsive td, .table-responsive th { 
+        font-weight: normal;
+      }
+
     </style>
   </head>
