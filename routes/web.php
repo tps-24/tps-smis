@@ -5,39 +5,74 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\StudentController;
-use App\Http\Controllers\ImportExportStudentsController;
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
-    return view('dashboard/dashboard');
+    $role = Auth::user()->role_id;
+    if($role == 1){
+        return view('dashboard/dashboard');
+    }
+    elseif($role == 2){
+        return view('/students/dashboard');
+    }
+    //return view('dashboard/dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+
+// Route::get('/', function () {
+//     return view('dashboard/dashboard');
+// });
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
-Route::group(['middleware' => ['auth']], function() {
-    Route::get('/', function () {
-        return view('dashboard/dashboard');
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/students/dashboard', function () {
+        return view('students/dashboard');
     });
+
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
     Route::resource('products', ProductController::class);
     Route::resource('students', StudentController::class);
 
+    Route::controller(StudentController::class)->prefix('students')->group(function () {
+        /**
+         *  Wizard route for student registration
+         */
+        Route::prefix('create')->group(function(){
+            Route::get('/', function () {
+                return view('students/wizards/stepOne');
+            });
+            Route::get('step-two', function () {
+                return view('students/wizards/stepTwo');
+            });
+            Route::get('step-three', function () {
+                return view('students/wizards/stepThree');
+            });
+            Route::post('post-step-one','postStepOne');
+            Route::post('post-step-two','postStepTwo');
+            Route::post('post-step-three','postStepThree');
+        });
+        /**
+         * End of wizard for student registration
+         */
 
-    Route::controller(StudentController::class)->prefix('students')->group(function(){
-    Route::post('{id}/update','update');
-    Route::post('{id}/delete','destroy');
-    Route::post('bulkimport','import');
+
+        Route::post('store', 'store');
+        Route::post('{id}/update', 'update');
+        Route::post('{id}/delete', 'destroy');
+        Route::post('bulkimport', 'import');
+
+
+    });
 
 });
 
-});
 Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');
