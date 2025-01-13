@@ -1,5 +1,4 @@
 @extends('layouts.main')
-
 @section('scrumb')
 <!-- Scrumb starts -->
 <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
@@ -7,13 +6,13 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Roles</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">View Roles</a></li>
+        <li class="breadcrumb-item"><a href="#">Session Programmes</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">View Programme Sessions</a></li>
       </ol>
     </nav>
   </div>
 </nav>
-<!-- Scrumb ends -->
+<!-- Scrumb ends --> 
 @endsection
 @section('content')
 <!-- Row starts -->
@@ -23,11 +22,11 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-12 margin-tb">
-                        <div class="pull-left">
-                            <h2>View Role</h2>
-                        </div>
+                        <!-- <div class="pull-left">
+                            <h2>View Programme Session</h2>
+                        </div> -->
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('roles.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('session_programmes.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -35,17 +34,23 @@
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Name:</strong>
-                            {{ $role->name }}
+                            <strong>Programme Session Name:</strong>
+                            {{ $session_programme->programme_name }}
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Permissions:</strong>
-                            @if(!empty($rolePermissions))
-                                @foreach($rolePermissions as $v)
-                                    <label class="label label-success">{{ $v->name }},</label>
-                                @endforeach
+                            <strong>Descriptions:</strong>
+                            {{ $session_programme->description }}
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="form-group">
+                            <strong>Status:</strong>
+                            @if ($session_programme->is_active == 1)
+                                <label style="color:green">Active Session</label>
+                            @else
+                            <label style="color:red">Not Active</label>
                             @endif
                         </div>
                     </div>
