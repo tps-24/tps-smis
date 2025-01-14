@@ -19,3 +19,10 @@
 .backbtn{
     float: right;
 }
+.error{
+    color: red;
+    font-size: 15px;
+  }
+  .width-40{
+    width:40%;
+  }

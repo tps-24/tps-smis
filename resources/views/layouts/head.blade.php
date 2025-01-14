@@ -27,10 +27,5 @@
 
     <!-- Scrollbar CSS -->
     <link rel="stylesheet" href="/tps-rms/resources/assets/vendor/overlay-scroll/OverlayScrollbars.min.css" />
-    <style>
-      .error{
-        color: red;
-        font-size: 15px;
-      }
-    </style>
+
   </head>

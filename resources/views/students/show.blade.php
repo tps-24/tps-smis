@@ -25,7 +25,7 @@
                 <div class="d-flex align-items-center">
                     <div class="  me-3">
                         <img src="/tps-rms/resources/assets/images/profile.png" style="height:50 !important; width:50"
-                            alt="attendence image" />
+                            alt="profile image" />
                         <p>{{ $student->force_number }}, {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</p>
                         <p>{{$student->rank}}</p>
                         <p> Company: {{$student->company}}</p>

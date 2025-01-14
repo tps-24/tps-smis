@@ -9,7 +9,7 @@ use App\Http\Controllers\SessionProgrammeController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\StudentController;
-
+use App\Http\Controllers\AttendenceController;
 
 require __DIR__ . '/auth.php';
 
@@ -44,6 +44,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('session_programmes', SessionProgrammeController::class);
     Route::resource('products', ProductController::class);
     Route::resource('students', StudentController::class);
+    Route::resource('attendences', AttendenceController::class);
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         /**
@@ -67,6 +68,7 @@ Route::group(['middleware' => ['auth']], function () {
          * End of wizard for student registration
          */
 
+        
 
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
@@ -78,5 +80,14 @@ Route::group(['middleware' => ['auth']], function () {
 
 });
 
+
+Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+    Route::post('create', 'create');
+    Route::post('{id}/store', 'store');
+    Route::get('today','today');
+});
+
+
+Route::get('today', [AttendenceController::class, 'today']);
 Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');

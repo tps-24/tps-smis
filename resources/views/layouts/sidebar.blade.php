@@ -48,6 +48,12 @@ c <!-- Sidebar wrapper starts -->
       </ul>
     </li>
     <li>
+      <a href="/tps-rms/attendences">
+        <i class="bi bi-bar-chart-line"></i>
+        <span class="menu-text">Attendences</span>
+      </a>
+    </li>
+    <li>
       <a href="#">
         <i class="bi bi-send"></i>
         <span class="menu-text">Print Certificate(s)</span>

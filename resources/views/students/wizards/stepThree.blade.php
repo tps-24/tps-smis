@@ -16,7 +16,7 @@
 
 @endsection
 @section('content')
-<h1>Next Kin information</h1>
+<h1>Next of Kin information</h1>
 <form action="{{url('students/create/post-step-three')}}" method="POST">
     @csrf
     @method('POST')
