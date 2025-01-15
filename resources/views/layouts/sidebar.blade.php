@@ -88,7 +88,7 @@
       </a>
     </li>
     <li>
-      <a href="#">
+      <a href="hospital">
         <i class="bi bi-calendar2"></i>
         <span class="menu-text">Hospital</span>
       </a>

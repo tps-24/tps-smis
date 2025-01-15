@@ -39,3 +39,22 @@ Route::controller(StudentController::class)->prefix('students')->group(function(
 });
 Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+use App\Http\Controllers\PatientController;
+
+Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+// web.php
+
+
+Route::post('update-patient-status/{id}', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
+Route::post('/patients/{id}/update', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
+
+Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::put('/update-patient-status/{id}', [PatientController::class, 'update'])->name('update.patient.status');

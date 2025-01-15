@@ -75,6 +75,18 @@
     
     <!-- Custom JS files -->
     <script src="resources/assets/js/custom.js"></script>
+    <!-- Include Bootstrap CSS in the head section -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Your custom styles (if any) -->
+<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+<!-- Include Bootstrap JS (and Popper.js) before the closing </body> tag -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Your custom scripts (if any) -->
+<script src="{{ asset('js/script.js') }}"></script>
+
  
   </body>
 </html>
