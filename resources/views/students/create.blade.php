@@ -1,13 +1,30 @@
 @extends('layouts.main')
-
+@section('scrumb')
+<!-- Scrumb starts -->
+<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
+        <li class="breadcrumb-item"><a href="/tps-rms/students/">Students</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Create</a></li>
+      </ol>
+    </nav>
+  </div>
+</nav>
+<!-- Scrumb ends -->
+ 
+@endsection
 @section('content')
 @session('success')
     <div class="alert alert-success alert-dismissible " role="alert">
         {{ $value }}
     </div>
 @endsession
-<form name="add-blog-post-form" id="add-blog-post-form" method="post" action="{{url('students/create-new-student')}}">
+<!-- Form wizard starts -->
+<form name="add-blog-post-form" id="add-blog-post-form" method="POST" action="{{url('students/store')}}">
     @csrf
+    @method('POST')
     <div class="row gx-4">
         <div class="col-sm-4 col-12">
             <div class="card mb-2">
@@ -28,9 +45,9 @@
                         <select class="form-select" id="abc4" name="rank" required
                             aria-label="Default select example">
                             <!-- <option selected="">select gender</option> -->
-                            <option value="RC">Recruit</option>
-                            <option value="CPL">Copral</option>
-                            <option value="SGT">Copral</option>
+                            <option value="Recruit">Recruit</option>
+                            <option value="Copral">Copral</option>
+                            <option value="Sergent">Copral</option>
                         </select>
                     </div>
                     @error('rank')
@@ -169,7 +186,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc3">Date of Birth</label>
                         <div class="input-group">
-                            <input type="date" id="abc3" required name="dob" class="form-control datepicker" />
+                            <input type="date" id="abc3" max="2007-07-01" required name="dob" class="form-control datepicker" />
                         </div>
 
                     </div>
@@ -262,7 +279,7 @@
                             <option value="A+">A+</option>
                             <option value="A">A</option>
                             <option value="B">B</option>
-                            <option value="O">O+</option>
+                            <option value="O+">O+</option>
                         </select>
                     </div>
                     
@@ -276,5 +293,7 @@
         </div>
     </div>
 </form>
+
+
 
 @endsection

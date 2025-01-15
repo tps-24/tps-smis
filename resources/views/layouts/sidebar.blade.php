@@ -1,4 +1,4 @@
- <!-- Sidebar wrapper starts -->
+c <!-- Sidebar wrapper starts -->
  <nav id="sidebar" class="sidebar-wrapper">
 
 <!-- App brand starts -->
@@ -26,10 +26,10 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="students">Student Details</a>
+          <a href="/tps-rms/students">Student Details</a>
         </li>
         <li>
-          <a href="students/registration">Student Registration</a>
+          <a href="students/create">Student Registration</a>
         </li>
       </ul>
     </li>
@@ -47,6 +47,27 @@
         </li>
       </ul>
     </li>
+    <li class="treeview">
+      <a href="#!">
+        <i class="bi bi-bar-chart-line"></i>
+        <span class="menu-text">Attendences</span>
+      </a>
+      <ul class="treeview-menu">
+        <li>
+          <a href="/tps-rms/attendences/type/1">Morning</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/2">Master Parade</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/3">Night</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/4">Flag</a>
+        </li>
+      </ul>
+    </li>
+
     <li>
       <a href="#">
         <i class="bi bi-send"></i>
@@ -119,20 +140,23 @@
         </li>
       </ul>
     </li>
+    <li>
+      <a href="{{ route('users.index') }}">
+        <i class="bi bi-border-all"></i>
+        <span class="menu-text">Users</span>
+      </a>
+    </li>
     <li class="treeview">
       <a href="#!">
-        <i class="bi bi-window-sidebar"></i>
-        <span class="menu-text">Invoices</span>
+        <i class="bi bi-ui-checks-grid"></i>
+        <span class="menu-text">Roles &amp; Permission</span>
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">Create Invoice</a>
+          <a href="{{ route('roles.index') }}">Roles</a>
         </li>
         <li>
-          <a href="#">View Invoice</a>
-        </li>
-        <li>
-          <a href="#">Invoice List</a>
+          <a href="#">Permission</a>
         </li>
       </ul>
     </li>
@@ -144,20 +168,6 @@
     </li>
     <li class="treeview">
       <a href="#!">
-        <i class="bi bi-ui-checks-grid"></i>
-        <span class="menu-text">Roles &amp; Permission</span>
-      </a>
-      <ul class="treeview-menu">
-        <li>
-          <a href="#">Roles</a>
-        </li>
-        <li>
-          <a href="#">Permission</a>
-        </li>
-      </ul>
-    </li>
-    <li class="treeview">
-      <a href="#!">
         <i class="bi bi-gear"></i>
         <span class="menu-text">Settings</span>
       </a>
@@ -166,7 +176,7 @@
           <a href="#">General Settings</a>
         </li>
         <li>
-          <a href="#">Session Settings</a>
+          <a href="{{ route('session_programmes.index') }}">Session Settings</a>
         </li>
         <li>
           <a href="#">Notification Setting</a>
