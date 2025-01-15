@@ -17,94 +17,136 @@
 
 @endsection
 @section('content')
-<form action="{{url('attendences/'.$platoon.'/store')}}" method="POST">
+<form action="
+    @if(isset($attendence))
+    {{url('attendences/'.$attendence->id.'/update')}}
+    @else
+        {{url('attendences/'.$platoon.'/store')}}
+    @endif
+
+" method="POST">
     @csrf
     @method('POST')
     <div class="row gx-4">
+    <div class="col-sm-4 col-12">
+    <div class="m-0">
+            <label for="">Type </label>
+            <select style="height:50%; width:40%;" class="form-select" name="type" id="abc4" required aria-label="Default select example">
+                 @foreach ($attendenceTypes as $attendenceType)
+                    <option 
+                    @if(isset($attendence) && $attendenceType->id == $attendence->attendenceType_id) 
+                        selected
+                    @endif
+                    value="{{$attendenceType->id}}">{{$attendenceType->name}}</option>
+                 @endforeach
+            </select>
+            </div>
+            </div>
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">Present </label>
-                <input  style="width: 40%" type="number" class="form-control" id="present" name="present" required
+                <input @if(isset($attendence))
+                        value="{{$attendence->present}}"
+                      @endif style="width: 40%" type="number" class="form-control" id="present" name="present" required
                     placeholder="present">
             </div>
         </div>
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">Sentry </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="sentry" name="sentry"
+                <input @if(isset($attendence))
+                        value="{{$attendence->sentry}}"
+                      @else
+                        value="0" 
+                     @endif style="width: 40%" type="number" class="form-control" id="sentry" name="sentry"
                     placeholder="Sentry">
             </div>
         </div>
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">Absent </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="absent" name="absent"
+                <input @if(isset($attendence))
+                        value="{{$attendence->absent}}"
+                      @else
+                        value="0" 
+                     @endif  style="width: 40%" type="number" class="form-control" id="absent" name="absent"
                     placeholder="absent">
-            </div>
-        </div>
-        <div class="col-sm-4 col-12">
-            <div class="m-0">
-                <label class="form-label" for="abc">Excuse Duty </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="excuse_duty" name="excuse_duty"
-                    placeholder="Excuse Duty">
-            </div>
-        </div>
-        <div class="col-sm-4 col-12">
-            <div class="m-0">
-                <label class="form-label" for="abc">Kazini </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="kazini" name="kazini"
-                    placeholder="Kazini">
             </div>
         </div>
 
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">ADM </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="adm" name="adm" placeholder="adm">
+                <input @if(isset($attendence))
+                        value="{{$attendence->adm}}"
+                      @else
+                        value="0" 
+                     @endif style="width: 40%" type="number" class="form-control" id="adm" name="adm" placeholder="adm">
             </div>
         </div>
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">Safari </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="safari" name="safari"
+                <input @if(isset($attendence))
+                        value="{{$attendence->safari}}"
+                      @else
+                        value="0" 
+                     @endif value="0" style="width: 40%" type="number" class="form-control" id="safari" name="safari"
                     placeholder="Safari">
             </div>
         </div>
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">Off </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="off" name="off" placeholder="Off">
+                <input @if(isset($attendence))
+                        value="{{$attendence->off}}"
+                      @else
+                        value="0" 
+                     @endif value="0" style="width: 40%" type="number" class="form-control" id="off" name="off" placeholder="Off">
             </div>
         </div>
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">Mess </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="mess" name="mess" placeholder="Mess">
+                <input @if(isset($attendence))
+                        value="{{$attendence->mess}}"
+                      @else
+                        value="0" 
+                     @endif value="0" style="width: 40%" type="number" class="form-control" id="mess" name="mess" placeholder="Mess">
             </div>
         </div>
-        <div class="col-sm-4 col-12">
-            <div class="m-0">
-                <label class="form-label" for="abc">Sick </label>
-                <input value="0" style="width: 40%" type="number" class="form-control" id="sick" name="sick" placeholder="Sick">
-            </div>
-        </div>
+        
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">Male </label>
-                <input  style="width: 40%" type="number" class="form-control" id="male" name="male" placeholder="Male">
+                <input @if(isset($attendence))
+                        value="{{$attendence->male}}"
+                      @else
+                        value="0" 
+                     @endif  style="width: 40%" type="number" class="form-control" id="male" name="male" placeholder="Male">
             </div>
         </div>
         <div class="col-sm-4 col-12">
             <div class="m-0">
                 <label class="form-label" for="abc">Female </label>
-                <input style="width: 40%" type="number" class="form-control" id="female" name="female"
+                <input @if(isset($attendence))
+                        value="{{$attendence->female}}"
+                      @else
+                        value="0" 
+                     @endif style="width: 40%" type="number" class="form-control" id="female" name="female"
                     placeholder="Female">
             </div>
         </div>
-
+        @if(isset($attendence))
         <div class="d-flex gap-2 justify-content-end">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        @else
+        <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        @endif
+
     </div>
 </form>
 @endsection

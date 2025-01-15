@@ -13,4 +13,5 @@ class Company extends Model
     public function platoons(){
         return $this->hasMany(Platoon::class,'company_id','id');
     }
+
 }

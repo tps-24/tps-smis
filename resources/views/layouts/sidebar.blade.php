@@ -47,12 +47,27 @@ c <!-- Sidebar wrapper starts -->
         </li>
       </ul>
     </li>
-    <li>
-      <a href="/tps-rms/attendences">
+    <li class="treeview">
+      <a href="#!">
         <i class="bi bi-bar-chart-line"></i>
         <span class="menu-text">Attendences</span>
       </a>
+      <ul class="treeview-menu">
+        <li>
+          <a href="/tps-rms/attendences/type/1">Morning</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/2">Master Parade</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/3">Night</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/4">Flag</a>
+        </li>
+      </ul>
     </li>
+
     <li>
       <a href="#">
         <i class="bi bi-send"></i>

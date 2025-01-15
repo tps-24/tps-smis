@@ -13,6 +13,8 @@ use App\Http\Controllers\AttendenceController;
 
 require __DIR__ . '/auth.php';
 
+Route::get('students', [StudentController::class, 'index']);
+
 Route::get('/', function () {
     $role = Auth::user()->role_id;
     if($role == 1){
@@ -82,12 +84,15 @@ Route::group(['middleware' => ['auth']], function () {
 
 
 Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+    Route::get('type/{type_id}', 'attendence');
     Route::post('create', 'create');
+    Route::get('edit/{id}', 'edit');
     Route::post('{id}/store', 'store');
-    Route::get('today','today');
+    Route::post('{id}/update', 'update');
+    Route::get('today/{company_id}','today_attendence');
 });
 
 
-Route::get('today', [AttendenceController::class, 'today']);
+Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today']);
 Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');

@@ -7,22 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 class Attendence extends Model
 {
    protected $fillable =[
+   'attendenceType_id',
     'platoon_id',
     'present',
     'sentry',
     'absent',
-    'excuse_duty',
-    'kazini',
     'adm',
     'safari',
     'off',
     'mess',
-    'sick',
     'female',
     'male',
     'total'
    ]; 
    public function platoon(){
       return $this->belongsTo(Platoon::class, 'platoon_id','id');
+   }
+   public function type(){
+      return $this->belongsTo(AttendenceType::class, 'attendenceType_id','id');
    }
 }
