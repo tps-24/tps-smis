@@ -22,7 +22,7 @@
       <!-- Auth container starts -->
       <div class="auth-container">
 
-        <div class="d-flex justify-content-center" style="margin-top:100px">
+        <div class="d-flex justify-content-center" style="margin-top:10">
 
           <!-- Form starts -->
           <form method="POST" action="{{ route('login') }}">

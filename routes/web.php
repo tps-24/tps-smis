@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
@@ -9,11 +10,13 @@ use App\Http\Controllers\SessionProgrammeController;
 use App\Http\Controllers\ProgrammeController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ProductController;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\StudentController;
-
+use App\Http\Controllers\AttendenceController;
+use App\Http\Controllers\PatientController;
 
 require __DIR__ . '/auth.php';
+
+Route::get('students', [StudentController::class, 'index']);
 
 Route::get('/', function () {
     // $role = Auth::user()->role_id;
@@ -49,6 +52,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('courses', CourseController::class);
     Route::resource('products', ProductController::class);
     Route::resource('students', StudentController::class);  
+    Route::resource('attendences', AttendenceController::class);
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
 
@@ -74,6 +78,7 @@ Route::group(['middleware' => ['auth']], function () {
          * End of wizard for student registration
          */
 
+        
 
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
@@ -85,6 +90,23 @@ Route::group(['middleware' => ['auth']], function () {
 
 });
 
+
+Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+    Route::get('type/{type_id}', 'attendence');
+    Route::post('create', 'create');
+    Route::get('edit/{id}', 'edit');
+    Route::post('{id}/store', 'store');
+    Route::post('{id}/update', 'update');
+    Route::get('today/{company_id}','today_attendence');
+});
+
+
+Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today']);
 Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+
+Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
+Route::post('/patients/{id}/update', [PatientController::class, 'updateStatus'])->name('update.patient.status');

@@ -20,7 +20,7 @@ class BulkImportStudents implements ToCollection, ToModel
     public function model(array $row)
     {
         $this->num++;
-        if($this->num>1){
+        if($this->num>5){
             $student = new Student();
             $student->force_number = $row[0];
             $student->first_name = $row[1];

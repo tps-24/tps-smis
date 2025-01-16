@@ -51,6 +51,33 @@ c <!-- Sidebar wrapper starts -->
     </li>
     <li class="treeview">
       <a href="#!">
+        <i class="bi bi-bar-chart-line"></i>
+        <span class="menu-text">Attendences</span>
+      </a>
+      <ul class="treeview-menu">
+        <li>
+          <a href="/tps-rms/attendences/type/1">Morning</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/2">Master Parade</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/3">Night</a>
+        </li>
+        <li>
+          <a href="/tps-rms/attendences/type/4">Flag</a>
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <a href="#">
+        <i class="bi bi-send"></i>
+        <span class="menu-text">Print Certificate(s)</span>
+      </a>
+    </li>
+    <li class="treeview">
+      <a href="#!">
         <i class="bi bi-box"></i>
         <span class="menu-text">Academics</span>
       </a>
@@ -119,7 +146,7 @@ c <!-- Sidebar wrapper starts -->
       </a>
     </li> -->
     <li>
-      <a href="#">
+      <a href="hospital">
         <i class="bi bi-calendar2"></i>
         <span class="menu-text">Hospital</span>
       </a>
