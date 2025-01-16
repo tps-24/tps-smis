@@ -45,8 +45,8 @@ class RoleController extends Controller
      */
     public function create(): View
     {
-        $permission = Permission::get();
-        return view('roles.create',compact('permission'));
+        $permissions = Permission::orderBy('description')->get();
+        return view('roles.create',compact('permissions'));
     }
     
     /**
@@ -95,16 +95,25 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id): View
-    {
-        $role = Role::find($id);
-        $permission = Permission::get();
-        $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id",$id)
-            ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
-            ->all();
+    // public function edit($id): View
+    // {
+    //     $role = Role::find($id);
+    //     $permission = Permission::get();
+    //     $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id",$id)
+    //         ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
+    //         ->all();
     
-        return view('roles.edit',compact('role','permission','rolePermissions'));
-    }
+    //     return view('roles.edit',compact('role','permission','rolePermissions'));
+    // }
+
+    public function edit($id):View
+{
+    $role = Role::find($id);
+    $permissions = Permission::orderBy('description')->get();
+    $rolePermissions = $role->permissions->pluck('id')->toArray(); // Get user's current permissions
+    return view('roles.edit', compact('role', 'permissions', 'rolePermissions'));
+}
+
     
     /**
      * Update the specified resource in storage.

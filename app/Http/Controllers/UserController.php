@@ -70,11 +70,32 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function show($id): View
     {
         $user = User::find($id);
 
         return view('users.show',compact('user'));
+    }
+    
+        /**
+     * Displaying user profile.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+     public function profile($id):View
+     {
+         $user = User::find($id);
+         return view('users.profile',compact('user'));
+     }
+    
+
+    public function changePassword($id): View
+    {
+        $user = User::find($id);
+        return view('users.changePassword',compact('user'));
     }
     
     /**

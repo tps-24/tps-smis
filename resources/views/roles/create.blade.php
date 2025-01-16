@@ -6,8 +6,8 @@
   <div class="container-fluid">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Roles</a></li>
+        <li class="breadcrumb-item"><a href="{{ url('/') }}" id="homee">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
         <li class="breadcrumb-item active" aria-current="page"><a href="#">Roles Create</a></li>
       </ol>
     </nav>
@@ -18,7 +18,7 @@
 @section('content')
 <!-- Row starts -->
 <div class="row gx-4">
-    <div class="col-sm-4 col-12">
+    <div class="col-sm-9 col-12">
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
@@ -48,22 +48,20 @@
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
-                                <strong>Name:</strong>
+                                <strong>Role Name:</strong>
                                 <input type="text" name="name" placeholder="Name" class="form-control">
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-12 col-md-12">
-                            <div class="form-group">
-                                <strong>Permission:</strong>
+                        <div class="col-xs-12 col-sm-12 col-md-12" style="margin-top:30px">
+                           
+                            <div class="row">
+                            <strong>Permission:</strong>
                                 <br/>
-                                @foreach($permission as $value)
-                                    <label><input type="checkbox" name="permission[{{$value->id}}]" value="{{$value->id}}" class="name">
-                                    {{ $value->name }}</label>
-                                <br/>
-                                @endforeach
-                            </div>
+                                 @foreach($permissions->chunk(ceil($permissions->count() / 4)) as $chunk) <div class="col-md-3"> @foreach($chunk as $permission) <div class="form-check"> <input class="form-check-input" type="checkbox" name="permission[$permission->id ]" value="{{ $permission->id }}" id="permission-{{ $permission->id }}"> <label class="form-check-label" for="permission-{{ $permission->id }}"> {{ $permission->description }} </label> </div> @endforeach </div> @endforeach </div>
+
+
                         </div>
-                        <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+                        <div class="col-xs-12 col-sm-12 col-md-12 text-center" style="margin-top:30px">
                             <button type="submit" class="btn btn-primary btn-sm mb-3"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
                         </div>
                     </div>
@@ -72,7 +70,7 @@
         </div>     
     </div>
   
-    <div class="col-sm-8 col-12">
+    <div class="col-sm-3 col-12">
         <div class="card mb-8">
             <div class="card-body">
             </div>

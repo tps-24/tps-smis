@@ -6,6 +6,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SessionProgrammeController;
+use App\Http\Controllers\ProgrammeController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\StudentController;
@@ -14,20 +16,21 @@ use App\Http\Controllers\StudentController;
 require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
-    $role = Auth::user()->role_id;
-    if($role == 1){
-        return view('dashboard/dashboard');
-    }
-    elseif($role == 2){
-        return view('/students/dashboard');
-    }
-    //return view('dashboard/dashboard');
+    // $role = Auth::user()->role_id;
+    // if($role == 1){
+    //     return view('dashboard/dashboard');
+    // }
+    // elseif($role == 2){
+    //     return view('/students/dashboard');
+    // }
+    return view('dashboard/dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
 // Route::get('/', function () {
 //     return view('dashboard/dashboard');
 // });
+
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -42,8 +45,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UserController::class);
     Route::resource('session_programmes', SessionProgrammeController::class);
+    Route::resource('programmes', ProgrammeController::class);
+    Route::resource('courses', CourseController::class);
     Route::resource('products', ProductController::class);
-    Route::resource('students', StudentController::class);
+    Route::resource('students', StudentController::class);  
+    Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
+    Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         /**
@@ -79,4 +86,5 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 Auth::routes();
+
 Route::get('/home', [HomeController::class, 'index'])->name('home');

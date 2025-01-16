@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Department;
 
 class Course extends Model
 {
-    /** @use HasFactory<\Database\Factories\CourseFactory> */
-    use HasFactory;
-    protected $fillable = ['courseCode', 'courseName'];
+    protected $fillable = ['programmeName', 'abbreviation', 'duration', 'department_id', 'studyLevel_id'];
+
+    public function department() 
+    { 
+        return $this->belongsTo(Department::class); 
+    }
 }

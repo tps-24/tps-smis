@@ -19,6 +19,7 @@ c <!-- Sidebar wrapper starts -->
         <span class="menu-text">Dashboard</span>
       </a>
     </li>
+    @can('student-list')
     <li class="treeview">
       <a href="#!">
         <i class="bi bi-box"></i>
@@ -33,6 +34,7 @@ c <!-- Sidebar wrapper starts -->
         </li>
       </ul>
     </li>
+    @endcan()
     <li class="treeview">
       <a href="#!">
         <i class="bi bi-box"></i>
@@ -47,12 +49,6 @@ c <!-- Sidebar wrapper starts -->
         </li>
       </ul>
     </li>
-    <li>
-      <a href="#">
-        <i class="bi bi-send"></i>
-        <span class="menu-text">Print Certificate(s)</span>
-      </a>
-    </li>
     <li class="treeview">
       <a href="#!">
         <i class="bi bi-box"></i>
@@ -60,17 +56,33 @@ c <!-- Sidebar wrapper starts -->
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">View Modules</a>
+          <a href="{{ route('programmes.index') }}">Programmes</a>
         </li>
         <li>
-          <a href="#">Module Registration</a>
+          <a href="{{ route('courses.index') }}">Courses</a>
         </li>
       </ul>
     </li>
+    @can('coursework-list')
     <li class="treeview">
       <a href="#!">
         <i class="bi bi-stickies"></i>
-        <span class="menu-text">Examination</span>
+        <span class="menu-text">Course work</span>
+      </a>
+      <ul class="treeview-menu">
+        <li>
+          <a href="#">semester 1</a>
+        </li>
+        <li>
+          <a href="#">semester 2</a>
+        </li>
+      </ul>
+    </li>
+    @endcan()
+    <li class="treeview">
+      <a href="#!">
+        <i class="bi bi-stickies"></i>
+        <span class="menu-text">Examination (UE)</span>
       </a>
       <ul class="treeview-menu">
         <li>
@@ -83,10 +95,29 @@ c <!-- Sidebar wrapper starts -->
     </li>
     <li>
       <a href="#">
+        <i class="bi bi-send"></i>
+        <span class="menu-text">Print Certificate(s)</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="#">
+        <i class="bi bi-send"></i>
+        <span class="menu-text">Announcements</span>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <i class="bi bi-download"></i>
+        <span class="menu-text">Download Center</span>
+      </a>
+    </li>
+    <!-- <li>
+      <a href="#">
         <i class="bi bi-globe"></i>
         <span class="menu-text">Hostel</span>
       </a>
-    </li>
+    </li> -->
     <li>
       <a href="#">
         <i class="bi bi-calendar2"></i>
@@ -140,7 +171,7 @@ c <!-- Sidebar wrapper starts -->
       </ul>
     </li>
     <li>
-      <a href="tables.html">
+      <a href="#">
         <i class="bi bi-border-all"></i>
         <span class="menu-text">Reports</span>
       </a>
@@ -177,5 +208,4 @@ c <!-- Sidebar wrapper starts -->
 <!-- Sidebar menu ends -->
 
 </nav>
-
-        <!-- Sidebar wrapper ends -->
+<!-- Sidebar wrapper ends -->

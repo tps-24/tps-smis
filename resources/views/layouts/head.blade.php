@@ -1,13 +1,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TPS - RMS</title>
+    <title>TPS - SMIS</title>
 
     <!-- Meta -->
     <meta name="description" content="System for facilitating essential functions of TPS Administration" />
     <meta name="author" content="Tanzania Police School" />
-    <link rel="canonical" href="http://localhost:8081/tps-rms/">
-    <meta property="og:url" content="http://localhost:8081/tps-rms/">
+    <link rel="canonical" href="http://localhost:8081/tps-smis/">
+    <meta property="og:url" content="http://localhost:8081/tps-smis/">
     <meta property="og:title" content="TPS - Moshi | Tanzania Police School">
     <meta property="og:description" content="System for facilitating essential functions of TPS Administration">
     <meta property="og:type" content="Management System">
@@ -35,6 +35,6 @@
       .table-responsive td, .table-responsive th { 
         font-weight: normal;
       }
-
     </style>
+    @yield('style')
   </head>

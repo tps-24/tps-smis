@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-// use Illuminate\Http\Request;
 use App\Models\Programme;
-use App\Http\Requests\StoreProgrammeRequest;
-use App\Http\Requests\UpdateProgrammeRequest;
-use DB;
+use Illuminate\Http\Request;
+use App\Models\Department;
+use App\Models\StudyLevel;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use DB;
 
 class ProgrammeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): View
     {
-        $session_programmes = Programme::orderBy('id','DESC')->paginate(5);
-        return view('session_programmes.index',compact('session_programmes'))
+        $studyLevels = StudyLevel::get();
+        $programmes = Programme::orderBy('id','DESC')->paginate(5);
+        return view('programmes.index',compact('programmes','studyLevels'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
@@ -27,22 +28,25 @@ class ProgrammeController extends Controller
      */
     public function create()
     {
-        return view('session_programmes.create');
+        $departments = Department::get();
+        $studylevels = StudyLevel::get();
+        return view('programmes.create',compact('departments', 'studylevels'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProgrammeRequest $request)
+    public function store(Request $request)
     {
         $this->validate($request, [
-            'programme_name' => 'required|unique:session_programmes,programme_name',
-            'year' => 'required',
+            'programmeName' => 'required|unique:programmes,programmeName',
+            'abbreviation' => 'required',
+            'duration' => 'required',
         ]);
     
         Programme::create($request->all());
     
-        return redirect()->route('session_programmes.index')
+        return redirect()->route('programmes.index')
                         ->with('success','Session programme created successfully');
     }
 
@@ -51,30 +55,43 @@ class ProgrammeController extends Controller
      */
     public function show(Programme $programme)
     {
-        return view('session_programmes.show',compact('session_programme'));
+        $departmentName = Department::WHERE('id' , $programme->department_id)->pluck('departmentName');
+        $studyLevelName = StudyLevel::WHERE('id' , $programme->studyLevel_id)->pluck('studyLevelName');
+        return view('programmes.show',compact('departmentName','programme', 'studyLevelName'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Programme $programme)
+    public function edit(Programme $programme): View
     {
-        return view('session_programmes.edit',compact('session_programme'));
+        $departments = Department::get();
+        $studylevels = StudyLevel::get();
+        return view('programmes.edit',compact('programme', 'departments', 'studylevels'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProgrammeRequest $request, Programme $programme)
+    public function update(Request $request, $id): RedirectResponse
     {
-        request()->validate([
-            'programme_name' => 'required|unique:session_programmes,programme_name',
-            'year' => 'required',
-       ]);
+        // Retrieve the programme by its ID 
+        $programme = Programme::findOrFail($id); 
+        // Validate the incoming request 
+        $validatedData = $request->validate([ 
+            'programmeName' => 'required|unique:programmes,programmeName,' . $id, 
+            'abbreviation' => 'required', 
+            'duration' => 'required|integer', 
+            'department_id' => 'required|exists:departments,id', 
+            'studyLevel_id' => 'required|exists:study_levels,id', 
+        ]); 
+
+        // dd($validatedData);
+        // Update the programme with validated data 
+
+        $programme->update($validatedData);
    
-       $session_programme->update($request->all());
-   
-       return redirect()->route('session_programmes.index')
+        return redirect()->route('programmes.index')
                        ->with('success','Session programme updated successfully');
     }
 
@@ -83,9 +100,9 @@ class ProgrammeController extends Controller
      */
     public function destroy(Programme $programme)
     {
-        $product->delete();
+        $programme->delete();
     
-        return redirect()->route('session_programmes.index')
+        return redirect()->route('programmes.index')
                         ->with('success','Session programme deleted successfully');
     }
 }

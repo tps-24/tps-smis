@@ -186,10 +186,10 @@
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end shadow-lg">
-                    <a class="dropdown-item d-flex align-items-center" href="#"><i
+                    <a class="dropdown-item d-flex align-items-center" href="{{ url('/profile/' . Auth::user()->id) }}"><i
                             class="bi bi-person fs-4 me-2"></i>My Profile</a>
-                    <a class="dropdown-item d-flex align-items-center" href="#"><i
-                            class="bi bi-gear fs-4 me-2"></i>Account Settings</a>
+                    <a class="dropdown-item d-flex align-items-center" href="{{ url('/profile/change-password/' . Auth::user()->id) }}"><i
+                            class="bi bi-gear fs-4 me-2"></i>Change Password</a>
                     <div class="mx-3 my-2 d-grid">
                         <a href="{{ route('logout') }}" class="btn btn-warning" 
                         onclick="event.preventDefault();
