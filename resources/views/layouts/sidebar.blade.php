@@ -29,7 +29,7 @@ c <!-- Sidebar wrapper starts -->
           <a href="/tps-rms/students">Student Details</a>
         </li>
         <li>
-          <a href="students/create">Student Registration</a>
+          <a href="/tps-rms/students/create">Student Registration</a>
         </li>
       </ul>
     </li>
@@ -115,7 +115,7 @@ c <!-- Sidebar wrapper starts -->
       </a>
     </li>
     <li>
-      <a href="#">
+      <a href="/tps-rms/mps">
         <i class="bi bi-wallet2"></i>
         <span class="menu-text">MPS</span>
       </a>

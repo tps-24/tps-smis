@@ -91,11 +91,13 @@ class StudentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Request $request,$id)
     {
         $student = Student::find($id);
+        $request->session()->put('student', $student);
         $page_name = "Edit Student Details";
-        return view('students.edit',compact('student', 'page_name'));
+        return view('students/wizards/stepOne',compact('student'));
+       // return view('students.edit',compact('student', 'page_name'));
     }
 
     /**
@@ -126,7 +128,6 @@ class StudentController extends Controller
         if ($validator->errors()->any()){
             return redirect()->back()->withErrors($validator->errors());//->with('success',$validator->errors());
         }
-//dd($request->all());
         $student->update([
             'force_number' => $request->force_number,
             'education_level'=> $request->education_level,
@@ -179,9 +180,10 @@ class StudentController extends Controller
         return back()->with('success', 'Students Uploaded  successfully.');
     }
 
-    public function postStepOne(Request $request)
+    public function postStepOne(Request $request, $type)
     {
         $validatedData = $request->validate([
+            'force_number'=>'nullable',
             'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'last_name'=> 'required|max:30|alpha|regex:/^[A-Z]/',
@@ -198,42 +200,48 @@ class StudentController extends Controller
             $student->fill($validatedData);
             $request->session()->put('student', $student);
         }
-        
-        return redirect('students/create/step-two');
+        if($type == "edit"){
+            return view('students/wizards.stepTwo', compact('student'));
+        }
+        return redirect('students/create/step-two/'.$type, );
     }
 
-    public function createStepTwo(Request $request)
+    public function createStepTwo(Request $request) 
     {
         $student = $request->session()->get('student');
   
         return view('students.wizards.stepTwo',compact('student'));
     }
 
-    public function postStepTwo(Request $request)
+    public function postStepTwo(Request $request, $type)
     {
+        $student = $request->session()->get('student');
         $validatedData = $request->validate([
-            'phone' => 'nullable|numeric|digits:10|unique:students',
-            'nin'=> 'required|numeric|unique:students',
+            'phone' => 'nullable|numeric|digits:10|unique:students,phone,'.$student->id.',id',
+            'nin'=> 'required|numeric|unique:students,nin,'.$student->id.',id',
             'dob' => 'required|string',
             'gender' => 'required|max:1|alpha|regex:/^[M,F]/',
             'company' => 'required|max:2|alpha',
             'platoon' => 'required|max:1',
         ]);
-        $student = $request->session()->get('student');
+        
         $student->fill($validatedData);
        $request->session()->put('student', $student);
-        return redirect('students/create/step-three');
+       if($type == "create"){
+        return view('students.wizards.stepThree');
+       }
+        return view('students.wizards.stepThree',compact('student'));
         
     }
 
     public function createStepThree(Request $request)
     {
         $student = $request->session()->get('student');
-  
+        
         return view('students.create-step-three',compact('student'));
     }
  
-    public function postStepThree(Request $request)
+    public function postStepThree(Request $request, $type)
     {
         $validatedData = $request->validate([
             'next_kin_phone' => 'nullable|numeric|digits:10',
@@ -249,6 +257,8 @@ class StudentController extends Controller
         $student->save();
   
         $request->session()->forget('student');
-        return redirect()->route('students.index')->with('success','Student created successfully.');
+
+        //return $this->index();
+        return redirect()->route('students.index')->with('success','Student '.$type.'d successfully.');
     }
 }

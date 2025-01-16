@@ -223,4 +223,10 @@ class AttendenceController extends Controller
         return view('attendences/index', compact('statistics', 'companies','page'));
     }
 
+    public function getMPSdata(){
+        $mpsData = [];
+        $mpsStudent = MPS::all();
+
+    }
+
 }

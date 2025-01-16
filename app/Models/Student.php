@@ -32,4 +32,7 @@ class Student extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+    public function mps(){
+        return $this->hasMany(MPS::class,'student_id','id');
+    }
 }

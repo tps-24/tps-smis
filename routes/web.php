@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AttendenceController;
+use App\Http\Controllers\MPSController;
 
 require __DIR__ . '/auth.php';
 
@@ -47,6 +48,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('products', ProductController::class);
     Route::resource('students', StudentController::class);
     Route::resource('attendences', AttendenceController::class);
+    Route::resource('mps', MPSController::class);
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         /**
@@ -56,21 +58,19 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('/', function () {
                 return view('students/wizards/stepOne');
             });
-            Route::get('step-two', function () {
+            Route::get('step-two/{type}', function () {
                 return view('students/wizards/stepTwo');
             });
             Route::get('step-three', function () {
                 return view('students/wizards/stepThree');
             });
-            Route::post('post-step-one','postStepOne');
-            Route::post('post-step-two','postStepTwo');
-            Route::post('post-step-three','postStepThree');
+            Route::post('post-step-one/{type}','postStepOne');
+            Route::post('post-step-two/{type}','postStepTwo');
+            Route::post('post-step-three/{type}','postStepThree');
         });
         /**
          * End of wizard for student registration
          */
-
-        
 
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
@@ -78,6 +78,12 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('bulkimport', 'import');
 
 
+    });
+
+    Route::controller(MPSController::class)->prefix('mps')->group(function(){
+        Route::post('search','search');
+        Route::post('store/{id}','store');
+        Route::post('release/{id}','release');
     });
 
 });
