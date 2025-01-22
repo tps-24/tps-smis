@@ -67,6 +67,18 @@
                         </div>
                         <div class="col-xs-6 col-sm-6 col-md-12">
                             <div class="form-group">
+                                <strong>Start Date:</strong>
+                                <input type="date" name="startDate" placeholder="Enter Start Date" class="form-control" value="{{ $session_programme->startDate ?? ''}}">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-12">
+                            <div class="form-group">
+                                <strong>End Date:</strong>
+                                <input type="date" name="endDate" placeholder="Enter End Date" class="form-control" value="{{ $session_programme->endDate ?? '' }}">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-12">
+                            <div class="form-group">
                                 <strong>Is Current:</strong>
                                 <select name="is_current" class="form-control">
                                     if($session_programme->is_current == 1){

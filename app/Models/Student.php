@@ -32,4 +32,14 @@ class Student extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    // public function courses() 
+    // { 
+    //     return $this->belongsToMany(Course::class, 'enrollments'); 
+    // }
+
+    public function optionalCourseEnrollments() 
+    { 
+        return $this->hasMany(OptionalCourseEnrollment::class); //Optional enrollments
+    }
 }

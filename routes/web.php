@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
@@ -14,18 +15,22 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AttendenceController;
 use App\Http\Controllers\PatientController;
 
+use App\Http\Controllers\GradingSystemController; 
+use App\Http\Controllers\GradeMappingController;
+use App\Http\Controllers\SemesterController; 
+use App\Http\Controllers\ProgrammeCourseSemesterController;
+use App\Http\Controllers\OptionalCourseEnrollmentController; 
+use App\Http\Controllers\CourseWorkController; 
+use App\Http\Controllers\SemesterExamController; 
+use App\Http\Controllers\CourseworkResultController; 
+use App\Http\Controllers\SemesterExamResultController; 
+use App\Http\Controllers\FinalResultController; 
+
 require __DIR__ . '/auth.php';
 
 Route::get('students', [StudentController::class, 'index']);
 
 Route::get('/', function () {
-    // $role = Auth::user()->role_id;
-    // if($role == 1){
-    //     return view('dashboard/dashboard');
-    // }
-    // elseif($role == 2){
-    //     return view('/students/dashboard');
-    // }
     return view('dashboard/dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -39,7 +44,13 @@ Route::get('/', function () {
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => 'session_programme'], function () {
+    // Add more routes as needed
+});
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/students/dashboard', function () {
         return view('students/dashboard');
     });
@@ -53,8 +64,27 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('products', ProductController::class);
     Route::resource('students', StudentController::class);  
     Route::resource('attendences', AttendenceController::class);
+
+    
+    Route::resource('grading_systems', GradingSystemController::class); 
+    Route::resource('grade_mappings', GradeMappingController::class);
+    Route::resource('semesters', SemesterController::class);
+    Route::resource('assign-courses', ProgrammeCourseSemesterController::class);
+    Route::resource('enrollments', OptionalCourseEnrollmentController::class); 
+    Route::resource('course_works', CourseWorkController::class); 
+    Route::resource('semester_exams', SemesterExamController::class); 
+    Route::resource('coursework_results', CourseworkResultController::class); 
+    Route::resource('semester_exam_results', SemesterExamResultController::class); 
+    Route::resource('final_results', FinalResultController::class);
+    Route::post('/programmes/{programmeId}/semesters/{semesterId}/session/{sessionProgrammeId}/assign-courses', 
+       [ProgrammeController::class, 'assignCoursesToSemester']); 
+    Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate'); 
+
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
+
+
+
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         /**

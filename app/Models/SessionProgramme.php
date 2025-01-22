@@ -15,6 +15,11 @@ class SessionProgramme extends Model
      * @var array
      */
     protected $fillable = [
-        'programme_name','description','year','is_current', 'is_active'
+        'programme_name','description','year','startDate','endDate','is_current','is_active'
     ];
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }

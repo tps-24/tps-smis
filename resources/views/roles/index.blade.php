@@ -19,7 +19,7 @@
 @section('content')
 <!-- Row starts -->
 <div class="row gx-4">
-  <div class="col-sm-12">
+  <div class="col-sm-8 col-12">
     <div class="card mb-3">
       <div class="card-header">
         <!-- <h5 class="card-title">Roles Management</h5> -->
@@ -72,6 +72,13 @@
         </div>
       </div>
     </div>
+  </div>
+  
+  <div class="col-sm-4 col-12">
+        <div class="card mb-8">
+            <div class="card-body">
+            </div>
+        </div>
   </div>
 </div>
 <!-- Row ends -->

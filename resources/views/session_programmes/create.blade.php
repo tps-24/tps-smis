@@ -62,6 +62,18 @@
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
+                            <strong>Start Date:</strong>
+                            <input type="date" name="startDate" placeholder="Enter Start Date" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-12">
+                        <div class="form-group">
+                            <strong>End Date:</strong>
+                            <input type="date" name="endDate" placeholder="Enter End Date" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-12">
+                        <div class="form-group">
                             <strong>Is Current:</strong>
                             <select name="is_current" class="form-control">
                                     <option value="1">Yes</option>

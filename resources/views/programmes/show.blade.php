@@ -17,7 +17,7 @@
 @section('content')
 <!-- Row starts -->
 <div class="row gx-4">
-    <div class="col-sm-8 col-12">
+    <div class="col-sm-6 col-12">
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
@@ -25,9 +25,12 @@
                         <!-- <div class="pull-left">
                             <h2>Programme Management</h2>
                         </div> -->
-                        <!-- <h2 class="card-title" style="float:left !important; margin-left:1%">Programme Management</h2> -->
+                        <!-- <h2 class="card-title" style="float:left !important; margin-left:1%">Programme Management</h2> --> 
+
+
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('programmes.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" style="margin-left:10px" href="{{ route('programmes.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('assign-courses.create') }}"><i class="fa fa-arrow-left"></i> Configure Programme</a>
                         </div>
                     </div>
                 </div>
@@ -68,7 +71,7 @@
         </div>     
     </div>
   
-    <div class="col-sm-4 col-12">
+    <div class="col-sm-6 col-12">
         <div class="card mb-8">
             <div class="card-body">
             </div>

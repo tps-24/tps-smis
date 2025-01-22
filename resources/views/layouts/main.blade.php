@@ -62,7 +62,8 @@
     <script src="/tps-rms/resources/assets/vendor/apex/custom/analytics/sales.js"></script>
     <script src="/tps-rms/resources/assets/vendor/apex/custom/analytics/views.js"></script>
     <script src="/tps-rms/resources/assets/vendor/apex/custom/analytics/audiences.js"></script>
-    <script src="/tps-rms/resources/assets/vendor/apex/custom/analytics/orders.js"></script>
+    <!-- <script src="/tps-rms/resources/assets/vendor/apex/custom/analytics/orders.js"></script> -->
+    <script src="/tps-rms/resources/assets/vendor/apex/custom/orders/orders.js"></script>
 
     <!-- Vector Maps -->
     <script src="/tps-rms/resources/assets/vendor/jvectormap/jquery-jvectormap-2.0.5.min.js"></script>
