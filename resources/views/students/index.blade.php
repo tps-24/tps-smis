@@ -33,13 +33,16 @@
           Students</i></button>
       </form>
     </div>
-    <div class="col-4">
+    <div class="col-3">
       <!-- <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SearchStudent">search
         student</button> -->
     </div>
-    <div class="col col-lg-2">
+    <!-- <div class="col col-lg-2">
       <a class="btn btn-success btn-sm mb-2" href="{{url('students/create')}}">Create Student</a>
-    </div>
+    </div> -->
+      <div class="col-3 pull-right" >
+          <a class="btn btn-success mb-2" href="{{ url('students/create') }}" style="float:right !important; margin-right:-22px"><i class="fa fa-plus"></i> Create New Student</a>
+      </div>
   </div>
 </div>
 <div class="modal fade" id="SearchStudent" tabindex="-1" aria-labelledby="createNewContactLabel" aria-hidden="true">
@@ -118,9 +121,6 @@
       <!-- <div class="col-6">
         <a class="btn btn-success mb-2" href="{{url('students/create')}}">Create Student</a>
       </div> -->
-      <div class="pull-right" >
-          <a class="btn btn-success mb-2" href="/students/create" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Student</a>
-      </div>
     </div>
   </div>
 </div>

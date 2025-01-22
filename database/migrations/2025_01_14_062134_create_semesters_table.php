@@ -11,7 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('semesters', function (Blueprint $table) {
+            $table->id();
+            $table->string('semester_name'); // e.g., 'Semester One', 'Semester Two'
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('semesters');
     }
 };

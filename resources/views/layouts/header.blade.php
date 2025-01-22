@@ -91,11 +91,19 @@
                             </form>
                         </div>
                     </div>
-                @else
-                    <!-- If user is not authenticated, show a placeholder or message -->
-                    <span class="me-2 text-truncate d-lg-block d-none">Guest</span>
-                    <div class="icon-box md rounded-4 fw-bold bg-primary-subtle text-primary">
-                        G
+                </a>
+                <div class="dropdown-menu dropdown-menu-end shadow-lg">
+                    <a class="dropdown-item d-flex align-items-center" href="{{ url('/profile/' . Auth::user()->id) }}"><i
+                            class="bi bi-person fs-4 me-2"></i>My Profile</a>
+                    <a class="dropdown-item d-flex align-items-center" href="{{ url('/profile/change-password/' . Auth::user()->id) }}"><i
+                            class="bi bi-gear fs-4 me-2"></i>Change Password</a>
+                    <div class="mx-3 my-2 d-grid">
+                        <a href="{{ route('logout') }}" class="btn btn-warning" 
+                        onclick="event.preventDefault();
+                        document.getElementById('logout-form').submit();">Logout</a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
                     </div>
                 @endif
             </div>
