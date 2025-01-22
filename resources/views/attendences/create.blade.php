@@ -17,11 +17,12 @@
 
 @endsection
 @section('content')
+<h5>Please check absent students.</h5>
 <form action="
     @if(isset($attendence))
         {{url('attendences/' . $attendence->id . '/update')}}
     @else
-        {{url('attendences/' . $platoon->id . '/store')}}
+        {{url('attendences/'.$attendenceType->id.'/'. $platoon->id . '/store')}}
     @endif
 
 " method="POST">

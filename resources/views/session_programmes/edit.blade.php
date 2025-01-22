@@ -27,7 +27,7 @@
                             <h2>Edit Programme Session</h2>
                         </div>
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('Session_programmes.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('session_programmes.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('Session_programmes.update', $session_programme->id) }}">
+                <form method="POST" action="{{ route('session_programmes.update', $session_programme->id) }}">
                     @csrf
                     @method('PUT')
 

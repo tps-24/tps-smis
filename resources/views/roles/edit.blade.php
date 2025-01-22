@@ -20,7 +20,7 @@
 
 <!-- Row starts -->
 <div class="row gx-4">
-    <div class="col-sm-4 col-12">
+    <div class="col-sm-9 col-12">
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
@@ -57,16 +57,13 @@
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12">
-                            <div class="form-group">
-                                <strong>Permission:</strong>
+                            <strong>Permission:</strong>
                                 <br/>
-                                @foreach($permission as $value)
-                                <label><input type="checkbox" name="permission[{{$value->id}}]" value="{{$value->id}}" class="name" {{ in_array($value->id, $rolePermissions) ? 'checked' : ''}}>
-                                {{ $value->name }}</label>
-                                <br/>
-                                @endforeach
-                            </div>
+                            <div class="row"> @foreach($permissions->chunk(ceil($permissions->count() / 4)) as $chunk) <div class="col-md-3"> @foreach($chunk as $permission) <div class="form-check"> <input class="form-check-input" type="checkbox"  name="permission[{{$permission->id}}]"  value="{{ $permission->id }}" id="permission-{{ $permission->id }}" {{ in_array($permission->id, $rolePermissions) ? 'checked' : '' }}> <label class="form-check-label" for="permission-{{ $permission->id }}"> {{ $permission->description }} </label> </div> @endforeach </div> @endforeach </div>
                         </div>
+
+
+
                         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
                             <button type="submit" class="btn btn-primary btn-sm mb-3"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
                         </div>
@@ -76,7 +73,7 @@
         </div>     
     </div>
   
-    <div class="col-sm-8 col-12">
+    <div class="col-sm-3 col-12">
         <div class="card mb-8">
             <div class="card-body">
             </div>

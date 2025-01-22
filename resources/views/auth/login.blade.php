@@ -22,15 +22,15 @@
       <!-- Auth container starts -->
       <div class="auth-container">
 
-        <div class="d-flex justify-content-center" style="margin-top:100px">
+        <div class="d-flex justify-content-center" style="margin-top:10">
 
           <!-- Form starts -->
           <form method="POST" action="{{ route('login') }}">
             @csrf
             <!-- Logo starts -->
             <center>
-                <a href="/" class="auth-logo mt-5 mb-3">
-                <img src="resources/assets/images/logo.png" style="height:180 !important; width:180" alt="Police Logo" />
+                <a href="/tps-rms" class="auth-logo mt-5 mb-3">
+                <img src="resources/assets/images/logo.png" style="height:200 !important; width:200" alt="Police Logo" />
                 </a>
             </center>
             <!-- Logo ends -->
@@ -38,7 +38,7 @@
             <!-- Authbox starts -->
             <div class="auth-box">
 
-              <h4 class="mb-4" style="text-align:center; color: #072A6C">TPS - RMS</h4>
+              <h4 class="mb-4" style="text-align:center; color: #072A6C">TPS - SMIS</h4>
 
               <div class="mb-3">
                 <label class="form-label" for="email">{{ __('Username') }} <span class="text-danger">*</span></label>
@@ -73,18 +73,19 @@
                 </div>
               </div>
 
-              <div class="d-flex justify-content-end mb-3">
-                <a href="#" class="text-decoration-underline">Forgot password?</a>
-              </div>
+              <!-- <div class="d-flex justify-content-end mb-3">
+                <a href="#" class="text-decoration-underline"></a>
+              </div> -->
 
-              <div class="d-grid gap-2">
+              <div class="d-grid gap-4" style="margin-top:40px">
                 <!-- <a href="#" class="btn btn-outline-dark">Not registered? Signup</a> -->
                   <button type="submit" class="btn btn-primary">
                   {{ __('Login') }}
                   </button>
 
                   @if (Route::has('password.request'))
-                  <a class="btn btn-link" href="{{ route('password.request') }}">
+                  <!-- <a class="btn btn-link" href="{{ route('password.request') }}"> -->
+                  <a class="btn btn-link" href="#">
                       {{ __('Forgot Your Password?') }}
                   </a>
                   @endif

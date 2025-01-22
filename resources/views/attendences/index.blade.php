@@ -156,8 +156,8 @@
                                     style="height:50 !important; width:50" alt="Leave image" />
                             </div>
                             <div class="p3 d-flex flex-column">
-                                <p class="m-0 ">Leave </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['HQ']['leave']}}</h2>
+                                <p class="m-0 ">Safari </p>
+                                <h2 class="lh-1 opacity-50">{{$statistics['HQ']['safari']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -261,8 +261,8 @@
                                     style="height:50 !important; width:50" alt="Leave image" />
                             </div>
                             <div class="p3 d-flex flex-column">
-                                <p class="m-0 ">Leave </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['A']['leave']}}</h2>
+                                <p class="m-0 ">Safari </p>
+                                <h2 class="lh-1 opacity-50">{{$statistics['A']['safari']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -363,8 +363,8 @@
                                     style="height:50 !important; width:50" alt="Leave image" />
                             </div>
                             <div class="p3 d-flex flex-column">
-                                <p class="m-0 ">Leave </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['B']['leave']}}</h2>
+                                <p class="m-0 ">Safari </p>
+                                <h2 class="lh-1 opacity-50">{{$statistics['B']['safari']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -465,8 +465,8 @@
                                     style="height:50 !important; width:50" alt="Leave image" />
                             </div>
                             <div class="p3 d-flex flex-column">
-                                <p class="m-0 ">Leave </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['C']['leave']}}</h2>
+                                <p class="m-0 ">Safari </p>
+                                <h2 class="lh-1 opacity-50">{{$statistics['C']['safari']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">

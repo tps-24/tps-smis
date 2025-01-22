@@ -17,7 +17,7 @@
 
 @endsection
 @section('content')
-
+<h5>Please check absent students.</h5>
 <div class="table-responsive">
     <form action="{{url('attendences/store-absents/'.$attendence_id)}}" method="post">
         @csrf

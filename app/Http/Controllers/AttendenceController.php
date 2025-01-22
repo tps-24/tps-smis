@@ -43,7 +43,7 @@ class AttendenceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, $platoon_id)
+    public function store(Request $request,$type, $platoon_id)
     {
         $present = count($request->input('student_ids'));
         $platoon = Platoon::find($platoon_id);
@@ -53,7 +53,7 @@ class AttendenceController extends Controller
         $todayRecords = Attendence::join('platoons', 'attendences.platoon_id', 'platoons.id')
             ->where('attendences.platoon_id', $platoon_id)->whereDate('attendences.created_at', Carbon::today())->get();
         if (!$todayRecords->isEmpty()) {
-            return redirect()->route('attendences.index')->with('success', "Attendences for this platoon already recorded.");
+            return redirect()->route('attendences.index')->with('error', "Attendences for this platoon already recorded.");
         }
         // $validator = Validator::make($request->all(), [
         //     'present' => 'required|numeric',
@@ -72,10 +72,10 @@ class AttendenceController extends Controller
         // if ($validator->errors()->any()) {
         //     return redirect()->back()->withErrors($validator->errors());
         // }
-        $page = AttendenceType::find($request->type);
+        $page = AttendenceType::find($type);
 
         Attendence::create([
-            'attendenceType_id' => 1,
+            'attendenceType_id' => $type,
             'platoon_id' => $platoon_id,
             'present' => $present,
             'sentry' => 0,
@@ -88,7 +88,7 @@ class AttendenceController extends Controller
             'male' => 0,
             'total' => $total
         ]);
-        return $this->attendence($request->type);
+        return $this->attendence($request->type)->with('page',$page);
     }
 
     /**
@@ -202,13 +202,14 @@ class AttendenceController extends Controller
         $absent = 0;
         $total = 0;
         $sick = 0;
-        $leave = 0;
+        $safari = 0;
         $off = 0;
         $mps = 0;
         for ($i = 0; $i < count($attendence); ++$i) {
             if (count($attendence[$i + 1]) > 0) {
                 $present += $attendence[$i + 1][0]['present'];
                 $absent += $attendence[$i + 1][0]['absent'];
+                $safari += $attendence[$i + 1][0]['safari'];
                 $total += $attendence[$i + 1][0]['total'];
                 // $data->put($i +1, $attendence[$i+ 1][0]['present']);
             } else {
@@ -220,7 +221,7 @@ class AttendenceController extends Controller
         $data->put('absent', $absent);
         $data->put('total', $total);
         $data->put('sick', $sick);
-        $data->put('leave', $leave);
+        $data->put('safari', $safari);
         $data->put('mps', $this->getMPSdata($company));
         return $data;
     }
@@ -319,6 +320,8 @@ class AttendenceController extends Controller
         return $count;
     }
 
+    
+
     public function list($list_type, $attendence_id)
     {
         $attendence = Attendence::find($attendence_id);
@@ -326,14 +329,14 @@ class AttendenceController extends Controller
         
         // $students = Company::join('students', 'companies.name', 'students.company')->join('platoons', 'platoons.id', 'students.platoon')
         //     ->where('students.company', 'HQ')->where('students.platoon', '1')->get('students.*');
-        return view('attendences.list_absent', compact('students', 'attendence_id','list_type'));
+        return view('attendences.select_absent', compact('students', 'attendence_id','list_type'));
     }
 
     public function list_safari($list_type, $attendence_id)
     {
         $attendence = Attendence::find($attendence_id);
         $students = $attendence->platoon->students;
-                return view('attendences.list_safari', compact('students', 'attendence_id','list_type'));
+                return view('attendences.select_safari', compact('students', 'attendence_id','list_type'));
     }
     public function storeAbsent(Request $request, $attendence_id)
     {

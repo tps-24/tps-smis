@@ -17,7 +17,7 @@
 
 @endsection
 @section('content')
-
+<h5>Please check left students .</h5>
 <div class="table-responsive">
     <form action="{{url('attendences/store-safari/'.$attendence_id)}}" method="post">
         @csrf
