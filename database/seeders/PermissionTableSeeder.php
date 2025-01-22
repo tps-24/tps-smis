@@ -99,6 +99,8 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'report-create', 'description' => 'Create new reports'], 
             ['name' => 'report-edit', 'description' => 'Edit existing reports'], 
             ['name' => 'report-delete', 'description' => 'Delete reports'],        
+            ['name' => 'enroll-students', 'description' => 'Enroll students to courses'],        
+            ['name' => 'generate-results', 'description' => 'Generate results Overview'],        
             // Add other permissions here with descriptions 
             ]; 
 

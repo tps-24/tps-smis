@@ -35,6 +35,8 @@
                   <th scope="col">Session Programme Name</th>
                   <th scope="col">Description</th>
                   <th scope="col">Year</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
                   <th scope="col">Is Current</th>
                   <th scope="col">Is Active</th>
                   <th scope="col" width="280px">Actions</th>
@@ -47,6 +49,8 @@
                       <td>{{ $session_p->programme_name }}</td>
                       <td>{{ $session_p->description }}</td>
                       <td>{{ $session_p->year }}</td>
+                      <td>{{ $session_p->startDate }}</td>
+                      <td>{{ $session_p->endDate }}</td>
                       <td>
                         @if($session_p->is_current == 1)
                             <label class="badge bg-success">Yes</label>

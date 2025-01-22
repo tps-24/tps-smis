@@ -9,6 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    // Holds individual exam scores for students.
     public function up(): void
     {
         Schema::create('semester_exam_results', function (Blueprint $table) {

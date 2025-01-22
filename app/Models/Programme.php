@@ -14,4 +14,16 @@ class Programme extends Model
     { 
         return $this->belongsTo(Department::class); 
     }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'programme_course_semesters')
+                    ->withPivot('semester_id', 'course_type', 'credit_weight', 'session_programme_id');
+    }
+
+    public function students() 
+    { 
+        return $this->hasMany(Student::class); 
+    }
+
 }

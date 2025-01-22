@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Programme;
+use App\Models\Course;
+use App\Models\Semester;
+use App\Models\SessionProgramme;
 use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\StudyLevel;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use DB;
+
 
 class ProgrammeController extends Controller
 {
@@ -59,6 +63,30 @@ class ProgrammeController extends Controller
         $studyLevelName = StudyLevel::WHERE('id' , $programme->studyLevel_id)->pluck('studyLevelName');
         return view('programmes.show',compact('departmentName','programme', 'studyLevelName'));
     }
+
+    //Course Assignment
+    public function assignCoursesToSemester(Request $request, $programmeId, $semesterId, $sessionProgrammeId)
+    {
+        $programme = Programme::findOrFail($programmeId);
+        $semester = Semester::findOrFail($semesterId);
+        $sessionProgramme = SessionProgramme::findOrFail($sessionProgrammeId);
+
+        $courseIds = $request->input('course_ids');
+        $courseType = $request->input('course_type'); // Assuming the same course type for all courses
+        $creditWeight = $request->input('credit_weight'); // Assuming the same credit weight for all courses
+
+        foreach ($courseIds as $courseId) {
+            $programme->courses()->attach($courseId, [
+                'semester_id' => $semesterId,
+                'course_type' => $courseType,
+                'credit_weight' => $creditWeight,
+                'session_programme_id' => $sessionProgrammeId
+            ]);
+        }
+
+        return response()->json(['message' => 'Courses assigned successfully']);
+    }
+
 
     /**
      * Show the form for editing the specified resource.

@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ProgrammeCourseSemester extends Model
+{
+    protected $table = "programme_course_semesters";
+    protected $fillable = ['programme_id', 'course_id','semester_id', 'course_type', 'credit_weight', 'session_programme_id'];
+}

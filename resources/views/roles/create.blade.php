@@ -52,14 +52,18 @@
                                 <input type="text" name="name" placeholder="Name" class="form-control">
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-12 col-md-12" style="margin-top:30px">
-                           
-                            <div class="row">
-                            <strong>Permission:</strong>
-                                <br/>
-                                 @foreach($permissions->chunk(ceil($permissions->count() / 4)) as $chunk) <div class="col-md-3"> @foreach($chunk as $permission) <div class="form-check"> <input class="form-check-input" type="checkbox" name="permission[$permission->id ]" value="{{ $permission->id }}" id="permission-{{ $permission->id }}"> <label class="form-check-label" for="permission-{{ $permission->id }}"> {{ $permission->description }} </label> </div> @endforeach </div> @endforeach </div>
-
-
+                        <div class="row" style="margin-top:30px"> 
+                            <strong>Permissions:</strong> <br/> 
+                            @foreach($permissions->chunk(ceil($permissions->count() / 4)) as $chunk) 
+                            <div class="col-md-3"> 
+                                @foreach($chunk as $permission) 
+                                <div class="form-check"> 
+                                    <input class="form-check-input" type="checkbox" name="permission[]" value="{{ $permission->id }}" id="permission-{{ $permission->id }}"> 
+                                    <label class="form-check-label" for="permission-{{ $permission->id }}"> {{ $permission->description }} </label> 
+                                </div> 
+                                @endforeach 
+                            </div> 
+                            @endforeach 
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12 text-center" style="margin-top:30px">
                             <button type="submit" class="btn btn-primary btn-sm mb-3"><i class="fa-solid fa-floppy-disk"></i> Submit</button>

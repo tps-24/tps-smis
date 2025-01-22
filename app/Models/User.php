@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'sessionProgramme_id',
     ];
 
     /**
@@ -50,4 +51,10 @@ class User extends Authenticatable
     public function student(){
         return $this->hasOne(Student::class,'user_id','id');
     }
+
+    public function sessionProgramme() 
+    { 
+        return $this->belongsTo(SessionProgramme::class); 
+    }
+
 }
