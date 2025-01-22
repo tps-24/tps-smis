@@ -8,8 +8,6 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SessionProgrammeController;
-use App\Http\Controllers\ProgrammeController;
-use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AttendenceController;
@@ -38,7 +36,6 @@ Route::get('/', function () {
 // Route::get('/', function () {
 //     return view('dashboard/dashboard');
 // });
-
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -59,10 +56,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UserController::class);
     Route::resource('session_programmes', SessionProgrammeController::class);
-    Route::resource('programmes', ProgrammeController::class);
-    Route::resource('courses', CourseController::class);
     Route::resource('products', ProductController::class);
-    Route::resource('students', StudentController::class);  
+    Route::resource('students', StudentController::class);
     Route::resource('attendences', AttendenceController::class);
 
     
@@ -133,10 +128,23 @@ Route::controller(AttendenceController::class)->prefix('attendences')->group(fun
 
 Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today']);
 Auth::routes();
-
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 
+
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+
+Route::post('update-patient-status/{id}', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::resource('hospital', PatientController::class);
+Route::post('patients/search', [PatientController::class, 'search'])->name('patients.search');
+
+Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+
+Route::post('/patients/save', [PatientController::class, 'save'])->name('patients.save');
+
 Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
-Route::post('/patients/{id}/update', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');

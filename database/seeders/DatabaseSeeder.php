@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             CompanySeeder::class,
             PlatoonSeeder::class,
             GradingSystemsTableSeeder::class,
-            GradeMappingsTableSeeder::class
+            PatientsTableSeeder::class
         ]);
 
         // User::factory(10)->create();
@@ -33,3 +33,5 @@ class DatabaseSeeder extends Seeder
         // ]);
     }
 }
+
+
