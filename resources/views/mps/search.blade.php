@@ -28,16 +28,7 @@
         <div class="d-flex">
             <!-- Name Search -->
             <input type="text" class="form-control me-2" name="last_name" placeholder="Enter Last Name">
-            <!-- <input type="text" class="form-control me-2" name="last_name" placeholder="Enter Name" value="{{ request('last_name') }}"> -->
-            <!-- Platun Dropdown -->
-            <select class="form-select me-2" name="platoon">
-                <option value="">Select Platoon</option>
-                @for ($i = 1; $i <= 15; $i++)
-                    <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
-                @endfor
-            </select>
-
-            <!-- Company Dropdown -->
+                         <!-- Company Dropdown -->
             <select class="form-select me-2" name="company">
                 <option value="">Select Company</option>
                 <option value="HQ" {{ request('company') == 'HQ' ? 'selected' : '' }}>HQ</option>
@@ -45,6 +36,15 @@
                 <option value="B" {{ request('company') == 'B' ? 'selected' : '' }}>B</option>
                 <option value="C" {{ request('company') == 'C' ? 'selected' : '' }}>C</option>
             </select>
+            <!-- Platoon Dropdown -->
+            <select class="form-select me-2" name="platoon">
+                <option value="">Select Platoon</option>
+                @for ($i = 1; $i <= 15; $i++)
+                    <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
+                @endfor
+            </select>
+
+
         </div>
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
@@ -62,6 +62,7 @@
                         </thead>
                         <tbody>
                             @foreach ($students as $student)
+                            <tr>
                                 <td>{{$student->first_name}} {{$student->last_name}}</td>
                                 <td>{{$student->company}}</td>
                                 <td>{{$student->platoon}}</td>
@@ -123,6 +124,7 @@
                                         </div>
                                     </div>
                                 </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>

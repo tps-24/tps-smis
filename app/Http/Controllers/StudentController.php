@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Student;
+use App\Models\Company;
 use App\Imports\BulkImportStudents;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
@@ -190,7 +191,7 @@ class StudentController extends Controller
             'middle_name'=> 'required|max:30|alpha|regex:/^[A-Z]/',
             'home_region' => 'required|string|min:4',
         ]);
-  
+            $companies = Company::all();
         if(empty($request->session()->get('student'))){
             $student = new Student();
             $student->fill($validatedData);
@@ -201,9 +202,9 @@ class StudentController extends Controller
             $request->session()->put('student', $student);
         }
         if($type == "edit"){
-            return view('students/wizards.stepTwo', compact('student'));
+            return view('students/wizards.stepTwo', compact('companies','companies'));
         }
-        return redirect('students/create/step-two/'.$type, );
+        return redirect('students/create/step-two/'.$type, )->with('companies',$companies);
     }
 
     public function createStepTwo(Request $request) 

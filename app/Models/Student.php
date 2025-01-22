@@ -32,7 +32,20 @@ class Student extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    
     public function mps(){
         return $this->hasMany(MPS::class,'student_id','id');
+    }
+    public function platoons(){
+        return $this->hasMany(Platoon::class,'name','id');
+    }
+
+    public function company(){
+        return $this->hasMany(Company::class,'name','id');
+    }
+
+    public function platoon(){
+        return $this->company()->merge($this->platoons());
     }
 }

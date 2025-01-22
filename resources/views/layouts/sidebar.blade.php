@@ -50,21 +50,21 @@ c <!-- Sidebar wrapper starts -->
     <li class="treeview">
       <a href="#!">
         <i class="bi bi-bar-chart-line"></i>
-        <span class="menu-text">Attendences</span>
+        <span class="menu-text">Attendances</span>
       </a>
       <ul class="treeview-menu">
         <li>
           <a href="/tps-rms/attendences/type/1">Morning</a>
         </li>
-        <li>
+        <!-- <li>
           <a href="/tps-rms/attendences/type/2">Master Parade</a>
-        </li>
+        </li> -->
         <li>
           <a href="/tps-rms/attendences/type/3">Night</a>
         </li>
-        <li>
+        <!-- <li>
           <a href="/tps-rms/attendences/type/4">Flag</a>
-        </li>
+        </li> -->
       </ul>
     </li>
 
@@ -109,7 +109,7 @@ c <!-- Sidebar wrapper starts -->
       </a>
     </li>
     <li>
-      <a href="#">
+      <a href="hospital">
         <i class="bi bi-calendar2"></i>
         <span class="menu-text">Hospital</span>
       </a>

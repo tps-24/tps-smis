@@ -69,11 +69,11 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc4">Gender</label>
-                        <select class="form-select" id="abc4" name="gender" required
+                        <select  class="form-select" id="abc4" name="gender" required
                             aria-label="Default select example">
-                            <!-- <option selected="">select gender</option> -->
-                            <option value="M">Male</option>
-                            <option value="F">Female</option>
+                            <option selected="">select gender</option>
+                            <option @if(isset($student)) value="{{$student->gender}}" @endif value="M">Male</option>
+                            <option @if(isset($student)) value="{{$student->gender}}" @endif value="F">Female</option>
                         </select>
                     </div>
                     @error('gender')
@@ -103,8 +103,9 @@
                         <label class="form-label" for="abc4">Company</label>
                         <select class="form-select" name="company" id="abc4" required
                             aria-label="Default select example">
-                            <!-- <option >select company</option> -->
-                            <option @if(isset($student) && $student->compan == "HQ") selected @endif value="HQ">HQ</option>
+                            
+                            <option >select company</option>
+                            <option @if(isset($student) && $student->company == "HQ") selected @endif value="HQ">HQ</option>
                             <option @if(isset($student) && $student->company == "A") selected @endif value="A">A</option>
                             <option @if(isset($student) && $student->company == "B") selected @endif value="B">B</option>
                             <option @if(isset($student) && $student->company == "C") selected @endif value="C">C</option>
@@ -123,7 +124,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc4">Platoon</label>
                         <select class="form-select" name="platoon" id="abc4" aria-label="Default select example">
-                            <!-- <option selected="">select platoon</option> -->
+                            <option selected="">select platoon</option>
                             <option @if(isset($student) && $student->platoon == "1") selected @endif value="1">1</option>
                             <option @if(isset($student) && $student->platoon == "2") selected @endif value="2">2</option>
                             <option @if(isset($student) && $student->platoon == "3") selected @endif value="3">3</option>

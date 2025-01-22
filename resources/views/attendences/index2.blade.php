@@ -6,8 +6,8 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/tps-rms/" id="home">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-rms/attendences/">Today  Attendence Summary</a>
+                <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
+                <li class="breadcrumb-item"><a href="/tps-rms/attendences/">Today {{$page->name}} Attendence Summary</a>
                 </li>
             </ol>
         </nav>
@@ -25,7 +25,7 @@
 
 
 <div class="row">
-<div class="col-8">
+    <div class="col-8">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane"
@@ -46,10 +46,13 @@
         </ul>
     </div>
     <div class="col-4">
-        <form action="{{url('attendences/create/'.$page->id)}}" method="POST">
+        <form action="{{url('attendences/create')}}" method="POST">
             @csrf
             @method('POST')
             <div class=" d-flex gap-2 justify-content-end">
+                <div class="">
+
+                </div>
                 <div class="">
                     <label for="">Company </label>
                     <select style="height:50%" class="form-select" name="company" id="companies" required
@@ -92,8 +95,9 @@
 </div>
 </div>
 
+
 <div class="tab-content" id="myTabContent">
-<div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+    <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
         <!-- Start of HQ Coy -->
         <div class="row gx-4 mt-1">
             <!-- Attendence starts -->
@@ -107,7 +111,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Attended</p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['HQ']['present']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['hq']['present']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="{{url('/today/1/' . $page->id)}}">
@@ -133,7 +137,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Sick </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['HQ']['sick']}} </h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['hq']['sick']}} </h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -157,7 +161,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Leave </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['HQ']['leave']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['hq']['leave']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -182,7 +186,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">MPS </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['HQ']['mps']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['hq']['mps']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="{{url("mps/HQ/company")}}">
@@ -212,7 +216,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Attended</p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['A']['present']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['a']['present']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="{{url('/today/2/' . $page->id)}}">
@@ -238,7 +242,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Sick </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['A']['sick']}} </h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['a']['sick']}} </h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -262,7 +266,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Leave </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['A']['leave']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['a']['leave']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -287,7 +291,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">MPS </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['A']['mps']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['a']['mps']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="{{url("mps/A/company")}}">
@@ -314,7 +318,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Attended</p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['B']['present']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['b']['present']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="{{url('/today/3/' . $page->id)}}">
@@ -340,7 +344,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Sick </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['B']['sick']}} </h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['b']['sick']}} </h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -364,7 +368,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Leave </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['B']['leave']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['b']['leave']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -389,7 +393,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">MPS </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['B']['mps']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['b']['mps']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="{{url("mps/B/company")}}">
@@ -416,7 +420,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Attended</p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['C']['present']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['c']['present']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="{{url('/today/4/' . $page->id)}}">
@@ -442,7 +446,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Sick </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['C']['sick']}} </h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['c']['sick']}} </h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -466,7 +470,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">Leave </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['C']['leave']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['c']['leave']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="javascript:void(0);">
@@ -491,7 +495,7 @@
                             </div>
                             <div class="p3 d-flex flex-column">
                                 <p class="m-0 ">MPS </p>
-                                <h2 class="lh-1 opacity-50">{{$statistics['C']['mps']}}</h2>
+                                <h2 class="lh-1 opacity-50">{{$statistics['c']['mps']}}</h2>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-1">
                                 <a class="text-primary ms-4" href="{{url("mps/C/company")}}">
@@ -505,6 +509,6 @@
             <!-- MPS days  end. -->
         </div>
     </div>
+</div>
 
-    </div>
-    @endsection
+@endsection

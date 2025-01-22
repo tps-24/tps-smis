@@ -26,4 +26,8 @@ class Attendence extends Model
    public function type(){
       return $this->belongsTo(AttendenceType::class, 'attendenceType_id','id');
    }
+
+   public function setAbsentStudentsAttribute($students) { 
+      $this->attributes['absent_students'] = $students;
+    }
 }

@@ -84,21 +84,51 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('search','search');
         Route::post('store/{id}','store');
         Route::post('release/{id}','release');
+        Route::get('{company}/company','company');
     });
 
 });
 
 
 Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+    Route::get('type-test/{type_id}', 'testAttendence');
     Route::get('type/{type_id}', 'attendence');
-    Route::post('create', 'create');
+    Route::post('create/{type_id}', 'create');
     Route::get('edit/{id}', 'edit');
     Route::post('{id}/store', 'store');
     Route::post('{id}/update', 'update');
+    Route::get('list-absent_students/{list_type}/{attendence_id}',action: 'list');
+    Route::get('list-safari_students/{list_type}/{attendence_id}',action: 'list_safari');
+    Route::post('store-absents/{attendence_id}',action: 'storeAbsent');
+    Route::post('store-safari/{attendence_id}',action: 'storeSafari');
     Route::get('today/{company_id}','today_attendence');
+    
 });
 
 
 Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today']);
 Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+use App\Http\Controllers\PatientController;
+
+Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+// web.php
+
+
+Route::post('update-patient-status/{id}', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
+Route::post('/patients/{id}/update', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
+
+Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+Route::put('/update-patient-status/{id}', [PatientController::class, 'update'])->name('update.patient.status');
+
+
+Route::get('/test/{company}',[AttendenceController::class,'list']);
+Route::post('/test_post/{attendence_id}',[AttendenceController::class,'storeAbsent']);
