@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AttendenceController;
+use App\Http\Controllers\PatientController;
 
 require __DIR__ . '/auth.php';
 
@@ -97,16 +98,18 @@ Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today'])
 Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-use App\Http\Controllers\PatientController;
+
 
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
-// web.php
-
 
 Route::post('update-patient-status/{id}', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
-Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
-Route::post('/patients/{id}/update', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+Route::resource('hospital', PatientController::class);
+Route::post('patients/search', [PatientController::class, 'search'])->name('patients.search');
+
+Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+
+Route::post('/patients/save', [PatientController::class, 'save'])->name('patients.save');
 
 Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
 
@@ -114,4 +117,6 @@ Route::put('/patients/{id}/update-status', [PatientController::class, 'updateSta
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
-Route::put('/update-patient-status/{id}', [PatientController::class, 'update'])->name('update.patient.status');
+
+
+

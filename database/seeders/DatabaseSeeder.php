@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
             CreateAdminUserSeeder::class,
             AttendenceTypeSeeder::class,
             CompanySeeder::class,
-            PlatoonSeeder::class
+            PlatoonSeeder::class,
+            PatientsTableSeeder::class
         ]);
 
         // User::factory(10)->create();
@@ -28,3 +29,5 @@ class DatabaseSeeder extends Seeder
         // ]);
     }
 }
+
+

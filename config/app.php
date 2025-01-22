@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost:8081/tps-rms'),
+    'url' => env('APP_URL', 'http://localhost/tps-rms'),
 
     /*
     |--------------------------------------------------------------------------
