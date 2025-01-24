@@ -4,62 +4,71 @@ namespace App\Http\Controllers;
 
 use App\Models\Semester;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use DB;
 
 class SemesterController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    function __construct()
     {
-        //
+         $this->middleware('permission:semester-list|semester-create|semester-edit|semester-delete', ['only' => ['index','view']]);
+         $this->middleware('permission:semester-create', ['only' => ['create','store']]);
+         $this->middleware('permission:semester-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:semester-delete', ['only' => ['destroy']]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function index(Request $request): View
+    {
+        $semesters = Semester::orderBy('id','Asc')->paginate(5);
+        return view('semesters.index',compact('semesters'))
+            ->with('i', ($request->input('page', 1) - 1) * 5);
+    }
+
     public function create()
     {
-        //
+        return view('semesters.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'semester_name' => 'required|string|max:255',
+        ]);
+
+        Semester::create($request->all());
+
+        return redirect()->route('semesters.index')
+                         ->with('success', 'Semester created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Semester $semester)
     {
-        //
+        return view('semesters.show', compact('semester'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Semester $semester)
     {
-        //
+        return view('semesters.edit', compact('semester'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Semester $semester)
     {
-        //
+        $request->validate([
+            'semester_name' => 'required|string|max:255',
+        ]);
+
+        $semester->update($request->all());
+
+        return redirect()->route('semesters.index')
+                         ->with('success', 'Semester updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Semester $semester)
     {
-        //
+        $semester->delete();
+
+        return redirect()->route('semesters.index')
+                         ->with('success', 'Semester deleted successfully.');
     }
 }

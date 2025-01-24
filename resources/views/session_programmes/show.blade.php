@@ -46,6 +46,18 @@
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
+                            <strong>Start Date:</strong>
+                            {{ $session_programme->startDate }}
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="form-group">
+                            <strong>End Date:</strong>
+                            {{ $session_programme->endDate }}
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="form-group">
                             <strong>Status:</strong>
                             @if ($session_programme->is_active == 1)
                                 <label style="color:green">Active Session</label>

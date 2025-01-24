@@ -7,7 +7,14 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
                 <li class="breadcrumb-item"><a href="/tps-rms/students/">Students</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><a href="#">Create Step Two</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a href="#">
+                @if(isset($student))
+                            Update
+                        @else
+                            Create
+                        @endif
+                        Step Two</a></li>
+                </a></li>
             </ol>
         </nav>
     </div>
@@ -16,7 +23,15 @@
 
 @endsection
 @section('content')
-<form action="{{url('students/create/post-step-two')}}" method="POST">
+<?php $typeToAppend ="";
+    if(isset(($student))){
+        $typeToAppend = "edit";
+
+    }else {
+         $typeToAppend = "create";
+    }
+?>
+<form action="{{url('students/create/post-step-two/'.$typeToAppend)}}" method="POST">
     @csrf
     @method('POST')
 
@@ -26,7 +41,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">NIDA</label>
-                        <input type="number" class="form-control" id="nin" name="nin" required
+                        <input @if(isset($student)) value="{{$student->nin}}" @endif type="number" class="form-control" id="nin" name="nin" required
                             placeholder="Enter NIDA number">
                     </div>
                     @error('nin')
@@ -40,7 +55,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Phone</label>
-                        <input type="number" class="form-control" id="phone" name="phone"
+                        <input @if(isset($student)) value="{{$student->phone}}" @endif type="number" class="form-control" id="phone" name="phone"
                             placeholder="Enter phone number">
                     </div>
                     @error('phone')
@@ -54,11 +69,11 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc4">Gender</label>
-                        <select class="form-select" id="abc4" name="gender" required
+                        <select  class="form-select" id="abc4" name="gender" required
                             aria-label="Default select example">
-                            <!-- <option selected="">select gender</option> -->
-                            <option value="M">Male</option>
-                            <option value="F">Female</option>
+                            <option selected="">select gender</option>
+                            <option @if(isset($student)) value="{{$student->gender}}" @endif value="M">Male</option>
+                            <option @if(isset($student)) value="{{$student->gender}}" @endif value="F">Female</option>
                         </select>
                     </div>
                     @error('gender')
@@ -73,7 +88,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc3">Date of Birth</label>
                         <div class="input-group">
-                            <input type="date" id="abc3" max="2007-07-01" required name="dob"
+                            <input @if(isset($student)) value="{{$student->dob}}" @endif type="date" id="abc3" max="2007-07-01" required name="dob"
                                 class="form-control datepicker" />
                         </div>
 
@@ -88,11 +103,12 @@
                         <label class="form-label" for="abc4">Company</label>
                         <select class="form-select" name="company" id="abc4" required
                             aria-label="Default select example">
-                            <!-- <option >select company</option> -->
-                            <option value="HQ">HQ</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
+                            
+                            <option >select company</option>
+                            <option @if(isset($student) && $student->company == "HQ") selected @endif value="HQ">HQ</option>
+                            <option @if(isset($student) && $student->company == "A") selected @endif value="A">A</option>
+                            <option @if(isset($student) && $student->company == "B") selected @endif value="B">B</option>
+                            <option @if(isset($student) && $student->company == "C") selected @endif value="C">C</option>
                         </select>
                     </div>
                     @error('company')
@@ -108,21 +124,21 @@
                     <div class="m-0">
                         <label class="form-label" for="abc4">Platoon</label>
                         <select class="form-select" name="platoon" id="abc4" aria-label="Default select example">
-                            <!-- <option selected="">select platoon</option> -->
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
+                            <option selected="">select platoon</option>
+                            <option @if(isset($student) && $student->platoon == "1") selected @endif value="1">1</option>
+                            <option @if(isset($student) && $student->platoon == "2") selected @endif value="2">2</option>
+                            <option @if(isset($student) && $student->platoon == "3") selected @endif value="3">3</option>
+                            <option @if(isset($student) && $student->platoon == "4") selected @endif value="4">4</option>
+                            <option @if(isset($student) && $student->platoon == "5") selected @endif value="5">5</option>
+                            <option @if(isset($student) && $student->platoon == "6") selected @endif value="6">6</option>
+                            <option @if(isset($student) && $student->platoon == "7") selected @endif value="7">7</option>
+                            <option @if(isset($student) && $student->platoon == "8") selected @endif value="8">8</option>
+                            <option @if(isset($student) && $student->platoon == "9") selected @endif value="9">9</option>
+                            <option @if(isset($student) && $student->platoon == "10") selected @endif value="10">10</option>
+                            <option @if(isset($student) && $student->platoon == "11") selected @endif value="11">11</option>
+                            <option @if(isset($student) && $student->platoon == "12") selected @endif value="12">12</option>
+                            <option @if(isset($student) && $student->platoon == "13") selected @endif value="13">13</option>
+                            <option @if(isset($student) && $student->platoon == "14") selected @endif value="14">14</option>
                         </select>
                     </div>
                     @error('platoon')

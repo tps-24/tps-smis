@@ -62,12 +62,14 @@ class RoleController extends Controller
             'permission' => 'required',
         ]);
 
+
+        $role = Role::create(['name' => $request->input('name')]);
+
         $permissionsID = array_map(
             function($value) { return (int)$value; },
             $request->input('permission')
         );
-    
-        $role = Role::create(['name' => $request->input('name')]);
+        
         $role->syncPermissions($permissionsID);
     
         return redirect()->route('roles.index')
@@ -85,8 +87,26 @@ class RoleController extends Controller
         $rolePermissions = Permission::join("role_has_permissions","role_has_permissions.permission_id","=","permissions.id")
             ->where("role_has_permissions.role_id",$id)
             ->get();
+        
+        // Group permissions by category 
+        $permissions = [ 
+            'Role Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'role'); }), 
+            'Product Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'product'); }), 
+            'Student Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'student'); }), 
+            'Department Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'department'); }), 
+            'Programme Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'programme'); }), 
+            'Coursework Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'coursework'); }), 
+            'Semester Exam Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'semester-exam'); }), 
+            'Certificate Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'print-certificate'); }), 
+            'Hospital Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'hospital'); }), 
+            'Settings Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'setting'); }), 
+            'Programme Session Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'programme-session'); }), 
+            'Report Management' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'report'); }), 
+            'Student Enrollment' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'enroll-students'); }), 
+            'Result Generation' => $rolePermissions->filter(function ($permission) { return str_contains($permission->name, 'generate-results'); }),
+        ];
     
-        return view('roles.show',compact('role','rolePermissions'));
+        return view('roles.show',compact('role','permissions'));
     }
     
     /**

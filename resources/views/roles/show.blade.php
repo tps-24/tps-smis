@@ -15,17 +15,18 @@
 </nav>
 <!-- Scrumb ends -->
 @endsection
+
 @section('content')
 <!-- Row starts -->
 <div class="row gx-4">
-    <div class="col-sm-8 col-12">
+    <div class="col-sm-9 col-12">
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-12 margin-tb">
-                        <div class="pull-left">
+                        <!-- <div class="pull-left">
                             <h2>View Role</h2>
-                        </div>
+                        </div> -->
                         <div class="pull-right">
                             <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('roles.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
@@ -39,14 +40,29 @@
                             {{ $role->name }}
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
+                    <div class="col-xs-12 col-sm-12 col-md-12" style="font-weight:normal">
                         <div class="form-group">
                             <strong>Permissions:</strong>
-                            @if(!empty($rolePermissions))
-                                @foreach($rolePermissions as $v)
-                                    <label class="label label-success">{{ $v->name }},</label>
-                                @endforeach
-                            @endif
+                            <table class="table table-bordered mt-3">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Permissions</th>
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    @foreach ($permissions as $category => $perms)
+                                        <tr>
+                                            <td>{{ $category }}</td>
+                                            <td>
+                                                @foreach ($perms as $perm)
+                                                    {{ $perm->description }},
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -54,7 +70,7 @@
         </div>     
     </div>
   
-    <div class="col-sm-4 col-12">
+    <div class="col-sm-3 col-12">
         <div class="card mb-8">
             <div class="card-body">
             </div>

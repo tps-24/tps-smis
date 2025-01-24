@@ -18,5 +18,9 @@ class Platoon extends Model
     public function attendences(){
         return $this->hasMany(Attendence::class,'platoon_id', 'id');
     }
+
+    public function students(){
+        return $this->hasMany(Student::class,'platoon', 'name');
+    }
     
 }

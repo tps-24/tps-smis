@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
@@ -12,21 +14,27 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AttendenceController;
+use App\Http\Controllers\MPSController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\TimetableController;
+
+use App\Http\Controllers\GradingSystemController; 
+use App\Http\Controllers\GradeMappingController;
+use App\Http\Controllers\SemesterController; 
+use App\Http\Controllers\ProgrammeCourseSemesterController;
+use App\Http\Controllers\OptionalCourseEnrollmentController; 
+use App\Http\Controllers\CourseWorkController; 
+use App\Http\Controllers\SemesterExamController; 
+use App\Http\Controllers\CourseworkResultController; 
+use App\Http\Controllers\SemesterExamResultController; 
+use App\Http\Controllers\FinalResultController; 
+use App\Http\Controllers\ExcuseTypeController; 
 
 require __DIR__ . '/auth.php';
 
 Route::get('students', [StudentController::class, 'index']);
 
 Route::get('/', function () {
-    // $role = Auth::user()->role_id;
-    // if($role == 1){
-    //     return view('dashboard/dashboard');
-    // }
-    // elseif($role == 2){
-    //     return view('/students/dashboard');
-    // }
     return view('dashboard/dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -40,7 +48,13 @@ Route::get('/', function () {
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => 'session_programme'], function () {
+    // Add more routes as needed
+});
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/students/dashboard', function () {
         return view('students/dashboard');
     });
@@ -54,8 +68,32 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('products', ProductController::class);
     Route::resource('students', StudentController::class);  
     Route::resource('attendences', AttendenceController::class);
+    Route::resource('mps', MPSController::class);
+    Route::resource('programmes', ProgrammeController::class);
+    Route::resource('courses', CourseController::class);
+
+
+    
+    Route::resource('grading_systems', GradingSystemController::class); 
+    Route::resource('grade_mappings', GradeMappingController::class);
+    Route::resource('semesters', SemesterController::class);
+    Route::resource('assign-courses', ProgrammeCourseSemesterController::class);
+    Route::resource('enrollments', OptionalCourseEnrollmentController::class); 
+    Route::resource('course_works', CourseWorkController::class); 
+    Route::resource('semester_exams', SemesterExamController::class); 
+    Route::resource('coursework_results', CourseworkResultController::class); 
+    Route::resource('semester_exam_results', SemesterExamResultController::class); 
+    Route::resource('final_results', FinalResultController::class);
+    Route::resource('/settings/excuse_types', ExcuseTypeController::class);
+    Route::post('/programmes/{programmeId}/semesters/{semesterId}/session/{sessionProgrammeId}/assign-courses', 
+       [ProgrammeController::class, 'assignCoursesToSemester']); 
+    Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate'); 
+
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
+
+
+
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         /**
@@ -65,21 +103,19 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('/', function () {
                 return view('students/wizards/stepOne');
             });
-            Route::get('step-two', function () {
+            Route::get('step-two/{type}', function () {
                 return view('students/wizards/stepTwo');
             });
             Route::get('step-three', function () {
                 return view('students/wizards/stepThree');
             });
-            Route::post('post-step-one','postStepOne');
-            Route::post('post-step-two','postStepTwo');
-            Route::post('post-step-three','postStepThree');
+            Route::post('post-step-one/{type}','postStepOne');
+            Route::post('post-step-two/{type}','postStepTwo');
+            Route::post('post-step-three/{type}','postStepThree');
         });
         /**
          * End of wizard for student registration
          */
-
-        
 
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
@@ -89,16 +125,29 @@ Route::group(['middleware' => ['auth']], function () {
 
     });
 
+    Route::controller(MPSController::class)->prefix('mps')->group(function(){
+        Route::post('search','search');
+        Route::post('store/{id}','store');
+        Route::post('release/{id}','release');
+        Route::get('{company}/company','company');
+    });
+
 });
 
 
 Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+    Route::get('type-test/{type_id}', 'testAttendence');
     Route::get('type/{type_id}', 'attendence');
-    Route::post('create', 'create');
+    Route::post('create/{type_id}', 'create');
     Route::get('edit/{id}', 'edit');
-    Route::post('{id}/store', 'store');
+    Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
     Route::post('{id}/update', 'update');
+    Route::get('list-absent_students/{list_type}/{attendence_id}',action: 'list');
+    Route::get('list-safari_students/{list_type}/{attendence_id}',action: 'list_safari');
+    Route::post('store-absents/{attendence_id}',action: 'storeAbsent');
+    Route::post('store-safari/{attendence_id}',action: 'storeSafari');
     Route::get('today/{company_id}','today_attendence');
+    
 });
 
 
@@ -123,14 +172,3 @@ Route::post('/patients/save', [PatientController::class, 'save'])->name('patient
 Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
-
-Route::post('/patients/{id}/update', [PatientController::class, 'updateStatus'])->name('update.patient.status');
-
-// routes for CCP timetable management:
-Route::get('/timetables', [TimetableController::class, 'index'])->name('timetable.index');
-Route::get('/timetables/create', [TimetableController::class, 'create'])->name('timetable.create');
-Route::post('/timetables', [TimetableController::class, 'store'])->name('timetable.store');
-Route::get('/timetables/{timetable}/edit', [TimetableController::class, 'edit'])->name('timetable.edit');
-Route::put('/timetables/{timetable}', [TimetableController::class, 'update'])->name('timetable.update');
-Route::delete('/timetables/{timetable}', [TimetableController::class, 'destroy'])->name('timetable.destroy');
-Route::get('/timetables/{company}/pdf', [TimetableController::class, 'generatePdf'])->name('timetable.pdf');

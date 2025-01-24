@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('duration');
             $table->unsignedBigInteger('department_id');
             $table->unsignedBigInteger('studyLevel_id');
+            $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });
     }

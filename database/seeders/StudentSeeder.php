@@ -13,20 +13,6 @@ class StudentSeeder extends Seeder
      */
     public function run(): void
     {
-        Student::create ([
-            'user_id',
-            'first_name',
-            'middle_name',
-            'last_name',
-            'gender',
-            'phone',
-            'nin',
-            'dob',
-            'home_region',
-            'company',
-            'education_level',
-            'height',
-            'weight',
-        ]);
+        
     }
 }

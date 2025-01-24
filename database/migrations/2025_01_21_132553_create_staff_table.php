@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('enrollments', function (Blueprint $table) {
+        Schema::create('staff', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained(); 
-            $table->foreignId('course_id')->constrained(); 
-            $table->foreignId('semester_id')->constrained(); // Link to semesters table 
-            $table->date('enrollment_date');
+            $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('enrollments');
+        Schema::dropIfExists('staff');
     }
 };

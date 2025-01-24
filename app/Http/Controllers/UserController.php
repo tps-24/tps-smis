@@ -13,7 +13,17 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
     
 class UserController extends Controller
-{
+{ 
+    function __construct()
+    {
+         $this->middleware('permission:user-list|user-create|user-edit|user-delete', ['only' => ['index','view']]);
+         $this->middleware('permission:user-create', ['only' => ['create','store']]);
+         $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:user-delete', ['only' => ['destroy']]);
+         $this->middleware('permission:user-profile-list|user-profile-create|user-profile-edit|user-profile-delete', ['only' => ['profile']]);
+         $this->middleware('permission:user-profile-edit', ['only' => ['updateProfile']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -76,6 +86,26 @@ class UserController extends Controller
 
         return view('users.show',compact('user'));
     }
+
+    /**
+     * Displaying user profile.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+    public function profile($id):View
+    {
+        $user = User::find($id);
+        return view('users.profile',compact('user'));
+    }
+   
+
+   public function changePassword($id): View
+   {
+       $user = User::find($id);
+       return view('users.changePassword',compact('user'));
+   }
     
     /**
      * Show the form for editing the specified resource.
