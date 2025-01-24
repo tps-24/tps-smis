@@ -13,6 +13,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AttendenceController;
+use App\Http\Controllers\MPSController;
 use App\Http\Controllers\PatientController;
 
 use App\Http\Controllers\GradingSystemController; 
@@ -64,6 +65,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('products', ProductController::class);
     Route::resource('students', StudentController::class);
     Route::resource('attendences', AttendenceController::class);
+    Route::resource('mps', MPSController::class);
+    Route::resource('programmes', ProgrammeController::class);
+    Route::resource('courses', CourseController::class);
+
 
     
     Route::resource('grading_systems', GradingSystemController::class); 
@@ -95,21 +100,19 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             Route::get('/', function () {
                 return view('students/wizards/stepOne');
             });
-            Route::get('step-two', function () {
+            Route::get('step-two/{type}', function () {
                 return view('students/wizards/stepTwo');
             });
             Route::get('step-three', function () {
                 return view('students/wizards/stepThree');
             });
-            Route::post('post-step-one','postStepOne');
-            Route::post('post-step-two','postStepTwo');
-            Route::post('post-step-three','postStepThree');
+            Route::post('post-step-one/{type}','postStepOne');
+            Route::post('post-step-two/{type}','postStepTwo');
+            Route::post('post-step-three/{type}','postStepThree');
         });
         /**
          * End of wizard for student registration
          */
-
-        
 
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
@@ -119,16 +122,29 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     });
 
+    Route::controller(MPSController::class)->prefix('mps')->group(function(){
+        Route::post('search','search');
+        Route::post('store/{id}','store');
+        Route::post('release/{id}','release');
+        Route::get('{company}/company','company');
+    });
+
 });
 
 
 Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+    Route::get('type-test/{type_id}', 'testAttendence');
     Route::get('type/{type_id}', 'attendence');
-    Route::post('create', 'create');
+    Route::post('create/{type_id}', 'create');
     Route::get('edit/{id}', 'edit');
-    Route::post('{id}/store', 'store');
+    Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
     Route::post('{id}/update', 'update');
+    Route::get('list-absent_students/{list_type}/{attendence_id}',action: 'list');
+    Route::get('list-safari_students/{list_type}/{attendence_id}',action: 'list_safari');
+    Route::post('store-absents/{attendence_id}',action: 'storeAbsent');
+    Route::post('store-safari/{attendence_id}',action: 'storeSafari');
     Route::get('today/{company_id}','today_attendence');
+    
 });
 
 

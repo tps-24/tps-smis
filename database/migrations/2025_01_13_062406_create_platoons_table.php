@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('company_id');
             $table->string('name');
+           // $table->foreign('company_id')->references('id')->on('companies')->onupdate('update')->ondelete('null');
+
             $table->timestamps();
         });
     }
