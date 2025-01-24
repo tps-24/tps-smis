@@ -33,8 +33,6 @@ class Student extends Model
         return $this->belongsTo(User::class);
     }
 
-<<<<<<< HEAD
-    
     public function mps(){
         return $this->hasMany(MPS::class,'student_id','id');
     }
@@ -48,7 +46,8 @@ class Student extends Model
 
     public function platoon(){
         return $this->company()->merge($this->platoons());
-=======
+    }
+
     // public function courses() 
     // { 
     //     return $this->belongsToMany(Course::class, 'enrollments'); 
@@ -57,6 +56,5 @@ class Student extends Model
     public function optionalCourseEnrollments() 
     { 
         return $this->hasMany(OptionalCourseEnrollment::class); //Optional enrollments
->>>>>>> 6941f5ca6072223fd6cba907132de2cd2cc55f56
     }
 }

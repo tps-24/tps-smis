@@ -38,7 +38,7 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'profile-create', 'description' => 'Create new profile'], 
             ['name' => 'profile-edit', 'description' => 'Edit existing profile'], 
             ['name' => 'profile-delete', 'description' => 'Delete profile'],
-            ['name' => '', 'description' => 'View attendance'], 
+            ['name' => 'attendance-list', 'description' => 'View attendance'], 
             ['name' => 'attendance-create', 'description' => 'Create new attendance'], 
             ['name' => 'attendance-edit', 'description' => 'Edit existing attendance'], 
             ['name' => 'attendance-delete', 'description' => 'Delete attendance'], 
@@ -75,10 +75,10 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'hospital-create', 'description' => 'Create new sick students'], 
             ['name' => 'hospital-edit', 'description' => 'Edit existing sick students'], 
             ['name' => 'hospital-delete', 'description' => 'Delete sick students'], 
-            ['name' => 'mps-list', 'description' => 'View products'], 
-            ['name' => 'mps-create', 'description' => 'Create new products'], 
-            ['name' => 'mps-edit', 'description' => 'Edit existing products'], 
-            ['name' => 'mps-delete', 'description' => 'Delete products'],
+            ['name' => 'mps-list', 'description' => 'View lock up'], 
+            ['name' => 'mps-create', 'description' => 'Create Lock up'], 
+            ['name' => 'mps-edit', 'description' => 'Modify lock up '], 
+            ['name' => 'mps-delete', 'description' => 'Delete lock up'],
             ['name' => 'leave-list', 'description' => 'View leave'], 
             ['name' => 'leave-create', 'description' => 'Create new leave'], 
             ['name' => 'leave-edit', 'description' => 'Edit existing leave'], 
@@ -101,6 +101,8 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'report-delete', 'description' => 'Delete reports'],        
             ['name' => 'enroll-students', 'description' => 'Enroll students to courses'],        
             ['name' => 'generate-results', 'description' => 'Generate results Overview'],        
+            ['name' => 'academic-view', 'description' => 'View Academics'],        
+            ['name' => 'create-backup', 'description' => 'Create Backup & Restore'],        
             // Add other permissions here with descriptions 
             ]; 
 
