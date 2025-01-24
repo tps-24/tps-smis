@@ -13,6 +13,14 @@ use DB;
 
 class OptionalCourseEnrollmentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:optional-enrollment-create')->only(['create', 'store']);
+        $this->middleware('permission:optional-enrollment-list')->only(['index', 'show']);
+        $this->middleware('permission:optional-enrollment-update')->only(['edit', 'update']);
+        $this->middleware('permission:optional-enrollment-delete')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

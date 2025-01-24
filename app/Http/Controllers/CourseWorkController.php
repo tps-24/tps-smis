@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class CourseWorkController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:coursework-create')->only(['create', 'store']);
+        $this->middleware('permission:coursework-list')->only(['index', 'show']);
+        $this->middleware('permission:coursework-update')->only(['edit', 'update']);
+        $this->middleware('permission:coursework-delete')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

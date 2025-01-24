@@ -82,7 +82,7 @@
                         </li>
                         <li class="nav-item" role="presentation">
                           <a class="nav-link" id="tab-fourA" data-bs-toggle="tab" href="#fourA" role="tab"
-                            aria-controls="fourA" aria-selected="false"><i class="bi bi-eye-slash me-2"></i>Reset
+                            aria-controls="fourA" aria-selected="false"><i class="bi bi-eye-slash me-2"></i>Change
                             Password</a>
                         </li>
                       </ul>

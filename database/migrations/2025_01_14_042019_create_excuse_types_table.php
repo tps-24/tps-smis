@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('programmes', function (Blueprint $table) {
+        Schema::create('excuse_types', function (Blueprint $table) {
             $table->id();
-            $table->string('programmeName');
+            $table->string('excuseName');
             $table->string('abbreviation');
-            $table->integer('duration');
-            $table->unsignedBigInteger('department_id');
-            $table->unsignedBigInteger('studyLevel_id');
-            $table->unsignedBigInteger('created_by');
+            $table->string('description');
+            $table->unsignedBigInteger('created_by')->nullable();;
+            $table->unsignedBigInteger('updated_by')->nullable();;
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('programmes');
+        Schema::dropIfExists('excuse_types');
     }
 };

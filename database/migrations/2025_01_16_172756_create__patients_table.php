@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
-            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
+            $table->foreignId('excuse_type_id')->constrained('excuse_types');
             $table->integer('rest_days');
             $table->text('doctor_comment')->nullable();
-            $table->string('excuse_type', 50)->nullable();
+            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
             $table->timestamps();
             
         });

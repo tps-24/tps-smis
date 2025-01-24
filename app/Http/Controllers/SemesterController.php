@@ -10,6 +10,14 @@ use DB;
 
 class SemesterController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:semester-list|semester-create|semester-edit|semester-delete', ['only' => ['index','view']]);
+         $this->middleware('permission:semester-create', ['only' => ['create','store']]);
+         $this->middleware('permission:semester-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:semester-delete', ['only' => ['destroy']]);
+    }
+
     public function index(Request $request): View
     {
         $semesters = Semester::orderBy('id','Asc')->paginate(5);

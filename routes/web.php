@@ -25,6 +25,7 @@ use App\Http\Controllers\SemesterExamController;
 use App\Http\Controllers\CourseworkResultController; 
 use App\Http\Controllers\SemesterExamResultController; 
 use App\Http\Controllers\FinalResultController; 
+use App\Http\Controllers\ExcuseTypeController; 
 
 require __DIR__ . '/auth.php';
 
@@ -75,6 +76,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('coursework_results', CourseworkResultController::class); 
     Route::resource('semester_exam_results', SemesterExamResultController::class); 
     Route::resource('final_results', FinalResultController::class);
+    Route::resource('/settings/excuse_types', ExcuseTypeController::class);
     Route::post('/programmes/{programmeId}/semesters/{semesterId}/session/{sessionProgrammeId}/assign-courses', 
        [ProgrammeController::class, 'assignCoursesToSemester']); 
     Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate'); 

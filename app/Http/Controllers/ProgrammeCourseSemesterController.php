@@ -11,6 +11,14 @@ use Illuminate\Http\Request;
 
 class ProgrammeCourseSemesterController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:course-enrollment-create')->only(['create', 'store']);
+        $this->middleware('permission:course-enrollment-list')->only(['index', 'show']);
+        $this->middleware('permission:course-enrollment-update')->only(['edit', 'update']);
+        $this->middleware('permission:course-enrollment-delete')->only(['destroy']);
+    }
+    
     public function index()
     {
         $semesterId = 1;

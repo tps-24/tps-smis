@@ -167,7 +167,7 @@ c <!-- Sidebar wrapper starts -->
         <span class="menu-text">Hostel</span>
       </a>
     </li> -->
-    @can('hosptal-list')
+    @can('hospital-list')
     <li>
       <a href="{{ route('hospital.index') }}">
         <i class="bi bi-calendar2"></i>
@@ -205,12 +205,14 @@ c <!-- Sidebar wrapper starts -->
       </ul>
     </li>
     @endcan()
+    @can('user-list')
     <li>
       <a href="{{ route('users.index') }}">
         <i class="bi bi-border-all"></i>
         <span class="menu-text">Users</span>
       </a>
     </li>
+    @endcan()
     @can('role-list')
     <li>
       <a href="{{ route('roles.index') }}">
@@ -242,6 +244,9 @@ c <!-- Sidebar wrapper starts -->
         </li>
         <li>
           <a href="{{ route('session_programmes.index') }}">Session Settings</a>
+        </li>
+        <li>
+          <a href="{{ route('excuse_types.create') }}">Excuse Type Settings</a>
         </li>
         <li>
           <a href="#">Notification Setting</a>

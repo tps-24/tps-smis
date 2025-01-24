@@ -16,13 +16,13 @@ class AttendenceSeeder extends Seeder
     public function run(): void
     {
         $data = [];
-        $startDate = Carbon::now()->subWeeks(12);
+        $startDate = Carbon::now('Africa/Dar_es_Salaam')->subWeeks(12);
 
         for ($day = 0; $day < 12 * 7; $day++) { // 12 weeks * 7 days
             $currentDate = $startDate->copy()->addDays($day);
 
             $data[] = [
-                'platoon_id' => 1,
+                'platoon_id' => 15,
                 'attendenceType_id' => 1,
                 'present' => rand(20, 30),
                 'sentry' => rand(1, 5),
