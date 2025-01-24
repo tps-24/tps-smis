@@ -140,11 +140,11 @@ c <!-- Sidebar wrapper starts -->
       </a>
     </li>
     <!-- <li>
-      <a href="#">
-        <i class="bi bi-globe"></i>
-        <span class="menu-text">Hostel</span>
+      <a href="">
+        <i class="bi bi-calendar2"></i>
+        <span class="menu-text">Timetable</span>
       </a>
-    </li> -->
+    </li>  -->
     <li>
       <a href="hospital">
         <i class="bi bi-calendar2"></i>
