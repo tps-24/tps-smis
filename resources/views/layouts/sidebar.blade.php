@@ -167,7 +167,7 @@ c <!-- Sidebar wrapper starts -->
         <span class="menu-text">Hostel</span>
       </a>
     </li> -->
-    @can('hosptal-list')
+    @can('hospital-list')
     <li>
       <a href="{{ route('hospital.index') }}">
         <i class="bi bi-calendar2"></i>

@@ -22,6 +22,9 @@
 
 @endsection
 @section('content')
+<div class="col-md-2 text-left">
+                        <button onclick="history.back()" class="btn btn-primary">Previous</button>
+                    </div>
 <h1>Next of Kin information</h1>
 <?php $typeToAppend ="";
     if(isset(($student))){
@@ -103,9 +106,7 @@
             </div>
             <div class="card-footer">
                 <div class="d-flex gap-2 justify-content-end">
-                    <div class="col-md-2 text-left">
-                        <button onclick="history.back()" class="btn btn-primary">Previous</button>
-                    </div>
+
                     <button class="btn btn-primary">
                     @if(isset($student))
                             Save

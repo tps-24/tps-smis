@@ -16,7 +16,7 @@ class AttendenceSeeder extends Seeder
     public function run(): void
     {
         $data = [];
-        $startDate = Carbon::now()->subWeeks(12);
+        $startDate = Carbon::now('Africa/Dar_es_Salaam')->subWeeks(12);
 
         for ($day = 0; $day < 12 * 7; $day++) { // 12 weeks * 7 days
             $currentDate = $startDate->copy()->addDays($day);

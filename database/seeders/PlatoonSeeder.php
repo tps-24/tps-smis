@@ -147,7 +147,7 @@ class PlatoonSeeder extends Seeder
             'name'=>'2'
         ]);
         Platoon::create([
-            'company_id'=>'2',
+            'company_id'=>'3',
             'name'=>'3'
         ]);
         Platoon::create([

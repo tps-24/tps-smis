@@ -17,7 +17,7 @@
 
 @endsection
 @section('content')
-<h5>Please check absent students.</h5>
+<h5>Please check present students.</h5>
 <form action="
     @if(isset($attendence))
         {{url('attendences/' . $attendence->id . '/update')}}

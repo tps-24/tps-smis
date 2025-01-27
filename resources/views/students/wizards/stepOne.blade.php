@@ -43,6 +43,9 @@
                         <input @if(isset($student)) value="{{$student->force_number}}" @endif type="text"
                             class="form-control" id="force_number" name="force_number" placeholder="Enter force number">
                     </div>
+                    @error('force_number')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -97,7 +100,7 @@
                         <label class="form-label" for="abc4">Education Level</label>
                         <select class="form-select" id="abc4" name="education_level" required
                             aria-label="Default select example">
-                            <!-- <option selected="">select gender</option> -->
+                            <option value = "">select education</option>
                             <option @if(isset($student) && $student->education_level == "Form Four") selected @endif
                                 value="Form Four">Form Four</option>
                             <option @if(isset($student) && $student->education_level == "Form Six") selected @endif value="Form Six">Form Six</option>

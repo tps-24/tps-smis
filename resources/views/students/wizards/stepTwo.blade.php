@@ -31,6 +31,9 @@
          $typeToAppend = "create";
     }
 ?>
+                    <div class="col-md-2 text-left">
+                        <button onclick="history.back()" class="btn btn-primary">Previous</button>
+                    </div>
 <form action="{{url('students/create/post-step-two/'.$typeToAppend)}}" method="POST">
     @csrf
     @method('POST')
@@ -72,8 +75,8 @@
                         <select  class="form-select" id="abc4" name="gender" required
                             aria-label="Default select example">
                             <option selected="">select gender</option>
-                            <option @if(isset($student)) value="{{$student->gender}}" @endif value="M">Male</option>
-                            <option @if(isset($student)) value="{{$student->gender}}" @endif value="F">Female</option>
+                            <option @if(isset($student)) selected @endif value="M">Male</option>
+                            <option @if(isset($student)) selected @endif value="F">Female</option>
                         </select>
                     </div>
                     @error('gender')
@@ -147,6 +150,54 @@
                 </div>
             </div>
         </div>
+        <div class="col-sm-4 col-12">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="m-0">
+                        <label class="form-label" for="abc4">Blood Group</label>
+                        <select class="form-select" name="blood_group" id="abc4" aria-label="Default select example">
+                            <option value=""> select blood group</option>
+                            <option @if(isset($student) && $student->blood_group == "A+") selected @endif value="A+">A+</option>
+                            <option @if(isset($student) && $student->blood_group == "A") selected @endif value="A">A</option>
+                            <option @if(isset($student) && $student->blood_group == "B") selected @endif value="B">B</option>
+                            <option @if(isset($student) && $student->blood_group == "O+") selected @endif value="O+">O+</option>
+                        </select>
+                    </div>
+                    @error('weight')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-12">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="m-0">
+                        <label class="form-label" for="abc">Weight (in Kg)</label>
+                        <input @if(isset($student)) value="{{$student->weight}}" @endif type="number" class="form-control" id="weight" name="weight" 
+                            placeholder="Enter weight">
+                    </div>
+                    @error('weight')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 col-12">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="m-0">
+                        <label class="form-label" for="abc">Height (in ft)</label>
+                        <input @if(isset($student)) value="{{$student->height}}" @endif type="number" class="form-control" id="weight" name="height"
+                            placeholder="Enter height">
+                    </div>
+                    @error('weight')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="card-footer">
@@ -156,9 +207,7 @@
             </div>
             <div class="card-footer">
                 <div class="d-flex gap-2 justify-content-end">
-                    <div class="col-md-2 text-left">
-                        <button onclick="history.back()" class="btn btn-primary">Previous</button>
-                    </div>
+
                     <button type="submit" class="btn btn-primary">Next</button>
                 </div>
             </div>

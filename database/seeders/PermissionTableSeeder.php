@@ -38,7 +38,7 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'profile-create', 'description' => 'Create new profile'], 
             ['name' => 'profile-edit', 'description' => 'Edit existing profile'], 
             ['name' => 'profile-delete', 'description' => 'Delete profile'],
-            ['name' => '', 'description' => 'View attendance'], 
+            ['name' => 'attendance-list', 'description' => 'View attendance'], 
             ['name' => 'attendance-create', 'description' => 'Create new attendance'], 
             ['name' => 'attendance-edit', 'description' => 'Edit existing attendance'], 
             ['name' => 'attendance-delete', 'description' => 'Delete attendance'], 
