@@ -7,21 +7,38 @@ use Illuminate\Database\Eloquent\Model;
 class Staff extends Model
 {
     protected $fillable = [
-            'force_number',
+            'forceNumber',
             'rank',
-            'first_name',
-            'middle_name',
-            'last_name',
-            'gender',
-            'phone',
             'nin',
-            'dob',
-            'home_region',
-            'company',
-            'platoon',
-            'education_level',
-            'blood_group',
-            'height',
-            'weight'
+            'firstName',
+            'middleName',
+            'lastName',
+            'gender',
+            'DoB',
+            'maritalStatus',
+            'religion',
+            'tribe',
+            'phoneNumber',
+            'email',
+            'currentAddress',
+            'permanentAddress',
+            'department_id',
+            'designation',
+            'educationLevel',
+            'contractType',
+            'joiningDate',
+            'location',
+            'nextofkinFullname',
+            'nextofkinRelationship',
+            'nextofkinPhoneNumber',
+            'nextofkinPhysicalAddress',
+            'user_id',
+            'created_by'
         ];
+
+
+        public function department() 
+        { 
+            return $this->belongsTo(Department::class); 
+        }
 }

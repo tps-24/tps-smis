@@ -15,10 +15,10 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $students = Student::latest()->paginate(5);
+        $students = Student::latest()->paginate(10);
         $page_name = "Student Management";
         return view('students.index',compact('students', 'page_name'))
-         ->with('i', ($request->input('page', 1) - 1) * 5);;
+         ->with('i', ($request->input('page', 1) - 1) * 10);;
     }
 
     /**
@@ -183,15 +183,21 @@ class StudentController extends Controller
 
     public function postStepOne(Request $request, $type)
     {
+        if($type == "edit"){
+            $student = Student::findOrFail($request->id);
+        }
+        // dd($request->id);
+
         $validatedData = $request->validate([
-            'force_number'=>'nullable',
+            'force_number' => 'nullable|unique:students,force_number,' . $request->id,
             'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'last_name'=> 'required|max:30|alpha|regex:/^[A-Z]/',
             'middle_name'=> 'required|max:30|alpha|regex:/^[A-Z]/',
             'home_region' => 'required|string|min:4',
         ]);
-            $companies = Company::all();
+        
+        $companies = Company::all();
         if(empty($request->session()->get('student'))){
             $student = new Student();
             $student->fill($validatedData);
@@ -202,7 +208,7 @@ class StudentController extends Controller
             $request->session()->put('student', $student);
         }
         if($type == "edit"){
-            return view('students/wizards.stepTwo', compact('companies','companies'));
+            return view('students/wizards.stepTwo', compact('companies','student'));
         }
         return redirect('students/create/step-two/'.$type, )->with('companies',$companies);
     }
@@ -219,7 +225,7 @@ class StudentController extends Controller
         $student = $request->session()->get('student');
         $validatedData = $request->validate([
             'phone' => 'nullable|numeric|digits:10|unique:students,phone,'.$student->id.',id',
-            'nin'=> 'required|numeric|unique:students,nin,'.$student->id.',id',
+            'nin'=> 'required|digits:20|numeric|unique:students,nin,'.$student->id.',id',
             'dob' => 'required|string',
             'gender' => 'required|max:1|alpha|regex:/^[M,F]/',
             'company' => 'required|max:2|alpha',
@@ -255,11 +261,15 @@ class StudentController extends Controller
         $student->fill($validatedData);
         $request->session()->put('student', $student);
         $student = $request->session()->get('student');
+        if($type == "edit"){
+            $student -> update([
+
+            ]);
+        }
         $student->save();
   
         $request->session()->forget('student');
-
-        //return $this->index();
+        // return redirect()->route('login');
         return redirect()->route('students.index')->with('success','Student '.$type.'d successfully.');
     }
 }

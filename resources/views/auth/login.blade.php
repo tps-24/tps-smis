@@ -83,12 +83,10 @@
                   {{ __('Login') }}
                   </button>
 
-                  @if (Route::has('password.request'))
                   <!-- <a class="btn btn-link" href="{{ route('password.request') }}"> -->
-                  <a class="btn btn-link" href="#">
-                      {{ __('Forgot Your Password?') }}
+                  <a class="btn btn-link" href="/tps-rms/students/create">
+                      {{ __('Register New Student') }}
                   </a>
-                  @endif
               </div>
             </div>
             <!-- Authbox ends -->

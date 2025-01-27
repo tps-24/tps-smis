@@ -29,6 +29,8 @@
     }else {
          $typeToAppend = "create";
     }
+
+    // dd($typeToAppend);
 ?>
 <form action="{{url('students/create/post-step-one/'.$typeToAppend)}}" method="POST">
     @csrf
@@ -39,10 +41,14 @@
             <div class="card mb-2">
                 <div class="card-body">
                     <div class="m-0">
+                        <input @if(isset($student)) value="{{$student->id}}" @endif type="text" class="form-control" id="id" name="id" hidden>
                         <label class="form-label" for="abc">Force Number </label>
                         <input @if(isset($student)) value="{{$student->force_number}}" @endif type="text"
                             class="form-control" id="force_number" name="force_number" placeholder="Enter force number">
                     </div>
+                    @error('force_number')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
         </div>

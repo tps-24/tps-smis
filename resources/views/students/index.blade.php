@@ -147,7 +147,7 @@
 
         <tr>
         <td>{{++$i}}</td>
-        <td>{{$student->force_number}}</td>
+        <td>{{$student->force_number ?? ''}}</td>
         <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
         <td>{{$student->company}}</td>
         <td>{{$student->platoon}}</td>

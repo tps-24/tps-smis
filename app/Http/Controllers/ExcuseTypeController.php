@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 
 class ExcuseTypeController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:excuseType-create')->only(['create', 'store']);
-        $this->middleware('permission:excuseType-list')->only(['index', 'show']);
-        $this->middleware('permission:excuseType-update')->only(['edit', 'update']);
-        $this->middleware('permission:excuseType-delete')->only(['destroy']);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('permission:excuseType-create')->only(['create', 'store']);
+    //     $this->middleware('permission:excuseType-list')->only(['index', 'show']);
+    //     $this->middleware('permission:excuseType-update')->only(['edit', 'update']);
+    //     $this->middleware('permission:excuseType-delete')->only(['destroy']);
+    // }
     /**
      * Display a listing of the resource.
      */
