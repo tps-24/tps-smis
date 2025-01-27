@@ -11,12 +11,20 @@ $(function () {
 
 // Wizard #2
 $(function () {
-	// SmartWizard 2 initialize
-	$("#smartwizard2").smartWizard({
-		theme: "arrows",
-		justified: false,
-	});
+    // SmartWizard 2 initialize
+    $("#smartwizard2").smartWizard({
+        theme: "arrows",    
+        justified: false,
+    });
+
+	if ($("#smartwizard2").smartWizard("getStepIndex") === $("#smartwizard2").smartWizard("stepsCount") - 1) {
+		$("#btnSubmit").hide();
+	}else{
+		$("#btnSubmit").show();
+	}
+
 });
+
 
 // Wizard #3
 $(function () {

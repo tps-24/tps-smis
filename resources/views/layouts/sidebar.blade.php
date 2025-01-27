@@ -1,4 +1,4 @@
-c <!-- Sidebar wrapper starts -->
+<!-- Sidebar wrapper starts -->
  <nav id="sidebar" class="sidebar-wrapper">
 
 <!-- App brand starts -->
@@ -44,10 +44,10 @@ c <!-- Sidebar wrapper starts -->
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">Staff Details</a>
+          <a href="{{ route('staffs.index') }}">Staff Details</a>
         </li>
         <li>
-          <a href="#">Staff Registration</a>
+          <a href="{{ route('staffs.create') }}">Staff Registration</a>
         </li>
       </ul>
     </li>
@@ -162,9 +162,9 @@ c <!-- Sidebar wrapper starts -->
       </a>
     </li>
     <!-- <li>
-      <a href="#">
-        <i class="bi bi-globe"></i>
-        <span class="menu-text">Hostel</span>
+      <a href="">
+        <i class="bi bi-calendar2"></i>
+        <span class="menu-text">Timetable</span>
       </a>
     </li> -->
     @can('hospital-list')
@@ -205,12 +205,14 @@ c <!-- Sidebar wrapper starts -->
       </ul>
     </li>
     @endcan()
+    @can('user-list')
     <li>
       <a href="{{ route('users.index') }}">
         <i class="bi bi-border-all"></i>
         <span class="menu-text">Users</span>
       </a>
     </li>
+    @endcan()
     @can('role-list')
     <li>
       <a href="{{ route('roles.index') }}">
@@ -242,6 +244,12 @@ c <!-- Sidebar wrapper starts -->
         </li>
         <li>
           <a href="{{ route('session_programmes.index') }}">Session Settings</a>
+        </li>
+        <li>
+          <a href="{{ route('excuse_types.index') }}">Excuse Type Settings</a>
+        </li>
+        <li>
+          <a href="{{ route('campuses.index') }}">Campus Settings</a>
         </li>
         <li>
           <a href="#">Notification Setting</a>

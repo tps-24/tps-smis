@@ -14,6 +14,14 @@ use Illuminate\Http\RedirectResponse;
 
 class ProgrammeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:programme-create')->only(['create', 'store']);
+        $this->middleware('permission:programme-list')->only(['index', 'show']);
+        $this->middleware('permission:programme-update')->only(['edit', 'update']);
+        $this->middleware('permission:programme-delete')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

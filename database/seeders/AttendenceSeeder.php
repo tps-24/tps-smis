@@ -22,7 +22,7 @@ class AttendenceSeeder extends Seeder
             $currentDate = $startDate->copy()->addDays($day);
 
             $data[] = [
-                'platoon_id' => 1,
+                'platoon_id' => 15,
                 'attendenceType_id' => 1,
                 'present' => rand(20, 30),
                 'sentry' => rand(1, 5),

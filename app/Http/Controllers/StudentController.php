@@ -15,11 +15,10 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $students = Student::latest()->paginate(5);
+        $students = Student::latest()->paginate(10);
         $page_name = "Student Management";
-        return view('students.index', compact('students', 'page_name'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
-        ;
+        return view('students.index',compact('students', 'page_name'))
+         ->with('i', ($request->input('page', 1) - 1) * 10);;
     }
 
     /**
@@ -185,8 +184,13 @@ class StudentController extends Controller
 
     public function postStepOne(Request $request, $type)
     {
+        if($type == "edit"){
+            $student = Student::findOrFail($request->id);
+        }
+
         $validatedData = $request->validate([
-            'force_number' => 'nullable|regex:/^[A-Z]\.\d+$/',
+            'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/',
+            'rank' => 'required',
             'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',

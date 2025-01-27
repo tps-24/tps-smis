@@ -29,6 +29,8 @@
     }else {
          $typeToAppend = "create";
     }
+
+    // dd($typeToAppend);
 ?>
 <form action="{{url('students/create/post-step-one/'.$typeToAppend)}}" method="POST">
     @csrf
@@ -39,11 +41,34 @@
             <div class="card mb-2">
                 <div class="card-body">
                     <div class="m-0">
+                        <input @if(isset($student)) value="{{$student->id}}" @endif type="text" class="form-control" id="id" name="id" hidden>
                         <label class="form-label" for="abc">Force Number </label>
                         <input @if(isset($student)) value="{{$student->force_number}}" @endif type="text"
                             class="form-control" id="force_number" name="force_number" placeholder="Enter force number">
                     </div>
                     @error('force_number')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-12">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="m-0">
+                        <label class="form-label" for="abc4">Rank</label>
+                        <select class="form-select" id="abc4" name="rank" required
+                            aria-label="Default select example">
+                            <option value = "">select rank</option>
+                            <option @if(isset($student) && $student->rank == "Recruit") selected @endif
+                                value="Recruit">Recruit</option>
+                            <option @if(isset($student) && $student->rank == "Constable") selected @endif value="Constable">Constable</option>
+                            <option @if(isset($student) && $student->rank == "Copral") selected @endif value="Certificate">Copral</option>
+                            <option @if(isset($student) && $student->rank == "Sergent") selected @endif value="Sergent">Sergent</option>
+
+                        </select>
+                    </div>
+                    @error('education_level')
                         <div class="error">{{ $message }}</div>
                     @enderror
                 </div>

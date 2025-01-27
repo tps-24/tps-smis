@@ -13,6 +13,14 @@ use Illuminate\Http\RedirectResponse;
 
 class SessionProgrammeController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:programme-session-list|programme-session-create|programme-session-edit|programme-session-delete', ['only' => ['index','view']]);
+         $this->middleware('permission:programme-session-create', ['only' => ['create','store']]);
+         $this->middleware('permission:programme-session-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:programme-session-delete', ['only' => ['destroy']]);
+    }
+
     /**
      * Display a listing of the resource.
      */

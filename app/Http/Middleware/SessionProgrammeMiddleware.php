@@ -16,12 +16,18 @@ class SessionProgrammeMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->has('session_id')) {
-            $sessionProgramme = SessionProgramme::find($request->input('session_id'));
-            session(['selected_session' => $sessionProgramme]);
-        }else{
-            return response()->json(['error' => 'Session ID is required'], 400);
-        }
+        // if ($request->has('session_id')) {
+        //     $sessionProgramme = SessionProgramme::find($request->input('session_id'));
+        //     session(['selected_session' => $sessionProgramme]);
+        // }else{
+        //     return response()->json(['error' => 'Session ID is required'], 400);
+        // }
+
+        // Check if the session key exists or set it
+        if (!Session::has('session_id')) {
+            Session::put('session_id', 'default_session');
+        } 
+
         return $next($request);
     }
 }

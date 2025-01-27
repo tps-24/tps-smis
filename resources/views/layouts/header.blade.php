@@ -15,9 +15,9 @@
     <!-- App brand sm starts -->
     <div class="app-brand-sm d-lg-none d-flex">
         <!-- Logo sm starts -->
-        <a href="index.html">
+        <!-- <a href="index.html">
             <img src="assets/images/logo-sm.svg" class="logo" alt="Tps Gallery">
-        </a>
+        </a> -->
         <!-- Logo sm end -->
     </div>
     <!-- App brand sm ends -->

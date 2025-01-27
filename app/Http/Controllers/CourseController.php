@@ -11,14 +11,22 @@ use DB;
 
 class CourseController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:course-create')->only(['create', 'store']);
+        $this->middleware('permission:course-list')->only(['index', 'show']);
+        $this->middleware('permission:course-update')->only(['edit', 'update']);
+        $this->middleware('permission:course-delete')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
-        $courses = Course::orderBy('id','DESC')->paginate(5);
+        $courses = Course::orderBy('id','DESC')->paginate(10);
         return view('courses.index',compact('courses'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+            ->with('i', ($request->input('page', 1) - 1) * 10);
     }
 
     /**
