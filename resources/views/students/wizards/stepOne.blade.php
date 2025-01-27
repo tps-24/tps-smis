@@ -63,7 +63,7 @@
                             <option @if(isset($student) && $student->rank == "Recruit") selected @endif
                                 value="Recruit">Recruit</option>
                             <option @if(isset($student) && $student->rank == "Constable") selected @endif value="Constable">Constable</option>
-                            <option @if(isset($student) && $student->rank == "Copral") selected @endif value="Certificate">Copral</option>
+                            <option @if(isset($student) && $student->rank == "Copral") selected @endif value="Copral">Copral</option>
                             <option @if(isset($student) && $student->rank == "Sergent") selected @endif value="Sergent">Sergent</option>
 
                         </select>

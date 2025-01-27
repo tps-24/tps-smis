@@ -207,6 +207,7 @@ class StudentController extends Controller
             $student = $request->session()->get('student');
             
             $student['force_number'] = $validatedData['force_number'];
+            $student['rank'] = $validatedData['rank'];
             $student['education_level'] = $validatedData['education_level'];
             $student['first_name'] = $validatedData['first_name'];
             $student['middle_name'] = $validatedData['middle_name'];
