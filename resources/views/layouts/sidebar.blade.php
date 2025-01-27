@@ -1,4 +1,4 @@
-c <!-- Sidebar wrapper starts -->
+<!-- Sidebar wrapper starts -->
  <nav id="sidebar" class="sidebar-wrapper">
 
 <!-- App brand starts -->
@@ -162,9 +162,9 @@ c <!-- Sidebar wrapper starts -->
       </a>
     </li>
     <!-- <li>
-      <a href="#">
-        <i class="bi bi-globe"></i>
-        <span class="menu-text">Hostel</span>
+      <a href="">
+        <i class="bi bi-calendar2"></i>
+        <span class="menu-text">Timetable</span>
       </a>
     </li> -->
     @can('hospital-list')

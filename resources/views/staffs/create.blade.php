@@ -86,12 +86,12 @@
                             Next of Kin Details
                           </a>
                         </li>
-                        <li class="nav-item abcd">
+                        <!-- <li class="nav-item abcd">
                           <a class="nav-link " href="#step-2d">
                             <span class="num">4</span>
                             Preview & Submit
                           </a>
-                        </li>
+                        </li> -->
                       </ul>
 
                       <div class="tab-content">
@@ -361,9 +361,10 @@
                                                     <label class="form-label" for="abc4">Contract Type</label>
                                                     <select class="form-select" id="contractType" name="contractType" aria-label="Default select example">
                                                         <option selected="">Choose Contract Type</option>
-                                                        <option value="Permanent">Permanent</option>
-                                                        <option value="Temporary">Temporary</option>
-                                                        <option value="Raia">Raia</option>
+                                                        <option value="Permanent">Permanent Contract</option>
+                                                        <option value="Temporary">Temporary Contract</option>
+                                                        <option value="Fixed-Term">Fixed-Term Contract</option>
+                                                        <option value="Probationary">Probationary Contract</option>
                                                     </select>
                                                     </div>
                                                 </div>
@@ -447,9 +448,9 @@
                             </div>
                             <!-- Row ends -->
                         </div>
-                        <div id="step-2d" class="tab-pane" role="tabpanel" aria-labelledby="step-2d">
+                        <!-- <div id="step-2d" class="tab-pane" role="tabpanel" aria-labelledby="step-2d"> -->
                             <!-- Row starts -->
-                            <div class="row gx-4">
+                            <!-- <div class="row gx-4">
                                 <div class="card mb-4">
                                     <div class="card-body">
                                         <div class="row abcd" style="margin-bottom:-1%">
@@ -464,9 +465,9 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <!-- Row ends -->
-                        </div>
+                        <!-- </div> -->
                         
                     </div>
 
@@ -488,11 +489,6 @@
               </div>
             </div>
             <!-- Row ends -->
-
-
-
-
-
 
             </form>
             </div>

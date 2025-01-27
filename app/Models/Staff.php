@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Traits\HasRoles;
 
 class Staff extends Model
 {
+
+    use HasRoles; 
+
     protected $fillable = [
             'forceNumber',
             'rank',
@@ -33,7 +37,8 @@ class Staff extends Model
             'nextofkinPhoneNumber',
             'nextofkinPhysicalAddress',
             'user_id',
-            'created_by'
+            'created_by',
+            'updated_by'
         ];
 
 

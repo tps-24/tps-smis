@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
             $table->foreignId('excuse_type_id')->constrained('excuse_types');
+            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
+            $table->string('first_name')->nullable();
+            $table->string('middle_name')->nullable(); // Optional
+            $table->string('last_name')->nullable();
             $table->integer('rest_days');
             $table->text('doctor_comment')->nullable();
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');

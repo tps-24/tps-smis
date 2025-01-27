@@ -87,12 +87,12 @@
                             Next of Kin Details
                           </a>
                         </li>
-                        <li class="nav-item abcd">
+                        <!-- <li class="nav-item abcd">
                           <a class="nav-link " href="#step-2d">
                             <span class="num">4</span>
                             Preview & Submit
                           </a>
-                        </li>
+                        </li> -->
                       </ul>
 
                       <div class="tab-content">
@@ -118,17 +118,17 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Rank</label>
                                                     <select class="form-select" id="rank" name="rank" aria-label="Default select example">
-                                                        <option selected="">Choose Rank</option>
-                                                        <option value="pc">Police Constable (PC)</option>
-                                                        <option value="cpl">Corporal</option>
-                                                        <option value="cpl">CorporalAssistant Sub-Inspector (ASI)</option>
-                                                        <option value="cpl">Sub-Inspector (SI)</option>
-                                                        <option value="cpl">Commissioner of Police (CP)</option>
-                                                        <option value="cpl">Senior Assistant Commissioner of Police (SACP)</option>
-                                                        <option value="cpl">Assistant Commissioner of Police (ACP)</option>
-                                                        <option value="cpl">Chief Inspector (CI)</option>
-                                                        <option value="cpl">Inspector (INSP)</option>
-                                                        <option value="cpl">Inspector General of Police (IGP)</option>
+                                                        <option value="" disabled>Select Rank</option>
+                                                        <option value="PC" {{ $staff->rank == 'PC' ? 'selected' : '' }}>Police Constable (PC)</option>
+                                                        <option value="CPL" {{ $staff->rank == 'CPL' ? 'selected' : '' }}>Corporal</option>
+                                                        <option value="ASI" {{ $staff->rank == 'ASI' ? 'selected' : '' }}>Assistant Sub-Inspector (ASI)</option>
+                                                        <option value="SI" {{ $staff->rank == 'SI' ? 'selected' : '' }}>Sub-Inspector (SI)</option>
+                                                        <option value="ACP" {{ $staff->rank == 'ACP' ? 'selected' : '' }}>Assistant Commissioner of Police (ACP)</option>
+                                                        <option value="CI" {{ $staff->rank == 'CI' ? 'selected' : '' }}>Chief Inspector (CI)</option>
+                                                        <option value="INSP" {{ $staff->rank == 'INSP' ? 'selected' : '' }}>Inspector (INSP)</option>
+                                                        <option value="SACP" {{ $staff->rank == 'SACP' ? 'selected' : '' }}>Senior Assistant Commissioner of Police (SACP)</option>
+                                                        <option value="CP" {{ $staff->rank == 'CP' ? 'selected' : '' }}>Commissioner of Police (CP)</option>
+                                                        <option value="IGP" {{ $staff->rank == 'IGP' ? 'selected' : '' }}>Inspector General of Police (IGP)</option>
                                                     </select>
                                                     </div>
                                                 </div>
@@ -183,8 +183,8 @@
                                                     <label class="form-label" for="abc4">Gender</label>
                                                     <select class="form-select" id="gender" name="gender" aria-label="Default select example">
                                                         <option selected="">Choose gender</option>
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
+                                                        <option value="Male" {{ $staff->gender == 'Male' ? 'selected' : '' }}>Male</option>
+                                                        <option value="Female" {{ $staff->gender == 'Female' ? 'selected' : '' }}>Female</option>
                                                     </select>
                                                     </div>
                                                 </div>
@@ -207,10 +207,10 @@
                                                     <label class="form-label" for="abc4">Marital Status</label>
                                                     <select class="form-select" id="maritalStatus" name="maritalStatus" aria-label="Default select example">
                                                         <option selected="">Choose Marital Status</option>
-                                                        <option value="Single">Single</option>
-                                                        <option value="Married">Married</option>
-                                                        <option value="Divorsed">Divorsed</option>
-                                                        <option value="Divorsed">Complicated</option>
+                                                        <option value="Single" {{ $staff->maritalStatus == 'Single' ? 'selected' : '' }}>Single</option>
+                                                        <option value="Married" {{ $staff->maritalStatus == 'Married' ? 'selected' : '' }}>Married</option>
+                                                        <option value="Divorsed" {{ $staff->maritalStatus == 'Divorsed' ? 'selected' : '' }}>Divorsed</option>
+                                                        <option value="Complicated" {{ $staff->maritalStatus == 'Complicated' ? 'selected' : '' }}>Complicated</option>
                                                     </select>
                                                     </div>
                                                 </div>
@@ -320,15 +320,13 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Role</label>
-                                                    
-                                                    
-                                <select name="roles[]" class="form-control" multiple="multiple">
-                                    @foreach ($roles as $value => $label)
-                                        <option value="{{ $value }}" {{ isset($userRole[$value]) ? 'selected' : ''}}>
-                                            {{ $label }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                                        <select name="roles[]" class="form-control" multiple="multiple">
+                                                            @foreach ($roles as $value => $label)
+                                                                <option value="{{ $value }}" {{ isset($userRole[$value]) ? 'selected' : ''}}>
+                                                                    {{ $label }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 </div>
@@ -339,15 +337,15 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Education Level</label>
                                                     <select class="form-select" id="educationLevel" name="educationLevel" aria-label="Default select example">
-                                                        <option selected="">Choose Education Level</option>
-                                                        <option value="std7">Darasa la Saba</option>
-                                                        <option value="4m4">Form Four</option>
-                                                        <option value="4m6">Form Six</option>
-                                                        <option value="Certificate">Certificate</option>
-                                                        <option value="Diploma">Diploma</option>
-                                                        <option value="Degree">Bachelor Degree</option>
-                                                        <option value="Masters">Masters</option>
-                                                        <option value="PhD">PhD</option>
+                                                        <option value="" disabled>Select Education Level</option>
+                                                        <option value="std7" {{ $staff->educationLevel == 'std7' ? 'selected' : '' }}>Darasa la Saba</option>
+                                                        <option value="4m4" {{ $staff->educationLevel == '4m4' ? 'selected' : '' }}>Form Four</option>
+                                                        <option value="4m6" {{ $staff->educationLevel == '4m6' ? 'selected' : '' }}>Form Six</option>
+                                                        <option value="Certificate" {{ $staff->educationLevel == 'Certificate' ? 'selected' : '' }}>Certificate</option>
+                                                        <option value="Diploma" {{ $staff->educationLevel == 'Diploma' ? 'selected' : '' }}>Diploma</option>
+                                                        <option value="Degree" {{ $staff->educationLevel == 'Degree' ? 'selected' : '' }}>Bachelor Degree</option>
+                                                        <option value="Masters" {{ $staff->educationLevel == 'Masters' ? 'selected' : '' }}>Masters</option>
+                                                        <option value="PhD" {{ $staff->educationLevel == 'PhD' ? 'selected' : '' }}>PhD</option>
                                                     </select>
                                                     </div>
                                                 </div>
@@ -362,9 +360,10 @@
                                                     <label class="form-label" for="abc4">Contract Type</label>
                                                     <select class="form-select" id="contractType" name="contractType" aria-label="Default select example">
                                                         <option selected="">Choose Contract Type</option>
-                                                        <option value="Permanent">Permanent</option>
-                                                        <option value="Temporary">Temporary</option>
-                                                        <option value="Raia">Raia</option>
+                                                        <option value="Permanent" {{ $staff->contractType == 'Permanent' ? 'selected' : '' }}>Permanent Contract</option>
+                                                        <option value="Temporary" {{ $staff->contractType == 'Temporary' ? 'selected' : '' }}>Temporary Contract</option>
+                                                        <option value="Fixed-Term" {{ $staff->contractType == 'Fixed-Term' ? 'selected' : '' }}>Fixed-Term Contract</option>
+                                                        <option value="Probationary" {{ $staff->contractType == 'Probation' ? 'selected' : '' }}>Probationary Contract</option>
                                                     </select>
                                                     </div>
                                                 </div>
@@ -448,9 +447,9 @@
                             </div>
                             <!-- Row ends -->
                         </div>
-                        <div id="step-2d" class="tab-pane" role="tabpanel" aria-labelledby="step-2d">
+                        <!-- <div id="step-2d" class="tab-pane" role="tabpanel" aria-labelledby="step-2d"> -->
                             <!-- Row starts -->
-                            <div class="row gx-4">
+                            <!-- <div class="row gx-4">
                                 <div class="card mb-4">
                                     <div class="card-body">
                                         <div class="row abcd" style="margin-bottom:-1%">
@@ -465,9 +464,9 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <!-- Row ends -->
-                        </div>
+                        <!-- </div> -->
                         
                     </div>
 
@@ -479,7 +478,7 @@
                                
                     <input type="number" name="updated_by" value="{{ Auth::user()->id }}" class="form-control" hidden> 
                     <div class="col-xs-12 col-sm-12 col-md-12 text-center" id="btnSubmit" style="margin-bottom:0px;">
-                        <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> Update</button>
+                        <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> submit</button>
                     </div>
 
                     </div>

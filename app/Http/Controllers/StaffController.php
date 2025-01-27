@@ -40,6 +40,7 @@ class StaffController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $this->validate($request, [
             'forceNumber' => 'required|unique:staff',
             'rank' => 'required',
@@ -77,7 +78,7 @@ class StaffController extends Controller
         
         // dd($input);
         //Now Create Staff
-        $user = Staff::create($input);
+        $staff = Staff::create($input);
 
         return redirect()->route('staffs.index')->with('success', 'Staff created successfully.');
     }
@@ -94,10 +95,17 @@ class StaffController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(Staff $staff)
-    {
+    {        
+        // Ensure the roles relationship is loaded
+        $staff->load('roles');
+        
+        $user = User::find($staff->user_id);
+
         $departments = Department::get();
         $roles = Role::pluck('name','name')->all();
-        return view('staffs.edit', compact('staff', 'departments', 'roles'));
+        $userRole = $user->roles->pluck('name','name')->all();
+
+        return view('staffs.edit', compact('staff', 'departments','roles', 'userRole'));
     }
 
     /**
@@ -116,12 +124,12 @@ class StaffController extends Controller
             'phoneNumber' => 'required',
             'email' => 'required|unique:staff,email,' . $staff->id,
             'department_id' => 'required|integer',
-            'role' => 'required',
+            'roles' => 'required',
             'educationLevel' => 'required',
             'contractType' => 'required',
             'joiningDate' => 'required|date',
             'location' => 'required',
-            'created_by' => 'required|exists:users,id'
+            'updated_by' => 'required|exists:users,id'
         ]);
 
         $id = Staff::where('id', $staff->id)->pluck('user_id');
