@@ -229,7 +229,7 @@ class StudentController extends Controller
             'dob' => 'required|string',
             'gender' => 'required|max:1|alpha|regex:/^[M,F]/',
             'company' => 'required|max:2|alpha',
-            'platoon' => 'required|max:1',
+            'platoon' => 'required|max:2',
         ]);
         
         $student->fill($validatedData);
