@@ -30,7 +30,6 @@
          $typeToAppend = "create";
     }
 
-    // dd($typeToAppend);
 ?>
 <form action="{{url('students/create/post-step-one/'.$typeToAppend)}}" method="POST">
     @csrf
@@ -59,7 +58,7 @@
                         <label class="form-label" for="abc4">Rank</label>
                         <select class="form-select" id="abc4" name="rank" required
                             aria-label="Default select example">
-                            <option value = "">select rank</option>
+                            <option value = "" selected disabled >select rank</option>
                             <option @if(isset($student) && $student->rank == "Recruit") selected @endif
                                 value="Recruit">Recruit</option>
                             <option @if(isset($student) && $student->rank == "Constable") selected @endif value="Constable">Constable</option>
@@ -125,7 +124,7 @@
                         <label class="form-label" for="abc4">Education Level</label>
                         <select class="form-select" id="abc4" name="education_level" required
                             aria-label="Default select example">
-                            <option value = "">select education</option>
+                            <option value = "" selected disabled >select education</option>
                             <option @if(isset($student) && $student->education_level == "Form Four") selected @endif
                                 value="Form Four">Form Four</option>
                             <option @if(isset($student) && $student->education_level == "Form Six") selected @endif value="Form Six">Form Six</option>

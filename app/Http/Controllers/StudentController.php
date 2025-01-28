@@ -244,7 +244,7 @@ class StudentController extends Controller
             'height' => 'required|numeric'
         ]);
         if ($validator->errors()->any()) {
-            return redirect()->back()->withErrors($validator->errors());//->with('error',$validator->errors());
+            return view('students/wizards/stepTwo', compact('student'))->withErrors($validator->errors());
         }
         $student['phone'] = $request->phone;
         $student['nin'] = $request->nin;
@@ -254,13 +254,10 @@ class StudentController extends Controller
         $student['platoon'] = $request->platoon;
         $student['weight'] = $request->weight;
         $student['height'] = $request->height;
-        //$student->fill($validatedData);
         $request->session()->put('student', $student);
         if ($type == "create") {
             return redirect('students/create/step-three/create');
-            //return view('students.wizards.stepThree');
         }
-
         return view('students.wizards.stepThree', compact('student'));
 
     }

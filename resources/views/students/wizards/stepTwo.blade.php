@@ -37,7 +37,6 @@
 <form action="{{url('students/create/post-step-two/'.$typeToAppend)}}" method="POST">
     @csrf
     @method('POST')
-
     <div class="row gx-4">
         <div class="col-sm-4 col-12">
             <div class="card mb-2">
@@ -74,9 +73,9 @@
                         <label class="form-label" for="abc4">Gender</label>
                         <select  class="form-select" id="abc4" name="gender" required
                             aria-label="Default select example">
-                            <option selected="">select gender</option>
-                            <option @if(isset($student)) selected @endif value="M">Male</option>
-                            <option @if(isset($student)) selected @endif value="F">Female</option>
+                            <option selected="" disabled>select gender</option>
+                            <option @if(isset($student)) @if($student->gender == "M") selected @endif @endif value="M">Male</option>
+                            <option @if(isset($student)) @if($student->gender == "F") selected @endif @endif value="F">Female</option>
                         </select>
                     </div>
                     @error('gender')
@@ -107,7 +106,7 @@
                         <select class="form-select" name="company" id="abc4" required
                             aria-label="Default select example">
                             
-                            <option >select company</option>
+                            <option selected disabled >select company</option>
                             <option @if(isset($student) && $student->company == "HQ") selected @endif value="HQ">HQ</option>
                             <option @if(isset($student) && $student->company == "A") selected @endif value="A">A</option>
                             <option @if(isset($student) && $student->company == "B") selected @endif value="B">B</option>
@@ -127,7 +126,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc4">Platoon</label>
                         <select class="form-select" name="platoon" id="abc4" aria-label="Default select example">
-                            <option selected="">select platoon</option>
+                            <option selected disabled>select platoon</option>
                             <option @if(isset($student) && $student->platoon == "1") selected @endif value="1">1</option>
                             <option @if(isset($student) && $student->platoon == "2") selected @endif value="2">2</option>
                             <option @if(isset($student) && $student->platoon == "3") selected @endif value="3">3</option>
@@ -174,7 +173,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Weight (in Kg)</label>
-                        <input @if(isset($student)) value="{{$student->weight}}" @endif type="number" class="form-control" id="weight" name="weight" 
+                        <input @if(isset($student)) value="{{$student->weight}}" @endif type="number" step="0.1" class="form-control" id="weight" name="weight" 
                             placeholder="Enter weight">
                     </div>
                     @error('weight')
@@ -189,7 +188,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Height (in ft)</label>
-                        <input @if(isset($student)) value="{{$student->height}}" @endif type="number" class="form-control" id="weight" name="height"
+                        <input @if(isset($student)) value="{{$student->height}}" @endif type="number" step="0.1" class="form-control" id="weight" name="height"
                             placeholder="Enter height">
                     </div>
                     @error('weight')
