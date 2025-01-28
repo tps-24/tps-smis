@@ -184,12 +184,17 @@ class StudentController extends Controller
 
     public function postStepOne(Request $request, $type)
     {
+        $student_validate_rule = "";
         if($type == "edit"){
             $student = Student::findOrFail($request->id);
+            $student_validate_rule = '|unique:students,force_number,' . $student->id . ',id';
+        }
+        else{
+            $student_validate_rule = '|unique:students,force_number';
         }
 
         $validatedData = $request->validate([
-            'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/|unique:students,force_number,' . $student->id . ',id',
+            'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/'.$student_validate_rule,
             'rank' => 'required',
             'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
@@ -244,7 +249,7 @@ class StudentController extends Controller
             'height' => 'required|numeric'
         ]);
         if ($validator->errors()->any()) {
-            return redirect()->back()->withErrors($validator->errors());//->with('error',$validator->errors());
+            return view('students/wizards/stepTwo', compact('student'))->withErrors($validator->errors());
         }
         $student['phone'] = $request->phone;
         $student['nin'] = $request->nin;
@@ -254,13 +259,10 @@ class StudentController extends Controller
         $student['platoon'] = $request->platoon;
         $student['weight'] = $request->weight;
         $student['height'] = $request->height;
-        //$student->fill($validatedData);
         $request->session()->put('student', $student);
         if ($type == "create") {
             return redirect('students/create/step-three/create');
-            //return view('students.wizards.stepThree');
         }
-
         return view('students.wizards.stepThree', compact('student'));
 
     }

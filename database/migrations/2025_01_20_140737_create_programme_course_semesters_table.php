@@ -18,7 +18,13 @@ return new class extends Migration
             $table->foreignId('semester_id')->constrained()->onDelete('cascade');
             $table->enum('course_type', ['core', 'minor', 'optional']);
             $table->integer('credit_weight');
-            $table->timestamps();
+            $table->unsignedBigInteger('session_programme_id')->constrained();
+            $table->unsignedBigInteger('created_by')->constrained();
+            $table->timestamp('created_at')->useCurrent()->nullable(false);
+            $table->timestamp('updated_at')->nullable(true)->useCurrentOnUpdate();
+
+            // Adding a unique constraint on the combination of programme_id, course_id, and session_programme_id  with a custom name
+            $table->unique(['programme_id', 'course_id', 'session_programme_id'], 'prog_course_session_unique');
         });
     }
 

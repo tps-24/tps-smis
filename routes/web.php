@@ -96,6 +96,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
+    Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'create'])->name('assign-courses.create');
+
 
     Route::resource('beats', BeatController::class);
 

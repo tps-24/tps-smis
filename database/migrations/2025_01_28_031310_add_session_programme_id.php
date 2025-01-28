@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('programme_course_semesters', function (Blueprint $table) {
-            $table->unsignedBigInteger('session_programme_id')->after('credit_weight')->nullable();
+        Schema::table('students', function (Blueprint $table) {
+            $table->unsignedBigInteger('session_programme_id')->after('user_id')->nullable();
             $table->foreign('session_programme_id')->references('id')->on('session_programmes')->onDelete('cascade');
         });
     }
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('programme_course_semesters', function (Blueprint $table) {
+        Schema::table('students', function (Blueprint $table) {
             $table->dropForeign(['sessionProgramme_id']);
             $table->dropColumn('sessionProgramme_id');
         });
