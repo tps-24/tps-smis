@@ -120,6 +120,7 @@
                                                         <option selected="">Choose Rank</option>
                                                         <option value="pc">Police Constable (PC)</option>
                                                         <option value="cpl">Corporal</option>
+                                                        <option value="cpl">Sergeant Major</option>
                                                         <option value="cpl">CorporalAssistant Sub-Inspector (ASI)</option>
                                                         <option value="cpl">Sub-Inspector (SI)</option>
                                                         <option value="cpl">Commissioner of Police (CP)</option>
@@ -320,7 +321,7 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Role</label>
                                                     <select multiple class="form-control select 2" id="exampleFormControlSelect2" name="roles[]" aria-label="Default select example">
-                                                        <option selected="">Choose role</option>  
+                                                        <option selected="" disabled>Choose role</option>  
                                                             @foreach ($roles as $value => $label)
                                                                 <option value="{{ $value }}">
                                                                     {{ $label }}

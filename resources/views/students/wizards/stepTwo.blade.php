@@ -174,8 +174,8 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Weight (in Kg)</label>
-                        <input @if(isset($student)) value="{{$student->weight}}" @endif type="number" class="form-control" id="weight" name="weight" 
-                            placeholder="Enter weight">
+                        <input @if(isset($student)) value="{{$student->weight}}" @endif type="number" step="0.1" class="form-control" id="weight" name="weight" 
+                           required placeholder="Enter weight">
                     </div>
                     @error('weight')
                         <div class="error">{{ $message }}</div>
@@ -189,8 +189,8 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Height (in ft)</label>
-                        <input @if(isset($student)) value="{{$student->height}}" @endif type="number" class="form-control" id="weight" name="height"
-                            placeholder="Enter height">
+                        <input @if(isset($student)) value="{{$student->height}}" @endif type="number" min="4" step="0.1" class="form-control" id="weight" name="height"
+                           required placeholder="Enter height">
                     </div>
                     @error('weight')
                         <div class="error">{{ $message }}</div>

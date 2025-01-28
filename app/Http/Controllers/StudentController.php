@@ -189,7 +189,7 @@ class StudentController extends Controller
         }
 
         $validatedData = $request->validate([
-            'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/',
+            'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/|unique:students,force_number,' . $student->id . ',id',
             'rank' => 'required',
             'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',

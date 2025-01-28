@@ -61,10 +61,10 @@
                             aria-label="Default select example">
                             <option value = "">select rank</option>
                             <option @if(isset($student) && $student->rank == "Recruit") selected @endif
-                                value="Recruit">Recruit</option>
-                            <option @if(isset($student) && $student->rank == "Constable") selected @endif value="Constable">Constable</option>
-                            <option @if(isset($student) && $student->rank == "Copral") selected @endif value="Copral">Copral</option>
-                            <option @if(isset($student) && $student->rank == "Sergent") selected @endif value="Sergent">Sergent</option>
+                                value="Recruit">Basic Recruit</option>
+                            <option @if(isset($student) && $student->rank == "Police Constable") selected @endif value="Constable">Police Constable</option>
+                            <option @if(isset($student) && $student->rank == "Corporal") selected @endif value="Corporal">Corporal</option>
+                            <option @if(isset($student) && $student->rank == "Sergeant Major") selected @endif value="Sergeant">Sergeant Major</option>
 
                         </select>
                     </div>
