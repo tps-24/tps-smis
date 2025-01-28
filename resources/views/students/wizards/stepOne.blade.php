@@ -56,6 +56,28 @@
             <div class="card mb-2">
                 <div class="card-body">
                     <div class="m-0">
+                        <label class="form-label" for="abc4">Rank</label>
+                        <select class="form-select" id="abc4" name="rank" required
+                            aria-label="Default select example">
+                            <option value = "">select rank</option>
+                            <option @if(isset($student) && $student->rank == "Recruit") selected @endif
+                                value="Recruit">Recruit</option>
+                            <option @if(isset($student) && $student->rank == "Constable") selected @endif value="Constable">Constable</option>
+                            <option @if(isset($student) && $student->rank == "Copral") selected @endif value="Copral">Copral</option>
+                            <option @if(isset($student) && $student->rank == "Sergent") selected @endif value="Sergent">Sergent</option>
+
+                        </select>
+                    </div>
+                    @error('education_level')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-12">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="m-0">
                         <label class="form-label" for="abc">First Name</label>
                         <input @if(isset($student)) value="{{$student->first_name}}" @endif type="text"
                             class="form-control" id="first_name" name="first_name" required
@@ -103,7 +125,7 @@
                         <label class="form-label" for="abc4">Education Level</label>
                         <select class="form-select" id="abc4" name="education_level" required
                             aria-label="Default select example">
-                            <!-- <option selected="">select gender</option> -->
+                            <option value = "">select education</option>
                             <option @if(isset($student) && $student->education_level == "Form Four") selected @endif
                                 value="Form Four">Form Four</option>
                             <option @if(isset($student) && $student->education_level == "Form Six") selected @endif value="Form Six">Form Six</option>

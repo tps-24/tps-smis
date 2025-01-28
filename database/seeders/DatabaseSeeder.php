@@ -14,15 +14,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        $this->call([ 
-            AttendenceSeeder::class,
-            PermissionTableSeeder::class,
+        $this->call([
             CreateAdminUserSeeder::class,
-            AttendenceTypeSeeder::class,
+            BeatTypeSeeder::class,
+            AreaSeeder::class,
+            VitengoSeeder::class,
             CompanySeeder::class,
             PlatoonSeeder::class,
+            AttendenceTypeSeeder::class,
+            AttendenceSeeder::class,
+            PermissionTableSeeder::class,
+
             GradingSystemsTableSeeder::class,
-            PatientsTableSeeder::class
+            PatientsTableSeeder::class,
+
         ]);
 
         // User::factory(10)->create();

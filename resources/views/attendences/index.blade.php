@@ -52,9 +52,9 @@
             <div class=" d-flex gap-2 justify-content-end">
                 <div class="">
                     <label for="">Company </label>
-                    <select style="height:50%" class="form-select" name="company" id="companies" required
+                    <select style="height:60%" class="form-select" name="company" id="companies" required
                         aria-label="Default select example">
-                        <!-- <option >select company</option> -->
+                        <option value="">company</option>
                         @foreach ($companies as $company)
                             <option value="{{$company->id}}">{{$company->name}}</option>
                         @endforeach
@@ -63,9 +63,9 @@
                 </div>
 
                 <div class=""> <label class="form-label" for="abc4">Platoon</label>
-                    <select style="height:50%" class="form-select" name="platoon" id=""
+                    <select style="height:60%" class="form-select" name="platoon" required id=""
                         aria-label="Default select example">
-                        <!-- <option selected="">select platoon</option> -->
+                        <option value="">platoon</option>
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
@@ -83,8 +83,8 @@
                     </select>
                 </div>
                 <div class="mt-4">
-                    <button type="submit" class="btn btn-success btn-sm">New
-                        attendance</button>
+                    <button type="submit" class="btn btn-success ">New
+                        </button>
                 </div>
             </div>
     </div>

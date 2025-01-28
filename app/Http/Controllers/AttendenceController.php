@@ -43,7 +43,7 @@ class AttendenceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request,$type, $platoon_id)
+    public function store(Request $request, $type, $platoon_id)
     {
         $present = count($request->input('student_ids'));
         $platoon = Platoon::find($platoon_id);
@@ -88,7 +88,7 @@ class AttendenceController extends Controller
             'male' => 0,
             'total' => $total
         ]);
-        return $this->attendence($request->type)->with('page',$page);
+        return $this->attendence($request->type)->with('page', $page);
     }
 
     /**
@@ -165,7 +165,7 @@ class AttendenceController extends Controller
                 foreach ($platoon_attendences as $att) {
                     $absent_students_ids = explode(',', $att->absent_student_ids);
                     $safari_students_ids = explode(',', $att->safari_student_ids);
-                    
+
                     if (count($absent_students_ids) > 0) {
                         for ($i = 0; $i < count($absent_students_ids); ++$i) {
                             $student = Student::find($absent_students_ids[$i]);
@@ -268,7 +268,6 @@ class AttendenceController extends Controller
         foreach ($companies as $company) {
             $statistics->put($company->name, $this->statistics($attendences[$company->name], $company->name));
         }
-
         return view('attendences/index', compact('statistics', 'companies', 'page'));
     }
 
@@ -311,32 +310,32 @@ class AttendenceController extends Controller
     {
         $mpsStudents = MPS::whereDate('created_at', Carbon::today())->orWhereNotNull('released_at')->get();
         $count = 0;
-        return 0;
         foreach ($mpsStudents as $mpsStudent) {
             if ($mpsStudent->student->company == $company) {
                 ++$count;
             }
         }
+
         return $count;
     }
 
-    
+
 
     public function list($list_type, $attendence_id)
     {
         $attendence = Attendence::find($attendence_id);
         $students = $attendence->platoon->students;
-        
+
         // $students = Company::join('students', 'companies.name', 'students.company')->join('platoons', 'platoons.id', 'students.platoon')
         //     ->where('students.company', 'HQ')->where('students.platoon', '1')->get('students.*');
-        return view('attendences.select_absent', compact('students', 'attendence_id','list_type'));
+        return view('attendences.select_absent', compact('students', 'attendence_id', 'list_type'));
     }
 
     public function list_safari($list_type, $attendence_id)
     {
         $attendence = Attendence::find($attendence_id);
         $students = $attendence->platoon->students;
-                return view('attendences.select_safari', compact('students', 'attendence_id','list_type'));
+        return view('attendences.select_safari', compact('students', 'attendence_id', 'list_type'));
     }
     public function storeAbsent(Request $request, $attendence_id)
     {
@@ -350,7 +349,7 @@ class AttendenceController extends Controller
         $attendence->absent = count(value: $ids);
         $attendence->save();
         $page = $attendence->attendenceType;
-        return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id)->with('page',$attendence->attendenceType);
+        return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id)->with('page', $attendence->attendenceType);
     }
 
     public function storeSafari(Request $request, $attendence_id)
@@ -368,4 +367,75 @@ class AttendenceController extends Controller
         return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id, )->with('page', $page);
     }
 
+    public function store_test(Request $request, $type, $platoon_id)
+    {
+        $ids = $request->input('student_ids');
+        $present = count($ids);
+        $platoon = Platoon::find($platoon_id);
+        $students = $platoon->students;
+        $absent = $present = 0;
+        $absent_ids =[];
+        $test_array = [];
+        $test_array1 = [];
+        foreach ($students as $student) {
+            for ($i = 0; $i < count($ids); ++$i) {
+                if ($student->id == $ids[$i]) {
+                    //Present
+                    array_push($test_array, [$student->id . ' imepata ' . $ids[$i]]);
+                    break;
+                } else {
+                    $absent += 1;
+
+                     if(!in_array($student->id, $absent_ids)){
+                        array_push($absent_ids, $student->id);
+                     }
+                    array_push($test_array1, [$student->id . ' is not ' . $ids[$i]]);
+                    //++$absent;
+                }
+            }
+        }
+        return $absent_ids;
+        $total = count(value: $students);
+        //$absent = $total - $present;
+        $todayRecords = Attendence::join('platoons', 'attendences.platoon_id', 'platoons.id')
+            ->where('attendences.platoon_id', $platoon_id)->whereDate('attendences.created_at', Carbon::today())->get();
+        if (!$todayRecords->isEmpty()) {
+            return redirect()->route('attendences.index')->with('error', "Attendences for this platoon already recorded.");
+        }
+        // $validator = Validator::make($request->all(), [
+        //     'present' => 'required|numeric',
+        //     'absent' => 'nullable|numeric',
+        //     'sick' => 'nullable|numeric',
+        //     'sentry' => 'nullable|numeric',
+        //     'excuse_duty' => 'nullable|numeric',
+        //     'kazini' => 'nullable|numeric',
+        //     'adm' => 'nullable|numeric',
+        //     'safari' => 'nullable|numeric',
+        //     'off' => 'nullable|numeric',
+        //     'mess' => 'nullable|numeric',
+        //     'female' => 'nullable|numeric',
+        //     'male' => 'nullable|numeric',
+        // ]);
+        // if ($validator->errors()->any()) {
+        //     return redirect()->back()->withErrors($validator->errors());
+        // }
+        $page = AttendenceType::find($type);
+
+        Attendence::create([
+            'attendenceType_id' => $type,
+            'platoon_id' => $platoon_id,
+            'present' => $present,
+            'sentry' => 0,
+            'absent' => $absent,
+            'adm' => 0,
+            'safari' => 0,
+            'off' => 0,
+            'mess' => 0,
+            'female' => 0,
+            'male' => 0,
+            'absent_student_ids' => $absent_ids,
+            'total' => $total
+        ]);
+        return $this->attendence($request->type)->with('page', $page);
+    }
 }

@@ -17,6 +17,7 @@
 @endsection
 </table>
 @section('content')
+
 <div class="row">
   @session('success')
     <div class="alert alert-success" role="alert">

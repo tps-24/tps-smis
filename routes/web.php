@@ -16,6 +16,7 @@ use App\Http\Controllers\AttendenceController;
 use App\Http\Controllers\MPSController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\BeatController;
 use App\Http\Controllers\TimetableController;
 
 use App\Http\Controllers\GradingSystemController; 
@@ -96,6 +97,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
 
+    Route::resource('beats', BeatController::class);
+
 
 
 
@@ -107,12 +110,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             Route::get('/', function () {
                 return view('students/wizards/stepOne');
             });
-            Route::get('step-two/{type}', function () {
-                return view('students/wizards/stepTwo');
-            });
-            Route::get('step-three', function () {
-                return view('students/wizards/stepThree');
-            });
+            Route::get('step-two/{type}',"createStepTwo");
+            Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
+
+            Route::get('step-three', "createStepTwo");
             Route::post('post-step-one/{type}','postStepOne');
             Route::post('post-step-two/{type}','postStepTwo');
             Route::post('post-step-three/{type}','postStepThree');
@@ -134,6 +135,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::post('store/{id}','store');
         Route::post('release/{id}','release');
         Route::get('{company}/company','company');
+    });
+
+    Route::controller(BeatController::class)->prefix('beats')->group(function(){
+        Route::get('{area_id}/create','create');
+        Route::get('{area_id}/search_students','search');
+        Route::post('{area_id}/assign_students','store');
     });
 
 });
@@ -206,3 +213,5 @@ Route::post('/patients/save', [PatientController::class, 'save'])->name('patient
 Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+
