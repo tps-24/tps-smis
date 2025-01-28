@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost/tps-rms'),
+    'url' => env('APP_URL', 'http://192.168.16.208:8081/tps-rms'),
 
     /*
     |--------------------------------------------------------------------------
@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'Africa/Dar_es_Salaam'),
+    'timezone' => env('APP_TIMEZONE', default: 'Africa/Dar_es_Salaam'),
 
     /*
     |--------------------------------------------------------------------------

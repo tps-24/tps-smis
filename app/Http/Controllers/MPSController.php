@@ -42,7 +42,7 @@ class MPSController extends Controller
         if ($mpsStudentData) {
             foreach ($mpsStudentData as $data) {
                 if (!$data->released_at) {
-                    return redirect()->route('mps.create')->with('success', 'Student  not released yet.');
+                    return redirect()->route('mps.create')->with('error', 'Student  not released yet.');
                 }
             }
         }
@@ -123,7 +123,7 @@ class MPSController extends Controller
 
     public function search(Request $request)
     {
-        $students = Student::where('platoon', $request->platoon)->where('company', $request->company)->orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        $students = Student::where('platoon', $request->platoon)->where('company', $request->company)->get();//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
         return view('mps.search', compact('students'));
         //return redirect()->back()->with('student',$student);
     }

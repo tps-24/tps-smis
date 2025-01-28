@@ -59,7 +59,11 @@
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <div class="p-4  me-3">
-                    <p>Gender: Male</p>
+                    <p>Gender: @if ($student->gender == "M")
+                        Male
+                    @else
+                        Female
+                    @endif</p>
                         <p>Blood Group: {{$student->blood_group}}</p>
                         <p>height: {{$student->height}} ft</p>
                         <p>Weight: {{$student->weight}} kg</p>

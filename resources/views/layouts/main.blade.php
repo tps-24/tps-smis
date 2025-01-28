@@ -75,5 +75,7 @@
     <!-- Rating -->
     <script src="/tps-rms/resources/assets/vendor/rating/raty.js"></script>
     <script src="/tps-rms/resources/assets/vendor/rating/raty-custom.js"></script> 
+    
+    @yield('scripts')
   </body>
 </html>

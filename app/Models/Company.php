@@ -14,4 +14,8 @@ class Company extends Model
         return $this->hasMany(Platoon::class,'company_id','id');
     }
 
+    public function students(){
+        return $this->hasMany(Student::class,'company','name');
+    }
+
 }

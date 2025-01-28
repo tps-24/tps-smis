@@ -22,6 +22,9 @@
 
 @endsection
 @section('content')
+<div class="col-md-2 text-left">
+                        <button onclick="history.back()" class="btn btn-primary">Previous</button>
+                    </div>
 <h1>Next of Kin information</h1>
 <?php $typeToAppend ="";
     if(isset(($student))){
@@ -42,7 +45,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc">Next Kin names</label>
                         <input @if(isset($student)) value="{{$student->next_kin_names}}" @endif type="text" class="form-control" id="last_name" name="next_kin_names" required
-                            placeholder="Enter next kin names">
+                            placeholder="Enter next kin names" value="{{old('next_kin_names')}}">
                     </div>
                     @error('next_kin_names')
                         <div class="error">{{ $message }}</div>
@@ -56,7 +59,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc">Phone</label>
                         <input @if(isset($student)) value="{{$student->next_kin_phone}}" @endif type="number" class="form-control" id="phone" name="next_kin_phone" required
-                            placeholder="Enter phone number">
+                            placeholder="Enter phone number" value="{{old('next_kin_phone')}}">
                     </div>
                     @error('next_kin_phone')
                         <div class="error">{{ $message }}</div>
@@ -71,7 +74,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc4">Relationship</label>
                         <input @if(isset($student)) value="{{$student->next_kin_relationship}}" @endif type="text" class="form-control" id="phone" name="next_kin_relationship" required
-                            placeholder="Enter relationship">
+                            placeholder="Enter relationship" value="{{old('next_kin_relationship')}}">
                     </div>
                     @error('next_kin_relationship')
                         <div class="error">{{ $message }}</div>
@@ -86,7 +89,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc4">Next Kin Address</label>
                         <input @if(isset($student)) value="{{$student->next_kin_address}}" @endif type="text" class="form-control" id="phone" name="next_kin_address" required
-                            placeholder="Enter address">
+                            placeholder="Enter address" value="{{old('next_kin_address')}}">
                     </div>
                     @error('next_kin_address')
                         <div class="error">{{ $message }}</div>
@@ -103,9 +106,7 @@
             </div>
             <div class="card-footer">
                 <div class="d-flex gap-2 justify-content-end">
-                    <div class="col-md-2 text-left">
-                        <button onclick="history.back()" class="btn btn-primary">Previous</button>
-                    </div>
+
                     <button class="btn btn-primary">
                     @if(isset($student))
                             Save

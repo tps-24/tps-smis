@@ -8,6 +8,9 @@ use App\Models\Semester;
 use App\Models\SessionProgramme;
 use App\Models\ProgrammeCourseSemester;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use DB;
 
 class ProgrammeCourseSemesterController extends Controller
 {
@@ -34,21 +37,29 @@ class ProgrammeCourseSemesterController extends Controller
         $semester = Semester::findOrFail($semesterId);
         $sessionProgramme = SessionProgramme::findOrFail($sessionProgrammeId);
         $courses = $programme->courses;
+        $course_opt = $programme->courses->where('course_type','optional');
 
 
-        $vcourses = $programme->courses()->wherePivot('semester_id', 1)
+        $courses1 = $programme->courses()->wherePivot('semester_id', 1)
                             ->wherePivot('session_programme_id', 4)
+                            ->orderBy('course_type', 'ASC')
                             ->get();
                             
+        $courses2 = $programme->courses()->wherePivot('semester_id', 2)
+                            ->wherePivot('session_programme_id', 4)
+                            ->orderBy('course_type', 'ASC')
+                            ->get();
+            
+                            
         $courseses = ProgrammeCourseSemester::all();
-        // dd($courses);
+        // dd($courseses);
 
-        return view('course_assignments.index', compact('programme', 'semester', 'sessionProgramme', 'courses'));
+        return view('course_assignments.index', compact('programme', 'semester', 'sessionProgramme', 'courses1','courses2'));
     }
 
-    public function create()
+    public function create($id)
     {
-        $programme = Programme::findOrFail(1);
+        $programme = Programme::findOrFail($id);
         $semester = Semester::findOrFail(1);
         $sessionProgramme = SessionProgramme::findOrFail(4);
         $courses = Course::all();
@@ -56,29 +67,71 @@ class ProgrammeCourseSemesterController extends Controller
         return view('course_assignments.create', compact('programme', 'semester', 'sessionProgramme', 'courses'));
     }
 
-    public function store(Request $request)
-    {
-        $programme = Programme::findOrFail(1);
 
-        $courseIds = $request->input('course_ids');
-        $courseType = $request->input('course_type'); 
-        $creditWeight = $request->input('credit_weight'); 
-        $sessionProgrammeId = $request->input('session_programme_id_'); 
-        $programmeId = $request->input('programme_id_ '); 
-        $semesterId = $request->input('semester_id_'); 
+public function store(Request $request)
+{
+    $this->validate($request, [
+        'programme_id' => 'required|exists:programmes,id',
+        'session_programme_id' => 'required|exists:session_programmes,id',
+        'course_type' => 'required|in:core,minor,optional',
+        'credit_weight' => 'required|integer',
+        'created_by' => 'required|exists:users,id'
+    ]);
 
-        foreach ($courseIds as $courseId) {
-            $programme->courses()->attach($courseId, [
-                'semester_id' => $semesterId,
-                'course_type' => $courseType,
-                'credit_weight' => $creditWeight,
-                'session_programme_id' => $sessionProgrammeId
-            ]);
+    $validCourseIds = [];
+    $skippedCourseIds = [];
+
+    foreach ($request->course_ids as $course_id) {
+        $validator = Validator::make(['course_id' => $course_id], [
+            'course_id' => [
+                'required',
+                Rule::unique('programme_course_semesters')->where(function ($query) use ($request) {
+                    return $query->where('programme_id', $request->programme_id)
+                                 ->where('session_programme_id', $request->session_programme_id);
+                }),
+            ],
+        ], [
+            'course_id.unique' => 'The course is already assigned to the selected programme and session.',
+        ]);
+
+        if (!$validator->fails()) {
+            // Add course_id to validCourseIds array if validation passes
+            $validCourseIds[] = $course_id;
+        } else {
+            // Add course_id to skippedCourseIds array if validation fails
+            $skippedCourseIds[] = $course_id;
         }
-
-        return redirect()->route('assign-courses.index', [$programmeId, $semesterId, $sessionProgrammeId])
-                         ->with('success', 'Courses assigned successfully');
     }
+
+    if (empty($validCourseIds) && !empty($skippedCourseIds)) {
+        return redirect()->back()->withErrors(['error' => 'The selected course(s) are already assigned.'])->withInput();
+    }
+
+    // Save only valid course_ids
+    foreach ($validCourseIds as $course_id) {
+        DB::table('programme_course_semesters')->insert([
+            'programme_id' => $request->programme_id,
+            'course_id' => $course_id,
+            'semester_id' => $request->semester_id,
+            'session_programme_id' => $request->session_programme_id,
+            'course_type' => $request->course_type,
+            'credit_weight' => $request->credit_weight,
+            'created_by' => $request->created_by
+        ]);
+    }
+
+    $successMessage = 'Course(s) assigned successfully.';
+    if (!empty($skippedCourseIds)) {
+        $successMessage .= ' Some courses were skipped because they were already assigned.';
+    }
+
+    return redirect()->route('assign-courses.index', [$request->programme_id, $request->semester_id, $request->session_programme_id])
+                     ->with('success', $successMessage);
+}
+
+
+    
+
 
     public function edit($programmeId, $semesterId, $sessionProgrammeId, $courseId)
     {

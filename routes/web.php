@@ -14,7 +14,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AttendenceController;
 use App\Http\Controllers\MPSController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\BeatController;
 use App\Http\Controllers\TimetableController;
 
 use App\Http\Controllers\GradingSystemController; 
@@ -28,6 +30,8 @@ use App\Http\Controllers\CourseworkResultController;
 use App\Http\Controllers\SemesterExamResultController; 
 use App\Http\Controllers\FinalResultController; 
 use App\Http\Controllers\ExcuseTypeController; 
+use App\Http\Controllers\CampusController;
+
 
 require __DIR__ . '/auth.php';
 
@@ -52,6 +56,8 @@ Route::group(['middleware' => 'session_programme'], function () {
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+Route::resource('students', StudentController::class);
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/students/dashboard', function () {
@@ -65,11 +71,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('programmes', ProgrammeController::class);
     Route::resource('courses', CourseController::class);
     Route::resource('products', ProductController::class);
-    Route::resource('students', StudentController::class);  
+    // Route::resource('students', StudentController::class);  
     Route::resource('attendences', AttendenceController::class);
     Route::resource('mps', MPSController::class);
-    Route::resource('programmes', ProgrammeController::class);
-    Route::resource('courses', CourseController::class);
+    Route::resource('staffs', StaffController::class);
+    Route::resource('campuses', CampusController::class);
 
 
     
@@ -90,6 +96,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
+    Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'create'])->name('assign-courses.create');
+
+
+    Route::resource('beats', BeatController::class);
 
 
 
@@ -102,12 +112,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             Route::get('/', function () {
                 return view('students/wizards/stepOne');
             });
-            Route::get('step-two/{type}', function () {
-                return view('students/wizards/stepTwo');
-            });
-            Route::get('step-three', function () {
-                return view('students/wizards/stepThree');
-            });
+            Route::get('step-two/{type}',"createStepTwo");
+            Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
+
+            Route::get('step-three', "createStepTwo");
             Route::post('post-step-one/{type}','postStepOne');
             Route::post('post-step-two/{type}','postStepTwo');
             Route::post('post-step-three/{type}','postStepThree');
@@ -129,6 +137,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::post('store/{id}','store');
         Route::post('release/{id}','release');
         Route::get('{company}/company','company');
+    });
+
+    Route::controller(BeatController::class)->prefix('beats')->group(function(){
+        Route::get('{area_id}/create','create');
+        Route::get('{area_id}/search_students','search');
+        Route::post('{area_id}/assign_students','store');
     });
 
 });
@@ -155,7 +169,37 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+//start
+Route::controller(StudentController::class)->prefix('students')->group(function () {
+    /**
+     *  Wizard route for student registration
+     */
+    Route::prefix('create')->group(function(){
+        Route::get('/', function () {
+            return view('students/wizards/stepOne');
+        });
+        Route::get('step-two/{type}', function () {
+            return view('students/wizards/stepTwo');
+        });
+        Route::get('step-three', function () {
+            return view('students/wizards/stepThree');
+        });
+        Route::post('post-step-one/{type}','postStepOne');
+        Route::post('post-step-two/{type}','postStepTwo');
+        Route::post('post-step-three/{type}','postStepThree');
+    });
+    /**
+     * End of wizard for student registration
+     */
 
+    Route::post('store', 'store');
+    Route::post('{id}/update', 'update');
+    Route::post('{id}/delete', 'destroy');
+    Route::post('bulkimport', 'import');
+
+
+});
+//end
 
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
 

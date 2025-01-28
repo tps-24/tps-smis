@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
-   protected $fillable = [
-    'force_number',
+    protected $fillable = [
+        'force_number',
         'first_name',
         'middle_name',
         'last_name',
@@ -29,32 +29,38 @@ class Student extends Model
         'next_kin_address',
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function mps(){
-        return $this->hasMany(MPS::class,'student_id','id');
+
+    public function mps()
+    {
+        return $this->hasMany(MPS::class, 'student_id', 'id');
     }
-    public function platoons(){
-        return $this->hasMany(Platoon::class,'name','id');
+    public function platoons()
+    {
+        return $this->hasMany(Platoon::class, 'name', 'id');
     }
 
-    public function company(){
-        return $this->hasMany(Company::class,'name','id');
+    public function company()
+    {
+        return $this->hasMany(Company::class, 'name', 'id');
     }
 
-    public function platoon(){
-        return $this->company()->merge($this->platoons());
-    }
-
+    // public function platoon()
+    // {
+    //     //return $this->company()->merge($this->platoons());
+    // }
+    
     // public function courses() 
     // { 
     //     return $this->belongsToMany(Course::class, 'enrollments'); 
     // }
 
-    public function optionalCourseEnrollments() 
-    { 
+    public function optionalCourseEnrollments()
+    {
         return $this->hasMany(OptionalCourseEnrollment::class); //Optional enrollments
     }
 }

@@ -1,4 +1,4 @@
-c <!-- Sidebar wrapper starts -->
+<!-- Sidebar wrapper starts -->
  <nav id="sidebar" class="sidebar-wrapper">
 
 <!-- App brand starts -->
@@ -44,10 +44,10 @@ c <!-- Sidebar wrapper starts -->
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">Staff Details</a>
+          <a href="{{ route('staffs.index') }}">Staff Details</a>
         </li>
         <li>
-          <a href="#">Staff Registration</a>
+          <a href="{{ route('staffs.create') }}">Staff Registration</a>
         </li>
       </ul>
     </li>
@@ -168,7 +168,6 @@ c <!-- Sidebar wrapper starts -->
       </a>
     </li> -->
     @can('hospital-list')
-    </li>  -->
     <li>
       <a href="{{ route('hospital.index') }}">
         <i class="bi bi-calendar2"></i>
@@ -247,7 +246,10 @@ c <!-- Sidebar wrapper starts -->
           <a href="{{ route('session_programmes.index') }}">Session Settings</a>
         </li>
         <li>
-          <a href="{{ route('excuse_types.create') }}">Excuse Type Settings</a>
+          <a href="{{ route('excuse_types.index') }}">Excuse Type Settings</a>
+        </li>
+        <li>
+          <a href="{{ route('campuses.index') }}">Campus Settings</a>
         </li>
         <li>
           <a href="#">Notification Setting</a>
