@@ -221,3 +221,45 @@ Route::post('/patients/save', [PatientController::class, 'save'])->name('patient
 Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
+
+
+
+
+
+
+
+
+
+
+Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+Route::post('/patients/submit', [PatientController::class, 'submit'])->name('patients.submit');
+Route::put('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name('patients.reject');
+Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
+Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+
+
+
+
+
+// Route for sending details to receptionist
+Route::post('/patients/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('patients.sendToReceptionist');
+
+// Route for receptionist to see pending approvals
+Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->name('receptionist.index');
+
+// Route for receptionist to approve patient
+Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve');
+
+
+
+// Receptionist Routes
+Route::get('/receptionist', [PatientController::class, 'receptionistIndex'])->name('receptionist.index');
+Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+
+//Daktari routes
+Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.page');
+Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
+
+
+
