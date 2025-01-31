@@ -9,7 +9,7 @@ class CourseWork extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['course_id', 'semester_id', 'coursework_title', 'assessment_type', 'max_score', 'due_date'];
+    protected $fillable = ['programme_id','course_id',  'semester_id', 'assessment_type_id', 'coursework_title',  'max_score', 'due_date', 'session_programme_id','created_by','updated_by'];
 
     public function course()
     {
@@ -24,5 +24,10 @@ class CourseWork extends Model
     public function courseworkResults()
     {
         return $this->hasMany(CourseworkResult::class);
+    }
+
+    public function assessmentType()
+    {
+        return $this->belongsTo(AssessmentType::class, 'assessment_type_id');
     }
 }

@@ -15,10 +15,14 @@ return new class extends Migration
         Schema::create('coursework_results', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained(); 
+            $table->foreignId('course_id')->constrained('courses'); 
             $table->foreignId('coursework_id')->constrained('course_works'); 
             $table->integer('score');
             $table->foreignId('semester_id')->constrained();
-            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->constrained('users');
+            $table->unsignedBigInteger('updated_by')->constrained('users')->nullable();
+            $table->timestamp('created_at')->useCurrent()->nullable(false);
+            $table->timestamp('updated_at')->nullable(true)->useCurrentOnUpdate();
         });
     }
 

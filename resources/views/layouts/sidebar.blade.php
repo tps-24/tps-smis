@@ -108,10 +108,13 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">semester 1</a>
+          <a href="{{ route('coursework_results.index') }}">semester 1</a>
         </li>
         <li>
           <a href="#">semester 2</a>
+        </li>
+        <li>
+          <a href="{{ route('course_works.index') }}">CA Configurations</a>
         </li>
       </ul>
     </li>

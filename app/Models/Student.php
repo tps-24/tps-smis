@@ -27,11 +27,17 @@ class Student extends Model
         'next_kin_phone',
         'next_kin_relationship',
         'next_kin_address',
+        'programme_id',
+        'user_id'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function programme()
+    {
+        return $this->belongsTo(Programme::class);
     }
 
 

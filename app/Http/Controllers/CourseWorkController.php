@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseWork;
+use App\Models\AssessmentType;
 use Illuminate\Http\Request;
 
 class CourseWorkController extends Controller
@@ -20,7 +21,8 @@ class CourseWorkController extends Controller
      */
     public function index()
     {
-        //
+        $courseWorks = CourseWork::all();
+        return view('course_works.index', compact('courseWorks'));
     }
 
     /**
@@ -28,7 +30,8 @@ class CourseWorkController extends Controller
      */
     public function create()
     {
-        //
+        $assessmentTypes = AssessmentType::get();
+        return view('course_works.create', compact('assessmentTypes'));
     }
 
     /**
@@ -36,7 +39,20 @@ class CourseWorkController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'programme_id' => 'required|exists:programmes,id',
+            'course_id' => 'required|exists:courses,id',
+            'semester_id' => 'required|exists:semesters,id',
+            'assessment_type_id' => 'required|exists:assessment_types,id',
+            'coursework_title' => 'required|string',
+            'max_score' => 'required|integer',
+            'due_date' => 'nullable|date',
+            'session_programme_id' => 'required|exists:session_programmes,id',
+        ]);
+
+        CourseWork::create($request->all());
+
+        return redirect()->route('course_works.index')->with('success', 'Coursework created successfully.');
     }
 
     /**

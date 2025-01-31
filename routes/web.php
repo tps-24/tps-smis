@@ -55,11 +55,13 @@ Route::group(['middleware' => 'session_programme'], function () {
     // Add more routes as needed
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
+Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
+Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/students', [StudentController::class, 'index'])->name('students.index');
 Route::resource('students', StudentController::class);
 
-Route::group(['middleware' => ['auth', 'verified']], function () {
+Route::group(['middleware' => ['auth']], function () {
     Route::get('/students/dashboard', function () {
         return view('students/dashboard');
     });
@@ -79,6 +81,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
 
     
+    // Define the custom route first
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+
+
     Route::resource('grading_systems', GradingSystemController::class); 
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);
@@ -96,7 +102,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
-    Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'create'])->name('assign-courses.create');
+    Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
 
     Route::resource('beats', BeatController::class);
@@ -181,7 +187,7 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
         Route::get('step-two/{type}', function () {
             return view('students/wizards/stepTwo');
         });
-        Route::get('step-three', function () {
+        Route::get('step-three/{type}', function () {
             return view('students/wizards/stepThree');
         });
         Route::post('post-step-one/{type}','postStepOne');
@@ -215,5 +221,3 @@ Route::post('/patients/save', [PatientController::class, 'save'])->name('patient
 Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
-
-

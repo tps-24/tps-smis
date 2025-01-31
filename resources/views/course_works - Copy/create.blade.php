@@ -22,10 +22,10 @@
                 <div class="row">
                     <div class="col-lg-12 margin-tb">
                         <div class="pull-left">
-                            <h2>Add Course Assessment</h2>
+                            <h2>Add New Course</h2>
                         </div>
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('course_works.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('courses.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -44,55 +44,27 @@
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Prog Id:</strong>
-                            <input type="number" name="programme_id" placeholder="Enter prog id" class="form-control">
+                            <strong>Course Name:</strong>
+                            <input type="text" name="courseName" placeholder="Enter Course Name" class="form-control">
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Course Id:</strong>
-                            <input type="number" name="course_id" placeholder="Enter Course id" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Semester Id:</strong>
-                            <input type="number" name="semester_id" placeholder="Enter Semester id" class="form-control">
+                            <strong>Course Code:</strong>
+                            <input type="text" name="courseCode" placeholder="Enter Course Code" class="form-control">
                         </div>
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
                             <strong>Department:</strong>
-                            <select name="assessment_type_id" class="form-control">                                    
-                                    @foreach ($assessmentTypes as $assessmentType)
-                                        <option value="{{ $assessmentType->id }}">{{ $assessmentType->type_name }}</option>
+                            <select name="department_id" class="form-control">                                    
+                                    @foreach ($departments as $value => $dep)
+                                        dd($value);
+                                        <option value="{{ $dep->id }}">
+                                            {{ $dep->departmentName }}
+                                        </option>
                                     @endforeach
                             </select>
-                        </div>
-                    </div>
-                    
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Coursework Title:</strong>
-                            <input type="text" name="coursework_title" placeholder="Enter Coursework title" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Max score:</strong>
-                            <input type="number" name="max_score" placeholder="Enter max score" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Due Date:</strong>
-                            <input type="date" name="due_date" placeholder="Enter Due Date" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Session Programme ID:</strong>
-                            <input type="number" name="session_programme_id" placeholder="Enter Course id" class="form-control">
                         </div>
                     </div>
                     <input type="number" name="created_by" value="{{ Auth::user()->id }}" class="form-control" hidden>
@@ -102,7 +74,7 @@
                 </div>
             </form>
             
-            </div>
+                </div>
         </div>
      
     </div>

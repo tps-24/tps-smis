@@ -22,7 +22,7 @@
       <!-- Auth container starts -->
       <div class="auth-container">
 
-        <div class="d-flex justify-content-center" style="margin-top:8%">
+        <div class="d-flex justify-content-center" style="margin-top:4%">
 
           <!-- Form starts -->
           <form method="POST" action="{{ route('login') }}">
@@ -82,11 +82,17 @@
                   <button type="submit" class="btn btn-primary">
                   {{ __('Login') }}
                   </button>
+                  
+                  <a href="/tps-rms/students/registration" class="btn btn-outline-dark">Not registered? Signup</a>
+                  @if (Route::has('password.request'))
+                      <a class="btn btn-link" href="{{ route('password.request') }}">
+                          {{ __('Forgot Your Password?') }}
+                      </a>
+                  @endif
 
-                  <!-- <a class="btn btn-link" href="{{ route('password.request') }}"> -->
-                  <a class="btn btn-link" href="/tps-rms/students/create">
+                  <!-- <a class="btn btn-link" href="/tps-rms/students/create">
                       {{ __('Register New Student') }}
-                  </a>
+                  </a> -->
               </div>
             </div>
             <!-- Authbox ends -->

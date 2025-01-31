@@ -31,5 +31,15 @@ class Course extends Model
                     ->withPivot('programme_id', 'course_type', 'credit_weight', 'session_programme_id');
     }
 
+    public function courseWorks()
+    {
+        return $this->hasMany(CourseWork::class);
+    }
+
+    public function courseworkResults()
+    {
+        return $this->hasMany(CourseworkResult::class);
+    }
+
 
 }
