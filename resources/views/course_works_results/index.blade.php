@@ -92,7 +92,7 @@
 
     function fetchCourseworkResults(courseId, page = 1) {
         var i = 1;
-        const basePath = '/tps-rms'; // Ensure this matches your base path
+        const basePath = '/tps-smis'; // Ensure this matches your base path
         console.log(`Fetching results for course ID: ${courseId}`); // Log before the fetch call
         fetch(`${basePath}/coursework_results/course/${courseId}?page=${page}`)
             .then(response => {

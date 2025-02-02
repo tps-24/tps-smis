@@ -5,8 +5,8 @@
   <div class="container-fluid">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="/tps-rms/students/">Students</a></li>
+        <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
+        <li class="breadcrumb-item"><a href="/tps-smis/students/">Students</a></li>
         <li class="breadcrumb-item active" aria-current="page"><a href="#">View</a></li>
       </ol>
     </nav>
@@ -24,7 +24,7 @@
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <div class="  me-3">
-                        <img src="/tps-rms/resources/assets/images/profile.png" style="height:50 !important; width:50"
+                        <img src="/tps-smis/resources/assets/images/profile.png" style="height:50 !important; width:50"
                             alt="profile image" />
                         <p>{{ $student->force_number ?? ''}}, {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</p>
                         <p>{{$student->rank}}</p>

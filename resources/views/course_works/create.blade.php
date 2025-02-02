@@ -62,7 +62,7 @@
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
-                            <strong>Department:</strong>
+                            <strong>Assessment Type:</strong>
                             <select name="assessment_type_id" class="form-control">                                    
                                     @foreach ($assessmentTypes as $assessmentType)
                                         <option value="{{ $assessmentType->id }}">{{ $assessmentType->type_name }}</option>

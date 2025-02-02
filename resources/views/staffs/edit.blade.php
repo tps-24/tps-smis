@@ -3,7 +3,7 @@
 @section('style')
 <!-- style starts -->
     <!-- Steps Wizard CSS -->
-    <link rel="stylesheet" href="/tps-rms/resources/assets/vendor/wizard/wizard.css" />
+    <link rel="stylesheet" href="/tps-smis/resources/assets/vendor/wizard/wizard.css" />
 
 <style>
     @media only screen and (min-width: 576px) {
@@ -504,7 +504,7 @@
 @section('scripts')
 <!-- scripts starts -->
     <!-- Steps wizard JS -->
-    <script src="/tps-rms/resources/assets/vendor/wizard/wizard.min.js"></script>
-    <script src="/tps-rms/resources/assets/vendor/wizard/wizard-custom.js"></script>
+    <script src="/tps-smis/resources/assets/vendor/wizard/wizard.min.js"></script>
+    <script src="/tps-smis/resources/assets/vendor/wizard/wizard-custom.js"></script>
 <!-- scripts ends -->
 @endsection

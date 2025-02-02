@@ -66,7 +66,7 @@ class CourseworkResultController extends Controller
     public function create()
     {
         // Retrieve necessary data for the form (students, courses, course works, semesters)
-        $students = Student::where('programme_id',1)->where('session_programme_id',4)->get();
+        $students = Student::where('programme_id',1)->where('session_programme_id',4)->orderBy('first_name','ASC')->get();
         $courses = Course::all();
         $courseWorks = CourseWork::all();
         $semesters = Semester::all();
