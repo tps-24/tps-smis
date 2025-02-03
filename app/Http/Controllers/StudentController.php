@@ -31,10 +31,10 @@ class StudentController extends Controller
         $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['import']]);
     }
 
-    public function dashboard(){
-        $user = Auth::user();
-        return view('students/dashboard', compact('user'));
-    }
+    // public function dashboard(){
+    //     $user = Auth::user();
+    //     return view('students/dashboard', compact('user'));
+    // }
     /**
      * Display a listing of the resource.
      */
