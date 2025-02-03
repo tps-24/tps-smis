@@ -30,4 +30,10 @@ class CourseworkResult extends Model
     {
         return $this->belongsTo(Semester::class);
     }
+
+
+    public function programmeCourseSemester()
+    {
+        return $this->belongsTo(ProgrammeCourseSemester::class, 'course_id', 'course_id');
+    }
 }

@@ -29,7 +29,7 @@
             @csrf
             <!-- Logo starts -->
             <center>
-                <a href="/tps-rms" class="auth-logo mt-5 mb-3">
+                <a href="/tps-smis" class="auth-logo mt-5 mb-3">
                 <img src="resources/assets/images/logo.png" style="height:200 !important; width:200" alt="Police Logo" />
                 </a>
             </center>
@@ -83,7 +83,7 @@
                   {{ __('Login') }}
                   </button>
                   
-                  <a href="/tps-rms/students/registration" class="btn btn-outline-dark">Not registered? Signup</a>
+                  <a href="/tps-smis/students/registration" class="btn btn-outline-dark">Not registered? Signup</a>
                   @if (Route::has('password.request'))
                       <a class="btn btn-link" href="{{ route('password.request') }}">
                           {{ __('Forgot Your Password?') }}

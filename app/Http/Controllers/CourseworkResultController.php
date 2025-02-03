@@ -59,6 +59,33 @@ class CourseworkResultController extends Controller
         }
     }
 
+    
+    public function coursework()
+    {
+        $user = auth()->user()->id;
+        $studentId = Student::where('user_id', $user)->pluck('id');
+        // $student = Student::find($studentId[0]);
+        // $coursework = $student->coursework();
+
+        $results = CourseworkResult::where('student_id', $studentId[0])
+                ->with(['student', 'course', 'coursework', 'semester','programmeCourseSemester'])->get();
+
+        $groupedBySemester = $results->groupBy('semester_id');
+
+        // dd($groupedBySemester);
+
+        return view('students.coursework.coursework', compact('groupedBySemester'));
+    }
+
+
+    public function summary($id)
+    {
+        $result = CourseworkResult::with(['student', 'course', 'coursework', 'semester', 'programmeCourseSemester'])
+                    ->findOrFail($id);
+
+        return view('students.coursework.summary', compact('result'));
+    }
+
 
     /**
      * Show the form for creating a new resource.

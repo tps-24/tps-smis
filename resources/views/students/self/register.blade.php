@@ -23,8 +23,8 @@
             
             <!-- Logo starts -->
             <center>
-                <a href="/tps-rms" class="auth-logo mt-5 mb-3">
-                <img src="/tps-rms/resources/assets/images/logo.png" style="height:200 !important; width:200" alt="Police Logo" />
+                <a href="/tps-smis" class="auth-logo mt-5 mb-3">
+                <img src="/tps-smis/resources/assets/images/logo.png" style="height:200 !important; width:200" alt="Police Logo" />
                 </a>
             </center>
             <!-- Logo ends -->
@@ -34,7 +34,7 @@
 
               <span class="mb-4" style="font-weight:500; font-size:24px;">Register Here</span><br><i>Please fill out all fields carefully as they appear on your official documents.</i>
                   <div class="row mb-3" style="margin-top:20px">
-                      <div class="col-xs-12 col-sm-6 col-md-6">
+                      <div class="col-xs-12 col-sm-6 col-md-6 mb-3">
                         <label class="form-label" for="force_number">Force Number <span class="text-danger">*</span></label>
                         <div class="input-group">
                           <span class="input-group-text">
@@ -48,7 +48,7 @@
                           @enderror
                         </div>
                       </div>
-                      <div class="col-xs-12 col-sm-6 col-md-6">
+                      <div class="col-xs-12 col-sm-6 col-md-6 mb-3">
                         <label class="form-label" for="first_name">First Name <span class="text-danger">*</span></label>
                         <div class="input-group">
                           <span class="input-group-text">
@@ -63,7 +63,7 @@
                           @enderror
                         </div>
                       </div>
-                      <div class="col-xs-12 col-sm-6 col-md-6">
+                      <div class="col-xs-12 col-sm-6 col-md-6 mb-3">
                         <label class="form-label" for="middle_name">Middle Name <span class="text-danger">*</span></label>
                         <div class="input-group">
                           <span class="input-group-text">
@@ -78,7 +78,7 @@
                           @enderror
                         </div>
                       </div>
-                      <div class="col-xs-12 col-sm-6 col-md-6">
+                      <div class="col-xs-12 col-sm-6 col-md-6 mb-3">
                         <label class="form-label" for="last_name">Last Name <span class="text-danger">*</span></label>
                         <div class="input-group">
                           <span class="input-group-text">
@@ -219,7 +219,7 @@
                         <div class="col-md-6 mb-3" style="position:relative; !important; margin-top:2%">
                           <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Register</button>
-                            <a href="/tps-rms/login" class="btn btn-outline-dark">Already have an account? Login</a>
+                            <a href="/tps-smis/login" class="btn btn-outline-dark">Already have an account? Login</a>
                           </div>
                         </div>
                       </center>

@@ -30,7 +30,7 @@
 
                         <div class="pull-right">
                             <a class="btn btn-primary btn-sm mb-2 backbtn" style="margin-left:10px" href="{{ route('programmes.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('assign-courses.create', $programme->id ) }}"><i class="fa fa-arrow-left"></i> Configure Programme</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('assign-courses.assignCourse', $programme->id ) }}"><i class="fa fa-arrow-left"></i> Configure Programme</a>
                         </div>
                     </div>
                 </div>
