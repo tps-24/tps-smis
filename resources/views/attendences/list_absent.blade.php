@@ -17,7 +17,7 @@
 
 @endsection
 @section('content')
-<h5>Please check absent students.</h5>
+
 <div class="table-responsive">
     <form action="{{url('attendences/store-absents/'.$attendence_id)}}" method="post">
         @csrf
@@ -41,20 +41,8 @@
     @endforeach
 </tbody>
 </table>
-
 <div class="d-flex gap-2 justify-content-end">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
 </form>
-
-<script>
-        // JavaScript function to toggle the state of checkboxes
-        function toggleSelectAll(source) {
-            // Get all checkboxes with the name "item"
-            var checkboxes = document.getElementsByName('item');
-            for (var i = 0; i < checkboxes.length; i++) {
-                checkboxes[i].checked = source.checked; // Set each checkbox's checked state to match the "Select All" checkbox
-            }
-        }
-    </script>
 @endsection

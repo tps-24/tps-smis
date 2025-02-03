@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Company;
@@ -20,15 +21,33 @@ use Hash;
 
 class StudentController extends Controller
 {
+    public function __construct()
+    {
+
+        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view']]);
+        $this->middleware('permission:student-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:student-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:student-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['import']]);
+    }
+
+    public function dashboard(){
+        $user = Auth::user();
+        return view('students/dashboard', compact('user'));
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $students = Student::latest()->paginate(10);
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
+        $students = Student::where('session_programme_id', $selectedSessionId)->latest()->paginate(10);
         $page_name = "Student Management";
-        return view('students.index',compact('students', 'page_name'))
-         ->with('i', ($request->input('page', 1) - 1) * 10);;
+        return view('students.index', compact('students', 'page_name'))
+            ->with('i', ($request->input('page', 1) - 1) * 10);
+        ;
     }
 
     /**
@@ -285,16 +304,15 @@ class StudentController extends Controller
     public function postStepOne(Request $request, $type)
     {
         $student_validate_rule = "";
-        if($type == "edit"){
+        if ($type == "edit") {
             $student = Student::findOrFail($request->id);
             $student_validate_rule = '|unique:students,force_number,' . $student->id . ',id';
-        }
-        else{
+        } else {
             $student_validate_rule = '|unique:students,force_number';
         }
 
         $validatedData = $request->validate([
-            'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/'.$student_validate_rule,
+            'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/' . $student_validate_rule,
             'rank' => 'required',
             'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
@@ -308,9 +326,9 @@ class StudentController extends Controller
             $student->fill($validatedData);
             $request->session()->put('student', $student);
         } else {
-            
+
             $student = $request->session()->get('student');
-            
+
             $student['force_number'] = $validatedData['force_number'];
             $student['rank'] = $validatedData['rank'];
             $student['education_level'] = $validatedData['education_level'];
@@ -319,7 +337,7 @@ class StudentController extends Controller
             $student['last_name'] = $validatedData['last_name'];
             $student['home_region'] = $validatedData['home_region'];
 
-            $request->session()->put('student', $student); 
+            $request->session()->put('student', $student);
         }
         if ($type == "edit") {
             return view('students.wizards.stepTwo', compact('student'));
@@ -338,14 +356,14 @@ class StudentController extends Controller
     public function postStepTwo(Request $request, $type)
     {
         $student = $request->session()->get('student');
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'phone' => 'nullable|numeric|digits:10|unique:students,phone,' . $student->id . ',id',
             'nin' => 'required|digits:20|numeric|unique:students,nin,' . $student->id . ',id',
             'dob' => 'required|string',
             'gender' => 'required|max:1|alpha|regex:/^[M,F]/',
             'company' => 'required|max:2|alpha',
             'platoon' => 'required|max:2',
-            'weight' =>'required|numeric',
+            'weight' => 'required|numeric',
             'height' => 'required|numeric'
         ]);
         if ($validator->errors()->any()) {
@@ -387,12 +405,24 @@ class StudentController extends Controller
         $student['next_kin_names'] = $validatedData['next_kin_names'];
         $student['next_kin_address'] = $validatedData['next_kin_address'];
         $student['next_kin_relationship'] = $validatedData['next_kin_relationship'];
+        if ($type == 'create') {
+            $selectedSessionId = session('selected_session');
+            if (!$selectedSessionId)
+                $selectedSessionId = 1;
+            $student['session_programme_id'] = $selectedSessionId;
+        }
         //$student->fill($validatedData);
-     $student->save();
+        $student->save();
         //$request->session()->put('student', $student);
-        $student = $request->session()->get('student');        
+        $student = $request->session()->get('student');
         $request->session()->forget('student');
-         //return $student;
-        return redirect()->route('students.index');
+        //return $student;
+        if ($type == "edit") {
+            $message = "Student updated successfully.";
+        } else {
+            $message = "";
+        }
+        return redirect()->route('students.index')->with('success', $message);
+        ;
     }
 }

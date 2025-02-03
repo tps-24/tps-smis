@@ -66,7 +66,7 @@
 
                         </select>
                     </div>
-                    @error('education_level')
+                    @error('rank')
                         <div class="error">{{ $message }}</div>
                     @enderror
                 </div>
