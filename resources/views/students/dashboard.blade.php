@@ -42,6 +42,12 @@
                         <td>Rank: </td>
                         <td>{{$user->student->rank}}</td>
                     </tr>
+                    @if ($user->student->programme)
+                    <tr>
+                        <td>Programme: </td>
+                        <td>{{$user->student->programme->programmeName}}</td>
+                    </tr>
+                    @endif
 
                 </table>
                 <div style="margin-left: 5%;">
@@ -52,9 +58,11 @@
                             <table class="table table-striped truncate m-0">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
+                                        <th></th>
                                         <th>Code</th>
                                         <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Credit</th>
                                         <th>Department</th>
                                     </tr>
                                 </thead>
@@ -64,6 +72,8 @@
                                             <td>{{++$i}}.</td>
                                             <td>{{$course->courseCode}}</td>
                                             <td>{{$course->courseName}}</td>
+                                            <td>{{$course->pivot->course_type}}</td>
+                                            <td>{{$course->pivot->credit_weight}}</td>
                                             <td>{{$course->department->departmentName}}</td>
                                         </tr>
                                     @endforeach

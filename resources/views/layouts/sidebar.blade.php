@@ -3,7 +3,7 @@
 
 <!-- App brand starts -->
 <div class="app-brand p-3 my-2">
-  <a href="index.html">
+  <a href="#">
     <!-- <img src="resources/assets/images/logo.svg" class="logo" alt="Bootstrap Gallery" /> -->
   </a>
 </div>
@@ -14,7 +14,7 @@
 <div class="sidebarMenuScroll">
   <ul class="sidebar-menu">
     <li>
-      <a href="/tps-rms">
+      <a href="/tps-smis">
         <i class="bi bi-bar-chart-line"></i>
         <span class="menu-text">Dashboard</span>
       </a>
@@ -27,10 +27,10 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="/tps-rms/students">Student Details</a>
+          <a href="/tps-smis/students">Student Details</a>
         </li>
         <li>
-          <a href="/tps-rms/students/create">Student Registration</a>
+          <a href="/tps-smis/students/create">Student Registration</a>
         </li>
       </ul>
     </li>
@@ -60,16 +60,16 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="/tps-rms/attendences/type/1">Morning</a>
+          <a href="/tps-smis/attendences/type/1">Morning</a>
         </li>
         <!-- <li>
-          <a href="/tps-rms/attendences/type/2">Master Parade</a>
+          <a href="/tps-smis/attendences/type/2">Master Parade</a>
         </li> -->
         <li>
-          <a href="/tps-rms/attendences/type/3">Night</a>
+          <a href="/tps-smis/attendences/type/3">Night</a>
         </li>
         <!-- <li>
-          <a href="/tps-rms/attendences/type/4">Flag</a>
+          <a href="/tps-smis/attendences/type/4">Flag</a>
         </li> -->
       </ul>
     </li>
@@ -108,10 +108,13 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">semester 1</a>
+          <a href="{{ route('coursework_results.index') }}">semester 1</a>
         </li>
         <li>
           <a href="#">semester 2</a>
+        </li>
+        <li>
+          <a href="{{ route('course_works.index') }}">CA Configurations</a>
         </li>
       </ul>
     </li>
@@ -177,7 +180,7 @@
     @endcan()
     @can('mps-list')
     <li>
-      <a href="/tps-rms/mps">
+      <a href="/tps-smis/mps">
         <i class="bi bi-wallet2"></i>
         <span class="menu-text">MPS</span>
       </a>

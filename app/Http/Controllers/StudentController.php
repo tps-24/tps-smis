@@ -4,10 +4,19 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
+use App\Models\User;
 use App\Models\Company;
+use App\Models\Programme;
 use App\Imports\BulkImportStudents;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
+
+use Spatie\Permission\Models\Role;
+use Illuminate\View\View;
+use Illuminate\Support\Arr;
+use Illuminate\Http\RedirectResponse;
+use DB;
+use Hash;
 
 class StudentController extends Controller
 {
@@ -47,6 +56,12 @@ class StudentController extends Controller
     {
         $page_name = "Create new Student";
         return view('students.create', compact('page_name'));
+    }
+
+    public function createPage()
+    {
+        $programmes = Programme::get();
+        return view('students.self.register', compact('programmes'));
     }
 
     /**
@@ -96,6 +111,68 @@ class StudentController extends Controller
             'blood_group' => $request->blood_group,
         ]);
         return redirect()->route('students.index')->with('success', "Student created successfully.");
+    }
+
+    
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'force_number' => 'required|regex:/^[A-Z]{1,2}\.\d+$/|unique:students,force_number',
+            'first_name' => 'required|max:50|alpha|regex:/^[A-Z]/',
+            'middle_name' => 'required|max:50|alpha|regex:/^[A-Z]/',
+            'last_name' => 'required|max:50|alpha|regex:/^[A-Z]/',
+            'nin' => 'required|numeric|unique:students,nin',
+            'dob' => 'required|date',
+            'programme_id' => 'required|string|max:255',
+            'email' => 'required|string|email|max:100|unique:users',
+            'gender' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        
+        $input = $request->all();
+        $password = Hash::make($input['password']);
+        $fullName = $request->first_name. ' ' . $request->middle_name. ' ' . $request->last_name;
+    
+
+        //Create User First
+        $user = User::create([
+            'name' => $fullName,
+            'email' => $request->email,
+            'password' => $password,
+        ]);
+
+        // Assign the 'student' role to the user
+        $user->assignRole('student');
+
+        $input['user_id'] = $user->id;
+        
+        // dd($input);
+        //Now Create Student
+        $student = new Student([
+            'force_number' => $request->input('force_number'),
+            'first_name' => $request->input('first_name'),
+            'middle_name' => $request->input('middle_name'),
+            'last_name' => $request->input('last_name'),
+            'nin' => $request->input('nin'),
+            'dob' => $request->input('dob'),
+            'programme_id' => $request->input('programme_id'),
+            'email' => $request->input('email'),
+            'gender' => $request->input('gender'),
+            'user_id' =>  $user->id,
+            'password' => Hash::make($request->input('password')),
+        ]);
+
+        $student->save();
+
+        return redirect()->back()->with('success', 'Your successfully created an account!');
+
+        // return redirect()->route('students.dashboard')->with('success', "Your successfully created an account.");
+    
     }
 
     /**

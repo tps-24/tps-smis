@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vitengos', function (Blueprint $table) {
+        Schema::create('assessment_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('description');
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
+            $table->string('type_name'); // e.g., 'assignment', 'quiz', 'project'
+            $table->timestamp('created_at')->useCurrent()->nullable(false);
+            $table->timestamp('updated_at')->nullable(true)->useCurrentOnUpdate();
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vitengos');
+        Schema::dropIfExists('assessment_types');
     }
 };

@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('nin')->unique();
             $table->string('dob');
-            $table->string('education_level');
-            $table->string('home_region');
+            $table->string('education_level')->nullable();
+            $table->string('home_region')->nullable();
             $table->string('company')->nullable();
             $table->string('photo')->nullable();
             $table->double('height')->nullable();

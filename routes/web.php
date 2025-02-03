@@ -55,13 +55,15 @@ Route::group(['middleware' => 'session_programme'], function () {
     // Add more routes as needed
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
+Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
+Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
+Route::get('students/dashboard', [StudentController::class, 'dashboard']);
 Route::resource('students', StudentController::class);
-
-Route::group(['middleware' => ['auth', 'verified']], function () {
-
-
+Route::group(['middleware' => ['auth']], function () {
+    
+    
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UserController::class);
@@ -76,8 +78,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('campuses', CampusController::class);
 
 
+    
+    // Define the custom route first
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
 
-    Route::resource('grading_systems', GradingSystemController::class);
+
+    Route::resource('grading_systems', GradingSystemController::class); 
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);
     Route::resource('assign-courses', ProgrammeCourseSemesterController::class);
@@ -96,7 +102,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
-    Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'create'])->name('assign-courses.create');
+    Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
     Route::resource('beats', BeatController::class);
 
@@ -122,7 +128,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         /**
          * End of wizard for student registration
          */
-        Route::get('dashaboard', 'dashboard');
+        Route::get('dashboard', 'dashboard');
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
         Route::post('{id}/delete', 'destroy');
@@ -263,8 +269,3 @@ Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->na
 //Daktari routes
 Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.page');
 Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
-
-
-
-
-Route::get('test', [StudentController::class, 'dashboard']);

@@ -12,11 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('students', function (Blueprint $table) {
-            $table->unsignedBigInteger('session_programme_id')->after('user_id')->nullable();
-            $table->foreign('session_programme_id')->references('id')->on('session_programmes')->onDelete('cascade');
+            $table->unsignedBigInteger('programme_id')->after('next_kin_address')->nullable();
+            $table->foreign('programme_id')->references('id')->on('programmes');
         });
-
-        
     }
 
     /**
@@ -25,10 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('students', function (Blueprint $table) {
-            if (Schema::hasColumn('students', 'sessionprogramme_id')) {
-                $table->dropForeign(['sessionprogramme_id']);
-                $table->dropColumn('sessionProgramme_id');
-            }
+            $table->dropForeign(['programme_id']);
+            $table->dropColumn('programme_id');
         });
     }
 };
