@@ -105,9 +105,12 @@
                                                 <div class="card mb-4">
                                                 <div class="card-body">
                                                     <div class="m-0">
-                                                    <label class="form-label abcd" for="abc">PF Number/Force Number</label>
-                                                    <input type="text" class="form-control" id="forceNumber" name="forceNumber" placeholder="Enter PF Number/Force Number" required>
+                                                        <label class="form-label abcd" for="abc">PF Number/Force Number</label>
+                                                        <input type="text" class="form-control" id="forceNumber" name="forceNumber" placeholder="Enter PF Number/Force Number" value="{{old('forceNumber')}}" required>
                                                     </div>
+                                                    @error('forceNumber')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>                                            
@@ -118,18 +121,22 @@
                                                     <label class="form-label" for="abc4">Rank</label>
                                                     <select class="form-select" id="rank" name="rank" aria-label="Default select example">
                                                         <option selected="">Choose Rank</option>
-                                                        <option value="pc">Police Constable (PC)</option>
-                                                        <option value="cpl">Corporal</option>
-                                                        <option value="cpl">CorporalAssistant Sub-Inspector (ASI)</option>
-                                                        <option value="cpl">Sub-Inspector (SI)</option>
-                                                        <option value="cpl">Commissioner of Police (CP)</option>
-                                                        <option value="cpl">Senior Assistant Commissioner of Police (SACP)</option>
-                                                        <option value="cpl">Assistant Commissioner of Police (ACP)</option>
-                                                        <option value="cpl">Chief Inspector (CI)</option>
-                                                        <option value="cpl">Inspector (INSP)</option>
-                                                        <option value="cpl">Inspector General of Police (IGP)</option>
+                                                        <option value="Constable" {{ old('rank', 'default_value') == 'Constable' ? 'selected' : '' }}>Police Constable (PC)</option>
+                                                        <option value="Corporal" {{ old('rank', 'default_value') == 'Corporal' ? 'selected' : '' }}>Corporal</option>
+                                                        <option value="Sergeant" {{ old('rank', 'default_value') == 'Sergeant' ? 'selected' : '' }}>Sergeant Major</option>
+                                                        <option value="cpl" {{ old('rank', 'default_value') == 'Probationary' ? 'selected' : '' }}>CorporalAssistant Sub-Inspector (ASI)</option>
+                                                        <option value="cpl" {{ old('rank', 'default_value') == 'Probationary' ? 'selected' : '' }}>Sub-Inspector (SI)</option>
+                                                        <option value="cpl" {{ old('rank', 'default_value') == 'Probationary' ? 'selected' : '' }}>Commissioner of Police (CP)</option>
+                                                        <option value="cpl" {{ old('rank', 'default_value') == 'Probationary' ? 'selected' : '' }}>Senior Assistant Commissioner of Police (SACP)</option>
+                                                        <option value="cpl" {{ old('rank', 'default_value') == 'Probationary' ? 'selected' : '' }}>Assistant Commissioner of Police (ACP)</option>
+                                                        <option value="cpl" {{ old('rank', 'default_value') == 'Probationary' ? 'selected' : '' }}>Chief Inspector (CI)</option>
+                                                        <option value="INSP" {{ old('rank', 'default_value') == 'Probationary' ? 'selected' : '' }}>Inspector (INSP)</option>
+                                                        <option value="IGP" {{ old('rank', 'default_value') == 'Probationary' ? 'selected' : '' }}>Inspector General of Police (IGP)</option>
                                                     </select>
                                                     </div>
+                                                    @error('rank')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -138,8 +145,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">National Identification Number</label>
-                                                    <input type="text" class="form-control" id="nin" name="nin" placeholder="Enter NIDA Number">
+                                                    <input type="text" class="form-control" id="nin" name="nin" placeholder="Enter NIDA Number" value="{{old('nin')}}">
                                                     </div>
+                                                    @error('nin')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -150,8 +160,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">First Name</label>
-                                                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" required>
+                                                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" value="{{old('firstName')}}" required>
                                                     </div>
+                                                    @error('firstName')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -160,8 +173,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Middlename</label>
-                                                    <input type="text" class="form-control" id="middleName"  name="middleName" placeholder="Enter Middle Name" required>
+                                                    <input type="text" class="form-control" id="middleName"  name="middleName" placeholder="Enter Middle Name" value="{{old('middleName')}}" required>
                                                     </div>
+                                                    @error('middleName')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -170,8 +186,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Lastname (Surname)</label>
-                                                    <input type="text" class="form-control" id="lastName"  name="lastName" placeholder="Enter Last Name" required>
+                                                    <input type="text" class="form-control" id="lastName"  name="lastName" placeholder="Enter Last Name" value="{{old('lastName')}}" required>
                                                     </div>
+                                                    @error('lastName')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -182,10 +201,13 @@
                                                     <label class="form-label" for="abc4">Gender</label>
                                                     <select class="form-select" id="gender" name="gender" aria-label="Default select example">
                                                         <option selected="">Choose gender</option>
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
+                                                        <option value="Male" {{ old('gender', 'default_value') == 'Male' ? 'selected' : '' }}>Male</option>
+                                                        <option value="Female" {{ old('gender', 'default_value') == 'Female' ? 'selected' : '' }}>Female</option>
                                                     </select>
                                                     </div>
+                                                    @error('gender')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -194,8 +216,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Date of Birth</label>
-                                                    <input type="date" class="form-control" id="DoB" name="DoB" placeholder="Enter Date of Birth" max="2007-07-15" required>
+                                                    <input type="date" class="form-control" id="DoB" name="DoB" placeholder="Enter Date of Birth" max="2007-07-15"  value="{{old('DoB')}}" required>
                                                     </div>
+                                                    @error('DoB')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>                                                                                        
@@ -206,12 +231,15 @@
                                                     <label class="form-label" for="abc4">Marital Status</label>
                                                     <select class="form-select" id="maritalStatus" name="maritalStatus" aria-label="Default select example">
                                                         <option selected="">Choose Marital Status</option>
-                                                        <option value="Single">Single</option>
-                                                        <option value="Married">Married</option>
-                                                        <option value="Divorsed">Divorsed</option>
-                                                        <option value="Divorsed">Complicated</option>
+                                                        <option value="Single" {{ old('maritalStatus', 'default_value') == 'Single' ? 'selected' : '' }}>Single</option>
+                                                        <option value="Married" {{ old('maritalStatus', 'default_value') == 'Married' ? 'selected' : '' }}>Married</option>
+                                                        <option value="Divorsed" {{ old('maritalStatus', 'default_value') == 'Divorsed' ? 'selected' : '' }}>Divorsed</option>
+                                                        <option value="Complicated" {{ old('maritalStatus', 'default_value') == 'Complicated' ? 'selected' : '' }}>Complicated</option>
                                                     </select>
                                                     </div>
+                                                    @error('maritalStatus')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -220,8 +248,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Religion</label>
-                                                    <input type="text" class="form-control" id="religion"  name="religion" placeholder="Enter religion">
+                                                    <input type="text" class="form-control" id="religion"  name="religion" placeholder="Enter religion" value="{{old('religion')}}">
                                                     </div>
+                                                    @error('religion')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -230,8 +261,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Tribe</label>
-                                                    <input type="text" class="form-control" id="tribe" name="tribe" placeholder="Enter tribe">
+                                                    <input type="text" class="form-control" id="tribe" name="tribe" placeholder="Enter tribe" value="{{old('tribe')}}">
                                                     </div>
+                                                    @error('tribe')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -240,8 +274,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Phone Number</label>
-                                                    <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" required>
+                                                    <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" value="{{old('phoneNumber')}}" required>
                                                     </div>
+                                                    @error('phoneNumber')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -250,8 +287,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Email Address</label>
-                                                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
+                                                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address"  value="{{old('email')}}" required>
                                                     </div>
+                                                    @error('email')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -260,8 +300,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Current Address</label>
-                                                    <input type="text" class="form-control" id="currentAddress" name="currentAddress" placeholder="Enter current address">
+                                                    <input type="text" class="form-control" id="currentAddress" name="currentAddress" placeholder="Enter current address" value="{{old('currentAddress')}}">
                                                     </div>
+                                                    @error('currentAddress')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -270,8 +313,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Permanent Address</label>
-                                                    <input type="text" class="form-control" id="permanentAddress" name="permanentAddress" placeholder="Enter permanent address">
+                                                    <input type="text" class="form-control" id="permanentAddress" name="permanentAddress" placeholder="Enter permanent address" value="{{old('permanentAddress')}}">
                                                     </div>
+                                                    @error('permanentAddress')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -301,6 +347,9 @@
                                                             @endforeach
                                                     </select>
                                                     </div>
+                                                    @error('department_id')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -309,8 +358,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Designation</label>
-                                                    <input type="text" class="form-control" id="designation" name="designation" placeholder="Enter designation">
+                                                    <input type="text" class="form-control" id="designation" name="designation" placeholder="Enter designation" value="{{old('designation')}}">
                                                     </div>
+                                                    @error('designation')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>                                  
@@ -320,15 +372,17 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Role</label>
                                                     <select multiple class="form-control select 2" id="exampleFormControlSelect2" name="roles[]" aria-label="Default select example">
-                                                        <option selected="">Choose role</option>  
+                                                        <option selected="" disabled>Choose role</option>  
                                                             @foreach ($roles as $value => $label)
                                                                 <option value="{{ $value }}">
                                                                     {{ $label }}
                                                                 </option>
                                                             @endforeach
                                                     </select>
-                                                
                                                     </div>
+                                                    @error('roles[]')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>                                                                                        
@@ -339,16 +393,19 @@
                                                     <label class="form-label" for="abc4">Education Level</label>
                                                     <select class="form-select" id="educationLevel" name="educationLevel" aria-label="Default select example">
                                                         <option selected="">Choose Education Level</option>
-                                                        <option value="std7">Darasa la Saba</option>
-                                                        <option value="4m4">Form Four</option>
-                                                        <option value="4m6">Form Six</option>
-                                                        <option value="Certificate">Certificate</option>
-                                                        <option value="Diploma">Diploma</option>
-                                                        <option value="Degree">Bachelor Degree</option>
-                                                        <option value="Masters">Masters</option>
-                                                        <option value="PhD">PhD</option>
+                                                        <option value="std7" {{ old('educationLevel', 'default_value') == 'std7' ? 'selected' : '' }}>Darasa la Saba</option>
+                                                        <option value="4m4" {{ old('educationLevel', 'default_value') == '4m4' ? 'selected' : '' }}>Form Four</option>
+                                                        <option value="4m6" {{ old('educationLevel', 'default_value') == '4m6' ? 'selected' : '' }}>Form Six</option>
+                                                        <option value="Certificate" {{ old('educationLevel', 'default_value') == 'Certificate' ? 'selected' : '' }}>Certificate</option>
+                                                        <option value="Diploma" {{ old('educationLevel', 'default_value') == 'Diploma' ? 'selected' : '' }}>Diploma</option>
+                                                        <option value="Degree" {{ old('educationLevel', 'default_value') == 'Degree' ? 'selected' : '' }}>Bachelor Degree</option>
+                                                        <option value="Masters" {{ old('educationLevel', 'default_value') == 'Masters' ? 'selected' : '' }}>Masters</option>
+                                                        <option value="PhD" {{ old('educationLevel', 'default_value') == 'PhD' ? 'selected' : '' }}>PhD</option>
                                                     </select>
                                                     </div>
+                                                    @error('educationLevel')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -361,12 +418,15 @@
                                                     <label class="form-label" for="abc4">Contract Type</label>
                                                     <select class="form-select" id="contractType" name="contractType" aria-label="Default select example">
                                                         <option selected="">Choose Contract Type</option>
-                                                        <option value="Permanent">Permanent Contract</option>
-                                                        <option value="Temporary">Temporary Contract</option>
-                                                        <option value="Fixed-Term">Fixed-Term Contract</option>
-                                                        <option value="Probationary">Probationary Contract</option>
+                                                        <option value="Permanent" {{ old('contractType', 'default_value') == 'Permanent' ? 'selected' : '' }}>Permanent Contract</option>
+                                                        <option value="Temporary" {{ old('contractType', 'default_value') == 'Temporary' ? 'selected' : '' }}>Temporary Contract</option>
+                                                        <option value="Fixed-Term" {{ old('contractType', 'default_value') == 'Fixed-Term' ? 'selected' : '' }}>Fixed-Term Contract</option>
+                                                        <option value="Probationary" {{ old('contractType', 'default_value') == 'Probationary' ? 'selected' : '' }}>Probationary Contract</option>
                                                     </select>
                                                     </div>
+                                                    @error('contractType')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -375,8 +435,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Date of Joining</label>
-                                                    <input type="date" class="form-control" id="joiningDate" name="joiningDate">
+                                                    <input type="date" class="form-control" id="joiningDate" name="joiningDate" value="{{old('joiningDate')}}">
                                                     </div>
+                                                    @error('joiningDate')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -385,8 +448,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Location</label>
-                                                    <input type="text" class="form-control" id="location" name="location" placeholder="Enter Location">
+                                                    <input type="text" class="form-control" id="location" name="location" placeholder="Enter Location" value="{{old('location')}}">
                                                     </div>
+                                                    @error('location')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -407,8 +473,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Full Names</label>
-                                                    <input type="text" class="form-control" id="nextofkinFullname" name="nextofkinFullname" placeholder="Enter Next of Kin Fullname">
+                                                    <input type="text" class="form-control" id="nextofkinFullname" name="nextofkinFullname" placeholder="Enter Next of Kin Fullname" value="{{old('nextofkinFullname')}}">
                                                     </div>
+                                                    @error('nextofkinFullname')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -417,8 +486,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Relationship</label>
-                                                    <input type="text" class="form-control" id="nextofkinRelationship" name="nextofkinRelationship" placeholder="Enter Next of Kin Relationship ">
+                                                    <input type="text" class="form-control" id="nextofkinRelationship" name="nextofkinRelationship" placeholder="Enter Next of Kin Relationship" value="{{old('nextofkinRelationship')}}">
                                                     </div>
+                                                    @error('nextofkinRelationship')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -427,8 +499,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Phone Number</label>
-                                                    <input type="text" class="form-control" id="nextofkinPhoneNumber" name="nextofkinPhoneNumber" placeholder="Enter Next of Kin Phone Number">
+                                                    <input type="text" class="form-control" id="nextofkinPhoneNumber" name="nextofkinPhoneNumber" placeholder="Enter Next of Kin Phone Number" value="{{old('nextofkinPhoneNumber')}}">
                                                     </div>
+                                                    @error('nextofkinPhoneNumber')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>
@@ -437,8 +512,11 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Physical Address</label>
-                                                    <input type="text" class="form-control" id="nextofkinPhysicalAddress" name="nextofkinPhysicalAddress" placeholder="Enter Next of Kin Physical Address">
+                                                    <input type="text" class="form-control" id="nextofkinPhysicalAddress" name="nextofkinPhysicalAddress" placeholder="Enter Next of Kin Physical Address" value="{{old('nextofkinPhysicalAddress')}}">
                                                     </div>
+                                                    @error('nextofkinPhysicalAddress')
+                                                        <div class="error">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 </div>
                                             </div>

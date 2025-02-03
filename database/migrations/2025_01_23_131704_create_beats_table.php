@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('beatType_id');
             $table->unsignedBigInteger('area_id');
-            $table->string('student_ids');
-            $table->timestamp('start_at');
-            $table->timestamp('end_at')->nullable();
+            $table->string('student_id');
+            $table->integer('round');
+            $table->date('date');
+            $table->time('start_at');
+            $table->time('end_at')->nullable();
+            $table->boolean('status')->nullable();
             $table->foreign('area_id')->references('id')->on('areas')->onupdate('update')->ondelete('null');
             //$table->foreign('beatType_id')->references('id')->on('beat_types')->onupdate('update')->ondelete('null');
             $table->timestamps();

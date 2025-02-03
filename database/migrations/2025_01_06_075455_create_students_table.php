@@ -14,12 +14,11 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->string('force_number')->unique()->nullable();
-            $table->string('rank');
+            $table->string('rank')->default("Recruit");
             $table->string('first_name');
             $table->string('middle_name');
             $table->string('last_name');
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('vitengo_id')->nullable();
             $table->char('gender');
             $table->char('blood_group')->nullable();
             $table->string('phone')->nullable();
@@ -37,7 +36,7 @@ return new class extends Migration
             $table->string('next_kin_relationship')->nullable();
             $table->string('next_kin_address')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onupdate('update')->ondelete('null');
-            $table->foreign('vitengo_id')->references('id')->on('vitengos')->onupdate('update')->ondelete('null');
+
             $table->timestamps();
         });
     }

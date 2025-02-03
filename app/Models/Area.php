@@ -11,10 +11,12 @@ class Area extends Model
         "name",
         "number_of_guards",
         "added_by",
-        "campus_id"
+        "campus_id",
+        "company_id"
     ];
 
     public function beats(){
         return $this->hasMany(Beat::class);
     }
+
 }

@@ -36,21 +36,13 @@
 
             <!-- Success Message -->
             @if(session('success'))
-    <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <script>
-    setTimeout(function() {
-        let successMessage = document.getElementById('successMessage');
-        if (successMessage) {
-            successMessage.style.transition = 'opacity 0.5s';
-            successMessage.style.opacity = '0';
-            setTimeout(() => successMessage.style.display = 'none', 500); // Wait for the fade-out to complete
-        }
-    }, 10000); // 10 seconds
-</script>
+                <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <script>
+                    setTimeout(() => document.getElementById('successMessage')?.remove(), 5000);
+                </script>
             @endif
         </div>
     </div>
@@ -76,43 +68,68 @@
                             <td>{{ $patient->platoon }}</td>
                             <td>{{ $patient->company }}</td>
                             <td>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statusModal{{ $patient->id }}">
-                                    Enter Patient Details
+                                <!-- Button for Sir Major to send for approval -->
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal{{ $patient->id }}">
+                                    Send Patient Details
                                 </button>
 
-                                <!-- Modal for Entering Patient Details -->
-                                <div class="modal fade" id="statusModal{{ $patient->id }}" tabindex="-1" aria-labelledby="statusModalLabel{{ $patient->id }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Enter Details for {{ $patient->first_name }} {{ $patient->last_name }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form action="{{ route('patients.save') }}" method="POST">
-                                                    @csrf
+                               <!-- Approval Modal -->
+                         <div class="modal fade" id="approvalModal{{ $patient->id }}" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog">
+                           <div class="modal-content">
+                           <div class="modal-header">
+                         <h5 class="modal-title">Send for Approval: {{ $patient->first_name }} {{ $patient->last_name }}</h5>
+                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                           </div>
+            <div class="modal-body">
+            <form action="{{ route('patients.sendToReceptionist') }}" method="POST" style="display: inline;">
+    @csrf
+    <input type="hidden" name="student_id" value="{{ $patient->id }}">
+    <button type="submit" class="btn btn-primary">Send to Receptionist</button>
+</form>
 
-                                                    <input type="hidden" name="student_id" value="{{ $patient->id }}">
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Excuse Type</label>
-                                                        <input type="text" class="form-control" name="excuse_type" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Days of Rest</label>
-                                                        <input type="number" class="form-control" name="rest_days" min="1" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Doctor's Comment</label>
-                                                        <textarea class="form-control" name="doctor_comment" rows="3" required></textarea>
-                                                    </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                                                    <button type="submit" class="btn btn-primary">Save</button>
-                                                </form>
+                                <!-- Doctor Modal (Only for approved patients) -->
+                                @if($patient->is_approved)
+                                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#doctorModal{{ $patient->id }}">
+                                        Doctor Input
+                                    </button>
+
+                                    <div class="modal fade" id="doctorModal{{ $patient->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Doctor's Details for {{ $patient->first_name }} {{ $patient->last_name }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('patients.save') }}" method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="student_id" value="{{ $patient->id }}">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Excuse Type</label>
+                                                            <input type="text" class="form-control" name="excuse_type" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Days of Rest</label>
+                                                            <input type="number" class="form-control" name="rest_days" min="1" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Doctor's Comment</label>
+                                                            <textarea class="form-control" name="doctor_comment" rows="3" required></textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-primary">Save</button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

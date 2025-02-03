@@ -35,6 +35,7 @@ class Student extends Model
     }
 
 
+
     public function mps()
     {
         return $this->hasMany(MPS::class, 'student_id', 'id');
@@ -46,7 +47,12 @@ class Student extends Model
 
     public function company()
     {
-        return $this->hasMany(Company::class, 'name', 'id');
+        return $this->hasOne(Company::class, 'name', 'id');
+    }
+
+    public function programme()
+    {
+        return $this->hasOne(Programme::class, 'id', 'programme_id');
     }
 
     // public function platoon()

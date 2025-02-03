@@ -56,14 +56,15 @@
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
-                            <strong>Duration:</strong>
+                            <strong>Duration (in Years):</strong>
                             <input type="number" name="duration" min="0" placeholder="Enter Duration Period" class="form-control">
                         </div>
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
                             <strong>Department:</strong>
-                            <select name="department_id" class="form-control">                                    
+                            <select name="department_id" class="form-control"> 
+                                    <option value="">Choose Department</option>                                    
                                     @foreach ($departments as $value => $dep)
                                         dd($value);
                                         <option value="{{ $dep->id }}">
@@ -76,7 +77,8 @@
                     <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
                             <strong>Study Level:</strong>
-                            <select name="studyLevel_id" class="form-control">     
+                            <select name="studyLevel_id" class="form-control"> 
+                                    <option value="">Choose study level</option>    
                                     @foreach ($studylevels as $value => $level)
                                         <option value="{{ $level->id }}">
                                             {{ $level->studyLevelName }}

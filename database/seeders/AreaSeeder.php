@@ -13,19 +13,19 @@ class AreaSeeder extends Seeder
     public function run(): void
     {
         Area::create([
-            "name"=> "Kanisa la Roma","added_by"=>"1"
+            "name"=> "Kanisa la Roma","added_by"=>"1","company_id"=>1,"campus_id"=> 1,
         ]);
 
         Area::create([
-            "name"=> "Geti kuu","added_by"=>"1"
+            "name"=> "Geti kuu","added_by"=>"1","company_id"=>2,"campus_id"=> 1,
         ]);
 
         Area::create([
-            "name"=> "Ofisi kuu","added_by"=>"1"
+            "name"=> "Ofisi kuu","added_by"=>"1","company_id"=>3,"campus_id"=> 1,
         ]);
 
         Area::create([
-            "name"=> "Ukumbi wa mikutano","added_by"=>"1"
+            "name"=> "Ukumbi wa mikutano","added_by"=>"1","company_id"=>4,"campus_id"=> 1,
         ]);
     }
 }

@@ -191,13 +191,13 @@
     </li>
     @can('beat-list')
     <li class="treeview">
-      <a href="#!">
+      <a href="!#">
         <i class="bi bi-pie-chart"></i>
         <span class="menu-text">Guards &amp; Patrols</span>
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">Guards</a>
+          <a href="{{url('beats')}}">Guards</a>
         </li>
         <li>
           <a href="#">Patrol</a>

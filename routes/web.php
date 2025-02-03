@@ -19,17 +19,17 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\BeatController;
 use App\Http\Controllers\TimetableController;
 
-use App\Http\Controllers\GradingSystemController; 
+use App\Http\Controllers\GradingSystemController;
 use App\Http\Controllers\GradeMappingController;
-use App\Http\Controllers\SemesterController; 
+use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\ProgrammeCourseSemesterController;
-use App\Http\Controllers\OptionalCourseEnrollmentController; 
-use App\Http\Controllers\CourseWorkController; 
-use App\Http\Controllers\SemesterExamController; 
-use App\Http\Controllers\CourseworkResultController; 
-use App\Http\Controllers\SemesterExamResultController; 
-use App\Http\Controllers\FinalResultController; 
-use App\Http\Controllers\ExcuseTypeController; 
+use App\Http\Controllers\OptionalCourseEnrollmentController;
+use App\Http\Controllers\CourseWorkController;
+use App\Http\Controllers\SemesterExamController;
+use App\Http\Controllers\CourseworkResultController;
+use App\Http\Controllers\SemesterExamResultController;
+use App\Http\Controllers\FinalResultController;
+use App\Http\Controllers\ExcuseTypeController;
 use App\Http\Controllers\CampusController;
 
 
@@ -60,9 +60,7 @@ Route::get('/students', [StudentController::class, 'index'])->name('students.ind
 Route::resource('students', StudentController::class);
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
-    Route::get('/students/dashboard', function () {
-        return view('students/dashboard');
-    });
+
 
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
@@ -78,24 +76,27 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('campuses', CampusController::class);
 
 
-    
-    Route::resource('grading_systems', GradingSystemController::class); 
+
+    Route::resource('grading_systems', GradingSystemController::class);
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);
     Route::resource('assign-courses', ProgrammeCourseSemesterController::class);
-    Route::resource('enrollments', OptionalCourseEnrollmentController::class); 
-    Route::resource('course_works', CourseWorkController::class); 
-    Route::resource('semester_exams', SemesterExamController::class); 
-    Route::resource('coursework_results', CourseworkResultController::class); 
-    Route::resource('semester_exam_results', SemesterExamResultController::class); 
+    Route::resource('enrollments', OptionalCourseEnrollmentController::class);
+    Route::resource('course_works', CourseWorkController::class);
+    Route::resource('semester_exams', SemesterExamController::class);
+    Route::resource('coursework_results', CourseworkResultController::class);
+    Route::resource('semester_exam_results', SemesterExamResultController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
-    Route::post('/programmes/{programmeId}/semesters/{semesterId}/session/{sessionProgrammeId}/assign-courses', 
-       [ProgrammeController::class, 'assignCoursesToSemester']); 
-    Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate'); 
+    Route::post(
+        '/programmes/{programmeId}/semesters/{semesterId}/session/{sessionProgrammeId}/assign-courses',
+        [ProgrammeController::class, 'assignCoursesToSemester']
+    );
+    Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
 
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
+    Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'create'])->name('assign-courses.create');
 
     Route::resource('beats', BeatController::class);
 
@@ -106,22 +107,22 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         /**
          *  Wizard route for student registration
          */
-        Route::prefix('create')->group(function(){
+        Route::prefix('create')->group(function () {
             Route::get('/', function () {
                 return view('students/wizards/stepOne');
             });
-            Route::get('step-two/{type}',"createStepTwo");
+            Route::get('step-two/{type}', "createStepTwo");
             Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
 
             Route::get('step-three', "createStepTwo");
-            Route::post('post-step-one/{type}','postStepOne');
-            Route::post('post-step-two/{type}','postStepTwo');
-            Route::post('post-step-three/{type}','postStepThree');
+            Route::post('post-step-one/{type}', 'postStepOne');
+            Route::post('post-step-two/{type}', 'postStepTwo');
+            Route::post('post-step-three/{type}', 'postStepThree');
         });
         /**
          * End of wizard for student registration
          */
-
+        Route::get('dashaboard', 'dashboard');
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
         Route::post('{id}/delete', 'destroy');
@@ -130,36 +131,46 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     });
 
-    Route::controller(MPSController::class)->prefix('mps')->group(function(){
-        Route::post('search','search');
-        Route::post('store/{id}','store');
-        Route::post('release/{id}','release');
-        Route::get('{company}/company','company');
+    Route::controller(MPSController::class)->prefix('mps')->group(function () {
+        Route::post('search', 'search');
+        Route::post('store/{id}', 'store');
+        Route::post('release/{id}', 'release');
+        Route::get('{company}/company', 'company');
     });
 
-    Route::controller(BeatController::class)->prefix('beats')->group(function(){
-        Route::get('{area_id}/create','create');
-        Route::get('{area_id}/search_students','search');
-        Route::post('{area_id}/assign_students','store');
+    Route::controller(BeatController::class)->prefix('beats')->group(function () {
+        Route::get('{area_id}/create', 'create');
+        Route::get('{area_id}/search_students', 'search');
+        Route::post('{area_id}/assign_students', 'store');
+    });
+
+    Route::controller(BeatController::class)->prefix('beats')->group(function () {
+        Route::get('/', 'index');
+        Route::get('/store', 'store');
+        Route::get('/show/{area_id}', 'show');
+        Route::put('/update/{area_id}', 'update_area');
+        Route::get('/list-guards/{area_id}', 'list_guards');
+        Route::put('/approve', 'approve_presence');
+    });
+
+    Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+        Route::get('type-test/{type_id}', 'testAttendence');
+        Route::get('type/{type_id}', 'attendence');
+        Route::post('create/{type_id}', 'create');
+        Route::get('edit/{id}', 'edit');
+        Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
+        Route::post('{id}/update', 'update');
+        Route::get('list-absent_students/{list_type}/{attendence_id}', action: 'list');
+        Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
+        Route::post('store-absents/{attendence_id}', action: 'storeAbsent');
+        Route::post('store-safari/{attendence_id}', action: 'storeSafari');
+        Route::get('today/{company_id}', 'today_attendence');
     });
 
 });
 
 
-Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
-    Route::get('type-test/{type_id}', 'testAttendence');
-    Route::get('type/{type_id}', 'attendence');
-    Route::post('create/{type_id}', 'create');
-    Route::get('edit/{id}', 'edit');
-    Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
-    Route::post('{id}/update', 'update');
-    Route::get('list-absent_students/{list_type}/{attendence_id}',action: 'list');
-    Route::get('list-safari_students/{list_type}/{attendence_id}',action: 'list_safari');
-    Route::post('store-absents/{attendence_id}',action: 'storeAbsent');
-    Route::post('store-safari/{attendence_id}',action: 'storeSafari');
-    Route::get('today/{company_id}','today_attendence');
-    
-});
+
 
 
 Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today']);
@@ -172,19 +183,19 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
     /**
      *  Wizard route for student registration
      */
-    Route::prefix('create')->group(function(){
+    Route::prefix('create')->group(function () {
         Route::get('/', function () {
             return view('students/wizards/stepOne');
         });
         Route::get('step-two/{type}', function () {
             return view('students/wizards/stepTwo');
         });
-        Route::get('step-three', function () {
+        Route::get('step-three/{type}', function () {
             return view('students/wizards/stepThree');
         });
-        Route::post('post-step-one/{type}','postStepOne');
-        Route::post('post-step-two/{type}','postStepTwo');
-        Route::post('post-step-three/{type}','postStepThree');
+        Route::post('post-step-one/{type}', 'postStepOne');
+        Route::post('post-step-two/{type}', 'postStepTwo');
+        Route::post('post-step-three/{type}', 'postStepThree');
     });
     /**
      * End of wizard for student registration
@@ -215,3 +226,45 @@ Route::put('/patients/{id}/update-status', [PatientController::class, 'updateSta
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 
+
+
+
+
+
+
+
+
+Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+Route::post('/patients/submit', [PatientController::class, 'submit'])->name('patients.submit');
+Route::put('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name('patients.reject');
+Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
+Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+
+
+
+
+
+// Route for sending details to receptionist
+Route::post('/patients/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('patients.sendToReceptionist');
+
+// Route for receptionist to see pending approvals
+Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->name('receptionist.index');
+
+// Route for receptionist to approve patient
+Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve');
+
+
+
+// Receptionist Routes
+Route::get('/receptionist', [PatientController::class, 'receptionistIndex'])->name('receptionist.index');
+Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+
+//Daktari routes
+Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.page');
+Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
+
+
+
+
+Route::get('test', [StudentController::class, 'dashboard']);

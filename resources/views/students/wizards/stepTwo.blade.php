@@ -44,7 +44,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc">NIDA</label>
                         <input @if(isset($student)) value="{{$student->nin}}" @endif type="number" class="form-control" id="nin" name="nin" required
-                            placeholder="Enter NIDA number">
+                            placeholder="Enter NIDA number" value="{{old('nin')}}">
                     </div>
                     @error('nin')
                         <div class="error">{{ $message }}</div>
@@ -58,7 +58,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc">Phone</label>
                         <input @if(isset($student)) value="{{$student->phone}}" @endif type="number" class="form-control" id="phone" name="phone"
-                            placeholder="Enter phone number">
+                            placeholder="Enter phone number" value="{{old('phone')}}">
                     </div>
                     @error('phone')
                         <div class="error">{{ $message }}</div>
@@ -90,7 +90,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc3">Date of Birth</label>
                         <div class="input-group">
-                            <input @if(isset($student)) value="{{$student->dob}}" @endif type="date" id="abc3" max="2007-07-01" required name="dob"
+                            <input @if(isset($student)) value="{{$student->dob}}" @endif type="date" id="abc3" max="2007-07-01" value="{{old('dob')}}" required name="dob"
                                 class="form-control datepicker" />
                         </div>
 
@@ -174,7 +174,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc">Weight (in Kg)</label>
                         <input @if(isset($student)) value="{{$student->weight}}" @endif type="number" step="0.1" class="form-control" id="weight" name="weight" 
-                            placeholder="Enter weight">
+                            placeholder="Enter weight" value="{{old('weight')}}">
                     </div>
                     @error('weight')
                         <div class="error">{{ $message }}</div>
@@ -188,8 +188,8 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Height (in ft)</label>
-                        <input @if(isset($student)) value="{{$student->height}}" @endif type="number" step="0.1" class="form-control" id="weight" name="height"
-                            placeholder="Enter height">
+                        <input @if(isset($student)) value="{{$student->height}}" @endif type="number" min="4" step="0.1" class="form-control" id="height" name="height"
+                           required placeholder="Enter height" value="{{old('height')}}">
                     </div>
                     @error('weight')
                         <div class="error">{{ $message }}</div>
