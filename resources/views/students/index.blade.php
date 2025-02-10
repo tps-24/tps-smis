@@ -5,8 +5,8 @@
   <div class="container-fluid">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="/tps-rms/students/">Students</a></li>
+        <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
+        <li class="breadcrumb-item"><a href="/tps-smis/students/">Students</a></li>
         <li class="breadcrumb-item active" aria-current="page"><a href="#">List</a></li>
       </ol>
     </nav>
@@ -34,16 +34,41 @@
           Students</i></button>
       </form>
     </div>
-    <div class="col-3">
-      <!-- <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SearchStudent">search
-        student</button> -->
+    <div class="col-3 " style="float: right;">
+      <form class="d-flex" action="{{route('students.search')}}" method="POST">
+        <div class="mx-auto p-2" style="width: 200px;"> Search </div>
+        @csrf
+        @method("POST")
+        <select style="height: 35px; width: 120px;" class="form-select me-2" name="company" required>
+          <option disabled selected>Company</option>
+          <option value="HQ" {{ request('company') == 'HQ' ? 'selected' : '' }}>HQ</option>
+          <option value="A" {{ request('company') == 'A' ? 'selected' : '' }}>A</option>
+          <option value="B" {{ request('company') == 'B' ? 'selected' : '' }}>B</option>
+          <option value="C" {{ request('company') == 'C' ? 'selected' : '' }}>C</option>
+        </select>
+        <select style="height: 35px; width: 120px;" class="form-select me-2" name="platoon"
+          onchange="this.form.submit()">
+          <option value="">Platoon</option>
+          @for ($i = 1; $i < 15; $i++)
+        <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>{{ $i }}</option>
+      @endfor
+        </select>
+      </form>
+
+
     </div>
+
+
+
     <!-- <div class="col col-lg-2">
       <a class="btn btn-success btn-sm mb-2" href="{{url('students/create')}}">Create Student</a>
     </div> -->
-      <div class="col-3 pull-right" >
-          <a class="btn btn-success mb-2" href="{{ url('students/create') }}" style="float:right !important; margin-right:-22px"><i class="fa fa-plus"></i> Create New Student</a>
-      </div>
+    <div class="col-3 pull-right">
+      <!-- <a type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SearchStudent">search
+      student</a> -->
+      <a class="btn btn-success mb-2 btn-sm" href="{{ url('students/create') }}"
+        style="float:right !important; margin-right:-22px"><i class="fa fa-plus"></i> Create New Student</a>
+    </div>
   </div>
 </div>
 <div class="modal fade" id="SearchStudent" tabindex="-1" aria-labelledby="createNewContactLabel" aria-hidden="true">
@@ -55,17 +80,9 @@
         </div>
       </div>
       <div class="modal-body">
-        <form action="">
-          <div class="row">
-            <div class="col">Search Criteria: </span></div>
-            <div class="col">
-              <select onchange="changeCriteria()" style="height: 30px;" class="form-select" name="company" id="criteria" required
-                aria-label="Default select example">
-                <option value="plt">Platoon</option>
-                <option value="names">Names</option>
-              </select>
-            </div>
-          </div>
+        <form action="{{route('students.search')}}" method="POST">
+          @csrf
+          @method("POST")
           <div class="row" id="platoonCriteria">
             <div class="col mt-2">
               <label class="form-label " for="abc4">Platoon:</label>
@@ -73,17 +90,17 @@
             <div class="col mt-2">
               <select style="height: 30px;" class="form-select" name="company" id="abc4" required
                 aria-label="Default select example">
-                <option>COY</option>
+                <option disabled selected value="">company</option>
                 <option value="HQ">HQ</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
               </select>
             </div>
-            <div class="col mt-2" >
-              <select style="height: 30px;" class="form-select" name="company" id="abc4" required
+            <div class="col mt-2">
+              <select style="height: 30px;" class="form-select" name="platoon" id="abc4" required
                 aria-label="Default select example">
-                <option>PLT</option>
+                <option disabled selected>platoon</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -101,21 +118,13 @@
               </select>
             </div>
           </div>
-          <div class="row mt-2" id="namesCriteria" style="display: none;">
-            <div class="col">
-            <label class="form-label" for="abc">Names</label>
-            </div>
-          <div class="col">
-            <input type="text" class="form-control" id="names" name="names"
-            required placeholder="Enter students names">
-            </div>
+
+          <div class="modal-footer mt-2">
+            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm">Search</i></button>
           </div>
-        <div class="modal-footer mt-2">
-        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button type="submit" class="btn btn-primary btn-sm">Search</i></button>
-        </div>
         </form>
       </div>
 
@@ -190,14 +199,14 @@
           </div>
           </div>
         </td>
-        
+
         </tr>
       @endforeach
         </tbody>
       </table>
     </div>
   </div>
-  
+
 </div>
 
 {!! $students->links('pagination::bootstrap-5') !!}
@@ -205,10 +214,10 @@
   changeCriteria(){
     alert("Hello");
     var criteriaDoc = document.getElementById('criteria').innerHTML;
-    if(criteriaDoc.value == "plt"){
+    if (criteriaDoc.value == "plt") {
       document.getElementById('platoonCriteria').style.display.block;
       document.getElementById('namesCriteria').style.display.none;
-    }elseif(criteriaDoc.value == "names"){
+    } elseif(criteriaDoc.value == "names"){
       document.getElementById('namesCriteria').style.display.block;
       document.getElementById('platoonCriteria').style.display.none;
     }

@@ -6,8 +6,8 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-rms/attendences/">Today  Attendence</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/attendences/">Today  Attendence</a></li>
                 <li class="breadcrumb-item"><a href="#">Students</a></li>
             </ol>
         </nav>

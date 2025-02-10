@@ -7,11 +7,14 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+    protected $commands = [
+        \App\Console\Commands\DailyBeats::class,
+    ];
     protected function schedule(Schedule $schedule): void
     {
         // Add your scheduled tasks here.
-        //$schedule->command('inspire')->hourly();
-        $schedule->command('app:daily-beats')->daily();
+        $schedule->command('inspire')->everyTwentySeconds();
+        $schedule->command('app:daily-beats')->daily();	;
     }
 
     protected function commands(): void

@@ -229,10 +229,10 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="{{url('beats')}}">Guards</a>
+          <a href="{{url('beats/companies/1')}}">Guards</a>
         </li>
         <li>
-          <a href="#">Patrol</a>
+          <a href="{{url('beats/companies/2')}}">Patrol</a>
         </li>
       </ul>
     </li>

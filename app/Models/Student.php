@@ -44,7 +44,10 @@ class Student extends Model
     {
         return $this->hasOne(Company::class, 'name', 'id');
     }
-
+    public function get_company()
+    {
+        return $this->hasOne(Company::class, 'name', 'company');
+    }
     // public function programme()
     // {
     //     return $this->hasOne(Programme::class, 'id', 'programme_id');

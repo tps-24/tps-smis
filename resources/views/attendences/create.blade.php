@@ -6,8 +6,8 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-rms/attendences/">Attendences</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/attendences/">Attendences</a></li>
                 <li class="breadcrumb-item active" aria-current="page"><a href="#">Create</a></li>
             </ol>
         </nav>
@@ -29,7 +29,7 @@
     @csrf
     @method('POST')
     <div class="row">
-        @foreach($platoon->students as $student)
+        @foreach($students as $student)
             <div class="col-6">
                 <div class="form-check">
                     <input class="form-check-input" onclick="updateSelectAll()" type="checkbox" name="student_ids[]"

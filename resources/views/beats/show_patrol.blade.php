@@ -8,7 +8,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
                 <li class="breadcrumb-item "><a href="/tps-smis/beats">Beats</a></li>
-                <li class="breadcrumb-item active"><a href="#">Guards </a></li>
+                <li class="breadcrumb-item active"><a href="#">Patrol </a></li>
             </ol>
         </nav>
     </div>
@@ -17,6 +17,7 @@
 
 @endsection
 @section('content')
+
 
 
 <div class="row gx-4">
@@ -36,6 +37,7 @@
                             <a class="nav-link" id="tab-twoA" data-bs-toggle="tab" href="#twoA" role="tab"
                                 aria-controls="twoA" aria-selected="false">Tomorrow</a>
                         </li>
+
                     </ul>
                     <!-- Nav tabs end -->
 
@@ -58,9 +60,8 @@
                                                     <table class="table table-striped truncate m-0">
                                                         <thead>
                                                             <tr>
-                                                                <th></th>
+                                                                <th>No</th>
                                                                 <th>Name</th>
-                                                                <th>Rank</th>
                                                                 <th>Status</th>
                                                                 <th>Round</th>
                                                                 <th>Start</th>
@@ -77,7 +78,6 @@
                                                                         {{$beat->student->middle_name}}
                                                                         {{$beat->student->last_name}}
                                                                     </td>
-                                                                    <td>{{$beat->student->rank}}</td>
                                                                     <td>
                                                                         @if ($beat->status == 1)
                                                                             Attended
@@ -129,7 +129,6 @@
                                                             <tr>
                                                                 <th>No</th>
                                                                 <th>Name</th>
-                                                                <th>Rank</th>
                                                                 <th>Status</th>
                                                                 <th>Round</th>
                                                                 <th>Start</th>
@@ -146,7 +145,6 @@
                                                                         {{$beat->student->middle_name}}
                                                                         {{$beat->student->last_name}}
                                                                     </td>
-                                                                    <td>{{$beat->student->rank}}</td>
                                                                     <td>
                                                                         @if ($beat->status == 1)
                                                                             Attended
