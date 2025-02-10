@@ -23,7 +23,7 @@ class StudentController extends Controller
     public function __construct()
     {
 
-        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view']]);
+        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view','search']]);
         $this->middleware('permission:student-create', ['only' => ['create', 'store']]);
         $this->middleware('permission:student-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:student-delete', ['only' => ['destroy']]);
@@ -42,11 +42,26 @@ class StudentController extends Controller
         $selectedSessionId = session('selected_session');
         if (!$selectedSessionId)
             $selectedSessionId = 1;
-        $students = Student::where('session_programme_id', $selectedSessionId)->latest()->paginate(10);
+        $students = Student::where('session_programme_id', $selectedSessionId)->latest()->paginate(20);
         $page_name = "Student Management";
         return view('students.index', compact('students', 'page_name'))
-            ->with('i', ($request->input('page', 1) - 1) * 10);
-        ;
+            ->with('i', ($request->input('page', 1) - 1) * 20);
+        
+    }
+
+    public function search(Request $request)
+    {
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
+        $students = Student::where('session_programme_id', $selectedSessionId)
+                    ->where('company', $request->company)
+                    ->where('platoon',$request->platoon)
+                    ->orderBy('first_name')
+                    ->latest()->paginate(90);
+        return view('students.index', compact('students'))
+            ->with('i', ($request->input('page', 1) - 1) * 90);
+        
     }
 
     /**

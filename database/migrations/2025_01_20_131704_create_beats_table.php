@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('beats', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('beatType_id');
-            $table->unsignedBigInteger('area_id');
+            $table->unsignedBigInteger('area_id')->nullable();
+            $table->unsignedBigInteger('patrolArea_id')->nullable();
             $table->string('student_id');
             $table->integer('round');
             $table->date('date');
@@ -22,7 +23,8 @@ return new class extends Migration
             $table->time('end_at')->nullable();
             $table->boolean('status')->nullable();
             $table->foreign('area_id')->references('id')->on('areas')->onupdate('update')->ondelete('null');
-            //$table->foreign('beatType_id')->references('id')->on('beat_types')->onupdate('update')->ondelete('null');
+            $table->foreign('patrolArea_id')->references('id')->on('patrol_areas')->onupdate('update')->ondelete('null');
+            $table->foreign('beatType_id')->references('id')->on('beat_types')->onupdate('update')->ondelete('null');
             $table->timestamps();
         });
     }

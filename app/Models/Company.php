@@ -20,4 +20,8 @@ class Company extends Model
     public function areas(){
         return $this->hasMany(Area::class);
     }
+
+    public function patrol_areas(){
+        return $this->hasMany(PatrolArea::class,'company_id','id');
+    }
 }

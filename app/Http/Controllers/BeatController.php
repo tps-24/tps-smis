@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Beat;
+use App\Models\BeatType;
 use App\Models\Company;
 use App\Models\Area;
+use App\Models\PatrolArea;
 use App\Models\Student;
 use DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class BeatController extends Controller
@@ -20,22 +23,18 @@ class BeatController extends Controller
     protected $start_at;
     protected $end_at;
     protected $area_id;
+
+    protected $patrolArea_id;
     protected $beatType_id;
     protected $company_id;
 
     public function __construct()
     {
 
-        // $this->middleware('permission:user-list|user-create|user-edit|user-delete', ['only' => ['index','view']]);
-        // $this->middleware('permission:user-create', ['only' => ['create','store']]);
-        // $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
-        // $this->middleware('permission:user-delete', ['only' => ['destroy']]);
-        // $this->middleware('permission:user-profile-list|user-profile-create|user-profile-edit|user-profile-delete', ['only' => ['profile']]);
-        // $this->middleware('permission:user-profile-edit', ['only' => ['updateProfile']]);
-
-        // $this->area_id = $area_id;
-        // $this->beatType_id = $beatType_id;
-        // $this->company_id = $company_id;
+        $this->middleware('permission:beat-list|beat-create|beat-edit|beat-delete', ['only' => ['index', 'view']]);
+        $this->middleware('permission:beat-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:beat-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:beat-delete', ['only' => ['destroy']]);
 
         $companyBeat = Beat::orderBy('beats.id', 'desc')
             ->leftJoin('students', 'students.id', 'beats.student_id')
@@ -48,9 +47,6 @@ class BeatController extends Controller
         } else {
             $this->round = 1;
         }
-
-        //$this->start_at = Carbon::createFromTime(18, 00, 0)->format('H:i:s');
-        //$this->end_at = Carbon::createFromTime(00, 00, 0)->format('H:i:s');
     }
     /**
      * Display a listing of the resource.
@@ -59,13 +55,43 @@ class BeatController extends Controller
     {
         $areas = Area::all();
         $companies = Company::all();
-        return view('beats.index', compact('areas','companies'));
+        return view('beats.index', compact('areas', 'companies'));
     }
 
     public function list_guards($area_id)
     {
-        $beats = Area::find($area_id)->beats()->where('beatType_id', 1)->get();
+        $beats = Area::find($area_id)->beats()->whereDate('date', Carbon::today())->where('beatType_id', 1)->get();
         return view('beats.list_guards', compact('beats'));
+    }
+
+    public function list_patrol($patrolArea_id)
+    {
+        $patrolArea = PatrolArea::find($patrolArea_id);
+        $beats = $patrolArea->beats()
+            ->whereDate('date', Carbon::today())->where('beatType_id', 2)->get();
+        return view('beats.list_patrol', compact('patrolArea', 'beats'));
+    }
+
+    public function list_patrol_guards($patrolArea_id)
+    {
+        $beatType = BeatType::find(2);
+
+        $todayBeats = $beatType->beats()
+            ->where('patrolArea_id', $patrolArea_id)
+            ->whereDate('date', Carbon::today())
+            ->get();
+        $tomorowBeats = $beatType->beats()
+            ->where('patrolArea_id', $patrolArea_id)
+            ->whereDate('date', Carbon::tomorrow())
+            ->get();
+        return view('beats.show_patrol', compact('todayBeats', 'tomorowBeats'));
+
+    }
+
+    public function list_patrol_areas()
+    {
+        $patrol_areas = PatrolArea::all();
+        return view('beats.list_patrol_areas', compact('patrol_areas'));
     }
     /**
      * Show the form for creating a new resource.
@@ -84,7 +110,7 @@ class BeatController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store($area_id, $beatType_id, $company_id,$start_at, $end_at)
+    public function store($session_programme_id, $area_id, $patrolArea_id, $beatType_id, $company_id, $start_at, $end_at)
     {
         // $area = Area::find($area_id);
         // $students_ids = $request->input('student_ids');
@@ -102,17 +128,27 @@ class BeatController extends Controller
         // $area->save();
         // return $students_ids[0];
 
-         $this->area_id=$area_id;
-        $this->beatType_id =$beatType_id;
+        $this->beatType_id = $beatType_id;
         $this->company_id = $company_id;
         $this->start_at = $start_at;
         $this->end_at = $end_at;
+        $this->area_id = $area_id;
+        $this->patrolArea_id = $patrolArea_id;
 
         $platoon = 1;
         $company = Company::find($company_id);
         $students = $company->students()->orderBy('id')->get();
-        $area = Area::find($area_id);
-        $number_of_students = $area->number_of_guards;
+        //return $students;
+        if ($beatType_id == 2) {
+            $area = PatrolArea::find($patrolArea_id);
+        } else {
+            $area = Area::find($area_id);
+        }
+
+        if ($session_programme_id == 1)
+            $number_of_students = $area->number_of_guards;
+        else
+            $number_of_students = 1;
         /**
          * Get Platoon students.
          */
@@ -125,6 +161,8 @@ class BeatController extends Controller
              */
             $beat_students = $company->students()->leftJoin('beats', 'students.id', '=', 'beats.student_id')
                 ->orderBy('platoon')
+                ->where('session_programme_id', $session_programme_id)
+                ->where('gender', 'M')
                 ->where('students.vitengo_id', NULL)
                 ->where('beats.student_id', NULL)
                 ->select('students.*');
@@ -169,17 +207,32 @@ class BeatController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($area_id)
+    public function show_guards_beats($area_id)
     {
-        $area = Area::find($area_id);
-        $todayBeats = $area->beats()
+        $beatType = BeatType::find(1);
+
+        $todayBeats = $beatType->beats()
+            ->where('area_id', $area_id)
             ->whereDate('date', Carbon::today())
             ->get();
-        $tomorowBeats = $area->beats()
+        $tomorowBeats = $beatType->beats()
+            ->where('area_id', $area_id)
             ->whereDate('date', Carbon::tomorrow())
             ->get();
-
         return view('beats.show', compact('todayBeats', 'tomorowBeats'));
+    }
+
+    public function show_patrol_beats($beatType_id)
+    {
+        $beatType = BeatType::find($beatType_id);
+
+        $todayBeats = $beatType->beats()
+            ->whereDate('date', Carbon::today())
+            ->get();
+        $tomorowBeats = $beatType->beats()
+            ->whereDate('date', Carbon::tomorrow())
+            ->get();
+        return view('beats.show_patrol', compact('todayBeats', 'tomorowBeats'));
     }
 
     /**
@@ -222,7 +275,8 @@ class BeatController extends Controller
         return view('beats.search_students', compact('area', 'companies', 'students'));
     }
 
-    public function update_area(Request $request, $area_id){
+    public function update_area(Request $request, $area_id)
+    {
         $area = Area::findOrFail($area_id);
         $request->validate([
             'name' => 'required',
@@ -230,7 +284,7 @@ class BeatController extends Controller
             'number_of_guards' => 'required'
         ]);
 
-        $area-> update([
+        $area->update([
             'name' => $request->name,
             'company_id' => $request->company,
             'number_of_guards' => $request->number_of_guards
@@ -239,34 +293,33 @@ class BeatController extends Controller
         return redirect()->back()->with('success', 'Area updated Successfully.');
 
     }
-    public function assign_beats()
-    {
-
-
-    }
 
     public function store_beat($company, $area_id, $beatType_id, $students)
     {
-
-        $last_student = $company->students()->orderBy('id', 'desc')->get()[0];
+        $last_student = $company->students()->orderBy('platoon')->orderBy('id', 'desc')->get()[0];
         /**
          *  Assign students to a beat
          */
         foreach ($students as $student) {
+            $beat_student = Beat::where('student_id', $student->id)->where('round', $this->round)->get();
+            if(count($beat_student)> 0){
+                ++$this->round;
+            }
             /**
              * Needs modifications to check if student is the last one
              */
 
-            if ($last_student->id == $student->id) {
-                $this->round += 1;
-            }
-            Beat::create([
+            // if ($last_student->id == $student->id) {
+            //     $this->round += 1;
+            // }
+             Beat::create([
                 'beatType_id' => $beatType_id,
-                'area_id' => $area_id,
+                'area_id' => $this->area_id,
+                'patrolArea_id' => $this->patrolArea_id,
                 'student_id' => $student->id,
                 'round' => $this->round,
                 'date' => Carbon::tomorrow()->format('d-m-Y'),
-                'start_at' =>  Carbon::createFromTime($this->start_at, 00, 0)->format('H:i:s'),
+                'start_at' => Carbon::createFromTime($this->start_at, 00, 0)->format('H:i:s'),
                 'end_at' => Carbon::createFromTime($this->end_at, 00, 0)->format('H:i:s')
             ]);
         }
@@ -276,9 +329,10 @@ class BeatController extends Controller
     {
         $platoon_students = new \Illuminate\Database\Eloquent\Collection();
         do {
-            $students_to_push = $company->students()->where('platoon', $platoon)->take($count)->get();
+            $students_to_push = $company->students()->where('gender', 'M')->where('platoon', $platoon)->take($count)->get();
             if ($students_to_push->isNotEmpty())
                 foreach ($students_to_push as $student_to_push) {
+
                     $platoon_students->push($student_to_push);
                     --$count;
                 }
@@ -290,6 +344,15 @@ class BeatController extends Controller
     public function approve_presence(Request $request)
     {
         $beat_ids = $request->input('beat_ids');
+        if (count($beat_ids) < 1) {
+            return redirect()->back()->with('error', 'Please select at least one guard.');
+        }
+        $todayBeats = Beat::whereDate('date', Carbon::today())->select('id')
+            ->get();
+        $todayBeats = $todayBeats->pluck('id')->toArray();
+        $beatType = Beat::find($beat_ids[0])->beatType;
+        $absent = array_values(array_diff($todayBeats, $beat_ids));
+        //Update present
         foreach ($beat_ids as $beat_id) {
             $beat = Beat::find($beat_id);
             if ($beat) {
@@ -297,10 +360,58 @@ class BeatController extends Controller
                     'status' => 1
                 ]);
             }
-
         }
-        return redirect('/beats')->with('success', "Ok");
+
+        //update absenties
+        foreach ($absent as $beat_id) {
+            $beat = Beat::find($beat_id);
+            if ($beat) {
+                $beat->update([
+                    'status' => 0
+                ]);
+            }
+        }
+        if ($beatType->id == 2) {
+            return redirect('/beats/show_patrol_areas')->with('success', "Successfully.");
+        }
+        return redirect('/beats')->with('success', "Successfully.");
     }
 
+    public function companies($beatType_id){
+        $companies = Company::all();
+        return view('beats.companies', compact('companies','beatType_id'));
+    }
 
+    public function get_companies_area($company_id){
+        $company = Company::find($company_id);
+        $areas = $company->areas;
+        $companies = Company::all();
+        return view('beats.list_guards_areas', compact('areas', 'companies','company'));
+    }
+
+    public function get_companies_patrol_area($company_id){
+        $company = Company::find($company_id);
+        $patrol_areas = $company->patrol_areas;
+        $companies = Company::all();
+        return view('beats.list_patrol_areas', compact('patrol_areas', 'companies', 'company'));
+    }
+
+    public function generateTodayPdf($company_id,$beatType_id,$day)
+    {
+        if($beatType_id == "all"){
+            $beatTypes = BeatType::all();
+        }
+        else{
+            $beatTypes = BeatType::find($beatType_id);
+        }
+        $company = Company::find($company_id);
+        //return view('beats.downloadPdf', compact('company','beatType_id', 'day'));
+        $pdf = PDF::loadView('beats.downloadPdf',compact('company', 'beatType_id', 'day'));
+        return $pdf->stream("beats.pdf");
+        
+    }
+    public function test(){
+        //$company = Company::find(1);
+        return $this->store(1, 1, NULL, 1, 1, "18", "00");
+    }
 }

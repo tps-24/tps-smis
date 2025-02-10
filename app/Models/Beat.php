@@ -9,6 +9,8 @@ class Beat extends Model
     protected $fillable = [
         'beatType_id',
         'area_id',
+        'start_area',
+        'patrolArea_id',
         'student_id',
         'status',
         'round',
@@ -19,9 +21,19 @@ class Beat extends Model
 
     protected $casts = [
         'date'=> 'datetime',
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
     ];
     public function area(){
         return $this->belongsTo(Area::class,'area_id', 'id');
+    }
+
+    public function start(){
+        return $this->belongsTo(Area::class,'start_area', 'id');
+    }
+
+    public function end(){
+        return $this->belongsTo(Area::class,'end_area', 'id');
     }
 
     public function student(){

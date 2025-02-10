@@ -27,14 +27,19 @@ class DailyBeats extends Command
      */
     public function handle()
     {
+        \Log::info('Task was run at ' . now());
         $companies = Company::all();
+        $output = new \Symfony\Component\Console\Output\ConsoleOutput();
+        $this->info('Hello, this is a custom message!');
+        $output->writeln("hello");
+        logger()->info("waaaaooooooo");
         foreach ($companies as $company) {
             foreach($company->areas as $area){
                 $beatController = new BeatController();
                 // 18:00 -> 00:00
-                $beatController->store($area->id,1,$company->id,"18","00");
+                //$beatController->store($area->id,1,$company->id,"18","00");
                 //00:00 -> 6:00
-                $beatController->store($area->id,1,$company->id,"00","6");
+                //$beatController->store($area->id,1,$company->id,"00","6");
             }
         }
     }

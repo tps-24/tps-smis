@@ -28,10 +28,12 @@
 </div> -->
 @if ($areas->isEmpty())
 
-  <h5>No beats available.</h5>
+  <h5>No areas assigned to this Company.</h5>
 
 @else
+
   <div class="table-responsive">
+  <a style="float:right;" href="{{route('beats.downloadPdf',['company_id' => $company->id,'beatType' => 1, 'day'=> "today"])}}"><button title="Download Pdf" class="btn btn-sm btn-success"><i class="bi bi-download"> </i> Download Pdf</button></a>
     <table class="table table-striped truncate m-0">
     <thead>
       <tr>
@@ -126,6 +128,7 @@
       <a href="{{url('/beats/show_guards/' . $area->id)}}"><button class="btn btn-sm btn-info">View</button></a>
       <a href="{{ url('/beats/list-guards/' . $area->id) }}"><button
       class="btn btn-sm btn-primary">Approve</button></a>
+
     @endif
       </td>
       </tr>

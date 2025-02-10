@@ -29,7 +29,7 @@
             @csrf
             <!-- Logo starts -->
             <center>
-                <a href="/tps-rms" class="auth-logo mt-5 mb-3">
+                <a href="/tps-smis" class="auth-logo mt-5 mb-3">
                 <img src="resources/assets/images/logo.png" style="height:200 !important; width:200" alt="Police Logo" />
                 </a>
             </center>

@@ -53,13 +53,41 @@ Route::get('/', function () {
 // });
 Route::group(['middleware' => 'session_programme'], function () {
     // Add more routes as needed
+
+    // Route::controller(BeatController::class)->prefix('beats')->group(function () {
+    //     Route::get('{area_id}/create', 'create');
+    //     Route::get('{area_id}/search_students', 'search');
+    //     Route::post('{area_id}/assign_students', 'store');
+    //     Route::post('approve','approve_presence');
+    // });
+
+});
+
+Route::controller(BeatController::class)->prefix('beats')->group(function () {
+    Route::get('/', 'index');
+    Route::get('companies/{beatType}','companies');
+    Route::get('companies/{companyId}/areas','get_companies_area');
+    Route::get('companies/{companyId}/patrol_areas','get_companies_patrol_area');
+    Route::get('/store', 'store');
+    Route::get('/show_guards/{area_id}', 'show_guards_beats');
+    Route::get('/show_patrol/{area_id}', 'show_patrol_beats');
+    Route::get('/show_patrol_areas', 'list_patrol_areas')->name('beats.show_patrol_areas');
+    Route::put('/update/{area_id}', 'update_area');
+    Route::put('/update_patrol_area/{patrol_area_id}', 'update_patrol_area');
+    
+    Route::get('/list-guards/{area_id}', 'list_guards');
+    Route::get('/list-patrol/{patrolArea_id}', 'list_patrol');
+    Route::get('/list-patrol-guards/{patrolArea_id}', 'list_patrol_guards');
+    Route::put('/approve', 'approve_presence');
+    Route::get('/downloadPdf/{company_id}/{beatType}/{day}', 'generateTodayPdf')->name('beats.downloadPdf');
 });
 
 Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
 Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
 Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
-Route::get('students/dashboard', [StudentController::class, 'dashboard']);
+Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
+Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
 Route::resource('students', StudentController::class);
 Route::group(['middleware' => ['auth']], function () {
     
@@ -104,7 +132,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
     Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
-    Route::resource('beats', BeatController::class);
+    //Route::resource('beats', BeatController::class);
 
 
 
@@ -144,23 +172,12 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('{company}/company', 'company');
     });
 
-    Route::controller(BeatController::class)->prefix('beats')->group(function () {
-        Route::get('{area_id}/create', 'create');
-        Route::get('{area_id}/search_students', 'search');
-        Route::post('{area_id}/assign_students', 'store');
-    });
 
-    Route::controller(BeatController::class)->prefix('beats')->group(function () {
-        Route::get('/', 'index');
-        Route::get('/store', 'store');
-        Route::get('/show/{area_id}', 'show');
-        Route::put('/update/{area_id}', 'update_area');
-        Route::get('/list-guards/{area_id}', 'list_guards');
-        Route::put('/approve', 'approve_presence');
-    });
+
+
 
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
-        Route::get('type-test/{type_id}', 'testAttendence');
+        Route::get('type-test/{type_id}', 'attendence');
         Route::get('type/{type_id}', 'attendence');
         Route::post('create/{type_id}', 'create');
         Route::get('edit/{id}', 'edit');
@@ -269,3 +286,7 @@ Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->na
 //Daktari routes
 Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.page');
 Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
+
+
+
+Route::get('test', [BeatController::class,'test']);

@@ -6,8 +6,9 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-                <li class="breadcrumb-item active"><a href="/tps-smis/beats">Area </a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis" id="homee">Home</a></li>
+                <li class="breadcrumb-item "><a href="/tps-smis/beats">Beats </a></li>
+                <li class="breadcrumb-item active"><a href="/tps-smis/beats">Patrol </a></li>
             </ol>
         </nav>
     </div>
@@ -20,7 +21,7 @@
     No students assigned
 @else
     <div class="mb-2">
-        Select present Guards for {{$beats[0]->area->name}}
+        Select present patrol Guards for {{$patrolArea->start->name}} to {{$patrolArea->end->name}}
     </div>
 
     <form action="{{url('/beats/approve')}}" method="POST">
