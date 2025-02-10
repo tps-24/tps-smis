@@ -109,7 +109,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-person"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="forceNumber" value="K.1112" Disabled>
+                                          <input type="text" class="form-control" id="forceNumber" value="{{$user->staff->forceNumber ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -125,7 +125,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-person"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="fullName" value="David John Tweve" Disabled>
+                                          <input type="text" class="form-control" id="fullName" value="{{$user->staff->firstName ?? ''}} {{$user->staff->middleName ?? ''}} {{$user->staff->lastName ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -141,7 +141,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-envelope"></i>
                                           </span>
-                                          <input type="email" class="form-control" id="yourEmail" value="info@email.com" Disabled>
+                                          <input type="email" class="form-control" id="yourEmail" value="{{$user->email}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -156,7 +156,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-phone"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="contactNumber" value="+255655527782" Disabled>
+                                          <input type="text" class="form-control" id="contactNumber" value="{{$user->staff->phoneNumber ?? ''}}" Disabled>
                                         </div>
 
                                       </div>
@@ -172,7 +172,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-calendar4"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="birthDay"  value="14/08/1986" Disabled>
+                                          <input type="text" class="form-control" id="birthDay"  value="{{$user->staff->DoB ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->

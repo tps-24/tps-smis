@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Staff;
 use App\Models\User;
-use Illuminate\Http\Request;
 use App\Models\Department;
+use App\Models\NextOfKin;
 use Spatie\Permission\Models\Role;
 use Illuminate\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Http\RedirectResponse;
 use DB;
 use Hash;
+use Auth;
 
 class StaffController extends Controller
 {
@@ -40,32 +42,24 @@ class StaffController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
+        // Validate request
         $this->validate($request, [
             'forceNumber' => 'required|unique:staff',
             'rank' => 'required',
             'firstName' => 'required',
             'lastName' => 'required',
             'gender' => 'required',
-            'DoB' => 'required|date',
-            'maritalStatus' => 'required',
-            'phoneNumber' => 'required',
             'email' => 'required|email|unique:users,email',
-            'department_id' => 'required|integer',
             'roles' => 'required',
-            'educationLevel' => 'required',
-            'contractType' => 'required',
-            'joiningDate' => 'required|date',
-            'location' => 'required',
-            'created_by' => 'required|exists:users,id'
+            'created_by' => 'required|exists:users,id',
         ]);
 
+        // Process input
         $input = $request->all();
-        $password = Hash::make($input['lastName']);
-        $fullName = $request->firstName. ' ' . $request->middleName. ' ' . $request->lastName;
-    
+        $password = Hash::make(strtoupper($input['lastName']));
+        $fullName = $request->firstName . ' ' . $request->middleName . ' ' . $request->lastName;
 
-        //Create User First
+        // Create User
         $user = User::create([
             'name' => $fullName,
             'email' => $request->email,
@@ -73,16 +67,43 @@ class StaffController extends Controller
         ]);
         $user->assignRole($request->input('roles'));
 
-        
+        // Set user_id for staff
         $input['user_id'] = $user->id;
-        
-        // dd($input);
-        //Now Create Staff
+
+        // Create Staff
         $staff = Staff::create($input);
+
+        // Check if Next of Kin full name is provided
+        if (!empty($request->input('nextofkinFullname'))) {
+            // Validate NextOfKin fields
+            $this->validate($request, [
+                'nextofkinFullname' => 'required',
+                'nextofkinRelationship' => 'required',
+                'nextofkinPhysicalAddress' => 'required',
+            ]);
+
+            // Create NextOfKin
+            NextOfKin::Create([
+                'nextofkinFullname' => $input['nextofkinFullname'],
+                'nextofkinRelationship' => $input['nextofkinRelationship'],
+                'nextofkinPhoneNumber' => $input['nextofkinPhoneNumber'],
+                'nextofkinPhysicalAddress' => $input['nextofkinPhysicalAddress'],
+                'staff_id' => $staff->id,
+            ]);
+        }
 
         return redirect()->route('staffs.index')->with('success', 'Staff created successfully.');
     }
 
+    /**
+     * Displaying user profile..
+     */
+    public function profile($id):View
+    {
+        $user = User::find($id);
+        return view('staffs.profile',compact('user'));
+    }
+    
     /**
      * Display the specified resource.
      */
@@ -104,8 +125,9 @@ class StaffController extends Controller
         $departments = Department::get();
         $roles = Role::pluck('name','name')->all();
         $userRole = $user->roles->pluck('name','name')->all();
+        $staffNextofkin = NextOfKin::where('staff_id', $staff->id)->first();
 
-        return view('staffs.edit', compact('staff', 'departments','roles', 'userRole'));
+        return view('staffs.edit', compact('staff', 'departments','roles', 'userRole', 'staffNextofkin'));
     }
 
     /**
@@ -119,46 +141,83 @@ class StaffController extends Controller
             'firstName' => 'required',
             'lastName' => 'required',
             'gender' => 'required',
-            'DoB' => 'required|date',
-            'maritalStatus' => 'required',
-            'phoneNumber' => 'required',
+            // 'DoB' => 'required|date',
+            // 'maritalStatus' => 'required',
+            // 'phoneNumber' => 'required',
             'email' => 'required|unique:staff,email,' . $staff->id,
             'department_id' => 'required|integer',
-            'roles' => 'required',
-            'educationLevel' => 'required',
-            'contractType' => 'required',
-            'joiningDate' => 'required|date',
-            'location' => 'required',
+            // 'roles' => 'required',
+            // 'educationLevel' => 'required',
+            // 'contractType' => 'required',
+            // 'joiningDate' => 'required|date',
+            // 'location' => 'required',
             'updated_by' => 'required|exists:users,id'
         ]);
 
         $id = Staff::where('id', $staff->id)->pluck('user_id');
-        $fullName = $request->firstName. ' ' . $request->middleName. ' ' . $request->lastName;
-        $input['name'] = $fullName;
-        $input = $request->only(['name', 'email']);
-        $input = Arr::except($input,array('password'));    
- 
-    
-        $user = User::find($id);
-        $user->update($input);
+        $fullName = $request->firstName . ' ' . $request->middleName . ' ' . $request->lastName;
+        $input = $request->all();
+        // $input = $request->only(['email', 'password']);
+        // $input = Arr::except($input,array('password'));  
 
+        $user = User::where('id', $id)->first();
 
-        DB::table('model_has_roles')->where('model_id',$id)->delete();
-    
+        if ($user) {
+            $user->update([
+                'name' => $fullName,
+                'email' => $input['email']
+            ]);
+        }
+
+        DB::table('model_has_roles')->where('model_id', $id)->delete();
+        
         $user->assignRole($request->input('roles'));
 
         $staff->update($request->all());
 
+        // Check if Next of Kin full name is provided
+        if (!empty($request->input('nextofkinFullname'))) {
+            // Validate NextOfKin fields
+            $this->validate($request, [
+                'nextofkinFullname' => 'required',
+                'nextofkinRelationship' => 'required',
+                'nextofkinPhoneNumber' => 'required',
+                'nextofkinPhysicalAddress' => 'required',
+            ]);
+
+        // Update or Create NextOfKin
+        NextOfKin::updateOrCreate(
+            ['staff_id' => $staff->id], // This is the condition to find the existing record
+            [
+                'nextofkinFullname' => $input['nextofkinFullname'],
+                'nextofkinRelationship' => $input['nextofkinRelationship'],
+                'nextofkinPhoneNumber' => $input['nextofkinPhoneNumber'],
+                'nextofkinPhysicalAddress' => $input['nextofkinPhysicalAddress'],
+                'staff_id' => $staff->id,
+            ]
+        );
+
+        }
+
         return redirect()->route('staffs.index')->with('success', 'Staff updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Staff $staff)
     {
+        // First, delete the corresponding user
+        $user = $staff->user; // Assuming there's a relationship defined between Staff and User
+        if ($user) {
+            $user->delete();
+        }
+    
+        // Then, delete the staff member
         $staff->delete();
-
-        return redirect()->route('staffs.index')->with('success', 'Staff deleted successfully.');
+    
+        return redirect()->route('staffs.index')->with('success', 'Staff and corresponding user deleted successfully.');
     }
+    
 }

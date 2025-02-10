@@ -38,9 +38,11 @@
         <li>
           <a href="/tps-smis/students">Student Details</a>
         </li>
+        @can('student-create')
         <li>
           <a href="/tps-smis/students/create">Student Registration</a>
         </li>
+        @endcan()
       </ul>
     </li>
     @endcan()
@@ -101,7 +103,7 @@
         </li>
         @endcan()
         <li>
-          <a href="{{ route('courses.index') }}">My Courses</a>  <!-- For Teacher-->
+          <a href="#">My Courses</a>  <!-- For Teacher-->
         </li>
         <li>
           <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a>  <!-- For Teacher-->
@@ -109,9 +111,11 @@
         <li>
           <a href="#">Semester Exam (SE)</a>  <!-- For Teacher-->
         </li>
+        @can('optional-enrollment-list')
         <li>
           <a href="{{ route('enrollments.index') }}">Optional Courses</a> <!-- For Academic Coord -->
         </li>
+        @endcan()
       </ul>
     </li>
     @endcan()
@@ -123,7 +127,7 @@
       </a>
     </li>
     @endcan()
-    @can('coursework-list')
+    @can('student-coursework-list')
     <li>
       <a href="{{ route('students.coursework') }}">
         <i class="bi bi-printer"></i>
@@ -266,6 +270,9 @@
       <ul class="treeview-menu">
         <li>
           <a href="#">General Settings</a>
+        </li>
+        <li>
+          <a href="{{ route('departments.index') }}">Department Settings</a>
         </li>
         <li>
           <a href="{{ route('semesters.index') }}">Semester Settings</a>

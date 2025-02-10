@@ -11,6 +11,8 @@ use App\Models\CourseworkResult;
 use App\Imports\BulkImportStudents;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 use Spatie\Permission\Models\Role;
 use Illuminate\View\View;
@@ -18,23 +20,20 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\RedirectResponse;
 use DB;
 use Hash;
+use Illuminate\Support\Facades\Log; // Correct namespace for the Log facade
+
+
 
 class StudentController extends Controller
 {
     public function __construct()
     {
-
         $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view']]);
-        $this->middleware('permission:student-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:student-create', ['only' => ['create', 'store', 'createStepOne', 'postStepOne', 'createStepTwo', 'postStepTwo', 'createStepThree', 'postStepThree', 'import']]);
         $this->middleware('permission:student-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:student-delete', ['only' => ['destroy']]);
-        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['import']]);
     }
 
-    // public function dashboard(){
-    //     $user = Auth::user();
-    //     return view('students/dashboard', compact('user'));
-    // }
     /**
      * Display a listing of the resource.
      */
@@ -53,10 +52,9 @@ class StudentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
-    {
-        $page_name = "Create new Student";
-        return view('students.create', compact('page_name'));
+    public function create()
+    {        
+        return view('students.wizards.stepOne');
     }
 
     public function createPage()
@@ -119,9 +117,9 @@ class StudentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'force_number' => 'required|regex:/^[A-Z]{1,2}\.\d+$/|unique:students,force_number',
-            'first_name' => 'required|max:50|alpha|regex:/^[A-Z]/',
-            'middle_name' => 'required|max:50|alpha|regex:/^[A-Z]/',
-            'last_name' => 'required|max:50|alpha|regex:/^[A-Z]/',
+            'first_name' => 'required|max:50|regex:/^[A-Z][a-zA-Z\s\-\'\.\,]*$/',
+            'middle_name' => 'required|max:50|regex:/^[A-Z][a-zA-Z\s\-\'\.\,]*$/',
+            'last_name' => 'required|max:50|regex:/^[A-Z][a-zA-Z\s\-\'\.\,]*$/',
             'nin' => 'required|numeric|unique:students,nin',
             'dob' => 'required|date',
             'programme_id' => 'required|string|max:255',
@@ -160,19 +158,20 @@ class StudentController extends Controller
             'middle_name' => $request->input('middle_name'),
             'last_name' => $request->input('last_name'),
             'nin' => $request->input('nin'),
+            'rank' => $request->input('rank'),
             'dob' => $request->input('dob'),
             'programme_id' => $request->input('programme_id'),
+            'session_programme_id' => $request->input('session_programme_id'),
             'email' => $request->input('email'),
             'gender' => $request->input('gender'),
             'user_id' =>  $user->id,
-            'password' => Hash::make($request->input('password')),
         ]);
 
         $student->save();
 
-        return redirect()->back()->with('success', 'Your successfully created an account!');
+        // return redirect()->back()->with('success', 'Your successfully created an account!');
 
-        // return redirect()->route('students.dashboard')->with('success', "Your successfully created an account.");
+        return redirect()->route('login')->with('success', "Your successfully created an account.");
     
     }
 
@@ -190,24 +189,46 @@ class StudentController extends Controller
         return view('students.mycourse', compact('courses'));
     }
 
+    //Haitumiki for now
     public function dashboard()
     {
-        $user = auth()->user()->id;
-        $student = Student::where('user_id', $user)->get();
+        $student = auth()->user()->id;
+        // $student = Student::where('user_id', $user)->get();
+        $pending_message = session('message');
+        // $pending_message = "Your account is pending for approval.";
 
-        return view('dashboard.student_dashboard', compact('student'));
+        // dd($pending_message);
+
+        return view('dashboard.student_dashboard', compact('pending_message'));
     }
 
+     /**
+     * Displaying user profile..
+     */
+    public function profile($id):View
+    {
+        $user = User::find($id);
+        return view('students.profile',compact('user'));
+    }
+
+    public function approveStudent($id)
+    {
+        $student = Student::findOrFail($id);
+        $student->approve();
+
+        return redirect()->route('students.index')->with('success', 'Student approved successfully.');
+    }
+    
     /**
      * Display the specified resource.
      */
+
     public function show($id)
     {
         $student = Student::find($id);
         $page_name = "More Student Details";
         return view('students.show', compact('student', 'page_name'));
     }
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -224,7 +245,7 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function updatex(Request $request, $id)
     {
 
         $student = Student::find($id);
@@ -272,15 +293,217 @@ class StudentController extends Controller
     }
 
     /**
+     * Update the specified student in storage.
+     */
+    public function completeProfile($id)
+    {        
+        $student = Student::where('id', $id)->first();
+        // dd($student);
+        return view('students.complete_profile', compact('student'));
+    }
+
+    public function profileComplete(Request $request, $id)
+    {
+        // dd($request->file('photo'));
+        $student = Student::findOrFail($id);
+        $request->validate([
+            'education_level' => 'required',
+            'home_region' => 'required|string|min:4',
+            'phone' => 'nullable|numeric|unique:students,phone,' . $student->id,
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'next_of_kin' => 'nullable|array',
+            'next_of_kin.*.name' => 'nullable|string',
+            'next_of_kin.*.phone' => 'nullable|string',
+            'next_of_kin.*.relationship' => 'nullable|string',
+            'next_of_kin.*.address' => 'nullable|string',
+            'company' => 'required',
+            'platoon' => 'required',
+        ]);
+
+
+        // if ($request->hasFile('photo')) {
+        //     $photo = $request->file('photo');
+        //     $photoPath = $photo->store('photos', 'public');
+
+        //     // Resize the photo to specific dimensions, e.g., 300x300 pixels
+        //     $image = Image::make(Storage::path('public/' . $photoPath));
+        //     $image->resize(300, 300);
+        //     $image->save();
+
+        //     $student->photo = $photoPath;
+        // }
+
+
+
+
+
+        // dd($request->all());
+        // Handle the file upload
+        // if ($request->hasFile('photo')) {
+        //     $photoPath = $request->file('photo')->store('photos', 'public');
+        //     $student->photo = $photoPath;
+        // }
+
+        // if ($request->hasFile('photo')) {
+        //     $photoFile = $request->file('photo');
+        
+        //     // Move the file and get the path
+        //     $photoPath = $photoFile->store('photos', 'public');
+        
+        //     // Verify the path before storing it in the database
+        //     if ($photoPath) {
+        //         $student->photo = $photoPath;
+        //     } else {
+        //         // Handle error - log or display message
+        //         \Log::error('File upload failed.');
+        //         return back()->with('error', 'Failed to upload photo.');
+        //     }
+        // }
+
+
+        // if ($request->hasFile('photo')) {
+        //     $photoFile = $request->file('photo');
+            
+        //     // Check if the file was uploaded correctly
+        //     if ($photoFile->isValid()) {
+        //         // Store the file and get the path
+        //         $photoPath = $photoFile->store('photos', 'public');
+                
+        //         // Check the stored path
+        //         if ($photoPath) {
+        //             $student->photo = $photoPath;
+        //             \Log::info('Photo stored at: ' . $photoPath);
+        //         } else {
+        //             \Log::error('Failed to store photo.');
+        //             return back()->with('error', 'Failed to store photo.');
+        //         }
+        //     } else {
+        //         \Log::error('Uploaded file is not valid.');
+        //         return back()->with('error', 'Uploaded file is not valid.');
+        //     }
+        // }
+        
+
+        // Handle the file upload and resize using GD library
+        if ($request->hasFile('photo')) {
+            $photoFile = $request->file('photo');
+            Log::info('Photo file received.', ['file' => $photoFile->getClientOriginalName()]);
+
+            $photoPath = 'photos/' . uniqid() . '.' . $photoFile->getClientOriginalExtension();
+            Log::info('Generated photo path.', ['path' => $photoPath]);
+
+            // Get the original dimensions and create the GD resource
+            list($width, $height) = getimagesize($photoFile->getPathname());
+            Log::info('Original dimensions.', ['width' => $width, 'height' => $height]);
+
+            $src = null;
+            switch ($photoFile->getClientOriginalExtension()) {
+                case 'jpeg':
+                case 'jpg':
+                    $src = imagecreatefromjpeg($photoFile->getPathname());
+                    break;
+                case 'png':
+                    $src = imagecreatefrompng($photoFile->getPathname());
+                    break;
+                case 'gif':
+                    $src = imagecreatefromgif($photoFile->getPathname());
+                    break;
+                case 'svg':
+                    // SVG handling would require additional libraries
+                    break;
+            }
+
+            if ($src) {
+                // Create a new true color image with the desired dimensions
+                $dst = imagecreatetruecolor(150, 170);
+                Log::info('Created new true color image.');
+
+                // Resize and copy the original image to the new image
+                imagecopyresampled($dst, $src, 0, 0, 0, 0, 150, 170, $width, $height);
+                Log::info('Resized and copied the original image to the new image.');
+
+                // Save the new image
+                $saveSuccess = false;
+                switch ($photoFile->getClientOriginalExtension()) {
+                    case 'jpeg':
+                    case 'jpg':
+                        $saveSuccess = imagejpeg($dst, storage_path('app/public/' . $photoPath));
+                        break;
+                    case 'png':
+                        $saveSuccess = imagepng($dst, storage_path('app/public/' . $photoPath));
+                        break;
+                    case 'gif':
+                        $saveSuccess = imagegif($dst, storage_path('app/public/' . $photoPath));
+                        break;
+                }
+
+                if ($saveSuccess) {
+                    Log::info('Saved the new image.', ['path' => $photoPath]);
+                    $student->photo = $photoPath;
+                } else {
+                    Log::error('Failed to save the new image.');
+                    return back()->with('error', 'Failed to save the photo.');
+                }
+
+                // Free up memory
+                imagedestroy($src);
+                imagedestroy($dst);
+                Log::info('Freed up memory.');
+            } else {
+                Log::error('Unsupported image format.');
+                return back()->with('error', 'Unsupported image format.');
+            }
+        }
+
+
+        // dd($student->photo = $photoPath);
+        // Update other student attributes...
+        // $student->update($request->all());
+         // Update or Create NextOfKin
+         Student::updateOrCreate(
+            ['id' => $student->id], // This is the condition to find the existing record
+            [
+                'education_level' => $request->education_level,
+                'home_region' => $request->home_region,
+                'phone' => $request->phone,
+                'photo' => $student->photo = $photoPath,
+                'company' => $request->company,
+                'platoon' => $request->platoon,
+            ]
+        );
+        
+        Log::info('Student saved successfully.', ['student' => $student]);
+
+
+        // Update other student attributes...
+        // $student->update($request->except('photo'));
+
+        // Handle next-of-kin data
+        $student->next_of_kin = $request->next_of_kin;
+        $student->save();
+
+        return redirect()->route('profile',$student->user_id)->with('success', 'Student updated successfully.');
+        // return back()->with('success', 'Students updated  successfully.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
         $student = Student::find($id);
+        
+        // Check if the student has a related user
+        if ($student->user) {
+            $student->user->delete();
+        }
+        
+        // Delete the student
         $student->delete();
-        return redirect('students')->with('success', "Student deleted successfully.");
-
+    
+        return redirect('students')->with('success', "Student and related user deleted successfully.");
     }
+    
 
     public function import(Request $request)
     {
@@ -301,6 +524,10 @@ class StudentController extends Controller
         return back()->with('success', 'Students Uploaded  successfully.');
     }
 
+    // public function createStepOne()
+    // {
+    //     return view('students.wizards.stepOne');
+    // }
     public function postStepOne(Request $request, $type)
     {
         $student_validate_rule = "";

@@ -32,10 +32,6 @@ class Staff extends Model
             'contractType',
             'joiningDate',
             'location',
-            'nextofkinFullname',
-            'nextofkinRelationship',
-            'nextofkinPhoneNumber',
-            'nextofkinPhysicalAddress',
             'user_id',
             'created_by',
             'updated_by'
@@ -45,5 +41,9 @@ class Staff extends Model
         public function department() 
         { 
             return $this->belongsTo(Department::class); 
+        }
+        public function user()
+        {
+            return $this->belongsTo(User::class);
         }
 }

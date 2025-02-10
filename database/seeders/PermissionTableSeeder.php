@@ -127,13 +127,17 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'campus-delete', 'description' => 'Delete campus'],        
             ['name' => 'hospital-approve', 'description' => 'Approve sick students'],        
             ['name' => 'student-courses', 'description' => 'View Courses as Student'],        
+            ['name' => 'student-coursework-list', 'description' => 'View Courseworks as Student'],        
             // Add other permissions here with descriptions 
             ]; 
 
             foreach ($permissions as $permission) { 
                 Permission::updateOrCreate( 
                     ['name' => $permission['name']], // Match by name 
-                    ['description' => $permission['description']] // Update description 
+                    [
+                        'name' => $permission['name'],
+                        'description' => $permission['description']
+                    ] // Update name & description 
                     ); 
             }
     }

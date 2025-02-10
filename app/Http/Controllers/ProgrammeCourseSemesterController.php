@@ -18,7 +18,7 @@ class ProgrammeCourseSemesterController extends Controller
     {
         $this->middleware('permission:course-enrollment-create')->only(['create', 'store']);
         $this->middleware('permission:course-enrollment-list')->only(['index', 'show']);
-        $this->middleware('permission:course-enrollment-update')->only(['edit', 'update']);
+        $this->middleware('permission:course-enrollment-edit')->only(['edit', 'update']);
         $this->middleware('permission:course-enrollment-delete')->only(['destroy']);
     }
     
@@ -71,7 +71,7 @@ class ProgrammeCourseSemesterController extends Controller
     public function assignCourse($id)
     {
         $programme = Programme::findOrFail($id);
-        $semester = Semester::findOrFail(1);
+        $semester = Semester::findOrFail(2);
         $sessionProgramme = SessionProgramme::findOrFail(4);
         $courses = Course::all();
 

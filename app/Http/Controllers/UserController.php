@@ -30,10 +30,10 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $data = User::latest()->paginate(5);
+        $data = User::latest()->paginate(20);
   
         return view('users.index',compact('data'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+            ->with('i', ($request->input('page', 1) - 1) * 20);
     }
     
     /**
@@ -87,18 +87,9 @@ class UserController extends Controller
     }
 
     /**
-     * Displaying user profile.
-     *
      * @param  int  $id
      * @return \Illuminate\Http\Response
-     */
-
-    public function profile($id):View
-    {
-        $user = User::find($id);
-        return view('users.profile',compact('user'));
-    }
-   
+     */   
 
    public function changePassword($id): View
    {

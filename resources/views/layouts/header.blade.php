@@ -112,9 +112,15 @@
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end shadow-lg">
-                    <a class="dropdown-item d-flex align-items-center"
-                        href="{{ url('/profile/' . Auth::user()->id) }}"><i class="bi bi-person fs-4 me-2"></i>My
-                        Profile</a>
+                        <a class="dropdown-item d-flex align-items-center"
+                            @if(auth()->user()->hasRole('Student'))
+                                href="{{ url('student/profile/' . Auth::user()->id) }}"
+                            @else
+                                href="{{ url('staff/profile/' . Auth::user()->id) }}"
+                            @endif>
+                            <i class="bi bi-person fs-4 me-2"></i>My Profile
+                        </a>
+
                     <a class="dropdown-item d-flex align-items-center"
                         href="{{ url('/profile/change-password/' . Auth::user()->id) }}"><i
                             class="bi bi-gear fs-4 me-2"></i>Change Password</a>

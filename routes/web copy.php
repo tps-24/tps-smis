@@ -37,9 +37,8 @@ use App\Http\Controllers\CampusController;
 require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
-        $pending_message = session('pending_message');
         if (auth()->user()->hasRole('Student')) {
-            return view('dashboard.student_dashboard', compact('pending_message'));
+            return view('dashboard/student_dashboard');
         } else {
             return view('dashboard/dashboard');
         }
@@ -63,13 +62,10 @@ Route::post('/students/registration', [StudentController::class, 'register'])->n
 // Route::resource('students', StudentController::class);
 
 Route::middleware(['auth', 'check.student.status'])->group(function () {
-    Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
-    Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
-    Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
-    Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
-    Route::resource('students', StudentController::class);  
-    
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 });
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::group(['middleware' => ['auth']], function () {
     
@@ -80,15 +76,15 @@ Route::group(['middleware' => ['auth']], function () {
     );
     Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
 
-    Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
-    Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
+    Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
-    Route::post('/students/{id}/approve', [StudentController::class, 'approveStudent'])->name('students.approve');
-    Route::get('/student/complete-profile/{id}', [StudentController::class, 'completeProfile'])->name('students.complete_profile');
-    Route::put('/student/profile-complete/{id}', [StudentController::class, 'profileComplete'])->name('students.profile_complete');
-
+    Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
+    Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
+    Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
+    Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
+    
     
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
@@ -99,6 +95,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('programmes', ProgrammeController::class);
     Route::resource('courses', CourseController::class);
     Route::resource('products', ProductController::class);
+    Route::resource('students', StudentController::class);  
     Route::resource('attendences', AttendenceController::class);
     Route::resource('mps', MPSController::class);
     Route::resource('staffs', StaffController::class);
@@ -114,7 +111,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('semester_exam_results', SemesterExamResultController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
-    // Route::resource('beats', BeatController::class);
+    Route::resource('beats', BeatController::class);
 
 
 
@@ -151,20 +148,20 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('{company}/company', 'company');
     });
 
-    // Route::controller(BeatController::class)->prefix('beats')->group(function () {
-    //     Route::get('{area_id}/create', 'create');
-    //     Route::get('{area_id}/search_students', 'search');
-    //     Route::post('{area_id}/assign_students', 'store');
-    // });
+    Route::controller(BeatController::class)->prefix('beats')->group(function () {
+        Route::get('{area_id}/create', 'create');
+        Route::get('{area_id}/search_students', 'search');
+        Route::post('{area_id}/assign_students', 'store');
+    });
 
-    // Route::controller(BeatController::class)->prefix('beats')->group(function () {
-    //     Route::get('/', 'index');
-    //     Route::get('/store', 'store');
-    //     Route::get('/show/{area_id}', 'show');
-    //     Route::put('/update/{area_id}', 'update_area');
-    //     Route::get('/list-guards/{area_id}', 'list_guards');
-    //     Route::put('/approve', 'approve_presence');
-    // });
+    Route::controller(BeatController::class)->prefix('beats')->group(function () {
+        Route::get('/', 'index');
+        Route::get('/store', 'store');
+        Route::get('/show/{area_id}', 'show');
+        Route::put('/update/{area_id}', 'update_area');
+        Route::get('/list-guards/{area_id}', 'list_guards');
+        Route::put('/approve', 'approve_presence');
+    });
 
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
         Route::get('type-test/{type_id}', 'testAttendence');

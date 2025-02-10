@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('staff', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('status', ['Active', 'Inactive', 'Locked', 'Suspended', 'Archived'])->default('Active')->after('sessionProgramme_id');
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('staff');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('status'); // Remove status field
+        });
     }
 };

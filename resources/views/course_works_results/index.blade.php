@@ -47,7 +47,7 @@
         <div class="pull-right">
           <span style="font-size:30px !important">Coursework Results</span>
           <a class="btn btn-success mb-2" href="{{ route('coursework_results.create') }}" style="float:right !important; margin-right:1%">
-            <i class="fa fa-plus"></i> Create New course
+            <i class="fa fa-plus"></i> Add Course Results
           </a>
         </div>
       </div>

@@ -40,7 +40,12 @@
 @section('content')
 <!-- Row starts -->
 <div class="row gx-4">
-    
+  
+@if ($pending_message)
+    <div class="alert alert-warning">
+        {{ $pending_message }}
+    </div>
+@endif
 </div>
 <!-- Row ends -->
 @endsection
