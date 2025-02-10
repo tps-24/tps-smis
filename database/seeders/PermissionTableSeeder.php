@@ -59,6 +59,7 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'coursework-create', 'description' => 'Create new courseworks'], 
             ['name' => 'coursework-edit', 'description' => 'Edit existing courseworks'], 
             ['name' => 'coursework-delete', 'description' => 'Delete courseworks'], 
+            ['name' => 'coursework-config', 'description' => 'Coursework configuration'], 
             ['name' => 'semester-exam-list', 'description' => 'View semester examination'], 
             ['name' => 'semester-exam-create', 'description' => 'Create new semester examination'], 
             ['name' => 'semester-exam-edit', 'description' => 'Edit existing semester examination'], 
@@ -125,6 +126,7 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'campus-edit', 'description' => 'Edit existing campus'], 
             ['name' => 'campus-delete', 'description' => 'Delete campus'],        
             ['name' => 'hospital-approve', 'description' => 'Approve sick students'],        
+            ['name' => 'student-courses', 'description' => 'View Courses as Student'],        
             // Add other permissions here with descriptions 
             ]; 
 

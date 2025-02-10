@@ -83,7 +83,7 @@
                   {{ __('Login') }}
                   </button>
                   
-                  <a href="/tps-rms/students/registration" class="btn btn-outline-dark">Not registered? Signup</a>
+                  <a href="/tps-smis/students/registration" class="btn btn-outline-dark">Not registered? Signup</a>
                   @if (Route::has('password.request'))
                       <a class="btn btn-link" href="{{ route('password.request') }}">
                           {{ __('Forgot Your Password?') }}

@@ -58,15 +58,15 @@ class ProgrammeCourseSemesterController extends Controller
     }
 
     //Haitumikiii
-    public function create()
-    {
-        $programme = Programme::findOrFail($id);
-        $semester = Semester::findOrFail(1);
-        $sessionProgramme = SessionProgramme::findOrFail(4);
-        $courses = Course::all();
+    // public function create()
+    // {
+    //     $programme = Programme::findOrFail($id);
+    //     $semester = Semester::findOrFail(1);
+    //     $sessionProgramme = SessionProgramme::findOrFail(4);
+    //     $courses = Course::all();
 
-        return view('course_assignments.create', compact('programme', 'semester', 'sessionProgramme', 'courses'));
-    }
+    //     return view('course_assignments.create', compact('programme', 'semester', 'sessionProgramme', 'courses'));
+    // }
 
     public function assignCourse($id)
     {

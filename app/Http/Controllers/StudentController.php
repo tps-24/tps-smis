@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Programme;
+use App\Models\CourseworkResult;
 use App\Imports\BulkImportStudents;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
@@ -30,10 +31,10 @@ class StudentController extends Controller
         $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['import']]);
     }
 
-    public function dashboard(){
-        $user = Auth::user();
-        return view('students/dashboard', compact('user'));
-    }
+    // public function dashboard(){
+    //     $user = Auth::user();
+    //     return view('students/dashboard', compact('user'));
+    // }
     /**
      * Display a listing of the resource.
      */
@@ -188,6 +189,28 @@ class StudentController extends Controller
 
         // return redirect()->route('students.dashboard')->with('success', "Your successfully created an account.");
     
+    }
+
+
+    public function myCourses()
+    {
+        $user = auth()->user()->id;
+        $studentId = Student::where('user_id', $user)->pluck('id');
+        $student = Student::find($studentId[0]);
+        $courses = $student->courses();
+    
+        // $role = auth()->user()->role;
+        // dd($courses);
+        
+        return view('students.mycourse', compact('courses'));
+    }
+
+    public function dashboard()
+    {
+        $user = auth()->user()->id;
+        $student = Student::where('user_id', $user)->get();
+
+        return view('dashboard.student_dashboard', compact('student'));
     }
 
     /**

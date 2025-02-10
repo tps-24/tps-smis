@@ -84,6 +84,12 @@ Route::controller(BeatController::class)->prefix('beats')->group(function () {
 
 Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
 Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
+Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
+Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
+Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
+Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
+
+
 Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
@@ -109,6 +115,8 @@ Route::group(['middleware' => ['auth']], function () {
     
     // Define the custom route first
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
+
 
 
     Route::resource('grading_systems', GradingSystemController::class); 
@@ -130,7 +138,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
-    Route::get('assign-courses/create/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
     //Route::resource('beats', BeatController::class);
 

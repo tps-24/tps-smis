@@ -68,14 +68,23 @@ class Student extends Model
     // {
     //     //return $this->company()->merge($this->platoons());
     // }
-    
-    // public function courses() 
-    // { 
-    //     return $this->belongsToMany(Course::class, 'enrollments'); 
-    // }
 
     public function optionalCourseEnrollments()
     {
         return $this->hasMany(OptionalCourseEnrollment::class); //Optional enrollments
     }
+
+    public function optionalCourses()
+    {
+        return $this->optionalCourseEnrollments()->with('course')->get()->pluck('course');
+    }
+
+    public function courses()
+    {
+        $programmeCourses = $this->programme->courses()->get(); // Fixed here
+        $optionalCourses = $this->optionalCourses();
+        // return $programmeCourses->merge($optionalCourses);
+        return $programmeCourses;
+    }
+
 }

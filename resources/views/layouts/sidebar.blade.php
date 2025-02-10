@@ -13,12 +13,21 @@
 <!-- Sidebar menu starts -->
 <div class="sidebarMenuScroll">
   <ul class="sidebar-menu">
+    @if(auth()->user()->hasRole('Student'))
+    <li>
+      <a href="{{ route('students.dashboard') }}">
+        <i class="bi bi-bar-chart-line"></i>
+        <span class="menu-text">Dashboard</span>
+      </a>
+    </li>
+    @else
     <li>
       <a href="/tps-smis">
         <i class="bi bi-bar-chart-line"></i>
         <span class="menu-text">Dashboard</span>
       </a>
     </li>
+    @endif
     @can('student-list')
     <li class="treeview">
       <a href="#!">
@@ -83,38 +92,54 @@
       <ul class="treeview-menu">
         @can('programme-list')
         <li>
-          <a href="{{ route('programmes.index') }}">Programmes</a>
+          <a href="{{ route('programmes.index') }}">Programmes</a> <!-- For Academic Coord-->
         </li>
         @endcan()
         @can('course-list')
         <li>
-          <a href="{{ route('courses.index') }}">Courses</a>
+          <a href="{{ route('courses.index') }}">Courses</a>  <!-- For Academic Coord-->
         </li>
         @endcan()
         <li>
-          <a href="{{ route('courses.index') }}">My Courses</a>
+          <a href="{{ route('courses.index') }}">My Courses</a>  <!-- For Teacher-->
         </li>
         <li>
-          <a href="{{ route('enrollments.index') }}">Optional Courses</a>
+          <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a>  <!-- For Teacher-->
+        </li>
+        <li>
+          <a href="#">Semester Exam (SE)</a>  <!-- For Teacher-->
+        </li>
+        <li>
+          <a href="{{ route('enrollments.index') }}">Optional Courses</a> <!-- For Academic Coord -->
         </li>
       </ul>
     </li>
     @endcan()
+    @can('student-courses')
+    <li>
+      <a href="{{ route('students.myCourses') }}">
+        <i class="bi bi-printer"></i>
+        <span class="menu-text">My Courses</span>
+      </a>
+    </li>
+    @endcan()
     @can('coursework-list')
+    <li>
+      <a href="{{ route('students.coursework') }}">
+        <i class="bi bi-printer"></i>
+        <span class="menu-text">Coursework</span>
+      </a>
+    </li>
+    @endcan()
+    @can('coursework-config')
     <li class="treeview">
       <a href="#!">
         <i class="bi bi-stickies"></i>
-        <span class="menu-text">Course work</span>
+        <span class="menu-text">Coursework</span>
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="{{ route('coursework_results.index') }}">semester 1</a>
-        </li>
-        <li>
-          <a href="#">semester 2</a>
-        </li>
-        <li>
-          <a href="{{ route('course_works.index') }}">CA Configurations</a>
+          <a href="{{ route('course_works.index') }}">CA Configurations</a>  <!-- Add to academic tab -->
         </li>
       </ul>
     </li>

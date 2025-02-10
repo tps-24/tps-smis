@@ -1,5 +1,22 @@
 @extends('layouts.main')
 
+@section('style')
+<style>
+    .breadcrumb {
+        display: flex;
+        width: 100%;
+    }
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+    }
+    #date {
+        position: absolute;
+        bottom: 10px; /* Adjust as needed */
+        right: 15px;  /* Adjust as needed */
+    }
+</style>
+@endsection
 @section('scrumb')
 <!-- Scrumb starts -->
 <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
@@ -9,6 +26,7 @@
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
         <li class="breadcrumb-item"><a href="#">Course</a></li>
         <li class="breadcrumb-item active" aria-current="page"><a href="#">Course Lists</a></li>
+        <li class="breadcrumb-item right-align"><a href="#" id="date">{{ now()->format('l jS \\o\\f F, Y') }}</a></li>
       </ol>
     </nav>
   </div>
