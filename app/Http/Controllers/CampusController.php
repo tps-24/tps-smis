@@ -85,9 +85,9 @@ class CampusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Campus $campus): RedirectResponse
+    public function destroy(Campus $campus)
     {
-        $course->delete();
+        $campus->delete();
     
         return redirect()->route('campuses.index')
                         ->with('success','Campus deleted successfully');

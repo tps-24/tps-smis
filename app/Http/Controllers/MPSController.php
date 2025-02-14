@@ -12,6 +12,15 @@ use Illuminate\Http\Request;
 
 class MPSController extends Controller
 {
+
+    public function __construct()
+    {
+
+        $this->middleware('permission:mps-list|mps-create|mps-edit|mps-delete', ['only' => ['index']]);
+        $this->middleware('permission:attendance-create', ['only' => ['create', 'store',]]);
+        $this->middleware('permission:attendance-edit', ['only' => ['edit', 'update','release']]);
+        $this->middleware('permission:attendance-delete', ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -123,7 +132,15 @@ class MPSController extends Controller
 
     public function search(Request $request)
     {
-        $students = Student::where('platoon', $request->platoon)->where('company', $request->company)->get();//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        $students = Student::where('platoon', $request->platoon)->where('company', $request->company);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        if ($request->name) {
+            $students = $students->where(function ($query) use ($request) {
+                $query->where('first_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('middle_name', 'like', '%' . $request->name . '%');
+            });
+        }
+        $students = $students->get();
         return view('mps.search', compact('students'));
         //return redirect()->back()->with('student',$student);
     }

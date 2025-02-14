@@ -189,7 +189,7 @@
                     <div class="m-0">
                         <label class="form-label" for="abc">Height (in ft)</label>
                         <input @if(isset($student)) value="{{$student->height}}" @endif type="number" min="4" step="0.1" class="form-control" id="height" name="height"
-                           required placeholder="Enter height" value="{{old('height')}}">
+                            placeholder="Enter height" value="{{old('height')}}">
                     </div>
                     @error('weight')
                         <div class="error">{{ $message }}</div>

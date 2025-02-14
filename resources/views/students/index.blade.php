@@ -25,7 +25,8 @@
     </div>
   @endsession
   <div class="row">
-    <div class="col-6">
+    @can('student-create')
+    <div class="col-3">
       <form method="POST" action="{{url('students/bulkimport')}}" style="display:inline" enctype="multipart/form-data">
         @csrf
         @method('POST')
@@ -34,25 +35,31 @@
           Students</i></button>
       </form>
     </div>
-    <div class="col-3 " style="float: right;">
+    @endcan
+    <div class="col-6 " style="float: right;">
       <form class="d-flex" action="{{route('students.search')}}" method="POST">
-        <div class="mx-auto p-2" style="width: 200px;"> Search </div>
+        <!-- <div class="mx-auto p-2" style="width: 200px;"> Search </div> -->
         @csrf
         @method("POST")
-        <select style="height: 35px; width: 120px;" class="form-select me-2" name="company" required>
-          <option disabled selected>Company</option>
-          <option value="HQ" {{ request('company') == 'HQ' ? 'selected' : '' }}>HQ</option>
-          <option value="A" {{ request('company') == 'A' ? 'selected' : '' }}>A</option>
-          <option value="B" {{ request('company') == 'B' ? 'selected' : '' }}>B</option>
-          <option value="C" {{ request('company') == 'C' ? 'selected' : '' }}>C</option>
-        </select>
-        <select style="height: 35px; width: 120px;" class="form-select me-2" name="platoon"
-          onchange="this.form.submit()">
-          <option value="">Platoon</option>
-          @for ($i = 1; $i < 15; $i++)
-        <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>{{ $i }}</option>
-      @endfor
-        </select>
+        <div class="d-flex">
+          <!-- Name Search -->
+          <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name" placeholder="name(option)">
+            <!-- Company Dropdown -->
+            <select class="form-select me-2" name="company" required>
+                <option value="">Select Company</option>
+                <option value="HQ" {{ request('company') == 'HQ' ? 'selected' : '' }}>HQ</option>
+                <option value="A" {{ request('company') == 'A' ? 'selected' : '' }}>A</option>
+                <option value="B" {{ request('company') == 'B' ? 'selected' : '' }}>B</option>
+                <option value="C" {{ request('company') == 'C' ? 'selected' : '' }}>C</option>
+            </select>
+            <!-- Platoon Dropdown -->
+            <select onchange="this.form.submit()" class="form-select me-2" name="platoon" required>
+                <option value="">Select Platoon</option>
+                @for ($i = 1; $i <= 15; $i++)
+                    <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
+                @endfor
+            </select>
+            </div>
       </form>
 
 
@@ -63,75 +70,13 @@
     <!-- <div class="col col-lg-2">
       <a class="btn btn-success btn-sm mb-2" href="{{url('students/create')}}">Create Student</a>
     </div> -->
+    @can('student-create')
     <div class="col-3 pull-right">
-      <!-- <a type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SearchStudent">search
-      student</a> -->
+    
       <a class="btn btn-success mb-2 btn-sm" href="{{ url('students/create') }}"
         style="float:right !important; margin-right:-22px"><i class="fa fa-plus"></i> Create New Student</a>
     </div>
-  </div>
-</div>
-<div class="modal fade" id="SearchStudent" tabindex="-1" aria-labelledby="createNewContactLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header flex-column">
-        <div class="text-center">
-          <h4 class="text-primary">Search Student</h4>
-        </div>
-      </div>
-      <div class="modal-body">
-        <form action="{{route('students.search')}}" method="POST">
-          @csrf
-          @method("POST")
-          <div class="row" id="platoonCriteria">
-            <div class="col mt-2">
-              <label class="form-label " for="abc4">Platoon:</label>
-            </div>
-            <div class="col mt-2">
-              <select style="height: 30px;" class="form-select" name="company" id="abc4" required
-                aria-label="Default select example">
-                <option disabled selected value="">company</option>
-                <option value="HQ">HQ</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-              </select>
-            </div>
-            <div class="col mt-2">
-              <select style="height: 30px;" class="form-select" name="platoon" id="abc4" required
-                aria-label="Default select example">
-                <option disabled selected>platoon</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="modal-footer mt-2">
-            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">
-              Close
-            </button>
-            <button type="submit" class="btn btn-primary btn-sm">Search</i></button>
-          </div>
-        </form>
-      </div>
-
-      <!-- <div class="col-6">
-        <a class="btn btn-success mb-2" href="{{url('students/create')}}">Create Student</a>
-      </div> -->
-    </div>
+    @endcan
   </div>
 </div>
 
@@ -164,11 +109,17 @@
         <td>{{$student->phone}}</td>
         <td>{{$student->home_region}}</td>
         <td>
+          @can('student-list')
           <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">
           Show</a>
+          @endcan
+          @can('student-edit')
           <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
+          @endcan
+          @can('student-delete')
           <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
           data-bs-target="#createNewContact{{$student->id}}">Delete</button>
+          @endcan
           <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
           aria-labelledby="createNewContactLabel" aria-hidden="true">
           <div class="modal-dialog">

@@ -24,8 +24,8 @@
         {{ session('success') }}
     </div>
 @endif
-<div class="container mb-2">
-    <a href="{{url('/mps/create')}}"><button class="btn btn-sm btn-primary float-right">Add Student</button></a>
+<div class="container mb-2 " >
+    <a style="float-right" href="{{url('/mps/create')}}"><button class="btn btn-sm btn-primary float-right">Add Student</button></a>
 </div>
 @if(isset($mpsStudents))
     @if ($mpsStudents->isNotEmpty())

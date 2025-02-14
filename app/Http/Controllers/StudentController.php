@@ -24,7 +24,7 @@ class StudentController extends Controller
     public function __construct()
     {
 
-        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view','search']]);
+        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view', 'search']]);
         $this->middleware('permission:student-create', ['only' => ['create', 'store']]);
         $this->middleware('permission:student-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:student-delete', ['only' => ['destroy']]);
@@ -47,7 +47,7 @@ class StudentController extends Controller
         $page_name = "Student Management";
         return view('students.index', compact('students', 'page_name'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
-        
+
     }
 
     public function search(Request $request)
@@ -56,13 +56,22 @@ class StudentController extends Controller
         if (!$selectedSessionId)
             $selectedSessionId = 1;
         $students = Student::where('session_programme_id', $selectedSessionId)
-                    ->where('company', $request->company)
-                    ->where('platoon',$request->platoon)
-                    ->orderBy('first_name')
-                    ->latest()->paginate(90);
+            ->where('company', $request->company)
+            ->where('platoon', $request->platoon);
+
+        if ($request->name) {
+            $students = $students->where(function ($query) use ($request) {
+                $query->where('first_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('middle_name', 'like', '%' . $request->name . '%');
+            });
+        }
+
+        $students = $students->orderBy('first_name')
+            ->latest()->paginate(90);
         return view('students.index', compact('students'))
             ->with('i', ($request->input('page', 1) - 1) * 90);
-        
+
     }
 
     /**
@@ -129,7 +138,7 @@ class StudentController extends Controller
         return redirect()->route('students.index')->with('success', "Student created successfully.");
     }
 
-    
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -149,11 +158,11 @@ class StudentController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        
+
         $input = $request->all();
         $password = Hash::make($input['password']);
-        $fullName = $request->first_name. ' ' . $request->middle_name. ' ' . $request->last_name;
-    
+        $fullName = $request->first_name . ' ' . $request->middle_name . ' ' . $request->last_name;
+
 
         //Create User First
         $user = User::create([
@@ -166,7 +175,7 @@ class StudentController extends Controller
         $user->assignRole('student');
 
         $input['user_id'] = $user->id;
-        
+
         // dd($input);
         //Now Create Student
         $student = new Student([
@@ -179,7 +188,7 @@ class StudentController extends Controller
             'programme_id' => $request->input('programme_id'),
             'email' => $request->input('email'),
             'gender' => $request->input('gender'),
-            'user_id' =>  $user->id,
+            'user_id' => $user->id,
             'password' => Hash::make($request->input('password')),
         ]);
 
@@ -188,7 +197,7 @@ class StudentController extends Controller
         return redirect()->back()->with('success', 'Your successfully created an account!');
 
         // return redirect()->route('students.dashboard')->with('success', "Your successfully created an account.");
-    
+
     }
 
 
@@ -198,10 +207,10 @@ class StudentController extends Controller
         $studentId = Student::where('user_id', $user)->pluck('id');
         $student = Student::find($studentId[0]);
         $courses = $student->courses();
-    
+
         // $role = auth()->user()->role;
         // dd($courses);
-        
+
         return view('students.mycourse', compact('courses'));
     }
 

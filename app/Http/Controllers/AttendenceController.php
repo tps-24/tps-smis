@@ -10,25 +10,30 @@ use App\Models\MPS;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 
 class AttendenceController extends Controller
 {
+    private $user;
+    private $companies;
 
     public function __construct()
     {
 
-        $this->middleware('permission:attendance-list|attendance-create|attendance-edit|attendance-delete', ['only' => ['index', 'today','attendence']]);
+        $this->middleware('permission:attendance-list|attendance-create|attendance-edit|attendance-delete', ['only' => ['index', 'today', 'attendence']]);
         $this->middleware('permission:attendance-create', ['only' => ['create', 'store']]);
         $this->middleware('permission:attendance-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:attendance-delete', ['only' => ['destroy']]);
+
     }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+
         return $this->attendence(1);
     }
 
@@ -39,12 +44,12 @@ class AttendenceController extends Controller
     {
         $attendenceType = AttendenceType::find($attendenceType_id);
         $platoon = Platoon::where('platoons.name', $request->platoon)
-                    ->leftJoin('companies', 'companies.id','platoons.company_id')
-                    ->where('companies.name', $request->company)
-                    ->select('platoons.*')->get()[0];
+            ->leftJoin('companies', 'companies.id', 'platoons.company_id')
+            ->where('companies.name', $request->company)
+            ->select('platoons.*')->get()[0];
 
-       
-        $students= Student::where('company', $request->company)->where('platoon',$request->platoon)->get();
+
+        $students = Student::where('company', $request->company)->where('platoon', $request->platoon)->get();
         //$platoon_id = $platoon->id;
         return view(
             'attendences/create',
@@ -168,7 +173,7 @@ class AttendenceController extends Controller
         $safari = 0;
         $off = 0;
         $mps = 0;
-        for ($i = 0; $i < count($attendence[0]); ++$i) {
+        for ($i = 0; $i < count($attendence); ++$i) {
             if (count($attendence[$i]) > 0) {
                 $present += $attendence[$i][0]['present'];
                 $absent += $attendence[$i][0]['absent'];
@@ -240,6 +245,30 @@ class AttendenceController extends Controller
 
     public function attendence($type)
     {
+        $roles = Auth::user()->roles;
+        foreach ($roles as $role) {
+            if (
+                $role->name == 'Admin' ||
+                $role->name == 'Academic Coordinator' ||
+                $role->name == 'Super Administrator' ||
+                $role->name == 'Chief Instructor' ||
+                $role->name == 'Staff Officer'
+            ) {
+                $this->companies = Company::all();
+                
+            }
+            else if($role->name == 'Teacher'|| $role->name == 'Sir Major'){
+                //return Auth::user()->staff;
+               $this->companies = [Auth::user()->staff->company];
+               if(count($this->companies) == 0){
+                abort(403);
+               }
+            }
+            else{
+                abort(403);
+            }
+        }
+        
         $attendenceType = AttendenceType::find($type);
         $page = $attendenceType;
         $hqAttendence = [];
@@ -247,45 +276,21 @@ class AttendenceController extends Controller
         $BAttendence = [];
         $CAttendence = [];
         $statistics = [];
-        $companies = Company::all();
-        foreach($companies as $company){
+        foreach ($this->companies as $company) {
             $company_stats = [];
-            foreach($company->platoons as $platoon){
-                if(count($platoon->attendences()->where('attendenceType_id', $type)->get()) > 0){
-                array_push($company_stats, $platoon->attendences()->where('attendenceType_id', $type)->get());
+            foreach ($company->platoons as $platoon) {
+                if (count($platoon->attendences()->whereDate('created_at', Carbon::today())->where('attendenceType_id', $type)->get()) > 0) {
+                    array_push($company_stats, $platoon->attendences()->whereDate('created_at', Carbon::today())->where('attendenceType_id', $type)->get());
                 }
-                
             }
-            array_push($statistics,[
+            array_push($statistics, [
                 'company_name' => $company->name,
                 'statistics' => count($company_stats) > 0 ? $this->statistics($company_stats, $company->name) : $this->setZero($company->name)
             ]);
         }
+        $companies = $this->companies;
         return view('attendences/index', compact('statistics', 'companies', 'page'));
-        $attendence = Attendence::where('attendenceType_id', $type)->whereDate('created_at', Carbon::today())->get();
-        foreach ($attendence as $att) {
-            if ($att->platoon->company != "null" && $att->platoon->company->name == "HQ") {
-                array_push($hqAttendence, $att);
-            }
-            if ($att->platoon->company != "null" && $att->platoon->company->name == "A") {
-                array_push($AAttendence, $att);
-            }
-            if ($att->platoon->company != "null" && $att->platoon->company->name == "B") {
-                array_push($BAttendence, $att);
-            }
-            if ($att->platoon->company != "null" && $att->platoon->company->name == "C") {
-                array_push($CAttendence, $att);
-            }
-        }
-
-        $statistics = [
-            'hq' => count($hqAttendence) > 0 ? $this->statistics($hqAttendence, 'HQ') : $this->setZero('HQ'),
-            'a' => count($AAttendence) > 0 ? $this->statistics($AAttendence, 'A') : $this->setZero('A'),
-            'b' => count($BAttendence) > 0 ? $this->statistics($BAttendence, 'B') : $this->setZero('B'),
-            'c' => count($CAttendence) > 0 ? $this->statistics($CAttendence, 'C') : $this->setZero('C')
-        ];
-
-        return view('attendences/index', compact('statistics', 'companies', 'page'));
+        
     }
 
     public function getMPSdata($company)
@@ -329,7 +334,8 @@ class AttendenceController extends Controller
         $absent_student_ids = implode(',', $ids);
         $attendence->absent_student_ids = $absent_student_ids;
         $attendence->absent = count(value: $ids);
-        $attendence->save();
+        $attendence -
+            $attendence->save();
         $page = $attendence->attendenceType;
         return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id)->with('page', $attendence->attendenceType);
     }
@@ -349,18 +355,19 @@ class AttendenceController extends Controller
         return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id, )->with('page', $page);
     }
 
-        /**
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request, $type, $platoon_id)
     {
         $ids = $request->input('student_ids');
-        if($ids == NULL){
-           // return redirect()->back()->with('success', "Please select at least one students.");
-        };
+        if ($ids == NULL) {
+            // return redirect()->back()->with('success', "Please select at least one students.");
+        }
+        ;
         $present = count($ids);
         $platoon = Platoon::find($platoon_id);
-        $students= Student::where('company', $platoon->company->name)->where('platoon',$platoon->id)->pluck('id')->toArray();
+        $students = Student::where('company', $platoon->company->name)->where('platoon', $platoon->id)->pluck('id')->toArray();
         $absent_ids = array_values(array_diff($students, $ids));
         $total = count($students);
         $todayRecords = Attendence::leftJoin('platoons', 'attendences.platoon_id', 'platoons.id')
@@ -382,9 +389,10 @@ class AttendenceController extends Controller
             'mess' => 0,
             'female' => 0,
             'male' => 0,
-            'absent_student_ids' => implode(',',$absent_ids),
+            'absent_student_ids' => implode(',', $absent_ids),
             'total' => $total
         ]);
-        return $this->attendence($request->type)->with('page', $page);
+        return redirect()->route('attendences.index')->with('page', $page);;
+        
     }
 }

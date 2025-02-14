@@ -46,4 +46,8 @@ class Staff extends Model
         { 
             return $this->belongsTo(Department::class); 
         }
+        public function company() 
+        { 
+            return $this->belongsTo(Company::class); 
+        }
 }

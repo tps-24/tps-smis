@@ -38,9 +38,11 @@
         <li>
           <a href="/tps-smis/students">Student Details</a>
         </li>
+        @can('student-cretate')
         <li>
           <a href="/tps-smis/students/create">Student Registration</a>
         </li>
+        @endcan
       </ul>
     </li>
     @endcan()
@@ -178,7 +180,7 @@
     @endcan()
     
     <li>
-      <a href="#">
+      <a href="{{ route('announcements.index') }}">
         <i class="bi bi-send"></i>
         <span class="menu-text">Announcements</span>
       </a>

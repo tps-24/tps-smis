@@ -405,8 +405,29 @@ class BeatController extends Controller
             $beatTypes = BeatType::find($beatType_id);
         }
         $company = Company::find($company_id);
-        //return view('beats.downloadPdf', compact('company','beatType_id', 'day'));
+        for ($i = 0; $i < count($beatType_id == 1? $company->areas : $company->patrol_areas); ++$i){
+             
+            if($beatType_id == 1){
+                $beats = $company->areas[$i]->beats()->orderBy('start_at')
+                            ->where('beatType_id', $beatType_id)    
+                            ->whereDate('date', Carbon::today())
+                            ->get();
+
+            }else{
+                $beats = $company->patrol_areas[$i]->beats()->orderBy('start_at')
+                        ->where('beatType_id', $beatType_id)
+                        ->whereDate('date', Carbon::today())                   
+                        ->get();           
+            }
+            $cols_beats = collect($beats)->groupBy(function ($data) {
+                return  $data->start_at->format('H:i:s');
+             });
+
+            }
+return $cols_beats;
+        return view('beats.downloadPdf', compact('company','beatType_id', 'day'));
         $pdf = PDF::loadView('beats.downloadPdf',compact('company', 'beatType_id', 'day'));
+        $pdf->setPaper('A4', 'landscape');
         return $pdf->stream("beats.pdf");
         
     }

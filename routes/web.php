@@ -31,7 +31,7 @@ use App\Http\Controllers\SemesterExamResultController;
 use App\Http\Controllers\FinalResultController;
 use App\Http\Controllers\ExcuseTypeController;
 use App\Http\Controllers\CampusController;
-
+use App\Http\Controllers\AnnouncementController;
 
 require __DIR__ . '/auth.php';
 
@@ -93,7 +93,6 @@ Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summ
 Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
-Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
 Route::resource('students', StudentController::class);
 Route::group(['middleware' => ['auth']], function () {
     
@@ -110,6 +109,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('mps', MPSController::class);
     Route::resource('staffs', StaffController::class);
     Route::resource('campuses', CampusController::class);
+    Route::resource('announcements', AnnouncementController::class);
 
 
     
@@ -163,6 +163,7 @@ Route::group(['middleware' => ['auth']], function () {
         /**
          * End of wizard for student registration
          */
+        Route::post('students/search', 'search')->name('students.search');
         Route::get('dashboard', 'dashboard');
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
@@ -194,7 +195,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
         Route::post('store-absents/{attendence_id}', action: 'storeAbsent');
         Route::post('store-safari/{attendence_id}', action: 'storeSafari');
-        Route::get('today/{company_id}', 'today_attendence');
+        Route::get('today/{company_id}/{type}','today');
+        Route::get('today/{company_id}/{$type}', 'today')->name('today_attendance');
     });
 
 });
