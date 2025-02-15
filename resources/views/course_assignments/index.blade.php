@@ -47,23 +47,21 @@
                                         <th>Semester One</th>
                                     </tr>
                                     <tr>
-                                        <th scope="col">No</th>
-                                        <th scope="col">Course Name</th>
-                                        <th scope="col">Course Code</th>
-                                        <th scope="col">Semester</th>
-                                        <th scope="col">Course Type</th>
-                                        <th scope="col">Credit Weight</th>
-                                        <th scope="col" width="280px">Actions</th>
+                                        <th scope="col" width="1%">No</th>
+                                        <th scope="col" width="15%">Course Code</th>
+                                        <th scope="col" width="50%">Course Name</th>
+                                        <th scope="col" width="14%">Course Type</th>
+                                        <th scope="col" width="10%">Credit Weight</th>
+                                        <th scope="col" width="10%">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($courses1 as $course)
-                                    @if ($course->pivot->course_type != 'optional')
+                                    @if ($course->pivot->course_type != 'Optional')
                                     <tr>
                                         <td>{{$i++}}</td>
-                                        <td>{{ $course->courseName }}</td>
                                         <td>{{ $course->courseCode }}</td>
-                                        <td>{{ $semester->semester_name }}</td>
+                                        <td>{{ $course->courseName }}</td>
                                         <td>{{ $course->pivot->course_type }}</td>
                                         <td>{{ $course->pivot->credit_weight }}</td>
                                         <td>
@@ -89,12 +87,11 @@
                                         <th colspan="7">Optional Course(s)</th>
                                     </tr>
                                     @foreach ($courses1 as $course)
-                                    @if ($course->pivot->course_type === 'optional')
+                                    @if ($course->pivot->course_type === 'Optional')
                                     <tr>
                                         <td>{{$i++}}</td>
-                                        <td>{{ $course->courseName }}</td>
                                         <td>{{ $course->courseCode }}</td>
-                                        <td>{{ $semester->semester_name }}</td>
+                                        <td>{{ $course->courseName }}</td>
                                         <td>{{ $course->pivot->course_type }}</td>
                                         <td>{{ $course->pivot->credit_weight }}</td>
                                         <td>
@@ -122,27 +119,26 @@
                     <div class="table-outer" style="margin-top:20px">
                         <div class="table-responsive">
                             <table class="table table-striped truncate m-0">
-                                <thead>
+                            <thead>
                                     <tr>
                                         <th>Semester Two</th>
                                     </tr>
                                     <tr>
-                                        <th scope="col">No</th>
-                                        <th scope="col">Course Name</th>
-                                        <th scope="col">Course Code</th>
-                                        <th scope="col">Semester</th>
-                                        <th scope="col">Course Type</th>
-                                        <th scope="col">Credit Weight</th>
-                                        <th scope="col" width="280px">Actions</th>
+                                        <th scope="col" width="1%">No</th>
+                                        <th scope="col" width="15%">Course Code</th>
+                                        <th scope="col" width="50%">Course Name</th>
+                                        <th scope="col" width="14%">Course Type</th>
+                                        <th scope="col" width="10%">Credit Weight</th>
+                                        <th scope="col" width="10%">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($courses2 as $course)
+                                    @if ($course->pivot->course_type != 'Optional')
                                     <tr>
                                         <td>{{$j++}}</td>
-                                        <td>{{ $course->courseName }}</td>
                                         <td>{{ $course->courseCode }}</td>
-                                        <td>{{ $semester->semester_name }}</td>
+                                        <td>{{ $course->courseName }}</td>
                                         <td>{{ $course->pivot->course_type }}</td>
                                         <td>{{ $course->pivot->credit_weight }}</td>
                                         <td>
@@ -159,18 +155,20 @@
                                             </form>
                                         </td>
                                     </tr>
+                                    @endif
                                     @endforeach
                                 </tbody>
+                                
                                 <tbody>
                                     <tr>
-                                        <th>Optional Course(s)</th>
+                                        <th colspan="7">Optional Course(s)</th>
                                     </tr>
                                     @foreach ($courses2 as $course)
+                                    @if ($course->pivot->course_type === 'Optional')
                                     <tr>
-                                        <td>{{$i++}}</td>
-                                        <td>{{ $course->courseName }}</td>
+                                        <td>{{$j++}}</td>
                                         <td>{{ $course->courseCode }}</td>
-                                        <td>{{ $semester->semester_name }}</td>
+                                        <td>{{ $course->courseName }}</td>
                                         <td>{{ $course->pivot->course_type }}</td>
                                         <td>{{ $course->pivot->credit_weight }}</td>
                                         <td>
@@ -187,6 +185,7 @@
                                             </form>
                                         </td>
                                     </tr>
+                                    @endif
                                     @endforeach
                                 </tbody>
                             </table>

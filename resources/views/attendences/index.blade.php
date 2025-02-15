@@ -22,6 +22,7 @@
         {{ $value }}
     </div>
 @endsession
+@if(isset($companies))
 <div class="d-flex  justify-content-end">
     <div class="col-4 z-index:1">
         <form action="{{url('attendences/create/' . $page->id)}}" method="POST">
@@ -68,8 +69,8 @@
     </div>
     </form>
 </div>
-
-
+@endif
+@if (isset($statistics))
 <div class="row gx-4">
     <div class="col-sm-12 col-12">
         <div class=" mb-4">
@@ -241,4 +242,7 @@
         </div>
     </div>
 </div>
+@else
+    <h3>You can not view attendences because you don't have a company.</h3>
+@endif
 @endsection

@@ -15,7 +15,7 @@ class CourseController extends Controller
     {
         $this->middleware('permission:course-create')->only(['create', 'store']);
         $this->middleware('permission:course-list')->only(['index', 'show']);
-        $this->middleware('permission:course-update')->only(['edit', 'update']);
+        $this->middleware('permission:course-edit')->only(['edit', 'update']);
         $this->middleware('permission:course-delete')->only(['destroy']);
     }
 
@@ -78,7 +78,7 @@ class CourseController extends Controller
     public function update(Request $request, Course $course)
     {
         request()->validate([
-            'courseName' => 'required|unique:courses,courseName',
+            'courseName' => 'required|unique:courses,courseName,' . $course->id,
             'courseCode' => 'required',
        ]);
    

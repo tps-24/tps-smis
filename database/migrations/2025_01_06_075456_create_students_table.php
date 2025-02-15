@@ -36,9 +36,10 @@ return new class extends Migration
             $table->string('next_kin_phone')->nullable();
             $table->string('next_kin_relationship')->nullable();
             $table->string('next_kin_address')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onupdate('update')->ondelete('null');
-            $table->foreign('vitengo_id')->references('id')->on('vitengos')->onupdate('update')->ondelete('null');
-            $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('set null');
+            $table->foreign('vitengo_id')->references('id')->on('vitengos')->onUpdate('cascade')->onDelete('set null');
+            $table->timestamp('created_at')->useCurrent()->nullable(false);
+            $table->timestamp('updated_at')->nullable(true)->useCurrentOnUpdate();
         });
     }
 

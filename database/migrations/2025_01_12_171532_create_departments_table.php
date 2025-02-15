@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
             $table->string('departmentName');
-            $table->timestamps();
+            $table->string('description');
+            $table->tinyInteger('is_active')->default(1);
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->timestamp('created_at')->useCurrent()->nullable(false);
+            $table->timestamp('updated_at')->nullable(true)->useCurrentOnUpdate();
         });
     }
 

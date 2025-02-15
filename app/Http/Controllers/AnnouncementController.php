@@ -12,7 +12,7 @@ class AnnouncementController extends Controller
     public function index()
     {
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
-        broadcast(new MessageSent($announcements));
+        broadcast(new MessageSent($announcements[0]));
         return view('announcements.index', compact('announcements'));
     }
 
@@ -34,7 +34,7 @@ class AnnouncementController extends Controller
         if ($expiresAt) {
             $expiresAt = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $expiresAt);
         }
-        Announcement::create(
+       $announcement = Announcement::create(
             [
                 'title' => $request->title,
                 'message' => $request->message,
@@ -43,6 +43,7 @@ class AnnouncementController extends Controller
                 'expires_at' => $expiresAt,
             ]
         );
+        broadcast(new MessageSent($announcement));
         return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
     }
 

@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://192.168.16.208:8081/tps-smis'),
+    'url' => env('APP_URL', 'http://192.168.16.208/tps-smis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -124,13 +124,6 @@ return [
     ],
 
 
-'providers' => [
-    Illuminate\Broadcasting\BroadcastServiceProvider::class,
 
-    // Other Service Providers
-    App\Providers\AppServiceProvider::class,
-    App\Providers\AuthServiceProvider::class,
-    App\Providers\BroadcastServiceProvider::class,
-],
 
 ];

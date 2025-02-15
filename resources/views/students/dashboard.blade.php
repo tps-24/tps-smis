@@ -31,7 +31,7 @@
                 <table class="table table-borderless">
                     <tr>
                         <td>Force Number: </td>
-                        <td>{{$user->student->force_number}}</td>
+                        <td>{{$user->student->force_number }}</td>
                     </tr>
                     <tr>
                         <td>Full name: </td>

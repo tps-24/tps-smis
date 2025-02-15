@@ -7,7 +7,7 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
         <li class="breadcrumb-item"><a href="#">Coursework Results</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">Add REsults</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Add Results</a></li>
       </ol>
     </nav>
   </div>

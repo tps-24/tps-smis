@@ -1,19 +1,11 @@
 import Echo from 'laravel-echo';
-import Pusher from 'pusher-js'; // if using Pusher
-// or if using Socket.IO
-import io from 'socket.io-client';
+import Pusher from 'pusher-js';
 
-window.Pusher = Pusher; // for Pusher
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: 'your-pusher-key',
-//     cluster: 'your-cluster',
-//     encrypted: true
-// });
-
-// For Socket.IO:
+// Enable Echo with Pusher
+window.Pusher = Pusher;
 window.Echo = new Echo({
-    broadcaster: 'socket.io',
-    host: window.location.hostname + ':6001', // if using Echo server
-    transports: ['websocket']
+    broadcaster: 'pusher',
+    key: '3a9b85e8ad0fb87a0a56', // Ensure this matches the value in your .env file
+    cluster: 'mt1',
+    encrypted: true,
 });

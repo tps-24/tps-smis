@@ -30,21 +30,21 @@ use App\Http\Controllers\CourseworkResultController;
 use App\Http\Controllers\SemesterExamResultController;
 use App\Http\Controllers\FinalResultController;
 use App\Http\Controllers\ExcuseTypeController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CampusController;
 use App\Http\Controllers\AnnouncementController;
 
 require __DIR__ . '/auth.php';
 
-Route::get('students', [StudentController::class, 'index']);
-
 Route::get('/', function () {
-    return view('dashboard/dashboard');
+        $pending_message = session('pending_message');
+        if (auth()->user()->hasRole('Student')) {
+            return view('dashboard.student_dashboard', compact('pending_message'));
+        } else {
+            return view('dashboard/dashboard');
+        }
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
-// Route::get('/', function () {
-//     return view('dashboard/dashboard');
-// });
 
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -84,27 +84,51 @@ Route::controller(BeatController::class)->prefix('beats')->group(function () {
 
 Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
 Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
-Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
-Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
-Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
-Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
 
+// Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
+// Route::resource('students', StudentController::class);
+
+Route::middleware(['auth', 'check.student.status'])->group(function () {
+    Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
+    Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
+    Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
+    Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
+    Route::resource('students', StudentController::class);  
+    
+});
 
 Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
-Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
+Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
 Route::resource('students', StudentController::class);
 Route::group(['middleware' => ['auth']], function () {
     
+    // Define the custom route first
+    Route::post(
+        '/programmes/{programmeId}/semesters/{semesterId}/session/{sessionProgrammeId}/assign-courses',
+        [ProgrammeController::class, 'assignCoursesToSemester']
+    );
+    Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
+
+    Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
+    Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
+    Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
+    Route::post('/students/{id}/approve', [StudentController::class, 'approveStudent'])->name('students.approve');
+    Route::get('/student/complete-profile/{id}', [StudentController::class, 'completeProfile'])->name('students.complete_profile');
+    Route::put('/student/profile-complete/{id}', [StudentController::class, 'profileComplete'])->name('students.profile_complete');
+
     
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UserController::class);
+    Route::resource('departments', DepartmentController::class);
+    Route::resource('campuses', CampusController::class);
     Route::resource('session_programmes', SessionProgrammeController::class);
     Route::resource('programmes', ProgrammeController::class);
     Route::resource('courses', CourseController::class);
     Route::resource('products', ProductController::class);
-    // Route::resource('students', StudentController::class);  
     Route::resource('attendences', AttendenceController::class);
     Route::resource('mps', MPSController::class);
     Route::resource('staffs', StaffController::class);
@@ -130,16 +154,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('semester_exam_results', SemesterExamResultController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
-    Route::post(
-        '/programmes/{programmeId}/semesters/{semesterId}/session/{sessionProgrammeId}/assign-courses',
-        [ProgrammeController::class, 'assignCoursesToSemester']
-    );
-    Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
-
-    Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
-    Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
-
-    //Route::resource('beats', BeatController::class);
+    // Route::resource('beats', BeatController::class);
 
 
 
@@ -149,9 +164,6 @@ Route::group(['middleware' => ['auth']], function () {
          *  Wizard route for student registration
          */
         Route::prefix('create')->group(function () {
-            Route::get('/', function () {
-                return view('students/wizards/stepOne');
-            });
             Route::get('step-two/{type}', "createStepTwo");
             Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
 
@@ -203,9 +215,9 @@ Route::group(['middleware' => ['auth']], function () {
 
 
 
-
-
 Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today']);
+
+
 Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -216,9 +228,7 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
      *  Wizard route for student registration
      */
     Route::prefix('create')->group(function () {
-        Route::get('/', function () {
-            return view('students/wizards/stepOne');
-        });
+      
         Route::get('step-two/{type}', function () {
             return view('students/wizards/stepTwo');
         });
@@ -242,6 +252,11 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
 });
 //end
 
+
+
+
+
+
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
 
 Route::post('update-patient-status/{id}', [PatientController::class, 'updateStatus'])->name('update.patient.status');
@@ -256,12 +271,6 @@ Route::post('/patients/save', [PatientController::class, 'save'])->name('patient
 Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
-
-
-
-
-
-
 
 
 

@@ -22,14 +22,8 @@
             {{ $value }}
         </div>
     @endsession  
-    <script>
-        const pusher = new Pusher('{{ config('broadcasting.connections.pusher.key') }}',{cluster:'mt1'});
-        const channel =pusher.subscribe('chat');
+   
 
-        channel.bind('message', function(data) {
-            alert(data)
-        })
-    </script>
     <div style="display: flex; justify-content: end;">
         <a href="{{ route('announcements.create') }}"><button class="btn btn-sm btn-success">New</button></a>
     </div>
@@ -37,10 +31,10 @@
         <div class="card-body">
             <ul class="list-group">
                 @foreach ($announcements as $announcement)
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <li class="list-group-item d-flex justify-content-between align-items-center mt-2">
                                 <div>
-                                    <h5 class="text-{{ $announcement->type }}">{{ $announcement->title }}</h5>
-                                    <p>{{ $announcement->message }}</p>
+                                    <h4 class="text-{{ $announcement->type }}">{{ $announcement->title }}</h4>
+                                    <p> &nbsp &nbsp &nbsp{{ $announcement->message }}</p>
                                     <p><small>Posted by: <i>{{ $announcement->poster->name }}</i></small></p>
                                     <small>Expires At:
                                         {{ $announcement->expires_at ? $announcement->expires_at->format('d-m-Y H:i') : 'N/A' }}</small>

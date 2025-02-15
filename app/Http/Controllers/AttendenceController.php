@@ -245,6 +245,8 @@ class AttendenceController extends Controller
 
     public function attendence($type)
     {
+        $attendenceType = AttendenceType::find($type);
+        $page = $attendenceType;
         $roles = Auth::user()->roles;
         foreach ($roles as $role) {
             if (
@@ -260,8 +262,10 @@ class AttendenceController extends Controller
             else if($role->name == 'Teacher'|| $role->name == 'Sir Major'){
                 //return Auth::user()->staff;
                $this->companies = [Auth::user()->staff->company];
-               if(count($this->companies) == 0){
-                abort(403);
+              
+               if($this->companies[0] == null){
+    
+                return view('attendences/index', compact( 'page'));
                }
             }
             else{
@@ -269,8 +273,7 @@ class AttendenceController extends Controller
             }
         }
         
-        $attendenceType = AttendenceType::find($type);
-        $page = $attendenceType;
+
         $hqAttendence = [];
         $AAttendence = [];
         $BAttendence = [];

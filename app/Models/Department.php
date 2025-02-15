@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
-    protected $fillable = ['departmentName']; 
+    protected $fillable = ['departmentName', 'description', 'is_active']; 
 
     public function staffs() 
     { 
