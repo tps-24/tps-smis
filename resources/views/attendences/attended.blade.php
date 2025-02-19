@@ -82,9 +82,11 @@
 
                                         </div>
                                         <div class="modal-footer">
+                                        @if($attendence->created_at->gt(\Carbon\Carbon::now()->subHours(2)) > 2)
                                             <a
                                                 href="{{url('attendences/list-absent_students/' . $company->id . '/' . $attendence->id)}}"><button
                                                     class="btn btn-sm btn-primary">Add absents</button></a>
+                                        @endif
                                         </div>
                                     </div>
                                 </div>

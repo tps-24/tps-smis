@@ -261,16 +261,12 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
 
 
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+Route::get('/hospital/viewDetails/{timeframe}', [PatientController::class, 'viewDetails'])->name('hospital.viewDetails');
+Route::get('/hospital/show/{id}', [PatientController::class, 'show'])->name('hospital.show');
 
-Route::post('update-patient-status/{id}', [PatientController::class, 'updateStatus'])->name('update.patient.status');
-
-Route::resource('hospital', PatientController::class);
-Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
-
+// 🏥 Patients Routes
 Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
-
 Route::post('/patients/save', [PatientController::class, 'save'])->name('patients.save');
-
 Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
@@ -280,34 +276,33 @@ Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->
 
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
 Route::post('/patients/submit', [PatientController::class, 'submit'])->name('patients.submit');
-Route::put('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve'); 
 Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name('patients.reject');
 Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
-Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
 
-
-
-
-
-// Route for sending details to receptionist
+// 🚀 Routes for Sending to Receptionist
 Route::post('/patients/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('patients.sendToReceptionist');
+Route::post('/hospital/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('hospital.sendToReceptionist');
 
-// Route for receptionist to see pending approvals
+// 💼 Receptionist Routes
+Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->name('receptionist.index')->middleware('auth');
+Route::post('/patients/{id}/approve', [PatientController::class, 'approvePatient'])->name('patients.approve')->middleware('auth');
 Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->name('receptionist.index');
 
-// Route for receptionist to approve patient
-Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve');
-
-
-
-// Receptionist Routes
-Route::get('/receptionist', [PatientController::class, 'receptionistIndex'])->name('receptionist.index');
-Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
-
-//Daktari routes
+// 🩺 Doctor Routes
 Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.page');
 Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
 
+// 📅 Timetable Routes
+Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');
+Route::get('/timetable/create', [TimetableController::class, 'create'])->name('timetable.create');
+Route::post('/timetable/store', [TimetableController::class, 'store'])->name('timetable.store');
+Route::get('/timetable/{id}/edit', [TimetableController::class, 'edit'])->name('timetable.edit');
+Route::put('/timetable/{id}', [TimetableController::class, 'update'])->name('timetable.update');
+Route::delete('/timetable/{id}', [TimetableController::class, 'destroy'])->name('timetable.destroy');
+Route::get('/timetable/export-pdf', [TimetableController::class, 'exportPDF'])->name('timetable.exportPDF');
+Route::get('/generate-timetable', [TimetableController::class, 'generateTimetable'])->name('timetable.generate');
 
 
 Route::get('test', [BeatController::class,'test']);

@@ -24,8 +24,8 @@
         {{ session('success') }}
     </div>
 @endif
-<div class="container mb-2 " >
-    <a style="float-right" href="{{url('/mps/create')}}"><button class="btn btn-sm btn-primary float-right">Add Student</button></a>
+<div style="display: flex; justify-content: flex-end; margin-right: 2px;">
+    <a href="{{url('/mps/create')}}"><button class="btn btn-sm btn-success">Add Student</button></a>
 </div>
 @if(isset($mpsStudents))
     @if ($mpsStudents->isNotEmpty())
@@ -34,7 +34,7 @@
                 <table class="table table-striped m-0">
                     <thead>
                         <tr>
-                            <th>No</th>
+                            <th></th>
                             <th>Name</th>
                             <th>Days</th>
                             <th>Arested at</th>
@@ -64,7 +64,7 @@
                                 <td>
                                     <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#statusModal{{ $student->id ?? ''}}">
-                                        Description
+                                        More
                                     </button>
                                 </td>
                                 <td>
@@ -111,14 +111,15 @@
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="statusModalLabel{{  $student->id ?? ''}}">
-                                                        Description for {{ $student->student->first_name }}
-                                                        {{ $student->student->last_name }}
+                                                        More Details
                                                     </h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <p>{{$student->description}}</p>
+                                                    <h5>Name: {{ $student->student->first_name }} {{ $student->student->last_name }}</h5>
+                                                    <h5>Company: {{ $student->student->company }} - {{ $student->student->platoon }}</h5>
+                                                   <h5>Description</h5> <p>{{$student->description}}</p>
                                                 </div>
                                             </div>
                                         </div>

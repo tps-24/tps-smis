@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -11,8 +12,8 @@ class AnnouncementController extends Controller
 {
     public function index()
     {
-        $announcements = Announcement::all();
-        broadcast(new NotificationEvent($announcements[0]->title,$announcements[0]->type, 'announcement', $announcements[0], $announcements[0]->id));
+        $announcements = Announcement::where('expires_at', '>', Carbon::now())->get();
+        //broadcast(new NotificationEvent($announcements[0]->title,$announcements[0]->type, 'announcement', $announcements[0], $announcements[0]->id));
         return view('announcements.index', compact('announcements'));
     }
 

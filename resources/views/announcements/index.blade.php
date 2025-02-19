@@ -39,11 +39,12 @@
                                 <div>
                                     <h4 class="text-{{ $announcement->type }}">{{ $announcement->title }}</h4>
                                     <p> &nbsp &nbsp &nbsp{{ $announcement->message }}</p>
-                                    <p><small>Posted by: <i>{{ $announcement->poster->name }}</i></small></p>
+                                    <p><small>Announced by: <i>{{ $announcement->poster->name }}</i></small></p>
                                     <small>Expires At:
                                         {{ $announcement->expires_at ? $announcement->expires_at->format('d-m-Y H:i') : 'N/A' }}</small>
 
                             </div>
+                            @if($announcement->created_at->gt(\Carbon\Carbon::now()->subHours(2)) > 2)
                                 <div class="btn-group">
                                     <a style="margin-right: 10px;" href="{{ route('announcements.edit', $announcement->id) }}"><button
                                             class="btn btn-sm btn-primary">Edit</button></a>
@@ -53,7 +54,8 @@
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
-                                </div>
+                                </div>                            
+                            @endif
                             </li>
                 @endforeach
             </ul>

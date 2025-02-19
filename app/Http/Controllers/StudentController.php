@@ -44,6 +44,7 @@ class StudentController extends Controller
         $selectedSessionId = session('selected_session');
         if (!$selectedSessionId)
             $selectedSessionId = 1;
+        
         $students = Student::where('session_programme_id', $selectedSessionId)->latest()->paginate(20);
         $page_name = "Student Management";
         return view('students.index', compact('students', 'page_name'))

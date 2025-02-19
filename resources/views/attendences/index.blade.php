@@ -116,7 +116,7 @@
                                                                             alt="attendence image" />
                                                                     </div>
                                                                     <div class="p3 d-flex flex-column">
-                                                                        <p class="m-0 ">Attended</p>
+                                                                        <p class="m-0 ">Present</p>
                                                                         <h2 class="lh-1 opacity-50">
                                                                             {{$statistics[$j]['statistics']['present']}}
                                                                         </h2>
@@ -214,7 +214,7 @@
                                                                     <div
                                                                         class="d-flex align-items-center justify-content-between mt-1">
                                                                         <a class="text-primary ms-4"
-                                                                            href="{{url("mps/HQ/company")}}">
+                                                                            href="{{url("mps/".$companies[$j]->name."/company")}}">
                                                                             <span>View</span>
                                                                         </a>
                                                                     </div>

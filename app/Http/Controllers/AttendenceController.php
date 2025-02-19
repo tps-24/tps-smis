@@ -189,12 +189,13 @@ class AttendenceController extends Controller
             }
         }
 
+        $mps = $this->getMPSdata($company);
         $data->put('present', $present);
         $data->put('absent', $absent);
-        $data->put('total', $total);
+        $data->put('total', $total - $mps);
         $data->put('sick', $sick);
         $data->put('safari', $safari);
-        $data->put('mps', $this->getMPSdata($company));
+        $data->put('mps', $mps);
         return $data;
     }
 
@@ -271,12 +272,6 @@ class AttendenceController extends Controller
                 abort(403);
             }
         }
-        
-
-        $hqAttendence = [];
-        $AAttendence = [];
-        $BAttendence = [];
-        $CAttendence = [];
         $statistics = [];
         foreach ($this->companies as $company) {
             $company_stats = [];
@@ -304,7 +299,6 @@ class AttendenceController extends Controller
                 ++$count;
             }
         }
-
         return $count;
     }
 
@@ -313,11 +307,11 @@ class AttendenceController extends Controller
     public function list($list_type, $attendence_id)
     {
         $attendence = Attendence::find($attendence_id);
-        $students = $attendence->platoon->students;
-
+        $students = $attendence->platoon->students()->orderBy('first_name')->get();
+        $absent_student_ids = explode(",", $attendence->absent_student_ids);
         // $students = Company::join('students', 'companies.name', 'students.company')->join('platoons', 'platoons.id', 'students.platoon')
         //     ->where('students.company', 'HQ')->where('students.platoon', '1')->get('students.*');
-        return view('attendences.select_absent', compact('students', 'attendence_id', 'list_type'));
+        return view('attendences.select_absent', compact('students', 'attendence_id', 'list_type','absent_student_ids'));
     }
 
     public function list_safari($list_type, $attendence_id)
@@ -335,8 +329,8 @@ class AttendenceController extends Controller
         $ids = $request->input('student_ids');
         $absent_student_ids = implode(',', $ids);
         $attendence->absent_student_ids = $absent_student_ids;
-        $attendence->absent = count(value: $ids);
-        $attendence -
+        $attendence->absent = count(value: $ids); 
+        $attendence->present =$attendence->total - $attendence->mps - $attendence->absent; 
             $attendence->save();
         $page = $attendence->attendenceType;
         return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id)->with('page', $attendence->attendenceType);

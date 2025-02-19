@@ -113,8 +113,11 @@
                                                             @error('description')
                                                                 <div class="error">{{ $message }}</div>
                                                             @enderror
-
-                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                            <div style="display: flex; justify-content: flex-end; margin-right: 2px;">
+                                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                            </div>
+                                                            
+                                                            
                                                         </form>
                                                     </div>
                                                 </div>

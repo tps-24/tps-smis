@@ -115,8 +115,8 @@
           <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
           @endcan
           @can('student-delete')
-          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-          data-bs-target="#createNewContact{{$student->id}}">Delete</button>
+          <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+          data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
           @endcan
           <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
           aria-labelledby="createNewContactLabel" aria-hidden="true">
@@ -159,17 +159,5 @@
 </div>
 
 {!! $students->links('pagination::bootstrap-5') !!}
-<script>
-  changeCriteria(){
-    alert("Hello");
-    var criteriaDoc = document.getElementById('criteria').innerHTML;
-    if (criteriaDoc.value == "plt") {
-      document.getElementById('platoonCriteria').style.display.block;
-      document.getElementById('namesCriteria').style.display.none;
-    } elseif(criteriaDoc.value == "names"){
-      document.getElementById('namesCriteria').style.display.block;
-      document.getElementById('platoonCriteria').style.display.none;
-    }
-  } 
-</script>
+
 @endsection

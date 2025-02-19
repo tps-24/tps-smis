@@ -45,7 +45,7 @@
       </form>
       </div>
       <div class="pull-right col" style="margin-right: 0px;">
-      <a class="btn btn-success mb-2" href="{{ route('staffs.create') }}"
+      <a class="btn btn-success mb-2 btn-sm" href="{{ route('staffs.create') }}"
       style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Staff</a>
       </div>
       </div>
