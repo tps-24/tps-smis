@@ -39,12 +39,12 @@
         <div class="mx-auto p-2" style="width: 200px;"> Search </div>
         @csrf
         @method("POST")
-        <select style="height: 35px; width: 120px;" class="form-select me-2" name="company" required>
+        <select style="height: 35px; width: 120px;" class="form-select me-2" name="company_id" required>
           <option disabled selected>Company</option>
-          <option value="HQ" {{ request('company') == 'HQ' ? 'selected' : '' }}>HQ</option>
-          <option value="A" {{ request('company') == 'A' ? 'selected' : '' }}>A</option>
-          <option value="B" {{ request('company') == 'B' ? 'selected' : '' }}>B</option>
-          <option value="C" {{ request('company') == 'C' ? 'selected' : '' }}>C</option>
+          <option value="1" {{ request('company_id') == '1' ? 'selected' : '' }}>HQ</option>
+          <option value="2" {{ request('company_id') == '2' ? 'selected' : '' }}>A</option>
+          <option value="3" {{ request('company_id') == '3' ? 'selected' : '' }}>B</option>
+          <option value="4" {{ request('company_id') == '4' ? 'selected' : '' }}>C</option>
         </select>
         <select style="height: 35px; width: 120px;" class="form-select me-2" name="platoon"
           onchange="this.form.submit()">
@@ -88,13 +88,13 @@
               <label class="form-label " for="abc4">Platoon:</label>
             </div>
             <div class="col mt-2">
-              <select style="height: 30px;" class="form-select" name="company" id="abc4" required
+              <select style="height: 30px;" class="form-select" name="company_id" id="abc4" required
                 aria-label="Default select example">
-                <option disabled selected value="">company</option>
-                <option value="HQ">HQ</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
+                <option disabled selected value="">Company</option>
+                <option value="1">HQ</option>
+                <option value="2">A</option>
+                <option value="3">B</option>
+                <option value="4">C</option>
               </select>
             </div>
             <div class="col mt-2">
@@ -143,9 +143,11 @@
           <tr>
             <th>No</th>
             <th>Force Number</th>
+            <th>Gender</th>
             <th>Name</th>
             <th>Company</th>
             <th>Platoon</th>
+            <th>Beat Status</th>
             <th>Phone</th>
             <th>Home Region</th>
             <th width="280px">Action</th>
@@ -158,17 +160,32 @@
         <tr>
         <td>{{++$i}}</td>
         <td>{{$student->force_number ?? ''}}</td>
+        <td>{{$student->gender ?? ''}}</td>
         <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
-        <td>{{$student->company}}</td>
+        <td>{{$student->company_id}}</td>
         <td>{{$student->platoon}}</td>
+        <td>@if ($student->beat_status == 1)
+            Active
+            @else
+            Inactive
+           @endif
+        </td>
         <td>{{$student->phone}}</td>
         <td>{{$student->home_region}}</td>
         <td>
+
           <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">
           Show</a>
           <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
           <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
           data-bs-target="#createNewContact{{$student->id}}">Delete</button>
+          @if ($student->beat_status == 1)
+          <a class="btn btn-warning btn-sm" href="{{ route('students.deactivate_beat_status', $student->id) }}">
+          Deactivate</a>
+          @else
+          <a class="btn btn-warning btn-sm" href="{{ route('students.activate_beat_status', $student->id) }}">
+          Activate</a>
+          @endif
           <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
           aria-labelledby="createNewContactLabel" aria-hidden="true">
           <div class="modal-dialog">

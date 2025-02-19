@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('areas', function (Blueprint $table) {
+        Schema::create('guard_areas', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('added_by');
-            $table->unsignedBigInteger('campus_id');
             $table->unsignedBigInteger('company_id');
-            $table->integer('number_of_guards')->default(5);
+            $table->unsignedBigInteger('campus_id');
+            $table->unsignedBigInteger('added_by');
+            $table->json('beat_exception_ids')->nullable();
+            $table->json('beat_time_exception_ids')->nullable();
+            $table->integer('number_of_guards')->default(2);
             // $table->foreign('campus_id')->references('id')->on('campuses')->onupdate('update')->ondelete('null');
             // $table->foreign('created_by')->references('id')->on('users')->onupdate('update')->ondelete('null');
             $table->timestamps();
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('areas');
+        Schema::dropIfExists('guard_areas');
     }
 };

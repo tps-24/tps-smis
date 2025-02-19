@@ -201,7 +201,7 @@
                                             <div class="card-body" style="background-color:rgb(209, 209, 214);">
                                                 <div class="d-flex align-items-center">
                                                     <div class="p-3  me-3">
-                                                        <p>Enrolled Course: {{$student->programme->programmeName}}</p>
+                                                        <p>Enrolled Course: {{$student->programme->programmeName ?? ''}}</p>
                                                         <p>NIDA: {{$student->nin}}</p>
                                                         <p>Gender: {{$student->gender}}</p>
                                                     </div>

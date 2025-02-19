@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('patrol_areas', function (Blueprint $table) {
             $table->id();
+            $table->string('start_area');
+            $table->string('end_area');
             $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('start_area');
-            $table->unsignedBigInteger('end_area');
+            $table->unsignedBigInteger('campus_id');
+            $table->unsignedBigInteger('added_by');
             $table->integer('number_of_guards');
+            $table->json('beat_exception_ids')->nullable();
+            $table->json('beat_time_exception_ids')->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->onupdate('update')->ondelete('null');
-            $table->foreign('end_area')->references('id')->on('areas')->onupdate('update')->ondelete('null');
-            $table->foreign('start_area')->references('id')->on('areas')->onupdate('update')->ondelete('null');
             $table->timestamps();
         });
     }

@@ -42,7 +42,7 @@ class StudentController extends Controller
         $selectedSessionId = session('selected_session');
         if (!$selectedSessionId)
             $selectedSessionId = 1;
-        $students = Student::where('session_programme_id', $selectedSessionId)->latest()->paginate(20);
+        $students = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
         $page_name = "Student Management";
         return view('students.index', compact('students', 'page_name'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
@@ -55,8 +55,10 @@ class StudentController extends Controller
         if (!$selectedSessionId)
             $selectedSessionId = 1;
         $students = Student::where('session_programme_id', $selectedSessionId)
-                    ->where('company', $request->company)
+                    ->where('company_id', $request->company_id)
                     ->where('platoon',$request->platoon)
+                    // ->where('beat_status', 1)
+                    // ->where('beat_round', 0)
                     ->orderBy('first_name')
                     ->latest()->paginate(90);
         return view('students.index', compact('students'))
@@ -513,12 +515,12 @@ class StudentController extends Controller
 
         $validatedData = $request->validate([
             'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/' . $student_validate_rule,
-            'rank' => 'required',
-            'education_level' => 'required',
+            //'rank' => 'nullable',
+            //'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'middle_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
-            'home_region' => 'required|string|min:4',
+            'home_region' => 'nullable|string|min:4',
         ]);
         $companies = Company::all();
         if (empty($request->session()->get('student'))) {
@@ -530,8 +532,8 @@ class StudentController extends Controller
             $student = $request->session()->get('student');
 
             $student['force_number'] = $validatedData['force_number'];
-            $student['rank'] = $validatedData['rank'];
-            $student['education_level'] = $validatedData['education_level'];
+            //$student['rank'] = $validatedData['rank'];
+            //$student['education_level'] = $validatedData['education_level'];
             $student['first_name'] = $validatedData['first_name'];
             $student['middle_name'] = $validatedData['middle_name'];
             $student['last_name'] = $validatedData['last_name'];
@@ -624,5 +626,22 @@ class StudentController extends Controller
         }
         return redirect()->route('students.index')->with('success', $message);
         ;
+    }
+
+    public function activate_beat_status($studentId){
+        $student  = Student::find($studentId);
+
+        $student -> beat_status = 1;
+        $student->save();
+         
+        return redirect()->back()->with('success','Beat activated successfully.');
+    }
+
+    public function deactivate_beat_status($studentId){
+        $student  = Student::find($studentId);
+
+        $student -> beat_status = 0;
+        $student->save();
+         return redirect()->back()->with('success','Beat deactivated successfully.');
     }
 }

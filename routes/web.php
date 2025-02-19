@@ -32,6 +32,8 @@ use App\Http\Controllers\FinalResultController;
 use App\Http\Controllers\ExcuseTypeController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CampusController;
+use App\Http\Controllers\GuardAreaController;
+use App\Http\Controllers\PatrolAreaController;
 
 
 require __DIR__ . '/auth.php';
@@ -54,33 +56,64 @@ Route::get('/', function () {
 Route::group(['middleware' => 'session_programme'], function () {
     // Add more routes as needed
 
-    // Route::controller(BeatController::class)->prefix('beats')->group(function () {
-    //     Route::get('{area_id}/create', 'create');
-    //     Route::get('{area_id}/search_students', 'search');
-    //     Route::post('{area_id}/assign_students', 'store');
-    //     Route::post('approve','approve_presence');
-    // });
-
 });
 
-Route::controller(BeatController::class)->prefix('beats')->group(function () {
-    Route::get('/', 'index');
-    Route::get('companies/{beatType}','companies');
-    Route::get('companies/{companyId}/areas','get_companies_area');
-    Route::get('companies/{companyId}/patrol_areas','get_companies_patrol_area');
-    Route::get('/store', 'store');
-    Route::get('/show_guards/{area_id}', 'show_guards_beats');
-    Route::get('/show_patrol/{area_id}', 'show_patrol_beats');
-    Route::get('/show_patrol_areas', 'list_patrol_areas')->name('beats.show_patrol_areas');
-    Route::put('/update/{area_id}', 'update_area');
-    Route::put('/update_patrol_area/{patrol_area_id}', 'update_patrol_area');
+
+// Route::get('/generate-beats', [BeatController::class, 'showGenerateBeatsForm'])->name('generate.beats.form');
+// Route::post('/generate-beats', [BeatController::class, 'generateBeats'])->name('generate.beats');
+// Route to display the generated beats
+// Route::get('/view-generated-beats', [BeatController::class, 'viewGeneratedBeats'])->name('view.generated.beats');
+
+// Route::get('/beats', [BeatController::class, 'index'])->name('beats.index'); // Show all beats---------
+// Route::post('/beats/generate', [BeatController::class, 'generate'])->name('beats.generate'); // Generate beats for a specific date
+
+
+// Route::get('/beats', [BeatController::class, 'index'])->name('beats.index');
+// Route::get('/beats/{id}', [BeatController::class, 'show'])->name('beats.show');
+// Route::post('/beats/generate', [BeatController::class, 'generateBeats'])->name('beats.generate');
+Route::get('/beats/generate', [BeatController::class, 'beatCreate'])->name('beats.beatCreate');
+Route::get('/beats', [BeatController::class, 'beatsByDate'])->name('beats.byDate');
+Route::delete('/beats/{id}', [BeatController::class, 'destroy'])->name('beats.destroy');
+
+Route::post('/fill-beats', [BeatController::class, 'fillBeats'])->name('beats.fillBeats');
+// Route::get('/beats', [BeatController::class, 'showBeats'])->name('beats.index');
+Route::get('/beats/{beat}', [BeatController::class, 'showBeat'])->name('beats.show');
+
+Route::get('/beats/pdf/{company}', [BeatController::class, 'generatePDF'])->name('beats.generatePDF');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Route::controller(BeatController::class)->prefix('beats')->group(function () {
+//     Route::get('/', 'index');
+//     Route::get('companies/{beatType}','companies');
+//     Route::get('companies/{companyId}/areas','get_companies_area');
+//     Route::get('companies/{companyId}/patrol_areas','get_companies_patrol_area');
+//     Route::get('/store', 'store');
+//     Route::get('/show_guards/{area_id}', 'show_guards_beats');
+//     Route::get('/show_patrol/{area_id}', 'show_patrol_beats');
+//     Route::get('/show_patrol_areas', 'list_patrol_areas')->name('beats.show_patrol_areas');
+//     Route::put('/update/{area_id}', 'update_area');
+//     Route::put('/update_patrol_area/{patrol_area_id}', 'update_patrol_area');
     
-    Route::get('/list-guards/{area_id}', 'list_guards');
-    Route::get('/list-patrol/{patrolArea_id}', 'list_patrol');
-    Route::get('/list-patrol-guards/{patrolArea_id}', 'list_patrol_guards');
-    Route::put('/approve', 'approve_presence');
-    Route::get('/downloadPdf/{company_id}/{beatType}/{day}', 'generateTodayPdf')->name('beats.downloadPdf');
-});
+//     Route::get('/list-guards/{area_id}', 'list_guards');
+//     Route::get('/list-patrol/{patrolArea_id}', 'list_patrol');
+//     Route::get('/list-patrol-guards/{patrolArea_id}', 'list_patrol_guards');
+//     Route::put('/approve', 'approve_presence');
+//     Route::get('/downloadPdf/{company_id}/{beatType}/{day}', 'generateTodayPdf')->name('beats.downloadPdf');
+// });
 
 Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
 Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
@@ -100,8 +133,36 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
 Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
 Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
-Route::resource('students', StudentController::class);
+//Route::resource('students', StudentController::class);
 Route::group(['middleware' => ['auth']], function () {
+
+    Route::controller(StudentController::class)->prefix('students')->group(function () {
+        Route::get('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
+        Route::get('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
+        /**
+         * 
+         *  Wizard route for student registration
+         */
+        Route::prefix('create')->group(function () {
+            Route::get('step-two/{type}', "createStepTwo");
+            Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
+
+            Route::get('step-three', "createStepTwo");
+            Route::post('post-step-one/{type}', 'postStepOne');
+            Route::post('post-step-two/{type}', 'postStepTwo');
+            Route::post('post-step-three/{type}', 'postStepThree');
+        });
+        /**
+         * End of wizard for student registration
+         */
+        Route::get('dashboard', 'dashboard');
+        Route::post('store', 'store');
+        Route::post('{id}/update', 'update');
+        Route::post('{id}/delete', 'destroy');
+        Route::post('bulkimport', 'import');
+
+
+    });
     
     // Define the custom route first
     Route::post(
@@ -118,6 +179,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/students/{id}/approve', [StudentController::class, 'approveStudent'])->name('students.approve');
     Route::get('/student/complete-profile/{id}', [StudentController::class, 'completeProfile'])->name('students.complete_profile');
     Route::put('/student/profile-complete/{id}', [StudentController::class, 'profileComplete'])->name('students.profile_complete');
+
+Route::get('patrol-areas/{patrolArea}/edit', [PatrolAreaController::class, 'edit'])->name('patrol-areas.edit');
+Route::put('patrol-areas/{patrolArea}', [PatrolAreaController::class, 'update'])->name('patrol-areas.update');
+Route::get('guard-areas/{guardArea}/edit', [GuardAreaController::class, 'edit'])->name('guard-areas.edit');
+Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->name('guard-areas.update');
+
 
     
     Route::resource('roles', RoleController::class);
@@ -144,35 +211,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('semester_exam_results', SemesterExamResultController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
-    // Route::resource('beats', BeatController::class);
+    Route::resource('guard-areas', GuardAreaController::class);
+    Route::resource('patrol-areas', PatrolAreaController::class);
 
 
-
-
-    Route::controller(StudentController::class)->prefix('students')->group(function () {
-        /**
-         *  Wizard route for student registration
-         */
-        Route::prefix('create')->group(function () {
-            Route::get('step-two/{type}', "createStepTwo");
-            Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
-
-            Route::get('step-three', "createStepTwo");
-            Route::post('post-step-one/{type}', 'postStepOne');
-            Route::post('post-step-two/{type}', 'postStepTwo');
-            Route::post('post-step-three/{type}', 'postStepThree');
-        });
-        /**
-         * End of wizard for student registration
-         */
-        Route::get('dashboard', 'dashboard');
-        Route::post('store', 'store');
-        Route::post('{id}/update', 'update');
-        Route::post('{id}/delete', 'destroy');
-        Route::post('bulkimport', 'import');
-
-
-    });
+    
 
     Route::controller(MPSController::class)->prefix('mps')->group(function () {
         Route::post('search', 'search');
@@ -212,6 +255,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 //start
 Route::controller(StudentController::class)->prefix('students')->group(function () {
+
     /**
      *  Wizard route for student registration
      */

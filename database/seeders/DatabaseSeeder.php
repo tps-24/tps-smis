@@ -15,17 +15,20 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
-            PermissionTableSeeder::class,
-            CreateAdminUserSeeder::class,
-            BeatTypeSeeder::class,
-            AreaSeeder::class,
-            VitengoSeeder::class,
-            CompanySeeder::class,
-            PlatoonSeeder::class,
-            AttendenceTypeSeeder::class,
-            AttendenceSeeder::class,
-            GradingSystemsTableSeeder::class,
-            PatientsTableSeeder::class,
+            // PermissionTableSeeder::class,
+            // CreateAdminUserSeeder::class,
+            // BeatTypeSeeder::class,
+            // BeatExceptionSeeder::class,
+            // BeatTimeExceptionSeeder::class,
+            // GuardAreaSeeder::class,
+            // PatrolAreaSeeder::class,
+            // VitengoSeeder::class,
+            // CompanySeeder::class,
+            // PlatoonSeeder::class,
+            // AttendenceTypeSeeder::class,
+            // AttendenceSeeder::class,
+            // GradingSystemsTableSeeder::class,
+            // PatientsTableSeeder::class,
         ]);
 
         // User::factory(10)->create();

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
+    
+    // use HasFactory;
     protected $fillable = [
         'name'
     ];
@@ -17,11 +19,14 @@ class Company extends Model
     public function students(){
         return $this->hasMany(Student::class,'company','name');
     }
-    public function areas(){
-        return $this->hasMany(Area::class);
+
+    public function guardAreas()
+    {
+        return $this->hasMany(GuardArea::class);
     }
 
-    public function patrol_areas(){
-        return $this->hasMany(PatrolArea::class,'company_id','id');
+    public function patrolAreas()
+    {
+        return $this->hasMany(PatrolArea::class);
     }
 }

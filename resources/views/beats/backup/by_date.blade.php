@@ -3,34 +3,25 @@
 @section('scrumb')
 <!-- Scrumb starts -->
 <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
-  <div class="container-fluid">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/tps-rms" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="">Beats</a></li>
-        <li class="breadcrumb-item active"><a href="">Guards and Patrols</a></li>
-      </ol>
-    </nav>
-  </div>
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
+                <li class="breadcrumb-item "><a href="/tps-smis/beats">Beats</a></li>
+                <li class="breadcrumb-item active"><a href="#">Guards Date Specific </a></li>
+            </ol>
+        </nav>
+    </div>
 </nav>
 <!-- Scrumb ends -->
 
 @endsection
+
+
+
 @section('content')
-  <!-- @session('success')
-    <div class="alert alert-success" role="alert">
-    {{ $value }}
-    </div>
-  @endsession -->
-
-    @if(session('success'))
-        <div style="color: green">{{ session('success') }}</div>
-    @endif
-
 <div class="container">
-
-
-<h2>Beats for {{ $date }}</h2>
+    <h2>Beats for {{ $date }}</h2>
     
     <form action="{{ route('beats.byDate') }}" method="GET" class="mb-4">
         <div class="row">
@@ -44,12 +35,11 @@
     </form>
 
 
-
     <ul class="nav nav-tabs" id="companyTabs" role="tablist">
         @foreach($companies as $company)
             <li class="nav-item" role="presentation">
                 <button class="nav-link @if($loop->first) active @endif" id="tab-{{ $company->id }}" data-bs-toggle="tab" data-bs-target="#company-{{ $company->id }}" type="button" role="tab" aria-controls="company-{{ $company->id }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                    {{ $company->description}} 
+                    {{ $company->description }}
                 </button>
             </li>
         @endforeach

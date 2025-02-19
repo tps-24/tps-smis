@@ -18,7 +18,7 @@ class BeatTypeSeeder extends Seeder
         ]);
 
         BeatType::create([
-            'name' => "Patrol",
+            'name' => "Patrols",
             'description' =>""
         ]);
     }
