@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Staff;
 use App\Models\User;
+use App\Imports\BulkImportStaff;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Department;
 use App\Models\NextOfKin;
 use Spatie\Permission\Models\Role;
@@ -93,6 +96,25 @@ class StaffController extends Controller
         }
 
         return redirect()->route('staffs.index')->with('success', 'Staff created successfully.');
+    }
+
+    public function import(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'import_file' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (!in_array($value->getClientOriginalExtension(), ['csv', 'xls', 'xlsx'])) {
+                        $fail('Incorrect :attribute type choose.');
+                    }
+                }
+            ],
+        ]);
+        if ($validator->fails()) {
+            return back()->with('error', $validator->errors()->first());
+        }
+        Excel::import(new BulkImportStaff, filePath: $request->file('import_file'));
+        return back()->with('success', 'Staff Uploaded  successfully.');
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Events\MessageSent;
+use App\Events\NotificationEvent;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,8 +11,8 @@ class AnnouncementController extends Controller
 {
     public function index()
     {
-        $announcements = Announcement::orderBy('created_at', 'desc')->get();
-        broadcast(new MessageSent($announcements[0]));
+        $announcements = Announcement::all();
+        broadcast(new NotificationEvent($announcements[0]->title,$announcements[0]->type, 'announcement', $announcements[0], $announcements[0]->id));
         return view('announcements.index', compact('announcements'));
     }
 
@@ -43,7 +43,7 @@ class AnnouncementController extends Controller
                 'expires_at' => $expiresAt,
             ]
         );
-        broadcast(new MessageSent($announcement));
+        broadcast(new NotificationEvent( $announcement->title,$announcement->type, 'announcement', $announcement, $announcement->id));
         return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
     }
 

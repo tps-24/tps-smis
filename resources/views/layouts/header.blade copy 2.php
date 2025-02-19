@@ -27,7 +27,7 @@
     <!-- Page title ends -->
     <!-- Session starts -->
     @php 
-                                                                            use Illuminate\Support\Facades\DB;
+                                                            use Illuminate\Support\Facades\DB;
 
         // Retrieve all session programmes from the database 
         $sessionProgrammes = DB::table('session_programmes')->where('is_current', 1)->get();
@@ -84,7 +84,94 @@
             <!-- Header actions end -->
 
 
-            @include('notifications.list')
+            <!-- Notification script starts -->
+            <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+            <script>
+                // Enable pusher logging - don't include this in production
+                Pusher.logToConsole = true;
+
+
+                var pusher = new Pusher('3a9b85e8ad0fb87a0a56', {
+                    cluster: 'mt1',
+                    encrypted: true, // Use encrypted connection (recommended)
+                    reconnection: true, // Enable automatic reconnection
+                    reconnectionAttempts: 5, // Max number of reconnection attempts
+                    reconnectionDelay: 1000, // Time in ms before each retry attempt
+                    reconnectTimeout: 5000, // Timeout before retrying reconnection
+                });
+                var channel = pusher.subscribe('announcements');
+                channel.bind('announcement', function (data) {
+                    //app.messages.push(JSON.stringify(data));
+                    var countLabel = document.querySelector('.count-label');
+                    countLabel.style.background = 'red';
+                    var currentValue = parseInt(countLabel.textContent, 10);
+                    var newValue = currentValue + 1;
+                    countLabel.textContent = newValue;
+
+                    // Add notification to the dropdown
+                    var notificationsContainer = document.querySelector('.dropdown-menu .mx-3.d-flex.flex-column');
+                    var notificationItem = document.createElement('div');
+                    notificationItem.className = 'notification-item';
+                    notificationItem.innerHTML = `
+                        <div class="bg-danger-subtle border border-${data.announcement.type} px-3 py-2 rounded-1"> 
+                        <a href="javascript:void(0)" class="dropdown-item text-${data.announcement.type} d-flex align-items-center">
+                            ${data.announcement.title}
+                        </a>
+                        <p class="small m-0">${data.announcement.created_at}</p>
+                        </div>
+                    `;
+                    notificationsContainer.prepend(notificationItem); // Add to the top of the list
+
+                });
+
+                setInterval(() => {
+                    pusher.connection.bind('announcement', function (states) {
+                        if (states.current === 'connected') {
+                            // Re-subscribe to the channel if the connection is re-established
+                            channel = pusher.subscribe('announcement');
+                        }
+                    });
+                }, 5000);
+
+                window.addEventListener('online', function () {
+                    console.log('Internet connection restored. Attempting to reconnect...');
+                    pusher.connect();
+                    channel = pusher.subscribe('announcements'); // Manually trigger the connection if needed
+                });
+
+                window.addEventListener('offline', function () {
+                    console.log('You are offline. Connection may be lost.');
+                });
+            </script>
+
+
+
+            <div class="d-sm-flex d-none">
+                <div class="dropdown">
+                    <a class="dropdown-toggle d-flex p-3 position-relative" href="#!" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell fs-4 lh-1 text-primary"></i>
+                        <span class="count-label">0</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-sm">
+                        <h5 class="fw-semibold px-3 py-2 text-primary">Notifications</h5>
+                        <div class="scroll250">
+                            <div class="mx-3 d-flex gap-2 flex-column">
+                                <!-- <div class="bg-danger-subtle border border-danger px-3 py-2 rounded-1">
+                                    <p class="m-0 text-danger">New product purchased</p>
+                                    <p class="small m-0">Just now</p>
+                                </div> -->
+
+                            </div>
+                        </div>
+                        <div class="d-grid m-3">
+                            <a href="javascript:void(0)" class="btn btn-primary">View all</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
             <!-- User settings start -->
             <div class="dropdown ms-2">
                 @if(Auth::check())
@@ -113,7 +200,7 @@
                         return $firstLetters;
                     }
                     echo getFirstLetters($string); // Prints First Letters of each name
-                                                                                                                                                                            ?>
+                                                                                                                                            ?>
 
                                     </div>
                                 </a>
@@ -131,7 +218,7 @@
                                     <div class="mx-3 my-2 d-grid">
                                         <a href="{{ route('logout') }}" class="btn btn-warning"
                                             onclick="event.preventDefault();
-                                                                                                                                                                            document.getElementById('logout-form').submit();">Logout</a>
+                                                                                                                                            document.getElementById('logout-form').submit();">Logout</a>
                                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                             @csrf
                                         </form>

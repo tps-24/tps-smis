@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
@@ -109,7 +110,7 @@ Route::group(['middleware' => ['auth']], function () {
         [ProgrammeController::class, 'assignCoursesToSemester']
     );
     Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
-
+    Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
@@ -211,6 +212,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('today/{company_id}/{$type}', 'today')->name('today_attendance');
     });
 
+    Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
+
 });
 
 
@@ -308,3 +311,12 @@ Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])-
 
 
 Route::get('test', [BeatController::class,'test']);
+
+// Route::post('/pusher/auth', function (\Illuminate\Http\Request $request) {
+//     return true;
+//     if (!Auth::check()) {
+//         //return \Illuminate\Support\Facades\Broadcast::auth($request);
+//     //} else {
+//         return response()->json(['message' => 'Unauthorized'], 403);
+//     }
+// });

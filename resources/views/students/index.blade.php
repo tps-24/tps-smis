@@ -15,7 +15,7 @@
 <!-- Scrumb ends -->
 
 @endsection
-</table>
+
 @section('content')
 
 <div class="row">
@@ -55,7 +55,7 @@
             <!-- Platoon Dropdown -->
             <select onchange="this.form.submit()" class="form-select me-2" name="platoon" required>
                 <option value="">Select Platoon</option>
-                @for ($i = 1; $i <= 15; $i++)
+                @for ($i = 1; $i < 15; $i++)
                     <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
                 @endfor
             </select>

@@ -29,6 +29,10 @@
     </div>
     <div class="card">
         <div class="card-body">
+            
+            @if ($announcements->isEmpty())
+                <h2>No announcements.</h2>
+            @else
             <ul class="list-group">
                 @foreach ($announcements as $announcement)
                             <li class="list-group-item d-flex justify-content-between align-items-center mt-2">
@@ -53,6 +57,7 @@
                             </li>
                 @endforeach
             </ul>
+            @endif
         </div>
         <script>
 

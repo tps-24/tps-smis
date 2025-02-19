@@ -256,13 +256,12 @@ class AttendenceController extends Controller
                 $role->name == 'Chief Instructor' ||
                 $role->name == 'Staff Officer'
             ) {
-                $this->companies = Company::all();
-                
+                $this->companies = Company::all();                
             }
             else if($role->name == 'Teacher'|| $role->name == 'Sir Major'){
                 //return Auth::user()->staff;
                $this->companies = [Auth::user()->staff->company];
-              
+              if(count($this->companies) != 0)
                if($this->companies[0] == null){
     
                 return view('attendences/index', compact( 'page'));
