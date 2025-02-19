@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
+        Schema::create('assessment_types', function (Blueprint $table) {
             $table->id();
-            $table->string('departmentName');
-            $table->timestamps();
+            $table->string('type_name'); // e.g., 'assignment', 'quiz', 'project'
+            $table->timestamp('created_at')->useCurrent()->nullable(false);
+            $table->timestamp('updated_at')->nullable(true)->useCurrentOnUpdate();
         });
     }
 
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('departments');
+        Schema::dropIfExists('assessment_types');
     }
 };

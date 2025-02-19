@@ -9,11 +9,16 @@ class CourseworkResult extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'coursework_id', 'score', 'semester_id'];
+    protected $fillable = ['course_id', 'student_id', 'coursework_id', 'score', 'semester_id','created_by','updated_by'];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
     }
 
     public function coursework()
@@ -24,5 +29,11 @@ class CourseworkResult extends Model
     public function semester()
     {
         return $this->belongsTo(Semester::class);
+    }
+
+
+    public function programmeCourseSemester()
+    {
+        return $this->belongsTo(ProgrammeCourseSemester::class, 'course_id', 'course_id');
     }
 }

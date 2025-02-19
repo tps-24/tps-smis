@@ -95,7 +95,7 @@
                         </div> 
                         <input type="number" name="session_programme_id" value="4" class="form-control" hidden>
                         <input type="number" name="programme_id" value="1" class="form-control" hidden>
-                        <input type="number" name="semester_id" value="1" class="form-control" hidden>
+                        <input type="number" name="semester_id" value="2" class="form-control" hidden>
                         <input type="number" name="created_by" value="{{ Auth::user()->id }}" class="form-control" hidden>  
                         <br> 
                         <div class="col-xs-12 col-sm-12 col-md-12 text-center">

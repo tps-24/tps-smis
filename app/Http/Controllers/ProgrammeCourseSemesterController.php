@@ -18,7 +18,7 @@ class ProgrammeCourseSemesterController extends Controller
     {
         $this->middleware('permission:course-enrollment-create')->only(['create', 'store']);
         $this->middleware('permission:course-enrollment-list')->only(['index', 'show']);
-        $this->middleware('permission:course-enrollment-update')->only(['edit', 'update']);
+        $this->middleware('permission:course-enrollment-edit')->only(['edit', 'update']);
         $this->middleware('permission:course-enrollment-delete')->only(['destroy']);
     }
     
@@ -57,10 +57,21 @@ class ProgrammeCourseSemesterController extends Controller
         return view('course_assignments.index', compact('programme', 'semester', 'sessionProgramme', 'courses1','courses2'));
     }
 
-    public function create($id)
+    //Haitumikiii
+    // public function create()
+    // {
+    //     $programme = Programme::findOrFail($id);
+    //     $semester = Semester::findOrFail(1);
+    //     $sessionProgramme = SessionProgramme::findOrFail(4);
+    //     $courses = Course::all();
+
+    //     return view('course_assignments.create', compact('programme', 'semester', 'sessionProgramme', 'courses'));
+    // }
+
+    public function assignCourse($id)
     {
         $programme = Programme::findOrFail($id);
-        $semester = Semester::findOrFail(1);
+        $semester = Semester::findOrFail(2);
         $sessionProgramme = SessionProgramme::findOrFail(4);
         $courses = Course::all();
 

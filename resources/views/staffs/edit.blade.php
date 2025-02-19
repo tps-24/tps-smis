@@ -3,7 +3,7 @@
 @section('style')
 <!-- style starts -->
     <!-- Steps Wizard CSS -->
-    <link rel="stylesheet" href="/tps-rms/resources/assets/vendor/wizard/wizard.css" />
+    <link rel="stylesheet" href="/tps-smis/resources/assets/vendor/wizard/wizard.css" />
 
 <style>
     @media only screen and (min-width: 576px) {
@@ -118,15 +118,20 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Rank</label>
                                                     <select class="form-select" id="rank" name="rank" aria-label="Default select example">
-                                                        <option value="" disabled>Select Rank</option>
+                                                        <option value="" disabled selected>Select Rank</option>
                                                         <option value="PC" {{ $staff->rank == 'PC' ? 'selected' : '' }}>Police Constable (PC)</option>
-                                                        <option value="CPL" {{ $staff->rank == 'CPL' ? 'selected' : '' }}>Corporal</option>
-                                                        <option value="ASI" {{ $staff->rank == 'ASI' ? 'selected' : '' }}>Assistant Sub-Inspector (ASI)</option>
-                                                        <option value="SI" {{ $staff->rank == 'SI' ? 'selected' : '' }}>Sub-Inspector (SI)</option>
-                                                        <option value="ACP" {{ $staff->rank == 'ACP' ? 'selected' : '' }}>Assistant Commissioner of Police (ACP)</option>
-                                                        <option value="CI" {{ $staff->rank == 'CI' ? 'selected' : '' }}>Chief Inspector (CI)</option>
-                                                        <option value="INSP" {{ $staff->rank == 'INSP' ? 'selected' : '' }}>Inspector (INSP)</option>
+                                                        <option value="CPL" {{ $staff->rank == 'CPL' ? 'selected' : '' }}>Corporal (CPL)</option>
+                                                        <option value="SGT" {{ $staff->rank == 'SGT' ? 'selected' : ''  }}>Sergeant (SGT)</option>
+                                                        <option value="S/SGT" {{ $staff->rank == 'S/SGT' ? 'selected' : '' }}>Staff Sergeant (S/SGT)</option>
+                                                        <option value="SM" {{ $staff->rank == 'SM' ? 'selected' : ''  }}>Sergeant Major (SM)</option>
+                                                        <option value="A/INSP" {{ $staff->rank == 'A/INSP' ? 'selected' : '' }}>Assistant Inspector of Police (A/INSP)</option>
+                                                        <option value="INSP" {{ $staff->rank == 'INSP' ? 'selected' : '' }}>Inspector of Police (INSP)</option>
+                                                        <option value="ASP" {{ $staff->rank == 'ASP' ? 'selected' : ''  }}>Assistant Superitendent of Police (ASP)</option>
+                                                        <option value="SP" {{ $staff->rank == 'SP' ? 'selected' : ''  }}>Superitendent of Police (SP)</option>
+                                                        <option value="SSP" {{ $staff->rank == 'SSP' ? 'selected' : '' }}>Senior Superitendent of Police (SSP)</option>
+                                                        <option value="ACP" {{ $staff->rank == 'ACP' ? 'selected' : ''  }}>Assistant Commissioner of Police (ACP)</option>
                                                         <option value="SACP" {{ $staff->rank == 'SACP' ? 'selected' : '' }}>Senior Assistant Commissioner of Police (SACP)</option>
+                                                        <option value="DCP" {{ $staff->rank == 'DCP' ? 'selected' : '' }}>Deputy Commissioner of Police (DCP)</option>
                                                         <option value="CP" {{ $staff->rank == 'CP' ? 'selected' : '' }}>Commissioner of Police (CP)</option>
                                                         <option value="IGP" {{ $staff->rank == 'IGP' ? 'selected' : '' }}>Inspector General of Police (IGP)</option>
                                                     </select>
@@ -182,7 +187,7 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Gender</label>
                                                     <select class="form-select" id="gender" name="gender" aria-label="Default select example">
-                                                        <option selected="">Choose gender</option>
+                                                        <option value="" disiabled selected>Choose gender</option>
                                                         <option value="Male" {{ $staff->gender == 'Male' ? 'selected' : '' }}>Male</option>
                                                         <option value="Female" {{ $staff->gender == 'Female' ? 'selected' : '' }}>Female</option>
                                                     </select>
@@ -195,7 +200,7 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Date of Birth</label>
-                                                    <input type="date" class="form-control" id="DoB" name="DoB" placeholder="Enter Date of Birth" value="{{ $staff->DoB }}"required>
+                                                    <input type="date" class="form-control" id="DoB" name="DoB" placeholder="Enter Date of Birth" value="{{ $staff->DoB }}">
                                                     </div>
                                                 </div>
                                                 </div>
@@ -206,7 +211,7 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Marital Status</label>
                                                     <select class="form-select" id="maritalStatus" name="maritalStatus" aria-label="Default select example">
-                                                        <option selected="">Choose Marital Status</option>
+                                                        <option value="" disabled selected>Choose Marital Status</option>
                                                         <option value="Single" {{ $staff->maritalStatus == 'Single' ? 'selected' : '' }}>Single</option>
                                                         <option value="Married" {{ $staff->maritalStatus == 'Married' ? 'selected' : '' }}>Married</option>
                                                         <option value="Divorsed" {{ $staff->maritalStatus == 'Divorsed' ? 'selected' : '' }}>Divorsed</option>
@@ -241,7 +246,7 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Phone Number</label>
-                                                    <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" value="{{ $staff->phoneNumber }}" required>
+                                                    <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" value="{{ $staff->phoneNumber }}">
                                                     </div>
                                                 </div>
                                                 </div>
@@ -294,7 +299,7 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Department</label>
                                                     <select class="form-select" id="department_id" name="department_id" aria-label="Default select example">
-                                                        <option selected="">Choose Department</option>                                 
+                                                        <option value="" disabled selected>Choose Department</option>                                 
                                                             @foreach ($departments as $value => $dep)
                                                                 <option value="{{ $dep->id }}" {{ $staff->department_id == $dep->id ? 'selected' : '' }}>
                                                                     {{ $dep->departmentName }}
@@ -337,7 +342,7 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Education Level</label>
                                                     <select class="form-select" id="educationLevel" name="educationLevel" aria-label="Default select example">
-                                                        <option value="" disabled>Select Education Level</option>
+                                                        <option value="" disabled selected>Select Education Level</option>
                                                         <option value="std7" {{ $staff->educationLevel == 'std7' ? 'selected' : '' }}>Darasa la Saba</option>
                                                         <option value="4m4" {{ $staff->educationLevel == '4m4' ? 'selected' : '' }}>Form Four</option>
                                                         <option value="4m6" {{ $staff->educationLevel == '4m6' ? 'selected' : '' }}>Form Six</option>
@@ -359,7 +364,7 @@
                                                     <div class="m-0">
                                                     <label class="form-label" for="abc4">Contract Type</label>
                                                     <select class="form-select" id="contractType" name="contractType" aria-label="Default select example">
-                                                        <option selected="">Choose Contract Type</option>
+                                                        <option value="" disabled selected>Choose Contract Type</option>
                                                         <option value="Permanent" {{ $staff->contractType == 'Permanent' ? 'selected' : '' }}>Permanent Contract</option>
                                                         <option value="Temporary" {{ $staff->contractType == 'Temporary' ? 'selected' : '' }}>Temporary Contract</option>
                                                         <option value="Fixed-Term" {{ $staff->contractType == 'Fixed-Term' ? 'selected' : '' }}>Fixed-Term Contract</option>
@@ -406,7 +411,7 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Full Names</label>
-                                                    <input type="text" class="form-control" id="nextofkinFullname" name="nextofkinFullname" placeholder="Enter Next of Kin Fullname" value="{{ $staff->nextofkinFullname }}">
+                                                    <input type="text" class="form-control" id="nextofkinFullname" name="nextofkinFullname" placeholder="Enter Next of Kin Fullname" value="{{ $staffNextofkin->nextofkinFullname ?? ''}}">
                                                     </div>
                                                 </div>
                                                 </div>
@@ -416,7 +421,7 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Relationship</label>
-                                                    <input type="text" class="form-control" id="nextofkinRelationship" name="nextofkinRelationship" placeholder="Enter Next of Kin Relationship" value="{{ $staff->nextofkinRelationship }}">
+                                                    <input type="text" class="form-control" id="nextofkinRelationship" name="nextofkinRelationship" placeholder="Enter Next of Kin Relationship" value="{{ $staffNextofkin->nextofkinRelationship ?? ''}}">
                                                     </div>
                                                 </div>
                                                 </div>
@@ -426,7 +431,7 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Phone Number</label>
-                                                    <input type="text" class="form-control" id="nextofkinPhoneNumber" name="nextofkinPhoneNumber" placeholder="Enter Next of Kin Phone Number" value="{{ $staff->nextofkinPhoneNumber }}">
+                                                    <input type="text" class="form-control" id="nextofkinPhoneNumber" name="nextofkinPhoneNumber" placeholder="Enter Next of Kin Phone Number" value="{{ $staffNextofkin->nextofkinPhoneNumber ?? ''}}">
                                                     </div>
                                                 </div>
                                                 </div>
@@ -436,7 +441,7 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                     <label class="form-label abcd" for="abc">Physical Address</label>
-                                                    <input type="text" class="form-control" id="nextofkinPhysicalAddress" name="nextofkinPhysicalAddress" placeholder="Enter Next of Kin Physical Address"  value="{{ $staff->nextofkinPhysicalAddress }}">
+                                                    <input type="text" class="form-control" id="nextofkinPhysicalAddress" name="nextofkinPhysicalAddress" placeholder="Enter Next of Kin Physical Address"  value="{{ $staffNextofkin->nextofkinPhysicalAddress ?? ''}}">
                                                     </div>
                                                 </div>
                                                 </div>
@@ -478,7 +483,7 @@
                                
                     <input type="number" name="updated_by" value="{{ Auth::user()->id }}" class="form-control" hidden> 
                     <div class="col-xs-12 col-sm-12 col-md-12 text-center" id="btnSubmit" style="margin-bottom:0px;">
-                        <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> submit</button>
+                        <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> Update</button>
                     </div>
 
                     </div>
@@ -504,7 +509,7 @@
 @section('scripts')
 <!-- scripts starts -->
     <!-- Steps wizard JS -->
-    <script src="/tps-rms/resources/assets/vendor/wizard/wizard.min.js"></script>
-    <script src="/tps-rms/resources/assets/vendor/wizard/wizard-custom.js"></script>
+    <script src="/tps-smis/resources/assets/vendor/wizard/wizard.min.js"></script>
+    <script src="/tps-smis/resources/assets/vendor/wizard/wizard-custom.js"></script>
 <!-- scripts ends -->
 @endsection

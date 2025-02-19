@@ -7,7 +7,7 @@
   border-radius: 30% !important;
 }
 .profile-header {
-    background-image: url('/tps-rms/resources/assets/images/profile/bg-profile.jpg');
+    background-image: url('/tps-smis/resources/assets/images/profile/bg-profile.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -44,7 +44,13 @@
         <div class="card mb-4">
           <div class="card-body back">
             <div class="profile-header"> 
-              <img src="/tps-rms/resources/assets/images/profile/avatar.jpg" alt="Profile Picture" />
+              <!-- <img src="/tps-smis/resources/assets/images/profile/avatar.jpg" alt="Profile Picture" /> -->
+              
+        @if ($user->hasRole('Student')) 
+          <img src="{{ url('storage/app/public/' . $user->student->photo) }}" alt="{{ $user->student->first_name }}'s Photo">
+        @else
+          <img src="{{ url('storage/app/public/' . $user->staff->photo) }}" alt="{{ $user->staff->firstName }}'s Photo">
+        @endif
             </div>
 
             <div class="d-flex justify-content-end mt-3">
@@ -112,7 +118,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-person"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="forceNumber" value="K.2120" Disabled>
+                                          <input type="text" class="form-control" id="forceNumber" value="{{$user->student->force_number}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -159,7 +165,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-phone"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="contactNumber" value="+255655527782" Disabled>
+                                          <input type="text" class="form-control" id="contactNumber" value="{{$user->student->phone}}" Disabled>
                                         </div>
 
                                       </div>
@@ -175,12 +181,13 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-calendar4"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="birthDay"  value="14/08/1968" Disabled>
+                                          <input type="text" class="form-control" id="birthDay"  value="{{$user->student->dob}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
 
                                     </div>
+                                    
                                     <div class="col-12">
 
                                       <!-- Form field start -->
@@ -190,7 +197,15 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-filter-circle"></i>
                                           </span>
-                                          <textarea class="form-control" id="abt" rows="4" Disabled> Hey, blah blah</textarea>
+                                            <div class="card-body" style="background-color:rgb(209, 209, 214);">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="p-3  me-3">
+                                                        <p>Enrolled Course: {{$user->student->programme->programmeName}}</p>
+                                                        <p>NIDA: {{$user->student->nin}}</p>
+                                                        <p>Gender: {{$user->student->gender}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -213,7 +228,7 @@
                           <div class="row gx-5 align-items-center">
                             <div class="col-sm-4 col-12">
                               <div class="p-3">
-                                <img src="/tps-rms/resources/assets/images/notifications.svg" alt="Notifications" class="img-fluid">
+                                <img src="/tps-smis/resources/assets/images/notifications.svg" alt="Notifications" class="img-fluid">
                               </div>
                             </div>
                             <div class="col-sm-4 col-12">
@@ -249,7 +264,7 @@
                           <div class="row align-items-end">
                             <div class="col-xl-4 col-sm-6 col-12">
                               <div class="p-3">
-                                <img src="/tps-rms/resources/assets/images/login.svg" alt="Contact Us" class="img-fluid" width="350" height="320">
+                                <img src="/tps-smis/resources/assets/images/login.svg" alt="Contact Us" class="img-fluid" width="350" height="320">
                               </div>
                             </div>
                             <div class="col-sm-4 col-12">

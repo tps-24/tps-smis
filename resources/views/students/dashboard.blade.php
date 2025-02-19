@@ -18,108 +18,71 @@
 @section('content')
 <div>
     <h3>Announcements</h3>
-    <p> 1. <i>Second Semister exams will start at 3rd March,2025.</i></p>
-    <h6>Anounced by <i class="primary" style="color: blue;">Staff Staff</i></h6>
+    <!-- <p> 1. <i>Second Semister exams will start at 3rd March,2025.</i></p>
+    <h6>Anounced by <i class="primary" style="color: blue;">Staff Staff</i></h6> -->
+
+    No new Announcements
 </div>
+<div class="card mb-4">
+    <div class="card-body back">
+        <div class="row gx-4">
+            <div class="col-10">
 
-<div class="row gx-4 mt-1">
-    <!-- Attendence starts -->
-    <div class="col-xxl-3 col-sm-6 col-12">
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="p-3  me-3">
-                        <img src="/tps-rms/resources/assets/images/attendance.png" style="height:50 !important; width:50"
-                            alt="attendence image" />
-                    </div>
-                    <div class="p3 d-flex flex-column">
-                        <p class="m-0 ">Not Attended</p>
-                        <h2 class="lh-1 opacity-50">0 days</h2>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between mt-1">
-                        <a class="text-primary ms-4" href="javascript:void(0);">
-                            <span>View</span>
-                        </a>
-                    </div>
+                <table class="table table-borderless">
+                    <tr>
+                        <td>Force Number: </td>
+                        <td>{{$user->student->force_number }}</td>
+                    </tr>
+                    <tr>
+                        <td>Full name: </td>
+                        <td>{{$user->student->first_name}} {{$user->student->middle_name}} {{$user->student->last_name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Rank: </td>
+                        <td>{{$user->student->rank}}</td>
+                    </tr>
+                    @if ($user->student->programme)
+                    <tr>
+                        <td>Programme: </td>
+                        <td>{{$user->student->programme->programmeName}}</td>
+                    </tr>
+                    @endif
+
+                </table>
+                <div style="margin-left: 5%;">
+                    <h5>Registered Courses: </h5>
+                    @if ($user->student->programme)
+                        <div class="table-responsive">
+                            <?php    $i = 0; ?>
+                            <table class="table table-striped truncate m-0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Credit</th>
+                                        <th>Department</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($user->student->programme->courses as $course)
+                                        <tr>
+                                            <td>{{++$i}}.</td>
+                                            <td>{{$course->courseCode}}</td>
+                                            <td>{{$course->courseName}}</td>
+                                            <td>{{$course->pivot->course_type}}</td>
+                                            <td>{{$course->pivot->credit_weight}}</td>
+                                            <td>{{$course->department->departmentName}}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 </div>
 
             </div>
-        </div>
-    </div>
 
-    <!-- Attendence  end. -->
-
-    <!-- Sick days starts -->
-    <div class="col-xxl-3 col-sm-6 col-12">
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="p-3  me-3">
-                        <img src="/tps-rms/resources/assets/images/bed.png" style="height:50 !important; width:50"
-                            alt="Sick image" />
-                    </div>
-                    <div class="p3 d-flex flex-column">
-                        <p class="m-0 ">Sick </p>
-                        <h2 class="lh-1 opacity-50">0 days</h2>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between mt-1">
-                        <a class="text-primary ms-4" href="javascript:void(0);">
-                            <span>View</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Sick days  end. -->
-
-    <!-- Leave days starts -->
-    <div class="col-xxl-3 col-sm-6 col-12">
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="p-3  me-3">
-                        <img src="/tps-rms/resources/assets/images/leave.png" style="height:50 !important; width:50"
-                            alt="Leave image" />
-                    </div>
-                    <div class="p3 d-flex flex-column">
-                        <p class="m-0 ">Leave </p>
-                        <h2 class="lh-1 opacity-50">2 days</h2>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between mt-1">
-                        <a class="text-primary ms-4" href="javascript:void(0);">
-                            <span>View</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Leave days  end. -->
-
-    <!-- MPS days starts -->
-    <div class="col-xxl-3 col-sm-6 col-12">
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="p-3  me-3">
-                        <img src="/tps-rms/resources/assets/images/prison.png" style="height:50 !important; width:50"
-                            alt="MPS image" />
-                    </div>
-                    <div class="p3 d-flex flex-column">
-                        <p class="m-0 ">MPS </p>
-                        <h2 class="lh-1 opacity-50">1 days</h2>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between mt-1">
-                        <a class="text-primary ms-4" href="javascript:void(0);">
-                            <span>View</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- MPS days  end. -->
-</div>
-@endsection
+            @endsection

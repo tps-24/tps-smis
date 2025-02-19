@@ -26,21 +26,21 @@ class BulkImportStudents implements ToCollection, ToModel
             $student->first_name = $row[1];
             $student->middle_name = $row[2];
             $student->last_name = $row[3];
-            $student->gender = $row[4];
+            $student->gender = $row[20] == "RC" ? "M" : "F";
             $student->phone = $row[5];
-            $student->dob = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[6]))->format('Y-m-d');
+           // $student->dob = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[6]))->format('Y-m-d');
             $student->nin = $row[7];
             $student->blood_group = $row[8];
             $student->home_region = $row[9];
             $student->company = $row[10];
             $student->platoon = $row[11];
             $student->education_level = $row[12];
-            $student->height = $row[13];
-            $student->weight = $row[14];
-            $student->next_kin_names = $row[15];
-            $student->next_kin_phone = $row[16];
-            $student->next_kin_relationship = $row[17];
-            $student->next_kin_address = $row[18];
+            // $student->height = $row[13];
+            // $student->weight = $row[14];
+            // $student->next_kin_names = $row[15];
+            // $student->next_kin_phone = $row[16];
+            // $student->next_kin_relationship = $row[17];
+            // $student->next_kin_address = $row[18];
                 $student->save();
         }
         

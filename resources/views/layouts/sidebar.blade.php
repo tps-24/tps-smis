@@ -3,7 +3,7 @@
 
 <!-- App brand starts -->
 <div class="app-brand p-3 my-2">
-  <a href="index.html">
+  <a href="#">
     <!-- <img src="resources/assets/images/logo.svg" class="logo" alt="Bootstrap Gallery" /> -->
   </a>
 </div>
@@ -13,12 +13,21 @@
 <!-- Sidebar menu starts -->
 <div class="sidebarMenuScroll">
   <ul class="sidebar-menu">
+    @if(auth()->user()->hasRole('Student'))
     <li>
-      <a href="/tps-rms">
+      <a href="{{ route('students.dashboard') }}">
         <i class="bi bi-bar-chart-line"></i>
         <span class="menu-text">Dashboard</span>
       </a>
     </li>
+    @else
+    <li>
+      <a href="/tps-smis">
+        <i class="bi bi-bar-chart-line"></i>
+        <span class="menu-text">Dashboard</span>
+      </a>
+    </li>
+    @endif
     @can('student-list')
     <li class="treeview">
       <a href="#!">
@@ -27,11 +36,13 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="/tps-rms/students">Student Details</a>
+          <a href="/tps-smis/students">Student Details</a>
         </li>
+        @can('student-create')
         <li>
-          <a href="/tps-rms/students/create">Student Registration</a>
+          <a href="/tps-smis/students/create">Student Registration</a>
         </li>
+        @endcan()
       </ul>
     </li>
     @endcan()
@@ -60,16 +71,16 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="/tps-rms/attendences/type/1">Morning</a>
+          <a href="/tps-smis/attendences/type/1">Morning</a>
         </li>
         <!-- <li>
-          <a href="/tps-rms/attendences/type/2">Master Parade</a>
+          <a href="/tps-smis/attendences/type/2">Master Parade</a>
         </li> -->
         <li>
-          <a href="/tps-rms/attendences/type/3">Night</a>
+          <a href="/tps-smis/attendences/type/3">Night</a>
         </li>
         <!-- <li>
-          <a href="/tps-rms/attendences/type/4">Flag</a>
+          <a href="/tps-smis/attendences/type/4">Flag</a>
         </li> -->
       </ul>
     </li>
@@ -83,35 +94,56 @@
       <ul class="treeview-menu">
         @can('programme-list')
         <li>
-          <a href="{{ route('programmes.index') }}">Programmes</a>
+          <a href="{{ route('programmes.index') }}">Programmes</a> <!-- For Academic Coord-->
         </li>
         @endcan()
         @can('course-list')
         <li>
-          <a href="{{ route('courses.index') }}">Courses</a>
+          <a href="{{ route('courses.index') }}">Courses</a>  <!-- For Academic Coord-->
         </li>
         @endcan()
         <li>
-          <a href="{{ route('courses.index') }}">My Courses</a>
+          <a href="#">My Courses</a>  <!-- For Teacher-->
         </li>
         <li>
-          <a href="{{ route('enrollments.index') }}">Optional Courses</a>
+          <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a>  <!-- For Teacher-->
         </li>
+        <li>
+          <a href="#">Semester Exam (SE)</a>  <!-- For Teacher-->
+        </li>
+        @can('optional-enrollment-list')
+        <li>
+          <a href="{{ route('enrollments.index') }}">Optional Courses</a> <!-- For Academic Coord -->
+        </li>
+        @endcan()
       </ul>
     </li>
     @endcan()
-    @can('coursework-list')
+    @can('student-courses')
+    <li>
+      <a href="{{ route('students.myCourses') }}">
+        <i class="bi bi-printer"></i>
+        <span class="menu-text">My Courses</span>
+      </a>
+    </li>
+    @endcan()
+    @can('student-coursework-list')
+    <li>
+      <a href="{{ route('students.coursework') }}">
+        <i class="bi bi-printer"></i>
+        <span class="menu-text">Coursework</span>
+      </a>
+    </li>
+    @endcan()
+    @can('coursework-config')
     <li class="treeview">
       <a href="#!">
         <i class="bi bi-stickies"></i>
-        <span class="menu-text">Course work</span>
+        <span class="menu-text">Coursework</span>
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">semester 1</a>
-        </li>
-        <li>
-          <a href="#">semester 2</a>
+          <a href="{{ route('course_works.index') }}">CA Configurations</a>  <!-- Add to academic tab -->
         </li>
       </ul>
     </li>
@@ -150,7 +182,7 @@
     @endcan()
     
     <li>
-      <a href="#">
+      <a href="{{ route('announcements.index') }}">
         <i class="bi bi-send"></i>
         <span class="menu-text">Announcements</span>
       </a>
@@ -203,7 +235,7 @@
 
     @can('mps-list')
     <li>
-      <a href="/tps-rms/mps">
+      <a href="/tps-smis/mps">
         <i class="bi bi-wallet2"></i>
         <span class="menu-text">MPS</span>
       </a>
@@ -217,16 +249,16 @@
     </li>
     @can('beat-list')
     <li class="treeview">
-      <a href="#!">
+      <a href="!#">
         <i class="bi bi-pie-chart"></i>
         <span class="menu-text">Guards &amp; Patrols</span>
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="#">Guards</a>
+          <a href="{{url('beats/companies/1')}}">Guards</a>
         </li>
         <li>
-          <a href="#">Patrol</a>
+          <a href="{{url('beats/companies/2')}}">Patrol</a>
         </li>
       </ul>
     </li>
@@ -264,6 +296,9 @@
       <ul class="treeview-menu">
         <li>
           <a href="#">General Settings</a>
+        </li>
+        <li>
+          <a href="{{ route('departments.index') }}">Department Settings</a>
         </li>
         <li>
           <a href="{{ route('semesters.index') }}">Semester Settings</a>

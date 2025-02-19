@@ -3,37 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Auth;
 
 class Student extends Model
 {
+    protected $casts = [
+        'next_of_kin' => 'array',
+    ];
+
     protected $fillable = [
-        'force_number',
-        'first_name',
-        'middle_name',
-        'last_name',
-        'gender',
-        'phone',
-        'nin',
-        'dob',
-        'home_region',
-        'company',
-        'platoon',
-        'education_level',
-        'blood_group',
-        'rank',
-        'height',
-        'weight',
-        'next_kin_names',
-        'next_kin_phone',
-        'next_kin_relationship',
-        'next_kin_address',
+        'force_number', 'rank', 'first_name', 'middle_name', 'last_name',
+        'user_id', 'vitengo_id', 'gender', 'blood_group', 'phone', 'nin', 
+        'dob', 'education_level', 'home_region', 'company', 'programme_id', 'session_programme_id',
+        'height', 'weight', 'platoon', 'next_kin_names', 'next_kin_phone', 
+        'next_kin_relationship', 'next_kin_address', 'next_of_kin', 'profile_complete', 'photo', 
+        'status', 'approved_at', 'rejected_at', 'reject_reason', 'approved_by', 
+        'rejected_by', 'transcript_printed', 'certificate_printed', 'printed_by', 
+        'reprint_reason'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
+    public function programme()
+    {
+        return $this->belongsTo(Programme::class);
+    }
 
     public function mps()
     {
@@ -46,21 +42,51 @@ class Student extends Model
 
     public function company()
     {
-        return $this->hasMany(Company::class, 'name', 'id');
+        return $this->hasOne(Company::class, 'name', 'id');
     }
+    public function get_company()
+    {
+        return $this->hasOne(Company::class, 'name', 'company');
+    }
+    // public function programme()
+    // {
+    //     return $this->hasOne(Programme::class, 'id', 'programme_id');
+    // }
 
     // public function platoon()
     // {
     //     //return $this->company()->merge($this->platoons());
-    // }
-    
-    // public function courses() 
-    // { 
-    //     return $this->belongsToMany(Course::class, 'enrollments'); 
     // }
 
     public function optionalCourseEnrollments()
     {
         return $this->hasMany(OptionalCourseEnrollment::class); //Optional enrollments
     }
+
+    public function optionalCourses()
+    {
+        return $this->optionalCourseEnrollments()->with('course')->get()->pluck('course');
+    }
+
+    public function courses()
+    {
+        $programmeCourses = $this->programme->courses()->get(); // Fixed here
+        $optionalCourses = $this->optionalCourses();
+        // return $programmeCourses->merge($optionalCourses);
+        return $programmeCourses;
+    }
+
+    public function approve()
+    {
+        $this->status = 'approved';
+        $this->approved_at = now();
+        $this->approved_by = Auth::user()->id;
+        $this->save();
+    }
+
+    // public function getPhotoUrlAttribute()
+    // {
+    //     return Storage::url($this->photo);
+    // }
+
 }

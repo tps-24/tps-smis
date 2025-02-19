@@ -22,14 +22,14 @@
       <!-- Auth container starts -->
       <div class="auth-container">
 
-        <div class="d-flex justify-content-center" style="margin-top:8%">
+        <div class="d-flex justify-content-center" style="margin-top:4%">
 
           <!-- Form starts -->
           <form method="POST" action="{{ route('login') }}">
             @csrf
             <!-- Logo starts -->
             <center>
-                <a href="/tps-rms" class="auth-logo mt-5 mb-3">
+                <a href="/tps-smis" class="auth-logo mt-5 mb-3">
                 <img src="resources/assets/images/logo.png" style="height:200 !important; width:200" alt="Police Logo" />
                 </a>
             </center>
@@ -62,7 +62,7 @@
                     <i class="bi bi-lock"></i>
                   </span>
                   <input type="password" id="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Enter password" required autocomplete="current-password">
-                  <button class="btn btn-outline-secondary" type="button">
+                  <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
                     <i class="bi bi-eye"></i>
                   </button>
                   @error('password')
@@ -82,11 +82,17 @@
                   <button type="submit" class="btn btn-primary">
                   {{ __('Login') }}
                   </button>
+                  
+                  <a href="/tps-smis/students/registration" class="btn btn-outline-dark">Not registered? Signup</a>
+                  @if (Route::has('password.request'))
+                      <!-- <a class="btn btn-link" href="{{ route('password.request') }}">
+                          {{ __('Forgot Your Password?') }}
+                      </a> -->
+                  @endif
 
-                  <!-- <a class="btn btn-link" href="{{ route('password.request') }}"> -->
-                  <a class="btn btn-link" href="/tps-rms/students/create">
+                  <!-- <a class="btn btn-link" href="/tps-rms/students/create">
                       {{ __('Register New Student') }}
-                  </a>
+                  </a> -->
               </div>
             </div>
             <!-- Authbox ends -->
@@ -102,6 +108,14 @@
     </div>
     <!-- Page wrapper ends -->
 
+  <!-- JavaScript for Password Toggle -->
+  <script>
+    function togglePassword(fieldId) {
+      const input = document.getElementById(fieldId);
+      const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+      input.setAttribute('type', type);
+    }
+  </script>
   </body>
 
 </html>

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'TPS-RMS'),
+    'name' => env('APP_NAME', 'TPS-SMIS'),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://192.168.16.208:8081/tps-rms'),
+    'url' => env('APP_URL', 'http://192.168.16.208/tps-smis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -122,5 +122,8 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+
+
 
 ];

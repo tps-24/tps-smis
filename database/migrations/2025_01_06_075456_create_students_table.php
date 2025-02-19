@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->string('force_number')->unique()->nullable();
-            $table->string('rank')->default("Recruit");
+            $table->string('rank');
             $table->string('first_name');
             $table->string('middle_name');
             $table->string('last_name');
@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('nin')->unique();
             $table->string('dob');
-            $table->string('education_level');
-            $table->string('home_region');
+            $table->string('education_level')->nullable();
+            $table->string('home_region')->nullable();
             $table->string('company')->nullable();
             $table->string('photo')->nullable();
             $table->double('height')->nullable();
@@ -36,9 +36,10 @@ return new class extends Migration
             $table->string('next_kin_phone')->nullable();
             $table->string('next_kin_relationship')->nullable();
             $table->string('next_kin_address')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onupdate('update')->ondelete('null');
-            $table->foreign('vitengo_id')->references('id')->on('vitengos')->onupdate('update')->ondelete('null');
-            $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('set null');
+            $table->foreign('vitengo_id')->references('id')->on('vitengos')->onUpdate('cascade')->onDelete('set null');
+            $table->timestamp('created_at')->useCurrent()->nullable(false);
+            $table->timestamp('updated_at')->nullable(true)->useCurrentOnUpdate();
         });
     }
 

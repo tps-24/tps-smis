@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 
 class CampusController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('permission:campus-create')->only(['create', 'store']);
-    //     $this->middleware('permission:campus-list')->only(['index', 'show']);
-    //     $this->middleware('permission:campus-update')->only(['edit', 'update']);
-    //     $this->middleware('permission:campus-delete')->only(['destroy']);
-    // }
+    public function __construct()
+    {
+        $this->middleware('permission:campus-create')->only(['create', 'store']);
+        $this->middleware('permission:campus-list')->only(['index', 'show']);
+        $this->middleware('permission:campus-edit')->only(['edit', 'update']);
+        $this->middleware('permission:campus-delete')->only(['destroy']);
+    }
     
     /**
      * Display a listing of the resource.
@@ -85,9 +85,9 @@ class CampusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Campus $campus): RedirectResponse
+    public function destroy(Campus $campus)
     {
-        $course->delete();
+        $campus->delete();
     
         return redirect()->route('campuses.index')
                         ->with('success','Campus deleted successfully');

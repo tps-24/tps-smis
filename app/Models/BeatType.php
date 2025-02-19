@@ -10,4 +10,12 @@ class BeatType extends Model
         "name",
         "description"
     ];
+
+    public function area(){
+        return $this->hasMany(Area::class);
+    }
+
+    public function beats(){
+        return $this->hasMany(Beat::class,'beatType_id', 'id');
+    }
 }

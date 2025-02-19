@@ -22,4 +22,9 @@ class SessionProgramme extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function programmeCourseSemesters()
+    {
+        return $this->hasMany(ProgrammeCourseSemester::class);
+    }
 }

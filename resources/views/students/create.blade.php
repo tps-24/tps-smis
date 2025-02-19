@@ -44,8 +44,7 @@
                         <label class="form-label" for="abc4">Rank</label>
                         <select class="form-select" id="abc4" name="rank" required
                             aria-label="Default select example">
-                            <!-- <option selected="">select gender</option> -->
-                            <option value="Recruit">Recruit</option>
+z                            <option value="Recruit">Recruit</option>
                             <option value="Copral">Copral</option>
                             <option value="Sergent">Copral</option>
                         </select>

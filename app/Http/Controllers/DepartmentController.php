@@ -7,13 +7,21 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:department-create')->only(['create', 'store']);
+        $this->middleware('permission:department-list')->only(['index', 'show']);
+        $this->middleware('permission:department-edit')->only(['edit', 'update']);
+        $this->middleware('permission:department-delete')->only(['destroy']);
+    }
     
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $departments = Department::get();
+        return view('settings.departments.index',compact('departments'));
     }
 
     /**
@@ -21,7 +29,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        //
+        return view('settings.departments.create');
     }
 
     /**
@@ -29,7 +37,17 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request);
+        $this->validate($request, [
+            'departmentName' => 'required|unique:departments,departmentName',
+            'description' => 'required',
+        ]);
+
+        // If validation passes, you can proceed with storing the data
+        Department::create($request->all());
+    
+        return redirect()->route('departments.index')
+                        ->with('success','Department added successfully');
     }
 
     /**
@@ -37,7 +55,7 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
-        //
+        return view('settings.departments.show',compact('department'));
     }
 
     /**
@@ -45,7 +63,7 @@ class DepartmentController extends Controller
      */
     public function edit(Department $department)
     {
-        //
+        return view('settings.departments.edit',compact('department'));
     }
 
     /**
@@ -53,14 +71,26 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        //
+        request()->validate([
+            'departmentName' => 'required|unique:departments,departmentName,'.$department->id,
+            'description' => 'required',
+            'is_active' => 'required',
+        ]);
+   
+       $department->update($request->all());
+   
+       return redirect()->route('departments.index')
+                       ->with('success','Department updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Department $department)
+    public function destroy(Department $department): RedirectResponse
     {
-        //
+        $department->delete();
+    
+        return redirect()->route('departments.index')
+                        ->with('success','Department deleted successfully');
     }
 }

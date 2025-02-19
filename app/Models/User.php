@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable
 {
@@ -53,9 +54,18 @@ class User extends Authenticatable
         return $this->hasOne(Student::class,'user_id','id');
     }
 
+    public function staff(){
+        return $this->hasOne(Staff::class,'user_id','id');
+    }
+
     public function sessionProgramme() 
     { 
         return $this->belongsTo(SessionProgramme::class); 
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 
 }
