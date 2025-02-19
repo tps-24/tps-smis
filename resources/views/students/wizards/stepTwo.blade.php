@@ -103,17 +103,17 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc4">Company</label>
-                        <select class="form-select" name="company" id="abc4" required
+                        <select class="form-select" name="company_id" id="abc4" required
                             aria-label="Default select example">
                             
                             <option selected disabled >select company</option>
-                            <option @if(isset($student) && $student->company == "HQ") selected @endif value="HQ">HQ</option>
-                            <option @if(isset($student) && $student->company == "A") selected @endif value="A">A</option>
-                            <option @if(isset($student) && $student->company == "B") selected @endif value="B">B</option>
-                            <option @if(isset($student) && $student->company == "C") selected @endif value="C">C</option>
+                            @foreach ($companies as $company)
+                            <option @if(isset($student) && $student->company == $company->id) selected @endif value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+
                         </select>
                     </div>
-                    @error('company')
+                    @error('company_id')
                         <div class="error">{{ $message }}</div>
                     @enderror
                 </div>

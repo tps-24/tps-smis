@@ -35,7 +35,8 @@ class MPSController extends Controller
      */
     public function create()
     {
-        return view('mps.search');
+        $companies = Company::all();
+        return view('mps.search', compact('companies'));
     }
 
     /**
@@ -132,7 +133,8 @@ class MPSController extends Controller
 
     public function search(Request $request)
     {
-        $students = Student::where('platoon', $request->platoon)->where('company', $request->company);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        $companies = Company::all();
+        $students = Student::where('platoon', $request->platoon)->where('company_id', $request->company_id);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
         if ($request->name) {
             $students = $students->where(function ($query) use ($request) {
                 $query->where('first_name', 'like', '%' . $request->name . '%')
@@ -141,7 +143,7 @@ class MPSController extends Controller
             });
         }
         $students = $students->get();
-        return view('mps.search', compact('students'));
+        return view('mps.search', compact('students', 'companies'));
         //return redirect()->back()->with('student',$student);
     }
 

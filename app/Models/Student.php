@@ -14,7 +14,7 @@ class Student extends Model
     protected $fillable = [
         'force_number', 'rank', 'first_name', 'middle_name', 'last_name',
         'user_id', 'vitengo_id', 'gender', 'blood_group', 'phone', 'nin', 
-        'dob', 'education_level', 'home_region', 'company', 'programme_id', 'session_programme_id',
+        'dob', 'education_level', 'home_region', 'company_id', 'programme_id', 'session_programme_id',
         'height', 'weight', 'platoon', 'next_kin_names', 'next_kin_phone', 
         'next_kin_relationship', 'next_kin_address', 'next_of_kin', 'profile_complete', 'photo', 
         'status', 'approved_at', 'rejected_at', 'reject_reason', 'approved_by', 
@@ -42,7 +42,7 @@ class Student extends Model
 
     public function company()
     {
-        return $this->hasOne(Company::class, 'name', 'id');
+        return $this->hasOne(Company::class, 'id', 'company_id');
     }
     public function get_company()
     {
@@ -82,6 +82,12 @@ class Student extends Model
         $this->approved_at = now();
         $this->approved_by = Auth::user()->id;
         $this->save();
+    }
+
+    public function beats()
+    {
+        return $this->belongsToMany(Beat::class, 'student_beat', 'student_id', 'beat_id')
+                    ->withTimestamps();
     }
 
     // public function getPhotoUrlAttribute()

@@ -22,18 +22,17 @@ class AttendenceController extends Controller
     public function __construct()
     {
 
-        $this->middleware('permission:attendance-list|attendance-create|attendance-edit|attendance-delete', ['only' => ['index', 'today', 'attendence']]);
+
+        $this->middleware('permission:attendance-list|attendance-create|attendance-edit|attendance-delete', ['only' => ['index', 'today','attendence']]);
         $this->middleware('permission:attendance-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:attendance-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:attendance-delete', ['only' => ['destroy']]);
+
 
     }
     /**
-     * Display a listing of the resource.
      */
     public function index()
     {
-
         return $this->attendence(1);
     }
 
@@ -45,11 +44,11 @@ class AttendenceController extends Controller
         $attendenceType = AttendenceType::find($attendenceType_id);
         $platoon = Platoon::where('platoons.name', $request->platoon)
             ->leftJoin('companies', 'companies.id', 'platoons.company_id')
-            ->where('companies.name', $request->company)
+            //->where('companies.name', $request->company)
             ->select('platoons.*')->get()[0];
 
 
-        $students = Student::where('company', $request->company)->where('platoon', $request->platoon)->get();
+        $students = Student::where('company_id', $request->company_id)->where('platoon', $request->platoon)->get();
         //$platoon_id = $platoon->id;
         return view(
             'attendences/create',
@@ -363,7 +362,7 @@ class AttendenceController extends Controller
         ;
         $present = count($ids);
         $platoon = Platoon::find($platoon_id);
-        $students = Student::where('company', $platoon->company->name)->where('platoon', $platoon->id)->pluck('id')->toArray();
+        $students = Student::where('company_id', $platoon->company->id)->where('platoon', $platoon->id)->pluck('id')->toArray();
         $absent_ids = array_values(array_diff($students, $ids));
         $total = count($students);
         $todayRecords = Attendence::leftJoin('platoons', 'attendences.platoon_id', 'platoons.id')

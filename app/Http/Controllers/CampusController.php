@@ -85,7 +85,7 @@ class CampusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Campus $campus)
+    public function destroy(Campus $campus): RedirectResponse
     {
         $campus->delete();
     

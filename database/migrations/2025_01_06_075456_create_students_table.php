@@ -27,15 +27,13 @@ return new class extends Migration
             $table->string('dob');
             $table->string('education_level')->nullable();
             $table->string('home_region')->nullable();
-            $table->string('company')->nullable();
+            $table->foreignId('company_id')->constrained('companies'); 
             $table->string('photo')->nullable();
             $table->double('height')->nullable();
             $table->double('weight')->nullable();
             $table->char('platoon')->nullable();
-            $table->string('next_kin_names')->nullable();
-            $table->string('next_kin_phone')->nullable();
-            $table->string('next_kin_relationship')->nullable();
-            $table->string('next_kin_address')->nullable();
+            $table->integer('beat_status')->default(0);
+            $table->integer('beat_round')->default(0);
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('set null');
             $table->foreign('vitengo_id')->references('id')->on('vitengos')->onUpdate('cascade')->onDelete('set null');
             $table->timestamp('created_at')->useCurrent()->nullable(false);

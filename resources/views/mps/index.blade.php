@@ -118,7 +118,7 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <h5>Name: {{ $student->student->first_name }} {{ $student->student->last_name }}</h5>
-                                                    <h5>Company: {{ $student->student->company }} - {{ $student->student->platoon }}</h5>
+                                                    <h5>Company: {{ $student->student->company->name }} - {{ $student->student->platoon }}</h5>
                                                    <h5>Description</h5> <p>{{$student->description}}</p>
                                                 </div>
                                             </div>
