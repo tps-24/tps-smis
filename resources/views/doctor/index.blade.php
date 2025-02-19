@@ -27,24 +27,24 @@
 
             @if($patients->isNotEmpty())
                 <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Company</th>
-                                <th>Platoon</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($patients as $patient)
-                                @if($patient->status === 'approved') <!-- Display only approved patients -->
-                                    <tr>
-                                        <td>{{ $patient->first_name }}</td>
-                                        <td>{{ $patient->last_name }}</td>
-                                        <td>{{ $patient->company }}</td>
-                                        <td>{{ $patient->platoon }}</td>
+                <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Platoon</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($patients as $patient)
+            <tr>
+            <td>{{ $patient->student->first_name ?? '-' }}</td>
+<td>{{ $patient->student->last_name ?? '-' }}</td>
+
+                <!-- <td>{{ $patient->student->platoon }}</td> -->
+                <td>{{ $patient->platoon }}</td>
+                <td>{{ $patient->status }}</td>
                                         <td>
                                             <!-- Button to trigger modal -->
                                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#patientModal{{ $patient->id }}">
@@ -63,31 +63,33 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <form action="{{ route('patients.saveDetails') }}" method="POST">
-                                                                @csrf
-                                                                <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+                                                            @csrf
+    <input type="hidden" name="student_id" value="{{ $patient->id }}">
 
-                                                                <div class="mb-3">
-                                                                    <label for="excuseType{{ $patient->id }}" class="form-label">Excuse Type</label>
-                                                                    <input type="text" id="excuseType{{ $patient->id }}" class="form-control" name="excuse_type" required>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label for="restDays{{ $patient->id }}" class="form-label">Days of Rest</label>
-                                                                    <input type="number" id="restDays{{ $patient->id }}" class="form-control" name="rest_days" min="1" required>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label for="doctorComment{{ $patient->id }}" class="form-label">Doctor's Comment</label>
-                                                                    <textarea id="doctorComment{{ $patient->id }}" class="form-control" name="doctor_comment" rows="3" required></textarea>
-                                                                </div>
+    <div class="mb-3">
+        <label class="form-label">Excuse Type</label>
+        <input type="text" class="form-control" name="excuse_type" required>
+    </div>
 
-                                                                <button type="submit" class="btn btn-primary">Save</button>
-                                                            </form>
+    <div class="mb-3">
+        <label class="form-label">Days of Rest</label>
+        <input type="number" class="form-control" name="rest_days" min="1" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Doctor's Comment</label>
+        <textarea class="form-control" name="doctor_comment" rows="3" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
-                                @endif
+                                
                             @endforeach
                         </tbody>
                     </table>

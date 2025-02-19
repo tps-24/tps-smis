@@ -1,5 +1,4 @@
-<?php
-
+<?php 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,13 +8,5 @@ class Timetable extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'company',
-        'day',
-        'venue',
-        'subject',
-        'teacher',
-        'start_time',
-        'end_time',
-    ];
+    protected $fillable = ['company', 'day', 'time_slot', 'activity', 'venue', 'instructor'];
 }

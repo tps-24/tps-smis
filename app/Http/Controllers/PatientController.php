@@ -4,135 +4,157 @@ namespace App\Http\Controllers;
 
 use App\Models\Patient;
 use App\Models\Student;
+use App\Models\Company;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class PatientController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:hospital-create')->only(['save', 'sendToReceptionist','index']);
-        $this->middleware('permission:hospital-list')->only(['doctorIndex', 'receptionistIndex']);
-        $this->middleware('permission:hospital-approve')->only(['receptionistIndex', 'receptionistPage', 'approvePatient']);
-        $this->middleware('permission:hospital-update')->only(['saveDetails', 'doctorPage']);
-        $this->middleware('permission:student-list')->only(['index']);
+        $this->middleware('permission:hospital-create')->only([
+            'save',
+            'sendToReceptionist'
+        ]);
+
+        $this->middleware('permission:hospital-list')->only([
+            'index',
+            'doctorPage'
+        ]);
+
+        $this->middleware('permission:hospital-approve')->only([
+            'receptionistIndex',
+            'approvePatient'
+        ]);
+
+        $this->middleware('permission:hospital-update')->only([
+            'saveDetails',
+            'doctorPage'
+        ]);
+
+        $this->middleware('permission:student-list')->only([
+            'index'
+        ]);
     }
-
-
+    
     public function index(Request $request)
     {
-        $patients = collect(); // Empty collection by default
-        $message = 'Please enter the required criteria to find patient details.'; // Default message
-
-        // Check if there is a search query
+        $sirMajor = Auth::user();
+    
+        // Ensure Sir Major only sees their company's data
+        $patients = collect();
+        $message = 'Please enter the required criteria to find patient details.';
+    
         if ($request->has('company') || $request->has('platoon') || $request->has('fullname')) {
-            $query = Student::query();
+            $query = Patient::with('student') // ✅ Ensure we load the student relationship
+            ->whereHas('student', function ($q) use ($sirMajor) {
+                $q->where('company', $sirMajor->company);
+            });
 
-            // Apply filters from the request
-            if ($request->filled('company')) {
-                $query->where('company', $request->input('company'));
-            }
-
-            if ($request->filled('platoon')) {
-                $query->where('platoon', $request->input('platoon'));
-            }
-
-            if ($request->filled('fullname')) {
-                $names = explode(' ', $request->input('fullname'));
-                $query->where(function ($subQuery) use ($names) {
-                    foreach ($names as $name) {
-                        $subQuery->orWhere('first_name', 'LIKE', '%' . $name . '%')
-                                 ->orWhere('middle_name', 'LIKE', '%' . $name . '%')
-                                 ->orWhere('last_name', 'LIKE', '%' . $name . '%');
-                    }
-                });
-            }
-
-            // Execute query and fetch results
-            $patients = $query->orderBy('first_name', 'asc')->get();
-
-            // Update message if no patients found
-            if ($patients->isEmpty()) {
-                $message = 'No students found with the given criteria.';
-            } else {
-                $message = ''; // Clear the message if results are found
-            }
+            
+        if ($request->filled('company')) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('company', $request->input('company'));
+            });
         }
 
-        return view('hospital.index', compact('patients', 'message'));
+        if ($request->filled('platoon')) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('platoon', $request->input('platoon'));
+            });
+        }
+
+        if ($request->filled('fullname')) {
+            $names = explode(' ', $request->input('fullname'));
+            $query->whereHas('student', function ($subQuery) use ($names) {
+                foreach ($names as $name) {
+                    $subQuery->where(function ($q) use ($name) {
+                        $q->orWhere('first_name', 'LIKE', '%' . $name . '%')
+                          ->orWhere('middle_name', 'LIKE', '%' . $name . '%')
+                          ->orWhere('last_name', 'LIKE', '%' . $name . '%');
+                    });
+                }
+            });
+        }
+
+            // ✅ Order by first name in ascending order
+         $patients = $query->orderBy(Student::select('first_name')
+            ->whereColumn('students.id', 'patients.student_id'))->get();   
+             
+         $message = $patients->isEmpty() ? 'No students found with the given criteria.' : '';
     }
+    
 
-    public function save(Request $request)
-    {
-        $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'excuse_type' => 'required|string',
-            'rest_days' => 'required|integer|min:1',
-            'doctor_comment' => 'required|string',
-        ]);
+    // ✅ Statistics for Sir Major (Filtered by their company)
+    $today = Carbon::today();
+    $thisWeek = Carbon::now()->startOfWeek();
 
-        // Retrieve the student's details
-        $student = Student::findOrFail($request->student_id);
+    $thisMonth = Carbon::now()->startOfMonth();
+    $thisYear = Carbon::now()->startOfYear();
 
-        // Create or update the patient record
-        Patient::create([
-            'student_id' => $student->id,
-            'excuse_type' => $request->excuse_type,
-            'rest_days' => $request->rest_days,
-            'doctor_comment' => $request->doctor_comment,
-            'first_name' => $student->first_name,
-            'middle_name' => $student->middle_name,
-            'last_name' => $student->last_name,
-        ]);
+    $dailyCount = Patient::where('company', $sirMajor->company)
+                        ->whereDate('created_at', $today)
+                        ->count();
 
-        return redirect()->route('hospital.index')->with('success', 'Patient details saved successfully!');
-    }
+    $weeklyCount = Patient::where('company', $sirMajor->company)
+                        ->whereBetween('created_at', [$thisWeek, Carbon::now()])
+                        ->count();
+
+    $monthlyCount = Patient::where('company', $sirMajor->company)
+                        ->whereBetween('created_at', [$thisMonth, Carbon::now()])
+                        ->count();
+
+    // // ✅ Get Doctor's details for each student
+    // $doctorDetails = Patient::where('company', $sirMajor->company)
+    //                     ->whereNotNull('excuse_type') // Only patients with doctor input
+    //                     ->orderBy('created_at', 'desc')
+    //                     ->get(['first_name', 'last_name', 'excuse_type', 'rest_days', 'created_at']);
 
 
-//     public function approve($id)
-// {
-//     $patient = Patient::findOrFail($id);
-//     $patient->update(['is_approved' => true]);
 
-//     return back()->with('success', 'Patient details sent to the receptionist for approval.');
+
+     // ✅ Fix the error by selecting student details from the relationship
+     $doctorDetails = Patient::with('student:id,first_name,last_name') // Load only required student fields
+     ->where('company', $sirMajor->company)
+     ->whereNotNull('excuse_type') // Only patients with doctor input
+     ->orderBy('created_at', 'desc')
+     ->get();
+     return view('hospital.index', compact('patients', 'message', 'dailyCount', 'weeklyCount', 'monthlyCount', 'doctorDetails'));
+
+// // ✅ Update view to use `student->first_name` instead of `first_name`
+// return view('hospital.index', compact('patients', 'message', 'doctorDetails'));
 // }
-
-public function receptionistIndex()
-{
-    $patients = Patient::where('status', 'pending')->get();
-
-    return view('receptionist.index', compact('patients'));
 }
 
-// public function approve($id)
-// {
-//     $patient = Patient::findOrFail($id);
-//     $patient->update(['status' => 'approved']);
-
-//     return redirect()->route('receptionist.index')->with('success', 'Patient details sent to the doctor.');
-// }
-
-public function doctorIndex()
+public function show($id)
 {
-    $patients = Patient::where('status', 'approved')->get();
+    // Fetch patient details from the database
+    $patient = Patient::findOrFail($id);
 
-    return view('doctor.index', compact('patients'));
+    // Pass the patient data to the view
+    return view('hospital.show', compact('patient'));
 }
-
+    
 public function sendToReceptionist(Request $request)
 {
+    $user = auth()->user();
+    
+    // Validate input
     $request->validate([
         'student_id' => 'required|exists:students,id',
     ]);
 
-    // Retrieve the student data
-    $student = Student::findOrFail($request->student_id);
+    // Find the student
+    $student = Student::where('id', $request->student_id)
+                      ->where('company', $user->company) // Ensure same company
+                      ->firstOrFail();
 
-    // Insert or update the patient record
-    $patient = Patient::updateOrCreate(
+    // Store patient details
+    Patient::updateOrCreate(
         ['student_id' => $student->id],
         [
-            'first_name' => $student->first_name,
-            'last_name' => $student->last_name,
+            'student_id' => $student->id, // Store student_id instead of names
             'company' => $student->company,
             'platoon' => $student->platoon,
             'status' => 'pending',
@@ -142,48 +164,132 @@ public function sendToReceptionist(Request $request)
     return redirect()->route('hospital.index')->with('success', 'Details sent to receptionist for approval.');
 }
 
-public function receptionistPage()
+
+
+
+
+public function receptionistIndex()
 {
-    $patients = Patient::where('status', 'pending')->get(); // Only fetch patients with 'pending' status
+    // Ensure only users with the "Receptionist" role can access
+    if (!auth()->user()->hasRole('Receptionist')) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    // Fetch only patients who are pending approval
+    $patients = Patient::where('status', 'pending')
+                ->with('student') // Load the related student details
+                ->get();
+
     return view('receptionist.index', compact('patients'));
 }
 
-
-
 public function approvePatient(Request $request, $id)
 {
+    // Find the patient by ID
     $patient = Patient::findOrFail($id);
-    $patient->status = 'approved'; // Mark as approved
+
+    // Update the patient's status to 'approved'
+    $patient->status = 'approved';
     $patient->save();
 
     return redirect()->route('receptionist.index')->with('success', 'Patient approved and forwarded to the doctor.');
 }
 
-public function saveDetails(Request $request)
+public function receptionistPage()
 {
-    $request->validate([
-        'patient_id' => 'required|exists:patients,id',
-        'excuse_type' => 'required|string',
-        'rest_days' => 'required|integer|min:1',
-        'doctor_comment' => 'required|string',
-    ]);
+    // Fetch patients that need approval by the receptionist
+    $patients = Patient::where('status', 'pending')->get();
 
-    $patient = Patient::findOrFail($request->patient_id);
-    $patient->excuse_type = $request->excuse_type;
-    $patient->rest_days = $request->rest_days;
-    $patient->doctor_comment = $request->doctor_comment;
-    $patient->status = 'treated'; // Update status to treated after doctor's input (CCP Dispensary)
-    $patient->save();
-
-    return redirect()->route('doctor.page')->with('success', 'Patient details saved successfully.');
+    // Return the receptionist view
+    return view('receptionist.index', compact('patients'));
 }
 
 
 public function doctorPage()
 {
-    $patients = Patient::where('status', 'approved')->get(); // Fetch approved patients
+    if (!auth()->user()->hasRole('Doctor')) {
+        abort(403, 'You do not have access to this page.');
+    }
+
+    // Fetch approved patients and include related student details
+    $patients = Patient::where('status', 'approved')
+                ->with('student:id,first_name,last_name') // Load only required fields
+                ->get();
+
     return view('doctor.index', compact('patients'));
+
+    
 }
 
+
+
+
+
+public function saveDetails(Request $request)
+{
+    $request->validate([
+        'student_id' => 'required|exists:patients,id',
+        'excuse_type' => 'required|string|max:255',
+        'rest_days' => 'required|integer|min:1',
+        'doctor_comment' => 'required|string'
+    ]);
+
+    $patient = Patient::findOrFail($request->student_id);
+    
+    // Save doctor's input
+    $patient->update([
+        'excuse_type' => $request->excuse_type,
+        'rest_days' => $request->rest_days,
+        'doctor_comment' => $request->doctor_comment,
+        'status' => 'treated', // Mark as treated
+    ]);
+
+    return redirect()->route('doctor.page')->with('success', 'Patient details saved successfully.');
+}
+
+
+public function sirMajorStatistics()
+{
+    $company = auth()->user()->company; // Ensure Sir Major only sees their company's data
+
+    $patients = Patient::where('company', $company)
+        ->whereNotNull('excuse_type') // Ensure only patients with doctor inputs are retrieved
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('sirmajor.statistics', compact('patients'));
+}
+
+public function viewDetails(Request $request, $timeframe)
+{
+    $sirMajor = Auth::user();
+
+    if (!$sirMajor) {
+        return redirect()->route('login')->with('error', 'Please log in first.');
+    }
+
+    if (!in_array($timeframe, ['daily', 'weekly', 'monthly'])) {
+        abort(404, 'Invalid timeframe');
+    }
+
+    $query = Patient::where('company', $sirMajor->company)
+                    ->whereYear('created_at', now()->year); // Ensure only current year data is fetched
+
+    switch ($timeframe) {
+        case 'daily':
+            $query->whereDate('created_at', now());
+            break;
+        case 'weekly':
+            $query->whereBetween('created_at', [now()->startOfWeek(), now()]);
+            break;
+        case 'monthly':
+            $query->whereBetween('created_at', [now()->startOfMonth(), now()]);
+            break;
+    }
+
+    $patients = $query->get();
+
+    return view('hospital.viewDetails', compact('patients', 'timeframe'));
+}
 
 }

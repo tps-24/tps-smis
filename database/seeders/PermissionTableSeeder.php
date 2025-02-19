@@ -124,7 +124,8 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'campus-create', 'description' => 'Create new campus'], 
             ['name' => 'campus-edit', 'description' => 'Edit existing campus'], 
             ['name' => 'campus-delete', 'description' => 'Delete campus'],        
-            ['name' => 'hospital-approve', 'description' => 'Approve sick students'],        
+            ['name' => 'hospital-approve', 'description' => 'Approve sick students'],
+            ['name' => 'hospital-update', 'description' =>' Updating hospital records'],        
             // Add other permissions here with descriptions 
             ]; 
 

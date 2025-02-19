@@ -161,27 +161,53 @@
         <span class="menu-text">Download Center</span>
       </a>
     </li>
-    <!-- <li>
-      <a href="">
-        <i class="bi bi-calendar2"></i>
-        <span class="menu-text">Timetable</span>
-      </a>
-    </li> -->
-    @can('hospital-list')
+     <li>
+            <a href="{{ route('timetable.index') }}">
+                <i class="bi bi-calendar2"></i>
+                <span class="menu-text">Timetable</span>
+            </a>
+        </li> 
+
+        
+    
+    @role('Sir Major')
+    @if(auth()->user()->company) 
+        <li>
+            <a href="{{ route('hospital.index') }}">
+                <i class="bi bi-hospital"></i>
+                <span class="menu-text">Hospital</span>
+            </a>
+        </li>
+    @endif
+@endrole
+
+@role('Receptionist')
     <li>
-      <a href="{{ route('hospital.index') }}">
-        <i class="bi bi-calendar2"></i>
-        <span class="menu-text">Hospital</span>
-      </a>
+        <a href="{{ route('receptionist.index') }}">
+            <i class="bi bi-person-lines-fill"></i>
+            <span class="menu-text">Receptionist Panel</span>
+        </a>
     </li>
-    @endcan()
+@endrole
+
+
+@role('Doctor')
+    <li>
+        <a href="{{ route('doctor.page') }}">
+            <i class="bi bi-stethoscope"></i>
+            <span class="menu-text">Doctor Panel</span>
+        </a>
+    </li>
+@endrole
+
+
     @can('mps-list')
     <li>
       <a href="/tps-rms/mps">
         <i class="bi bi-wallet2"></i>
         <span class="menu-text">MPS</span>
       </a>
-    </li>
+
     @endcan()
     <li>
       <a href="#">
