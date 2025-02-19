@@ -27,24 +27,24 @@
 
             @if($patients->isNotEmpty())
                 <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Company</th>
-                                <th>Platoon</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($patients as $patient)
-                                @if($patient->status === 'approved') <!-- Display only approved patients -->
-                                    <tr>
-                                        <td>{{ $patient->first_name }}</td>
-                                        <td>{{ $patient->last_name }}</td>
-                                        <td>{{ $patient->company }}</td>
-                                        <td>{{ $patient->platoon }}</td>
+                <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Platoon</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($patients as $patient)
+            <tr>
+            <td>{{ $patient->student->first_name ?? '-' }}</td>
+<td>{{ $patient->student->last_name ?? '-' }}</td>
+
+                <!-- <td>{{ $patient->student->platoon }}</td> -->
+                <td>{{ $patient->platoon }}</td>
+                <td>{{ $patient->status }}</td>
                                         <td>
                                             <!-- Button to trigger modal -->
                                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#patientModal{{ $patient->id }}">
@@ -63,6 +63,7 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <form action="{{ route('patients.saveDetails') }}" method="POST">
+<<<<<<< HEAD
                                                                 @csrf
                                                                 <input type="hidden" name="patient_id" value="{{ $patient->id }}">
 
@@ -81,13 +82,39 @@
 
                                                                 <button type="submit" class="btn btn-primary">Save</button>
                                                             </form>
+=======
+                                                            @csrf
+    <input type="hidden" name="student_id" value="{{ $patient->id }}">
+
+    <div class="mb-3">
+        <label class="form-label">Excuse Type</label>
+        <input type="text" class="form-control" name="excuse_type" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Days of Rest</label>
+        <input type="number" class="form-control" name="rest_days" min="1" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Doctor's Comment</label>
+        <textarea class="form-control" name="doctor_comment" rows="3" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
+<<<<<<< HEAD
                                 @endif
+=======
+                                
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
                             @endforeach
                         </tbody>
                     </table>

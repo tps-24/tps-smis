@@ -28,7 +28,8 @@ class StudentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view','search']]);
+        $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view', 'search']]);
+        $this->middleware('permission:student-create', ['only' => ['create', 'store']]);
         $this->middleware('permission:student-create', ['only' => ['create', 'store', 'createStepOne', 'postStepOne', 'createStepTwo', 'postStepTwo', 'createStepThree', 'postStepThree', 'import']]);
         $this->middleware('permission:student-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:student-delete', ['only' => ['destroy']]);
@@ -46,7 +47,6 @@ class StudentController extends Controller
         $page_name = "Student Management";
         return view('students.index', compact('students', 'page_name'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
-        
     }
 
     public function search(Request $request)
@@ -62,8 +62,23 @@ class StudentController extends Controller
                     ->orderBy('first_name')
                     ->latest()->paginate(90);
         return view('students.index', compact('students'))
+            ->with('i', ($request->input('page', 1) - 1) * 90)
+            ->where('company', $request->company)
+            ->where('platoon', $request->platoon);
+
+        if ($request->name) {
+            $students = $students->where(function ($query) use ($request) {
+                $query->where('first_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('middle_name', 'like', '%' . $request->name . '%');
+            });
+        }
+
+        $students = $students->orderBy('first_name')
+            ->latest()->paginate(90);
+        return view('students.index', compact('students'))
             ->with('i', ($request->input('page', 1) - 1) * 90);
-        
+
     }
 
     /**
@@ -130,6 +145,7 @@ class StudentController extends Controller
     }
 
     
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -155,6 +171,11 @@ class StudentController extends Controller
         $fullName = $request->first_name. ' ' . $request->middle_name. ' ' . $request->last_name;
     
 
+        $input = $request->all();
+        $password = Hash::make($input['password']);
+        $fullName = $request->first_name . ' ' . $request->middle_name . ' ' . $request->last_name;
+
+
         //Create User First
         $user = User::create([
             'name' => $fullName,
@@ -167,6 +188,7 @@ class StudentController extends Controller
 
         $input['user_id'] = $user->id;
         
+
         // dd($input);
         //Now Create Student
         $student = new Student([
@@ -182,6 +204,8 @@ class StudentController extends Controller
             'email' => $request->input('email'),
             'gender' => $request->input('gender'),
             'user_id' =>  $user->id,
+            'user_id' => $user->id,
+            'password' => Hash::make($request->input('password')),
         ]);
 
         $student->save();
@@ -203,6 +227,10 @@ class StudentController extends Controller
         // $role = auth()->user()->role;
         // dd($courses);
         
+
+        // $role = auth()->user()->role;
+        // dd($courses);
+
         return view('students.mycourse', compact('courses'));
     }
 
@@ -521,6 +549,12 @@ class StudentController extends Controller
             'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'middle_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'home_region' => 'nullable|string|min:4',
+            'rank' => 'required',
+            'education_level' => 'required',
+            'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
+            'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
+            'middle_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
+            'home_region' => 'required|string|min:4',
         ]);
         $companies = Company::all();
         if (empty($request->session()->get('student'))) {
@@ -534,6 +568,8 @@ class StudentController extends Controller
             $student['force_number'] = $validatedData['force_number'];
             //$student['rank'] = $validatedData['rank'];
             //$student['education_level'] = $validatedData['education_level'];
+            $student['rank'] = $validatedData['rank'];
+            $student['education_level'] = $validatedData['education_level'];
             $student['first_name'] = $validatedData['first_name'];
             $student['middle_name'] = $validatedData['middle_name'];
             $student['last_name'] = $validatedData['last_name'];

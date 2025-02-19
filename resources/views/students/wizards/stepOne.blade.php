@@ -145,7 +145,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Home Region</label>
-                        <input @if(isset($student)) value="{{$student->home_region}}" @endif type="text" class="form-control" id="home_region" name="home_region" required
+                        <input @if(isset($student)) value="{{$student->home_region}}" @endif type="text" class="form-control" id="home_region" name="home_region" 
                             placeholder="Enter home region" value="{{old('home_region')}}">
                     </div>
                     @error('home_region')

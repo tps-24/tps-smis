@@ -14,9 +14,7 @@ class Patient extends Model
         'excuse_type',
         'rest_days',
         'doctor_comment',
-        'first_name',
-        'middle_name',
-        'last_name',
+       
         'company',
         'platoon',
         'status', // Workflow status: pending, approved, rejected, treated
@@ -31,7 +29,6 @@ class Patient extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
-
     /**
      * Define the relationship to the User model for tracking updates.
      */

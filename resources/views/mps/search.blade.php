@@ -42,9 +42,7 @@
                 @endfor
             </select>
             <!-- Name Search -->
-            <input type="text" class="form-control me-2" name="last_name" placeholder="Last name(option)">
-
-
+            <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name" placeholder="name(option)">
         </div>
         <button type="submit" class="btn btn-primary">Search</button>
     </form>

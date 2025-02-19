@@ -18,7 +18,11 @@ class BeatTypeSeeder extends Seeder
         ]);
 
         BeatType::create([
+<<<<<<< HEAD
             'name' => "Patrols",
+=======
+            'name' => "Patrol",
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
             'description' =>""
         ]);
     }

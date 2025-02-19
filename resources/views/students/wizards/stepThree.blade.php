@@ -5,8 +5,8 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-rms/students/">Students</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/students/">Students</a></li>
                 <li class="breadcrumb-item active" aria-current="page"><a href="#">
                 @if(isset($student))
                             Update
@@ -44,7 +44,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Next Kin names</label>
-                        <input @if(isset($student)) value="{{$student->next_kin_names}}" @endif type="text" class="form-control" id="last_name" name="next_kin_names" required
+                        <input @if(isset($student)) value="{{$student->next_kin_names}}" @endif type="text" class="form-control" id="last_name" name="next_kin_names" 
                             placeholder="Enter next kin names" value="{{old('next_kin_names')}}">
                     </div>
                     @error('next_kin_names')
@@ -58,7 +58,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc">Phone</label>
-                        <input @if(isset($student)) value="{{$student->next_kin_phone}}" @endif type="number" class="form-control" id="phone" name="next_kin_phone" required
+                        <input @if(isset($student)) value="{{$student->next_kin_phone}}" @endif type="number" class="form-control" id="phone" name="next_kin_phone" 
                             placeholder="Enter phone number" value="{{old('next_kin_phone')}}">
                     </div>
                     @error('next_kin_phone')
@@ -73,7 +73,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc4">Relationship</label>
-                        <input @if(isset($student)) value="{{$student->next_kin_relationship}}" @endif type="text" class="form-control" id="phone" name="next_kin_relationship" required
+                        <input @if(isset($student)) value="{{$student->next_kin_relationship}}" @endif type="text" class="form-control" id="phone" name="next_kin_relationship"
                             placeholder="Enter relationship" value="{{old('next_kin_relationship')}}">
                     </div>
                     @error('next_kin_relationship')
@@ -88,7 +88,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc4">Next Kin Address</label>
-                        <input @if(isset($student)) value="{{$student->next_kin_address}}" @endif type="text" class="form-control" id="phone" name="next_kin_address" required
+                        <input @if(isset($student)) value="{{$student->next_kin_address}}" @endif type="text" class="form-control" id="phone" name="next_kin_address"
                             placeholder="Enter address" value="{{old('next_kin_address')}}">
                     </div>
                     @error('next_kin_address')

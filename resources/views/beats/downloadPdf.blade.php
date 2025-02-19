@@ -45,6 +45,7 @@
         <div class="text-center">
             <h4><b>TANZANIA POLICE SCHOOL-MOSHI</b></h4>
             <img src="{{ public_path('logo.png') }}" style="height:50px; width:50px" alt="Logo"></br>
+<<<<<<< HEAD
             <span>GUARDS AND PATROL</span></br>
         </div>
         <span>
@@ -120,6 +121,22 @@
         @endfor
 
     </div>
+=======
+        </div></br>
+        <span> RATIBA YA
+            @if ($beatType_id == 1)
+                MALINDO
+            @else
+                DORIA
+            @endif
+            {{$company->name}} COMPANY
+        </br>
+        </span>
+
+    </center>
+
+    
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
 
 </body>
 

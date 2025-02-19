@@ -193,7 +193,7 @@
     @endcan()
     
     <li>
-      <a href="#">
+      <a href="{{ route('announcements.index') }}">
         <i class="bi bi-send"></i>
         <span class="menu-text">Announcements</span>
       </a>
@@ -218,6 +218,46 @@
       </a>
     </li>
     @endcan()
+     <li>
+            <a href="{{ route('timetable.index') }}">
+                <i class="bi bi-calendar2"></i>
+                <span class="menu-text">Timetable</span>
+            </a>
+        </li> 
+
+        
+    
+    @role('Sir Major')
+    @if(auth()->user()->company) 
+        <li>
+            <a href="{{ route('hospital.index') }}">
+                <i class="bi bi-hospital"></i>
+                <span class="menu-text">Hospital</span>
+            </a>
+        </li>
+    @endif
+@endrole
+
+@role('Receptionist')
+    <li>
+        <a href="{{ route('receptionist.index') }}">
+            <i class="bi bi-person-lines-fill"></i>
+            <span class="menu-text">Receptionist Panel</span>
+        </a>
+    </li>
+@endrole
+
+
+@role('Doctor')
+    <li>
+        <a href="{{ route('doctor.page') }}">
+            <i class="bi bi-stethoscope"></i>
+            <span class="menu-text">Doctor Panel</span>
+        </a>
+    </li>
+@endrole
+
+
     @can('mps-list')
     <li>
       <a href="/tps-smis/mps">
@@ -225,6 +265,7 @@
         <span class="menu-text">MPS</span>
       </a>
     </li>
+
     @endcan()
     <li>
       <a href="#">

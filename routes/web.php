@@ -199,6 +199,16 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
     Route::resource('attendences', AttendenceController::class);
     Route::resource('mps', MPSController::class);
     Route::resource('staffs', StaffController::class);
+    Route::resource('campuses', CampusController::class);
+    Route::resource('announcements', AnnouncementController::class);
+
+
+    
+    // Define the custom route first
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
+
+
 
     Route::resource('grading_systems', GradingSystemController::class); 
     Route::resource('grade_mappings', GradeMappingController::class);
@@ -216,6 +226,36 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
 
 
     
+    // Route::resource('beats', BeatController::class);
+
+
+
+
+    Route::controller(StudentController::class)->prefix('students')->group(function () {
+        /**
+         *  Wizard route for student registration
+         */
+        Route::prefix('create')->group(function () {
+            Route::get('step-two/{type}', "createStepTwo");
+            Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
+
+            Route::get('step-three', "createStepTwo");
+            Route::post('post-step-one/{type}', 'postStepOne');
+            Route::post('post-step-two/{type}', 'postStepTwo');
+            Route::post('post-step-three/{type}', 'postStepThree');
+        });
+        /**
+         * End of wizard for student registration
+         */
+        Route::post('students/search', 'search')->name('students.search');
+        Route::get('dashboard', 'dashboard');
+        Route::post('store', 'store');
+        Route::post('{id}/update', 'update');
+        Route::post('{id}/delete', 'destroy');
+        Route::post('bulkimport', 'import');
+
+
+    });
 
     Route::controller(MPSController::class)->prefix('mps')->group(function () {
         Route::post('search', 'search');
@@ -239,7 +279,8 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
         Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
         Route::post('store-absents/{attendence_id}', action: 'storeAbsent');
         Route::post('store-safari/{attendence_id}', action: 'storeSafari');
-        Route::get('today/{company_id}', 'today_attendence');
+        Route::get('today/{company_id}/{type}','today');
+        Route::get('today/{company_id}/{$type}', 'today')->name('today_attendance');
     });
 
 });
@@ -255,7 +296,6 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 //start
 Route::controller(StudentController::class)->prefix('students')->group(function () {
-
     /**
      *  Wizard route for student registration
      */
@@ -290,16 +330,12 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
 
 
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+Route::get('/hospital/viewDetails/{timeframe}', [PatientController::class, 'viewDetails'])->name('hospital.viewDetails');
+Route::get('/hospital/show/{id}', [PatientController::class, 'show'])->name('hospital.show');
 
-Route::post('update-patient-status/{id}', [PatientController::class, 'updateStatus'])->name('update.patient.status');
-
-Route::resource('hospital', PatientController::class);
-Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
-
+// 🏥 Patients Routes
 Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
-
 Route::post('/patients/save', [PatientController::class, 'save'])->name('patients.save');
-
 Route::put('/patients/{id}/update-status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
@@ -309,34 +345,33 @@ Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->
 
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
 Route::post('/patients/submit', [PatientController::class, 'submit'])->name('patients.submit');
-Route::put('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve'); 
 Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name('patients.reject');
 Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
-Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
+Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
 
-
-
-
-
-// Route for sending details to receptionist
+// 🚀 Routes for Sending to Receptionist
 Route::post('/patients/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('patients.sendToReceptionist');
+Route::post('/hospital/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('hospital.sendToReceptionist');
 
-// Route for receptionist to see pending approvals
+// 💼 Receptionist Routes
+Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->name('receptionist.index')->middleware('auth');
+Route::post('/patients/{id}/approve', [PatientController::class, 'approvePatient'])->name('patients.approve')->middleware('auth');
 Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->name('receptionist.index');
 
-// Route for receptionist to approve patient
-Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve');
-
-
-
-// Receptionist Routes
-Route::get('/receptionist', [PatientController::class, 'receptionistIndex'])->name('receptionist.index');
-Route::post('/patients/approve/{id}', [PatientController::class, 'approve'])->name('patients.approve');
-
-//Daktari routes
+// 🩺 Doctor Routes
 Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.page');
 Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
 
+// 📅 Timetable Routes
+Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');
+Route::get('/timetable/create', [TimetableController::class, 'create'])->name('timetable.create');
+Route::post('/timetable/store', [TimetableController::class, 'store'])->name('timetable.store');
+Route::get('/timetable/{id}/edit', [TimetableController::class, 'edit'])->name('timetable.edit');
+Route::put('/timetable/{id}', [TimetableController::class, 'update'])->name('timetable.update');
+Route::delete('/timetable/{id}', [TimetableController::class, 'destroy'])->name('timetable.destroy');
+Route::get('/timetable/export-pdf', [TimetableController::class, 'exportPDF'])->name('timetable.exportPDF');
+Route::get('/generate-timetable', [TimetableController::class, 'generateTimetable'])->name('timetable.generate');
 
 
 Route::get('test', [BeatController::class,'test']);

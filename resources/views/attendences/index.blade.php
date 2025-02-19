@@ -15,12 +15,20 @@
 <!-- Scrumb ends -->
 
 @endsection
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
 @section('content')
 @session('success')
     <div class="alert alert-success" role="alert">
         {{ $value }}
     </div>
 @endsession
+<<<<<<< HEAD
+=======
+@if(isset($companies))
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
 <div class="d-flex  justify-content-end">
     <div class="col-4 z-index:1">
         <form action="{{url('attendences/create/' . $page->id)}}" method="POST">
@@ -67,8 +75,13 @@
     </div>
     </form>
 </div>
+<<<<<<< HEAD
 
 
+=======
+@endif
+@if (isset($statistics))
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
 <div class="row gx-4">
     <div class="col-sm-12 col-12">
         <div class=" mb-4">
@@ -78,7 +91,11 @@
                     <!-- Nav tabs start -->
                     <ul class="nav nav-tabs" id="customTab2" role="tablist">
                         <?php
+<<<<<<< HEAD
 $i = 0;
+=======
+                            $i = 0;
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
                         ?>
                         @foreach ($companies as $company)
                             <li class="nav-item" role="presentation">
@@ -122,7 +139,11 @@ $i = 0;
                                                                     <div
                                                                         class="d-flex align-items-center justify-content-between mt-1">
                                                                         <a class="text-primary ms-4"
+<<<<<<< HEAD
                                                                             href="{{url('/today/1/' . $page->id)}}">
+=======
+                                                                        href="{{url('attendences/today/'.($j+1).'/'.$page->id) }}"
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
                                                                             <span>View</span>
                                                                         </a>
                                                                     </div>
@@ -240,4 +261,10 @@ $i = 0;
         </div>
     </div>
 </div>
+<<<<<<< HEAD
+=======
+@else
+    <h3>You can not view attendences because you don't have a company.</h3>
+@endif
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
 @endsection

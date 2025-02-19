@@ -11,29 +11,28 @@
     @if($patients->isEmpty())
         <p>No pending requests.</p>
     @else
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Company</th>
-                    <th>Platoon</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($patients as $patient)
-                    <tr>
-                        <td>{{ $patient->first_name }}</td>
-                        <td>{{ $patient->last_name }}</td>
-                        <td>{{ $patient->company }}</td>
-                        <td>{{ $patient->platoon }}</td>
+    <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Platoon</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($patients as $patient)
+            <tr>
+                <td>{{ $patient->student->first_name ?? '-' }}</td>
+                <td>{{ $patient->student->last_name ?? '-' }}</td>
+                <td>{{ $patient->student->platoon ?? '-' }}</td>
+                <td>{{ $patient->status }}</td>
                         <td>
-                            <form action="{{ route('patients.approve', $patient->id) }}" method="POST" style="display: inline;">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-success">Approve</button>
-                            </form>
+                        <form action="{{ route('patients.approve', $patient->id) }}" method="POST">
+    @csrf
+    <button type="submit" class="btn btn-success">Approve Patient</button>
+</form>
+
                         </td>
                     </tr>
                 @endforeach

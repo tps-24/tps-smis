@@ -41,9 +41,18 @@ class Staff extends Model
         public function department() 
         { 
             return $this->belongsTo(Department::class); 
+
+        }
+
+        
+        public function company() 
+        { 
+            return $this->belongsTo(Company::class); 
         }
         public function user()
         {
             return $this->belongsTo(User::class);
         }
+
+
 }

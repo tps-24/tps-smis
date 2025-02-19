@@ -13,6 +13,7 @@ class PatrolAreaSeeder extends Seeder
     public function run(): void
     {
         PatrolArea::create([
+<<<<<<< HEAD
             "added_by"=>"1",
             "campus_id"=> 1,
             "company_id" => 1,
@@ -183,5 +184,19 @@ class PatrolAreaSeeder extends Seeder
             "number_of_guards" => 4
         ]);
 
+=======
+            "company_id" => 1,
+            "start_area"=> 1,
+            "number_of_guards" => 3,
+            "end_area"=> 2
+        ]);
+
+        PatrolArea::create([
+            "company_id" => 2,
+            "start_area" => 3,
+            "number_of_guards" => 3,
+            "end_area" => 4
+        ]);
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
     }
 }
