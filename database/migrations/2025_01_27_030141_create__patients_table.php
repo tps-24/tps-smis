@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -11,6 +12,7 @@ return new class extends Migration
      */
     public function up()
     {
+        // Modify the existing 'patients' table
         // Schema::table('patients', function (Blueprint $table) {
         //     // Add student_id column
         //     $table->unsignedBigInteger('student_id')->after('id')->nullable();
@@ -26,6 +28,9 @@ return new class extends Migration
         //     if (Schema::hasColumn('patients', 'last_name')) {
         //         $table->dropColumn('last_name');
         //     }
+        // });
+
+        // Create a new 'patients' table (if this is meant to be a fresh table)
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained('students');
@@ -36,9 +41,7 @@ return new class extends Migration
             $table->integer('rest_days');
             $table->text('doctor_comment')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
-         
             $table->timestamps();
-            
         });
 
     }
@@ -46,9 +49,12 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
+        // Drop the newly created 'patients' table if needed
         Schema::dropIfExists('patients');
+        
+        
     }
 };
 

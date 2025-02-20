@@ -15,7 +15,7 @@ class Patient extends Model
         'rest_days',
         'doctor_comment',
        
-        'company',
+        'company_id',
         'platoon',
         'status', // Workflow status: pending, approved, rejected, treated
         'receptionist_comment', // Comments from the receptionist
@@ -48,9 +48,9 @@ class Patient extends Model
     /**
      * Scope for filtering by company and platoon.
      */
-    public function scopeByCompanyAndPlatoon($query, $company, $platoon)
+    public function scopeByCompanyAndPlatoon($query, $company_id, $platoon)
     {
-        return $query->where('company', $company)->where('platoon', $platoon);
+        return $query->where('company_id', $company_id)->where('platoon', $platoon);
     }
 
     /**
@@ -61,5 +61,10 @@ class Patient extends Model
         static::creating(function ($patient) {
             $patient->status = $patient->status ?? 'pending';
         });
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 }

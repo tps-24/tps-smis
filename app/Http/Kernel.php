@@ -71,5 +71,10 @@ class Kernel extends HttpKernel
         'session_programme' => \App\Http\Middleware\SessionProgrammeMiddleware::class,
         // Add your custom route middleware here
         'yourMiddlewareKey' => \App\Http\Middleware\YourMiddlewareName::class,
-    ];
+        
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            
+        ];
+   
+    
 }

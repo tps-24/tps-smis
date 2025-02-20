@@ -46,16 +46,16 @@ class PatientController extends Controller
         $patients = collect();
         $message = 'Please enter the required criteria to find patient details.';
     
-        if ($request->has('company') || $request->has('platoon') || $request->has('fullname')) {
+        if ($request->has('company_id') || $request->has('platoon') || $request->has('fullname')) {
             $query = Patient::with('student') // ✅ Ensure we load the student relationship
             ->whereHas('student', function ($q) use ($sirMajor) {
-                $q->where('company', $sirMajor->company);
+                $q->where('company_id', $sirMajor->company_id);
             });
 
             
-        if ($request->filled('company')) {
+        if ($request->filled('company_id')) {
             $query->whereHas('student', function ($q) use ($request) {
-                $q->where('company', $request->input('company'));
+                $q->where('company_id', $request->input('company_id'));
             });
         }
 
@@ -93,15 +93,15 @@ class PatientController extends Controller
     $thisMonth = Carbon::now()->startOfMonth();
     $thisYear = Carbon::now()->startOfYear();
 
-    $dailyCount = Patient::where('company', $sirMajor->company)
+    $dailyCount = Patient::where('company_id', $sirMajor->company_id)
                         ->whereDate('created_at', $today)
                         ->count();
 
-    $weeklyCount = Patient::where('company', $sirMajor->company)
+    $weeklyCount = Patient::where('company_id', $sirMajor->company_id)
                         ->whereBetween('created_at', [$thisWeek, Carbon::now()])
                         ->count();
 
-    $monthlyCount = Patient::where('company', $sirMajor->company)
+    $monthlyCount = Patient::where('company_id', $sirMajor->company_id)
                         ->whereBetween('created_at', [$thisMonth, Carbon::now()])
                         ->count();
 
@@ -116,7 +116,7 @@ class PatientController extends Controller
 
      // ✅ Fix the error by selecting student details from the relationship
      $doctorDetails = Patient::with('student:id,first_name,last_name') // Load only required student fields
-     ->where('company', $sirMajor->company)
+     ->where('company_id', $sirMajor->company_id)
      ->whereNotNull('excuse_type') // Only patients with doctor input
      ->orderBy('created_at', 'desc')
      ->get();
@@ -147,7 +147,7 @@ public function sendToReceptionist(Request $request)
 
     // Find the student
     $student = Student::where('id', $request->student_id)
-                      ->where('company', $user->company) // Ensure same company
+                      ->where('company_id', $user->company_id) // Ensure same company
                       ->firstOrFail();
 
     // Store patient details
@@ -155,7 +155,7 @@ public function sendToReceptionist(Request $request)
         ['student_id' => $student->id],
         [
             'student_id' => $student->id, // Store student_id instead of names
-            'company' => $student->company,
+            'company_id' => $student->company_id,
             'platoon' => $student->platoon,
             'status' => 'pending',
         ]
@@ -163,9 +163,6 @@ public function sendToReceptionist(Request $request)
 
     return redirect()->route('hospital.index')->with('success', 'Details sent to receptionist for approval.');
 }
-
-
-
 
 
 public function receptionistIndex()
@@ -221,10 +218,6 @@ public function doctorPage()
     
 }
 
-
-
-
-
 public function saveDetails(Request $request)
 {
     $request->validate([
@@ -250,9 +243,9 @@ public function saveDetails(Request $request)
 
 public function sirMajorStatistics()
 {
-    $company = auth()->user()->company; // Ensure Sir Major only sees their company's data
+    $company_id = auth()->user()->company_id; // Ensure Sir Major only sees their company's data
 
-    $patients = Patient::where('company', $company)
+    $patients = Patient::where('company_id', $company_id)
         ->whereNotNull('excuse_type') // Ensure only patients with doctor inputs are retrieved
         ->orderBy('created_at', 'desc')
         ->get();
@@ -272,7 +265,7 @@ public function viewDetails(Request $request, $timeframe)
         abort(404, 'Invalid timeframe');
     }
 
-    $query = Patient::where('company', $sirMajor->company)
+    $query = Patient::where('company_id', $sirMajor->company_id)
                     ->whereYear('created_at', now()->year); // Ensure only current year data is fetched
 
     switch ($timeframe) {

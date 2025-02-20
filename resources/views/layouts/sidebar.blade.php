@@ -198,26 +198,19 @@
         <span class="menu-text">Announcements</span>
       </a>
     </li>
+    <!-- <li>
+      
+    <a href="{{ route('downloads.index') }}">
+              <i class="bi bi-download"></i>
+        <span class="menu-text">Download Center</span>
+      </a>
+    </li> -->
     <li>
-      <a href="#">
-        <i class="bi bi-download"></i>
+    <a href="{{ route('downloads.index') }}">
+    <i class="bi bi-download"></i>
         <span class="menu-text">Download Center</span>
       </a>
     </li>
-    <!-- <li>
-      <a href="">
-        <i class="bi bi-calendar2"></i>
-        <span class="menu-text">Timetable</span>
-      </a>
-    </li> -->
-    @can('hospital-list')
-    <li>
-      <a href="{{ route('hospital.index') }}">
-        <i class="bi bi-calendar2"></i>
-        <span class="menu-text">Hospital</span>
-      </a>
-    </li>
-    @endcan()
      <li>
             <a href="{{ route('timetable.index') }}">
                 <i class="bi bi-calendar2"></i>
