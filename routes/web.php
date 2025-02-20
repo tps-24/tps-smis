@@ -58,7 +58,7 @@ Route::get('/', function () {
 // });
 Route::group(['middleware' => 'session_programme'], function () {
     // Add more routes as needed
-
+    // Or i will join it with auth --Recommended
 });
 
 
@@ -83,19 +83,6 @@ Route::post('/fill-beats', [BeatController::class, 'fillBeats'])->name('beats.fi
 Route::get('/beats/{beat}', [BeatController::class, 'showBeat'])->name('beats.show');
 
 Route::get('/beats/pdf/{company}', [BeatController::class, 'generatePDF'])->name('beats.generatePDF');
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -101,7 +101,7 @@
         <td>{{++$i}}</td>
         <td>{{$student->force_number ?? ''}}</td>
         <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
-        <td>{{$student->company->name}}</td>
+        <td>{{$student->company->name ?? ''}}</td>
         <td>{{$student->platoon}}</td>
         <td>{{$student->phone}}</td>
         <td>{{$student->home_region}}</td>
@@ -117,6 +117,13 @@
           <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
           data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
           @endcan
+          @if ($student->beat_status == 1)
+          <a class="btn btn-warning btn-sm" href="{{ route('students.deactivate_beat_status', $student->id) }}">
+          Deactivate</a>
+          @else
+          <a class="btn btn-warning btn-sm" href="{{ route('students.activate_beat_status', $student->id) }}">
+          Activate</a>
+          @endif
           <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
           aria-labelledby="createNewContactLabel" aria-hidden="true">
           <div class="modal-dialog">

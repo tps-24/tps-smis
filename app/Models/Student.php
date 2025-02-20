@@ -42,11 +42,7 @@ class Student extends Model
 
     public function company()
     {
-        return $this->hasOne(Company::class, 'id', 'company_id');
-    }
-    public function get_company()
-    {
-        return $this->hasOne(Company::class, 'name', 'company');
+        return $this->belongsTo(Company::class);
     }
     // public function programme()
     // {
@@ -84,7 +80,7 @@ class Student extends Model
         $this->save();
     }
 
-    public function beats()
+    public function beats() 
     {
         return $this->belongsToMany(Beat::class, 'student_beat', 'student_id', 'beat_id')
                     ->withTimestamps();

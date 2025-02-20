@@ -22,7 +22,10 @@
     </div>
 @endsession
 <div class="d-flex  justify-content-end">
-    <div class="col-4 z-index:1">
+    
+
+<div class="row gx-4">
+    <div class="col-12">
         <form action="{{url('attendences/create/' . $page->id)}}" method="POST">
             @csrf
             @method('POST')
@@ -64,8 +67,10 @@
                     </button>
                 </div>
             </div>
+        <!-- </div> -->
+       </form>
     </div>
-    </form>
+</div>
 </div>
 
 
@@ -78,7 +83,7 @@
                     <!-- Nav tabs start -->
                     <ul class="nav nav-tabs" id="customTab2" role="tablist">
                         <?php
-$i = 0;
+                            $i = 0;
                         ?>
                         @foreach ($companies as $company)
                             <li class="nav-item" role="presentation">

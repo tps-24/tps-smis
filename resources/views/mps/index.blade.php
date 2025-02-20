@@ -48,7 +48,7 @@
                     <tbody>
                         <?php        $i = 0; ?>
                         @foreach ($mpsStudents as $student)
-                            <tr>
+                            <tr>{{ dd($student->student) }}
                                 <td>{{++$i}}</td>
                                 <td>{{$student->student->first_name}} {{$student->student->last_name}}</td>
                                 <td>{{$student->days}}</td>
