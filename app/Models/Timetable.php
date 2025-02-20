@@ -8,5 +8,10 @@ class Timetable extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company', 'day', 'time_slot', 'activity', 'venue', 'instructor'];
+    protected $fillable = ['company_id', 'day', 'time_slot', 'activity', 'venue', 'instructor'];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }
