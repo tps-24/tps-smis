@@ -28,7 +28,6 @@ class StudentController extends Controller
 {
     public function __construct()
     {
-
         $this->middleware('permission:student-list|student-create|student-edit|student-delete', ['only' => ['index', 'view', 'search']]);
         $this->middleware('permission:student-create', ['only' => ['create', 'store']]);
         $this->middleware('permission:student-create', ['only' => ['create', 'store', 'createStepOne', 'postStepOne', 'createStepTwo', 'postStepTwo', 'createStepThree', 'postStepThree', 'import']]);
@@ -44,11 +43,10 @@ class StudentController extends Controller
         $selectedSessionId = session('selected_session');
         if (!$selectedSessionId)
             $selectedSessionId = 1;
-        $students = Student::where('session_programme_id', $selectedSessionId)->latest()->paginate(20);
-        $page_name = "Student Management";
-        return view('students.index', compact('students', 'page_name'))
+        $students = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
+        $companies = Company::all();
+        return view('students.index', compact('students', 'companies'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
-
     }
 
     public function search(Request $request)
@@ -57,8 +55,14 @@ class StudentController extends Controller
         if (!$selectedSessionId)
             $selectedSessionId = 1;
         $students = Student::where('session_programme_id', $selectedSessionId)
-            ->where('company', $request->company)
-            ->where('platoon', $request->platoon);
+                    ->where('company_id', $request->company_id)
+                    ->where('platoon',$request->platoon)
+                    ->orderBy('first_name');
+                    //->latest()->paginate(90);
+        //return view('students.index', compact('students'))
+            //->with('i', ($request->input('page', 1) - 1) * 90);
+            // ->where('company_id', $request->company_id)
+            // ->where('platoon', $request->platoon);
 
         if ($request->name) {
             $students = $students->where(function ($query) use ($request) {
@@ -67,10 +71,9 @@ class StudentController extends Controller
                     ->orWhere('middle_name', 'like', '%' . $request->name . '%');
             });
         }
-
-        $students = $students->orderBy('first_name')
-            ->latest()->paginate(90);
-        return view('students.index', compact('students'))
+        $companies = Company::all();
+        $students = $students->latest()->paginate(90);
+        return view('students.index', compact('students','companies'))
             ->with('i', ($request->input('page', 1) - 1) * 90);
 
     }
@@ -138,6 +141,7 @@ class StudentController extends Controller
         return redirect()->route('students.index')->with('success', "Student created successfully.");
     }
 
+    
 
     public function register(Request $request)
     {
@@ -158,6 +162,11 @@ class StudentController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        
+        $input = $request->all();
+        $password = Hash::make($input['password']);
+        $fullName = $request->first_name. ' ' . $request->middle_name. ' ' . $request->last_name;
+    
 
         $input = $request->all();
         $password = Hash::make($input['password']);
@@ -175,6 +184,7 @@ class StudentController extends Controller
         $user->assignRole('student');
 
         $input['user_id'] = $user->id;
+        
 
         // dd($input);
         //Now Create Student
@@ -190,6 +200,7 @@ class StudentController extends Controller
             'session_programme_id' => $request->input('session_programme_id'),
             'email' => $request->input('email'),
             'gender' => $request->input('gender'),
+            'user_id' =>  $user->id,
             'user_id' => $user->id,
             'password' => Hash::make($request->input('password')),
         ]);
@@ -209,6 +220,10 @@ class StudentController extends Controller
         $studentId = Student::where('user_id', $user)->pluck('id');
         $student = Student::find($studentId[0]);
         $courses = $student->courses();
+    
+        // $role = auth()->user()->role;
+        // dd($courses);
+        
 
         // $role = auth()->user()->role;
         // dd($courses);
@@ -525,6 +540,12 @@ class StudentController extends Controller
 
         $validatedData = $request->validate([
             'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/' . $student_validate_rule,
+            //'rank' => 'nullable',
+            //'education_level' => 'required',
+            'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
+            'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
+            'middle_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
+            'home_region' => 'nullable|string|min:4',
             'rank' => 'required',
             'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
@@ -542,6 +563,8 @@ class StudentController extends Controller
             $student = $request->session()->get('student');
 
             $student['force_number'] = $validatedData['force_number'];
+            //$student['rank'] = $validatedData['rank'];
+            //$student['education_level'] = $validatedData['education_level'];
             $student['rank'] = $validatedData['rank'];
             $student['education_level'] = $validatedData['education_level'];
             $student['first_name'] = $validatedData['first_name'];
@@ -552,7 +575,7 @@ class StudentController extends Controller
             $request->session()->put('student', $student);
         }
         if ($type == "edit") {
-            return view('students.wizards.stepTwo', compact('student'));
+            return view('students.wizards.stepTwo', compact('student', 'companies'));
 
         }
         return view('students.wizards.stepTwo', compact('companies', 'type'));
@@ -567,25 +590,26 @@ class StudentController extends Controller
 
     public function postStepTwo(Request $request, $type)
     {
+        $companies = Company::all();
         $student = $request->session()->get('student');
         $validator = Validator::make($request->all(), [
             'phone' => 'nullable|numeric|digits:10|unique:students,phone,' . $student->id . ',id',
             'nin' => 'required|digits:20|numeric|unique:students,nin,' . $student->id . ',id',
             'dob' => 'required|string',
             'gender' => 'required|max:1|alpha|regex:/^[M,F]/',
-            'company' => 'required|max:2|alpha',
+            'company_id' => 'required|max:2|numeric',
             'platoon' => 'required|max:2',
             'weight' => 'required|numeric',
             'height' => 'required|numeric'
         ]);
         if ($validator->errors()->any()) {
-            return view('students/wizards/stepTwo', compact('student'))->withErrors($validator->errors());
+            return view('students/wizards/stepTwo', compact('student', 'companies'))->withErrors($validator->errors());
         }
         $student['phone'] = $request->phone;
         $student['nin'] = $request->nin;
         $student['dob'] = $request->dob;
         $student['gender'] = $request->gender;
-        $student['company'] = $request->company;
+        $student['company_id'] = $request->company_id;
         $student['platoon'] = $request->platoon;
         $student['weight'] = $request->weight;
         $student['height'] = $request->height;
@@ -593,7 +617,7 @@ class StudentController extends Controller
         if ($type == "create") {
             return redirect('students/create/step-three/create');
         }
-        return view('students.wizards.stepThree', compact('student'));
+        return view('students.wizards.stepThree', compact('student','companies'));
 
     }
 
@@ -636,5 +660,22 @@ class StudentController extends Controller
         }
         return redirect()->route('students.index')->with('success', $message);
         ;
+    }
+
+    public function activate_beat_status($studentId){
+        $student  = Student::find($studentId);
+
+        $student -> beat_status = 1;
+        $student->save();
+         
+        return redirect()->back()->with('success','Beat activated successfully.');
+    }
+
+    public function deactivate_beat_status($studentId){
+        $student  = Student::find($studentId);
+
+        $student -> beat_status = 0;
+        $student->save();
+         return redirect()->back()->with('success','Beat deactivated successfully.');
     }
 }

@@ -15,7 +15,7 @@
 <!-- Scrumb ends -->
 
 @endsection
-</table>
+
 @section('content')
 
 <div class="row">
@@ -45,17 +45,16 @@
           <!-- Name Search -->
           <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name" placeholder="name(option)">
             <!-- Company Dropdown -->
-            <select class="form-select me-2" name="company" required>
+            <select class="form-select me-2" name="company_id" required>
                 <option value="">Select Company</option>
-                <option value="HQ" {{ request('company') == 'HQ' ? 'selected' : '' }}>HQ</option>
-                <option value="A" {{ request('company') == 'A' ? 'selected' : '' }}>A</option>
-                <option value="B" {{ request('company') == 'B' ? 'selected' : '' }}>B</option>
-                <option value="C" {{ request('company') == 'C' ? 'selected' : '' }}>C</option>
+                @foreach ($companies as $company)
+                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
+                @endforeach
             </select>
             <!-- Platoon Dropdown -->
             <select onchange="this.form.submit()" class="form-select me-2" name="platoon" required>
                 <option value="">Select Platoon</option>
-                @for ($i = 1; $i <= 15; $i++)
+                @for ($i = 1; $i < 15; $i++)
                     <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
                 @endfor
             </select>
@@ -102,7 +101,7 @@
         <td>{{++$i}}</td>
         <td>{{$student->force_number ?? ''}}</td>
         <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
-        <td>{{$student->company}}</td>
+        <td>{{$student->company->name}}</td>
         <td>{{$student->platoon}}</td>
         <td>{{$student->phone}}</td>
         <td>{{$student->home_region}}</td>
@@ -115,8 +114,8 @@
           <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
           @endcan
           @can('student-delete')
-          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-          data-bs-target="#createNewContact{{$student->id}}">Delete</button>
+          <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+          data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
           @endcan
           <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
           aria-labelledby="createNewContactLabel" aria-hidden="true">
@@ -159,17 +158,5 @@
 </div>
 
 {!! $students->links('pagination::bootstrap-5') !!}
-<script>
-  changeCriteria(){
-    alert("Hello");
-    var criteriaDoc = document.getElementById('criteria').innerHTML;
-    if (criteriaDoc.value == "plt") {
-      document.getElementById('platoonCriteria').style.display.block;
-      document.getElementById('namesCriteria').style.display.none;
-    } elseif(criteriaDoc.value == "names"){
-      document.getElementById('namesCriteria').style.display.block;
-      document.getElementById('platoonCriteria').style.display.none;
-    }
-  } 
-</script>
+
 @endsection

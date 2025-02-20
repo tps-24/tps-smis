@@ -15,14 +15,12 @@
 <!-- Scrumb ends -->
 
 @endsection
-
 @section('content')
 @session('success')
     <div class="alert alert-success" role="alert">
         {{ $value }}
     </div>
 @endsession
-@if(isset($companies))
 <div class="d-flex  justify-content-end">
     <div class="col-4 z-index:1">
         <form action="{{url('attendences/create/' . $page->id)}}" method="POST">
@@ -31,11 +29,11 @@
             <div class=" d-flex gap-2 justify-content-end">
                 <div class="">
                     <label for="">Company </label>
-                    <select style="height:60%" class="form-select" name="company" id="companies" required
+                    <select style="height:60%" class="form-select" name="company_id" id="companies" required
                         aria-label="Default select example">
                         <option value="">company</option>
                         @foreach ($companies as $company)
-                            <option value="{{$company->name}}">{{$company->name}}</option>
+                            <option value="{{$company->id}}">{{$company->name}}</option>
                         @endforeach
 
                     </select>
@@ -69,8 +67,8 @@
     </div>
     </form>
 </div>
-@endif
-@if (isset($statistics))
+
+
 <div class="row gx-4">
     <div class="col-sm-12 col-12">
         <div class=" mb-4">
@@ -80,7 +78,7 @@
                     <!-- Nav tabs start -->
                     <ul class="nav nav-tabs" id="customTab2" role="tablist">
                         <?php
-                            $i = 0;
+$i = 0;
                         ?>
                         @foreach ($companies as $company)
                             <li class="nav-item" role="presentation">
@@ -116,7 +114,7 @@
                                                                             alt="attendence image" />
                                                                     </div>
                                                                     <div class="p3 d-flex flex-column">
-                                                                        <p class="m-0 ">Attended</p>
+                                                                        <p class="m-0 ">Present</p>
                                                                         <h2 class="lh-1 opacity-50">
                                                                             {{$statistics[$j]['statistics']['present']}}
                                                                         </h2>
@@ -124,7 +122,7 @@
                                                                     <div
                                                                         class="d-flex align-items-center justify-content-between mt-1">
                                                                         <a class="text-primary ms-4"
-                                                                        href="{{url('attendences/today/'.($j+1).'/'.$page->id) }}"
+                                                                            href="{{url('/today/1/' . $page->id)}}">
                                                                             <span>View</span>
                                                                         </a>
                                                                     </div>
@@ -214,7 +212,7 @@
                                                                     <div
                                                                         class="d-flex align-items-center justify-content-between mt-1">
                                                                         <a class="text-primary ms-4"
-                                                                            href="{{url("mps/HQ/company")}}">
+                                                                            href="{{url("mps/".$companies[$j]->name."/company")}}">
                                                                             <span>View</span>
                                                                         </a>
                                                                     </div>
@@ -242,7 +240,4 @@
         </div>
     </div>
 </div>
-@else
-    <h3>You can not view attendences because you don't have a company.</h3>
-@endif
 @endsection

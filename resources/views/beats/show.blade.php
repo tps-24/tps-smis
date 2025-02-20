@@ -24,6 +24,23 @@
         <div class="card mb-4">
             <div class="card-body">
                 <!-- Custom tabs start -->
+<<<<<<< HEAD
+
+<div class="container">
+    <h2>Beat Details</h2>
+    <p><strong>Date:</strong> {{ $beat->date }}</p>
+    <p><strong>Start Time:</strong> {{ $beat->start_at }}</p>
+    <p><strong>End Time:</strong> {{ $beat->end_at }}</p>
+
+    <h3>Assigned Students</h3>
+    <ul>
+        @foreach($students as $student)
+            <li>{{ $student->first_name }} {{ $student->last_name }} (PLT {{ $student->platoon }})</li>
+        @endforeach
+    </ul>
+</div>
+
+=======
                 <div class="custom-tabs-container">
 
                     <!-- Nav tabs start -->
@@ -184,6 +201,7 @@
                     <!-- Tab content end -->
 
                 </div>
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
             </div>
         </div>
     </div>

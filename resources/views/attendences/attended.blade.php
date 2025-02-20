@@ -85,6 +85,7 @@
                                             <a
                                                 href="{{url('attendences/list-absent_students/' . $company->id . '/' . $attendence->id)}}"><button
                                                     class="btn btn-sm btn-primary">Add absents</button></a>
+                                        
                                         </div>
                                     </div>
                                 </div>

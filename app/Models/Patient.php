@@ -29,7 +29,6 @@ class Patient extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
-    
     /**
      * Define the relationship to the User model for tracking updates.
      */

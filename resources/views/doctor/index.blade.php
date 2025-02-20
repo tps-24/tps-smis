@@ -63,6 +63,26 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <form action="{{ route('patients.saveDetails') }}" method="POST">
+<<<<<<< HEAD
+                                                                @csrf
+                                                                <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+
+                                                                <div class="mb-3">
+                                                                    <label for="excuseType{{ $patient->id }}" class="form-label">Excuse Type</label>
+                                                                    <input type="text" id="excuseType{{ $patient->id }}" class="form-control" name="excuse_type" required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="restDays{{ $patient->id }}" class="form-label">Days of Rest</label>
+                                                                    <input type="number" id="restDays{{ $patient->id }}" class="form-control" name="rest_days" min="1" required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="doctorComment{{ $patient->id }}" class="form-label">Doctor's Comment</label>
+                                                                    <textarea id="doctorComment{{ $patient->id }}" class="form-control" name="doctor_comment" rows="3" required></textarea>
+                                                                </div>
+
+                                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                            </form>
+=======
                                                             @csrf
     <input type="hidden" name="student_id" value="{{ $patient->id }}">
 
@@ -83,13 +103,18 @@
 
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
+<<<<<<< HEAD
+                                @endif
+=======
                                 
+>>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
                             @endforeach
                         </tbody>
                     </table>

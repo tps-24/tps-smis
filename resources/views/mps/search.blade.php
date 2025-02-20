@@ -27,17 +27,16 @@
         @csrf
         <div class="d-flex">
             <!-- Company Dropdown -->
-            <select class="form-select me-2" name="company" required>
+            <select class="form-select me-2" name="company_id" required>
                 <option value="">Select Company</option>
-                <option value="HQ" {{ request('company') == 'HQ' ? 'selected' : '' }}>HQ</option>
-                <option value="A" {{ request('company') == 'A' ? 'selected' : '' }}>A</option>
-                <option value="B" {{ request('company') == 'B' ? 'selected' : '' }}>B</option>
-                <option value="C" {{ request('company') == 'C' ? 'selected' : '' }}>C</option>
+                @foreach ($companies as $company)
+                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
+                @endforeach
             </select>
             <!-- Platoon Dropdown -->
             <select class="form-select me-2" name="platoon" required>
                 <option value="">Select Platoon</option>
-                @for ($i = 1; $i <= 15; $i++)
+                @for ($i = 1; $i < 15; $i++)
                     <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
                 @endfor
             </select>
@@ -47,11 +46,13 @@
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
     @if(isset($students))
+    <?php $i = 0; ?>
             <div class="table-outer">
                 <div class="table-responsive">
                     <table class="table table-striped m-0">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>Name</th>
                                 <th>Company</th>
                                 <th>Platoon</th>
@@ -61,8 +62,9 @@
                         <tbody>
                             @foreach ($students as $student)
                                 <tr>
+                                    <td>{{ ++$i }}.</td>
                                     <td>{{$student->first_name}} {{$student->last_name}}</td>
-                                    <td>{{$student->company}}</td>
+                                    <td>{{$student->company->name}}</td>
                                     <td>{{$student->platoon}}</td>
                                     <td>
                                         <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">View</a>
@@ -113,8 +115,11 @@
                                                             @error('description')
                                                                 <div class="error">{{ $message }}</div>
                                                             @enderror
-
-                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                            <div style="display: flex; justify-content: flex-end; margin-right: 2px;">
+                                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                            </div>
+                                                            
+                                                            
                                                         </form>
                                                     </div>
                                                 </div>

@@ -13,21 +13,32 @@
 <!-- Sidebar menu starts -->
 <div class="sidebarMenuScroll">
   <ul class="sidebar-menu">
-    @if(auth()->user()->hasRole('Student'))
-    <li>
-      <a href="{{ route('students.dashboard') }}">
-        <i class="bi bi-bar-chart-line"></i>
-        <span class="menu-text">Dashboard</span>
-      </a>
-    </li>
+  @if (auth()->check())
+    @if (auth()->user()->hasRole('Student'))
+        <li>
+            <a href="{{ route('students.dashboard') }}">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+        </li>
     @else
-    <li>
-      <a href="/tps-smis">
-        <i class="bi bi-bar-chart-line"></i>
-        <span class="menu-text">Dashboard</span>
-      </a>
-    </li>
+        <li>
+            <a href="/tps-smis">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+        </li>
     @endif
+@else
+    <li>
+        <a href="/tps-smis">
+            <i class="bi bi-bar-chart-line"></i>
+            <span class="menu-text">Dashboard</span>
+        </a>
+    </li>
+@endif
+
+
     @can('student-list')
     <li class="treeview">
       <a href="#!">
@@ -198,18 +209,8 @@
     <a href="{{ route('downloads.index') }}">
     <i class="bi bi-download"></i>
         <span class="menu-text">Download Center</span>
-    </a>
-</li>
-
-@auth
-    <li>
-        <a href="{{ route('downloads.create') }}">
-        <i class="bi bi-download"></i>
-        <span class="menu-text"> Upload File</span>
-        </a>
+      </a>
     </li>
-@endauth
-
      <li>
             <a href="{{ route('timetable.index') }}">
                 <i class="bi bi-calendar2"></i>
@@ -256,6 +257,7 @@
         <i class="bi bi-wallet2"></i>
         <span class="menu-text">MPS</span>
       </a>
+    </li>
 
     @endcan()
     <li>
@@ -272,11 +274,14 @@
       </a>
       <ul class="treeview-menu">
         <li>
-          <a href="{{url('beats/companies/1')}}">Guards</a>
+          <a href="{{url('beats')}}">Generate Beat</a>
         </li>
         <li>
-          <a href="{{url('beats/companies/2')}}">Patrol</a>
+          <a href="{{url('beats/history')}}">Beat History</a>
         </li>
+        <!-- <li>
+          <a href="{{url('beats/generate')}}">Generate Beat</a>
+        </li> -->
       </ul>
     </li>
     @endcan()
@@ -328,6 +333,12 @@
         </li>
         <li>
           <a href="{{ route('campuses.index') }}">Campus Settings</a>
+        </li>
+        <li>
+          <a href="{{ route('guard-areas.index') }}">Guard Areas</a>
+        </li>
+        <li>
+          <a href="{{ route('patrol-areas.index') }}">Patrol Areas</a>
         </li>
         <li>
           <a href="#">Notification Setting</a>

@@ -22,18 +22,17 @@ class AttendenceController extends Controller
     public function __construct()
     {
 
-        $this->middleware('permission:attendance-list|attendance-create|attendance-edit|attendance-delete', ['only' => ['index', 'today', 'attendence']]);
+
+        $this->middleware('permission:attendance-list|attendance-create|attendance-edit|attendance-delete', ['only' => ['index', 'today','attendence']]);
         $this->middleware('permission:attendance-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:attendance-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:attendance-delete', ['only' => ['destroy']]);
+
 
     }
     /**
-     * Display a listing of the resource.
      */
     public function index()
     {
-
         return $this->attendence(1);
     }
 
@@ -45,11 +44,11 @@ class AttendenceController extends Controller
         $attendenceType = AttendenceType::find($attendenceType_id);
         $platoon = Platoon::where('platoons.name', $request->platoon)
             ->leftJoin('companies', 'companies.id', 'platoons.company_id')
-            ->where('companies.name', $request->company)
+            //->where('companies.name', $request->company)
             ->select('platoons.*')->get()[0];
 
 
-        $students = Student::where('company', $request->company)->where('platoon', $request->platoon)->get();
+        $students = Student::where('company_id', $request->company_id)->where('platoon', $request->platoon)->get();
         //$platoon_id = $platoon->id;
         return view(
             'attendences/create',
@@ -189,12 +188,13 @@ class AttendenceController extends Controller
             }
         }
 
+        $mps = $this->getMPSdata($company);
         $data->put('present', $present);
         $data->put('absent', $absent);
-        $data->put('total', $total);
+        $data->put('total', $total - $mps);
         $data->put('sick', $sick);
         $data->put('safari', $safari);
-        $data->put('mps', $this->getMPSdata($company));
+        $data->put('mps', $mps);
         return $data;
     }
 
@@ -256,13 +256,12 @@ class AttendenceController extends Controller
                 $role->name == 'Chief Instructor' ||
                 $role->name == 'Staff Officer'
             ) {
-                $this->companies = Company::all();
-                
+                $this->companies = Company::all();                
             }
             else if($role->name == 'Teacher'|| $role->name == 'Sir Major'){
                 //return Auth::user()->staff;
                $this->companies = [Auth::user()->staff->company];
-              
+              if(count($this->companies) != 0)
                if($this->companies[0] == null){
     
                 return view('attendences/index', compact( 'page'));
@@ -272,12 +271,6 @@ class AttendenceController extends Controller
                 abort(403);
             }
         }
-        
-
-        $hqAttendence = [];
-        $AAttendence = [];
-        $BAttendence = [];
-        $CAttendence = [];
         $statistics = [];
         foreach ($this->companies as $company) {
             $company_stats = [];
@@ -305,7 +298,6 @@ class AttendenceController extends Controller
                 ++$count;
             }
         }
-
         return $count;
     }
 
@@ -314,11 +306,11 @@ class AttendenceController extends Controller
     public function list($list_type, $attendence_id)
     {
         $attendence = Attendence::find($attendence_id);
-        $students = $attendence->platoon->students;
-
+        $students = $attendence->platoon->students()->orderBy('first_name')->get();
+        $absent_student_ids = explode(",", $attendence->absent_student_ids);
         // $students = Company::join('students', 'companies.name', 'students.company')->join('platoons', 'platoons.id', 'students.platoon')
         //     ->where('students.company', 'HQ')->where('students.platoon', '1')->get('students.*');
-        return view('attendences.select_absent', compact('students', 'attendence_id', 'list_type'));
+        return view('attendences.select_absent', compact('students', 'attendence_id', 'list_type','absent_student_ids'));
     }
 
     public function list_safari($list_type, $attendence_id)
@@ -336,8 +328,8 @@ class AttendenceController extends Controller
         $ids = $request->input('student_ids');
         $absent_student_ids = implode(',', $ids);
         $attendence->absent_student_ids = $absent_student_ids;
-        $attendence->absent = count(value: $ids);
-        $attendence -
+        $attendence->absent = count(value: $ids); 
+        $attendence->present =$attendence->total - $attendence->mps - $attendence->absent; 
             $attendence->save();
         $page = $attendence->attendenceType;
         return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id)->with('page', $attendence->attendenceType);
@@ -370,7 +362,7 @@ class AttendenceController extends Controller
         ;
         $present = count($ids);
         $platoon = Platoon::find($platoon_id);
-        $students = Student::where('company', $platoon->company->name)->where('platoon', $platoon->id)->pluck('id')->toArray();
+        $students = Student::where('company_id', $platoon->company->id)->where('platoon', $platoon->id)->pluck('id')->toArray();
         $absent_ids = array_values(array_diff($students, $ids));
         $total = count($students);
         $todayRecords = Attendence::leftJoin('platoons', 'attendences.platoon_id', 'platoons.id')
