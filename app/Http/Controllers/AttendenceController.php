@@ -362,8 +362,10 @@ class AttendenceController extends Controller
         ;
         $present = count($ids);
         $platoon = Platoon::find($platoon_id);
-        $students = Student::where('company_id', $platoon->company->id)->where('platoon', $platoon->id)->pluck('id')->toArray();
+        $students = Student::where('company_id', 2)->where('platoon', $platoon_id)->pluck('id')->toArray();
         $absent_ids = array_values(array_diff($students, $ids));
+        
+        // dd($absent_ids);
         $total = count($students);
         $todayRecords = Attendence::leftJoin('platoons', 'attendences.platoon_id', 'platoons.id')
             ->where('attendences.platoon_id', $platoon_id)
@@ -384,7 +386,7 @@ class AttendenceController extends Controller
             'mess' => 0,
             'female' => 0,
             'male' => 0,
-            'absent_student_ids' => implode(',', $absent_ids),
+            'absent_student_ids' => json_encode($absent_ids),
             'total' => $total
         ]);
         return redirect()->route('attendences.index')->with('page', $page);;
