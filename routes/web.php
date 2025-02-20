@@ -33,6 +33,8 @@ use App\Http\Controllers\ExcuseTypeController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CampusController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\DownloadController;
+
 
 require __DIR__ . '/auth.php';
 
@@ -301,5 +303,14 @@ Route::delete('/timetable/{id}', [TimetableController::class, 'destroy'])->name(
 Route::get('/timetable/export-pdf', [TimetableController::class, 'exportPDF'])->name('timetable.exportPDF');
 Route::get('/generate-timetable', [TimetableController::class, 'generateTimetable'])->name('timetable.generate');
 
+//Downloader Centre Routes
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index'); // List files
+    Route::get('/downloads/upload', [DownloadController::class, 'create'])->name('downloads.create'); // Upload form
+    Route::post('/downloads/upload', [DownloadController::class, 'store'])->name('downloads.store'); // Upload action
+    Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file'); // Download file
+});
 
 Route::get('test', [BeatController::class,'test']);
+

@@ -48,8 +48,8 @@
             <form action="{{ route('hospital.index') }}" method="GET" class="d-flex justify-content-between mb-3">
                 <div class="d-flex">
                     <!-- Company Dropdown (Sir Major can only see their company) -->
-                    <select class="form-select me-2" name="company">
-                        <option value="{{ auth()->user()->company }}">{{ auth()->user()->company }}</option>
+                    <select class="form-select me-2" name="company_id">
+                        <option value="{{ auth()->user()->company_id }}">{{ auth()->user()->company_id}}</option>
                     </select>
 
                     <!-- Platoon Dropdown -->
@@ -83,12 +83,12 @@
                 </thead>
                 <tbody>
                     @foreach($patients as $patient)
-                        @if($patient->company === auth()->user()->company) 
+                        @if($patient->company_id === auth()->user()->company_id) 
                         <tr>
                         <td>{{ $patient->student->first_name ?? 'N/A' }}</td>
                         <td>{{ $patient->student->last_name ?? 'N/A' }}</td>
                             <td>{{ $patient->platoon }}</td>
-                            <td>{{ $patient->company }}</td>
+                            <td>{{ $patient->company_id }}</td>
                             <td>
                                 <!-- Button for Sir Major to send for approval -->
 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal{{ $patient->id }}">

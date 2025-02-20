@@ -187,12 +187,29 @@
         <span class="menu-text">Announcements</span>
       </a>
     </li>
-    <li>
-      <a href="#">
-        <i class="bi bi-download"></i>
+    <!-- <li>
+      
+    <a href="{{ route('downloads.index') }}">
+              <i class="bi bi-download"></i>
         <span class="menu-text">Download Center</span>
       </a>
+    </li> -->
+    <li>
+    <a href="{{ route('downloads.index') }}">
+    <i class="bi bi-download"></i>
+        <span class="menu-text">Download Center</span>
+    </a>
+</li>
+
+@auth
+    <li>
+        <a href="{{ route('downloads.create') }}">
+        <i class="bi bi-download"></i>
+        <span class="menu-text"> Upload File</span>
+        </a>
     </li>
+@endauth
+
      <li>
             <a href="{{ route('timetable.index') }}">
                 <i class="bi bi-calendar2"></i>
