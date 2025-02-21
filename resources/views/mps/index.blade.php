@@ -50,7 +50,7 @@
                         @foreach ($mpsStudents as $student)
                             <tr>
                                 <td>{{++$i}}</td>
-                                <td>{{$student->student->first_name}} {{$student->student->last_name}}</td>
+                                <td>{{$student->student->first_name ?? ''}} {{$student->student->last_name ?? ''}}</td>
                                 <td>{{$student->days}}</td>
                                 <td>{{$student->arrested_at}}</td>
                                 <td>
@@ -60,7 +60,7 @@
                                         {{$student->released_at}}
                                     @endif
                                 </td>
-                                <td>{{$student->staff->name}}</td>
+                                <td>{{$student->staff->name ?? ''}}</td>
                                 <td>
                                     <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#statusModal{{ $student->id ?? ''}}">
@@ -91,8 +91,8 @@
                                                 </div>
                                                 <div class="modal-body">
 
-                                                    <p>You are about to release {{$student->student->first_name}}
-                                                        {{$student->student->last_name}}
+                                                    <p>You are about to release {{$student->student->first_name ?? ''}}
+                                                        {{$student->student->last_name ?? ''}}
                                                     </p>
                                                 </div>
                                                 <div class="modal-footer">
@@ -118,7 +118,7 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <h5>Name: {{ $student->student->first_name }} {{ $student->student->last_name }}</h5>
-                                                    <h5>Company: {{ $student->student->company->name }} - {{ $student->student->platoon }}</h5>
+                                                    <h5>Company: {{ $student->student->company->name ?? ''}} - {{ $student->student->platoon ?? ''}}</h5>
                                                    <h5>Description</h5> <p>{{$student->description}}</p>
                                                 </div>
                                             </div>
