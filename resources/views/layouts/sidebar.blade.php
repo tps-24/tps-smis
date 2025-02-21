@@ -219,36 +219,34 @@
         </li> 
 
         
-    
-    @role('Sir Major')
-    @if(auth()->user()->company) 
+       
+        @can('hospital-create')
         <li>
             <a href="{{ route('hospital.index') }}">
                 <i class="bi bi-hospital"></i>
                 <span class="menu-text">Hospital</span>
             </a>
         </li>
-    @endif
-@endrole
+    @endcan()
 
-@role('Receptionist')
+@can('hospital-approve')
     <li>
         <a href="{{ route('receptionist.index') }}">
             <i class="bi bi-person-lines-fill"></i>
             <span class="menu-text">Receptionist Panel</span>
         </a>
     </li>
-@endrole
+    @endcan()
 
 
-@role('Doctor')
+@can('hospital-update')
     <li>
         <a href="{{ route('doctor.page') }}">
             <i class="bi bi-stethoscope"></i>
             <span class="menu-text">Doctor Panel</span>
         </a>
     </li>
-@endrole
+    @endcan()
 
 
     @can('mps-list')

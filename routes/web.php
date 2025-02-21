@@ -195,6 +195,10 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
 
     
     // Define the custom route first
+
+    // routes/web.php
+Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
+
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
@@ -260,17 +264,18 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
 
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
         Route::get('type-test/{type_id}', 'attendence');
-        Route::get('type/{type_id}', 'attendence');
+        Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
         Route::post('create/{type_id}', 'create');
         Route::get('edit/{id}', 'edit');
         Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
         Route::post('{id}/update', 'update');
-        Route::get('list-absent_students/{list_type}/{attendence_id}', action: 'list');
+        Route::get('list-absent_students/{list_type}/{attendence_id}/{date}', action: 'list');
         Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
-        Route::post('store-absents/{attendence_id}', action: 'storeAbsent');
+        Route::post('store-absents/{attendence_id}/{date}', action: 'storeAbsent');
         Route::post('store-safari/{attendence_id}', action: 'storeSafari');
         Route::get('today/{company_id}/{type}','today');
-        Route::get('today/{company_id}/{$type}', 'today')->name('today_attendance');
+        Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
+        //Route::get('today/{company_id}/{$type}', 'today')->name('attendances.summary');
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
@@ -279,7 +284,7 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
 
 
 
-Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today']);
+Route::get('/today/{company_id}/{type}/{date}', [AttendenceController::class, 'today']);
 
 
 Auth::routes();
@@ -374,7 +379,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file'); // Download file
 });
 
-Route::get('test', [BeatController::class,'test']);
+//Route::get('test', [AttendenceController::class,'generatePdf']);
 
 // Route::post('/pusher/auth', function (\Illuminate\Http\Request $request) {
 //     return true;

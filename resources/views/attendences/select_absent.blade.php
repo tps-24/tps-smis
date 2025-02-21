@@ -19,7 +19,7 @@
 @section('content')
 <h5>Please check absent students.</h5>
 <div class="table-responsive">
-    <form action="{{url('attendences/store-absents/' . $attendence_id)}}" method="post">
+    <form action="{{url('attendences/store-absents/' . $attendence_id.'/'.$date)}}" method="post">
         @csrf
         @method("POST")
         <table class="table table-striped truncate m-0">

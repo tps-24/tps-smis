@@ -12,18 +12,21 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class AttendenceController extends Controller
 {
     private $user;
     private $companies;
-
+    private $selectedSessionId;
     public function __construct()
     {
+        $this->selectedSessionId = session('selected_session');
+        if (!$this->selectedSessionId)
+            $this->selectedSessionId = 1;
 
-
-        $this->middleware('permission:attendance-list|attendance-create|attendance-edit|attendance-delete', ['only' => ['index', 'today','attendence']]);
+        $this->middleware('permission:attendance-list|attendance-create|attendance-edit|attendance-delete', ['only' => ['index', 'today', 'attendence']]);
         $this->middleware('permission:attendance-create', ['only' => ['create', 'store']]);
         $this->middleware('permission:attendance-delete', ['only' => ['destroy']]);
 
@@ -33,7 +36,7 @@ class AttendenceController extends Controller
      */
     public function index()
     {
-        return $this->attendence(1);
+        return redirect()->to('attendences/type/1');
     }
 
     /**
@@ -42,14 +45,9 @@ class AttendenceController extends Controller
     public function create(Request $request, $attendenceType_id)
     {
         $attendenceType = AttendenceType::find($attendenceType_id);
-        $platoon = Platoon::where('platoons.name', $request->platoon)
-            ->leftJoin('companies', 'companies.id', 'platoons.company_id')
-            //->where('companies.name', $request->company)
-            ->select('platoons.*')->get()[0];
+        $platoon = Platoon::find($request->platoon);
 
-
-        $students = Student::where('company_id', $request->company_id)->where('platoon', $request->platoon)->get();
-        //$platoon_id = $platoon->id;
+        $students = Student::where('company_id', $platoon->company_id)->where('platoon', $platoon->name)->get();
         return view(
             'attendences/create',
             compact('students', 'attendenceType', 'platoon')
@@ -120,14 +118,15 @@ class AttendenceController extends Controller
     /**
      * List all attendence for all companies
      */
-    public function today($company_id, $type)
+    public function today($company_id, $type, $date)
     {
         $attendences = new \Illuminate\Database\Eloquent\Collection;
         $company = Company::find($company_id);
         $page = AttendenceType::find($type);
+        $date = Carbon::parse($date)->format('Y-m-d');
         foreach ($company->platoons as $platoon) {
             if ($platoon->attendences->isNotEmpty()) {
-                $platoon_attendences = $platoon->attendences()->where('attendenceType_id', $type)->whereDate('created_at', Carbon::today())->get();
+                $platoon_attendences = $platoon->attendences()->where('attendenceType_id', $type)->whereDate('created_at', $date)->get();
                 $absent_students = new \Illuminate\Database\Eloquent\Collection;
                 $safari_students = new \Illuminate\Database\Eloquent\Collection;
                 foreach ($platoon_attendences as $att) {
@@ -159,7 +158,7 @@ class AttendenceController extends Controller
 
 
         }
-        return view('attendences.attended', compact('attendences', 'page', 'company'));
+        return view('attendences.attended', compact('attendences', 'page', 'company', 'date'));
     }
     protected function statistics($attendence, $company)
     {
@@ -243,8 +242,15 @@ class AttendenceController extends Controller
         return view('attendences/index', compact('statistics', 'companies', 'page'));
     }
 
-    public function attendence($type)
+    public function attendence(Request $request, $type)
     {
+
+        if (!$request->date) {
+            $date = Carbon::today();
+        } else {
+            $date = $request->date;
+        }
+        $date = Carbon::parse($date)->format('Y-m-d');
         $attendenceType = AttendenceType::find($type);
         $page = $attendenceType;
         $roles = Auth::user()->roles;
@@ -256,18 +262,15 @@ class AttendenceController extends Controller
                 $role->name == 'Chief Instructor' ||
                 $role->name == 'Staff Officer'
             ) {
-                $this->companies = Company::all();                
-            }
-            else if($role->name == 'Teacher'|| $role->name == 'Sir Major'){
+                $this->companies = Company::all();
+            } else if ($role->name == 'Teacher' || $role->name == 'Sir Major') {
                 //return Auth::user()->staff;
-               $this->companies = [Auth::user()->staff->company];
-              if(count($this->companies) != 0)
-               if($this->companies[0] == null){
-    
-                return view('attendences/index', compact( 'page'));
-               }
-            }
-            else{
+                $this->companies = [Auth::user()->staff->company];
+                if (count($this->companies) != 0)
+                    if ($this->companies[0] == null) {
+                        return view('attendences/index', compact('page', 'date'));
+                    }
+            } else {
                 abort(403);
             }
         }
@@ -275,8 +278,8 @@ class AttendenceController extends Controller
         foreach ($this->companies as $company) {
             $company_stats = [];
             foreach ($company->platoons as $platoon) {
-                if (count($platoon->attendences()->whereDate('created_at', Carbon::today())->where('attendenceType_id', $type)->get()) > 0) {
-                    array_push($company_stats, $platoon->attendences()->whereDate('created_at', Carbon::today())->where('attendenceType_id', $type)->get());
+                if (count($platoon->attendences()->whereDate('created_at', $date)->where('attendenceType_id', $type)->get()) > 0) {
+                    array_push($company_stats, $platoon->attendences()->whereDate('created_at', $date)->where('attendenceType_id', $type)->get());
                 }
             }
             array_push($statistics, [
@@ -285,8 +288,8 @@ class AttendenceController extends Controller
             ]);
         }
         $companies = $this->companies;
-        return view('attendences/index', compact('statistics', 'companies', 'page'));
-        
+        return view('attendences/index', compact('statistics', 'companies', 'page', 'date'));
+
     }
 
     public function getMPSdata($company)
@@ -303,14 +306,14 @@ class AttendenceController extends Controller
 
 
 
-    public function list($list_type, $attendence_id)
+    public function list($list_type, $attendence_id, $date)
     {
         $attendence = Attendence::find($attendence_id);
         $students = $attendence->platoon->students()->orderBy('first_name')->get();
         $absent_student_ids = explode(",", $attendence->absent_student_ids);
         // $students = Company::join('students', 'companies.name', 'students.company')->join('platoons', 'platoons.id', 'students.platoon')
         //     ->where('students.company', 'HQ')->where('students.platoon', '1')->get('students.*');
-        return view('attendences.select_absent', compact('students', 'attendence_id', 'list_type','absent_student_ids'));
+        return view('attendences.select_absent', compact('students', 'attendence_id', 'list_type', 'absent_student_ids', 'date'));
     }
 
     public function list_safari($list_type, $attendence_id)
@@ -319,7 +322,7 @@ class AttendenceController extends Controller
         $students = $attendence->platoon->students;
         return view('attendences.select_safari', compact('students', 'attendence_id', 'list_type'));
     }
-    public function storeAbsent(Request $request, $attendence_id)
+    public function storeAbsent(Request $request, $attendence_id, $date)
     {
         $attendence = Attendence::find($attendence_id);
         if (!$attendence) {
@@ -328,11 +331,11 @@ class AttendenceController extends Controller
         $ids = $request->input('student_ids');
         $absent_student_ids = implode(',', $ids);
         $attendence->absent_student_ids = $absent_student_ids;
-        $attendence->absent = count(value: $ids); 
-        $attendence->present =$attendence->total - $attendence->mps - $attendence->absent; 
-            $attendence->save();
+        $attendence->absent = count(value: $ids);
+        $attendence->present = $attendence->total - $attendence->mps - $attendence->absent;
+        $attendence->save();
         $page = $attendence->attendenceType;
-        return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id)->with('page', $attendence->attendenceType);
+        return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id, $date)->with('page', $attendence->attendenceType);
     }
 
     public function storeSafari(Request $request, $attendence_id)
@@ -347,7 +350,13 @@ class AttendenceController extends Controller
         $attendence->safari = count(value: $ids);
         $attendence->save();
         $page = $attendence->attendenceType;
-        return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id, )->with('page', $page);
+        return $this->today($attendence->platoon->company_id, $attendence->attendenceType_id, Carbon::today())->with('page', $page);
+    }
+
+    public function getPlatoons($company_id)
+    {
+        $company = Company::find($company_id);
+        return response()->json($company->platoons);
     }
 
     /**
@@ -357,19 +366,44 @@ class AttendenceController extends Controller
     {
         $ids = $request->input('student_ids');
         if ($ids == NULL) {
-            // return redirect()->back()->with('success', "Please select at least one students.");
+            return redirect()->route('attendences.index')->with('success', "Attendences for this platoon already recorded.");
         }
-        ;
+        // $female = $students->where('gender', 'F')->count();
+        // $male = $students->where('gender', 'M')->count();
         $present = count($ids);
         $platoon = Platoon::find($platoon_id);
-        $students = Student::where('company_id', $platoon->company->id)->where('platoon', $platoon->id)->pluck('id')->toArray();
+        $students = Student::where('company_id', $platoon->company_id)
+            ->where('session_programme_id', $this->selectedSessionId)
+            ->where('platoon', $platoon->id)
+            ->pluck('id')->toArray();
+            $male = Student::where('company_id', $platoon->company_id)
+            ->where('session_programme_id', $this->selectedSessionId)
+            ->where('platoon', $platoon->id)
+            ->where('gender', 'M')
+            ->count();
+        
+        $female = Student::where('company_id', $platoon->company_id)
+            ->where('session_programme_id', $this->selectedSessionId)
+            ->where('platoon', $platoon->id)
+            ->where('gender', 'F')
+            ->count();
+        
         $absent_ids = array_values(array_diff($students, $ids));
+
         $total = count($students);
         $todayRecords = Attendence::leftJoin('platoons', 'attendences.platoon_id', 'platoons.id')
             ->where('attendences.platoon_id', $platoon_id)
             ->whereDate('attendences.created_at', Carbon::today())->get();
         if (!$todayRecords->isEmpty()) {
             return redirect()->route('attendences.index')->with('success', "Attendences for this platoon already recorded.");
+        }
+        for($i = 0; $i<count($absent_ids); $i++){
+            $student = Student::find($absent_ids[$i]);
+                if($student->gender == 'M'){
+                    $male-=1;
+                }else if($student->gender = 'F'){
+                    $female -=1;
+                }
         }
         $page = AttendenceType::find($type);
         Attendence::create([
@@ -382,12 +416,123 @@ class AttendenceController extends Controller
             'safari' => 0,
             'off' => 0,
             'mess' => 0,
-            'female' => 0,
-            'male' => 0,
+            'female' => $female,
+            'male' => $male,
             'absent_student_ids' => implode(',', $absent_ids),
             'total' => $total
         ]);
-        return redirect()->route('attendences.index')->with('page', $page);;
-        
+        return redirect()->route('attendences.index')->with('page', $page);
+        ;
+
+    }
+
+    public function day_report($companyId, $date)
+    {
+        $summary = [];
+        $company = Company::find($companyId);
+        $total_present = $total_absent = $total = 0;
+        $summary = [];
+        $total_present = 0;
+        $total_absent = 0;
+        $total = 0;
+        foreach ($company->platoons as $platoon) {
+            $attendances = $platoon->attendences()->whereDate('created_at', $date)->get();
+            if ($attendances->isNotEmpty()) {
+                foreach ($attendances as $attendance) {
+                    $summary[$platoon->id] = ['present' => $attendance->present, 'absent' => $attendance->absent, 'total' => $attendance->total];
+                    $total_present += $attendance->present;
+                    $total_absent += $attendance->absent;
+                    $total += $attendance->total;
+                }
+            } else {
+                $summary[$platoon->id] = ['present' => 0, 'absent' => 0, 'total' => 0];
+            }
+        }
+        return [
+            'summary' => $summary,
+            'total_present' => $total_present,
+            'total_absent' => $total_absent,
+            'total' => $total,
+            'absent_percentage' => round(($total_absent / $total) * 100, 4)
+        ];
+    }
+    public function current_week_report($companyId)
+    {
+        $company = Company::find($companyId);
+        $summary = [];
+        $total_present = $total_absent = $total = 0;
+
+        // Determine the start and end dates of the current week
+        $startDate = Carbon::now()->startOfWeek()->toDateString();
+        $endDate = Carbon::now()->endOfWeek()->toDateString();
+
+        foreach ($company->platoons as $platoon) {
+            $platoon_summary = ['present' => 0, 'absent' => 0, 'total' => 0];
+
+            $attendances = $platoon->attendences()->whereBetween('created_at', [$startDate, $endDate])->get();
+
+            foreach ($attendances as $attendance) {
+                $platoon_summary['present'] += $attendance->present;
+                $platoon_summary['absent'] += $attendance->absent;
+                $platoon_summary['total'] += $attendance->total;
+                $total_present += $attendance->present;
+                $total_absent += $attendance->absent;
+                $total += $attendance->total;
+            }
+
+            $summary[$platoon->id] = $platoon_summary;
+        }
+
+        $absent_percentage = $total > 0 ? round(($total_absent / $total) * 100, 4) : 0;
+
+        return [
+            'summary' => $summary,
+            'total_present' => $total_present,
+            'total_absent' => $total_absent,
+            'total' => $total,
+            'absent_percentage' => $absent_percentage
+        ];
+    }
+
+    public function report_for_date_range($companyId, $startDate, $endDate)
+    {
+        $company = Company::find($companyId);
+        $summary = [];
+        $total_present = $total_absent = $total = 0;
+
+        foreach ($company->platoons as $platoon) {
+            $platoon_summary = ['present' => 0, 'absent' => 0, 'total' => 0];
+
+            $attendances = $platoon->attendences()->whereBetween('created_at', [$startDate, $endDate])->get();
+
+            foreach ($attendances as $attendance) {
+                $platoon_summary['present'] += $attendance->present;
+                $platoon_summary['absent'] += $attendance->absent;
+                $platoon_summary['total'] += $attendance->total;
+                $total_present += $attendance->present;
+                $total_absent += $attendance->absent;
+                $total += $attendance->total;
+            }
+
+            $summary[$platoon->id] = $platoon_summary;
+        }
+
+        $absent_percentage = $total > 0 ? round(($total_absent / $total) * 100, 4) : 0;
+
+        return [
+            'summary' => $summary,
+            'total_present' => $total_present,
+            'total_absent' => $total_absent,
+            'total' => $total,
+            'absent_percentage' => $absent_percentage
+        ];
+    }
+
+    public function generatePdf($companyId, $date)
+    {
+        $company = Company::find($companyId);
+        //return view('attendences.daily_report', compact('company', 'date'));
+        $pdf = Pdf::loadView('attendences.daily_report', compact('company', 'date'));
+        return $pdf->download($date . "-" . $company->name . "-attendance.pdf");
     }
 }
