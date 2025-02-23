@@ -32,4 +32,8 @@ class Company extends Model
     public function platoons(){
         return $this->hasMany(Platoon::class);
     } 
+
+    public function beatRound(){
+        return $this->hasMany(BeatRound::class);
+    } 
 }

@@ -92,7 +92,7 @@
                     <!-- Nav tabs start -->
                     <ul class="nav nav-tabs" id="customTab2" role="tablist">
                         <?php
-$i = 0;
+                            $i = 0;
                         ?>
                         @foreach ($companies as $company)
                             <li class="nav-item" role="presentation">

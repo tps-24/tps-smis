@@ -637,6 +637,70 @@ $additionalReserves = $additionalMaleReserves->merge($additionalFemaleReserves)
 //Beat Report
 public function showReport(Request $request)
 {
+    $companies = Company::all();
+    //return $companies[0]->beatRound[0]->current_round;
+    $report = [];
+    foreach($companies as $company){
+        $students = $company->students->where('session_programme_id', 1);
+        $totalStudents = count($students);
+        $totalEligibleStudents = count($students->where('beat_status', 1));
+        $totalIneligibleStudents = count($students->where('beat_status','!=', 1));
+        $eligibleStudentsPercent = round((($totalStudents-$totalIneligibleStudents )/$totalStudents) *100, 2);
+        $InEligibleStudentsPercent = round((($totalIneligibleStudents )/$totalStudents) *100, 2);
+
+        $guardAreas = count($company->guardAreas);
+        $patrolAreas = count($company->patrolAreas);
+        $current_round = $company->beatRound[0]->current_round;
+        $attained_current_round = count($students->where('beat_round',$current_round)->values());
+        $NotAttained_current_round = count($students->where('beat_round','<',$current_round)->values());
+        $exceededAttained_current_round = count($students->where('beat_round','>',$current_round)->values());
+
+        $ICTStudents = $students->where('beat_exclusion_vitengo_id',1)->values();
+        $ujenziStudents = $students->where('beat_exclusion_vitengo_id',2)->values();
+        $hospitalStudents = $students->where('beat_exclusion_vitengo_id',3)->values();
+        $emergencyStudents = $students->whereNotNull('beat_emergency')->where('beat_status', 0)->values();
+        
+
+        $company = [
+            'company_name' =>$company->name,
+            'data'=>[
+                'totalStudents' => $totalStudents,
+                'totalIneligibleStudents' => $totalIneligibleStudents,
+                'totalEligibleStudents' => $totalEligibleStudents,
+                'eligibleStudentsPercent' => $eligibleStudentsPercent,
+                'InEligibleStudentsPercent' => $InEligibleStudentsPercent,
+                'guardAreas'=> $guardAreas,
+                'patrolAreas'=> $patrolAreas,
+                'current_round' => $current_round,
+                'attained_current_round'=> $attained_current_round,
+                'NotAttained_current_round' => $NotAttained_current_round,
+                'exceededAttained_current_round'=>$exceededAttained_current_round,
+                'vitengo' => [
+                    [
+                    'name' => 'ICT',
+                    'students' => $ICTStudents
+                    ],
+                    [
+                        'name' => 'UJENZI',
+                        'students' => $ujenziStudents
+                    ],
+                    [
+                        'name' => 'HOSPITAL',
+                        'students' => $hospitalStudents
+                    ],
+
+                ],
+                'emergencyStudents' => $emergencyStudents
+            ]
+            ];
+            array_push($report, $company);
+    }
+   // dd($report) ;
+    return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
+}
+
+public function showReport2(Request $request)
+{
     $startDate = $request->input('start_date', null);
     $endDate = $request->input('end_date', null);
     $dateFilter = $request->input('date_filter', null);
@@ -645,6 +709,7 @@ public function showReport(Request $request)
     
     return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
 }
+
 
 public function downloadReport(Request $request)
 {

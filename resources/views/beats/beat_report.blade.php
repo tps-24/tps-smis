@@ -23,190 +23,163 @@
 
 
 
-<div class="container">
-    <h1>Beat Report</h1>
-
-    <!-- Filter form -->
-    <form action="{{ route('report.generate') }}" method="get" class="mb-4">
-        <div class="row">
-            <div class="col-md-4">
-                <label for="start_date">Start Date:</label>
-                <input type="date" name="start_date" id="start_date" class="form-control"
-                    value="{{ request('start_date') }}">
-            </div>
-            <div class="col-md-4">
-                <label for="end_date">End Date:</label>
-                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request('end_date') }}">
-            </div>
-            <div class="col-md-4">
-                <label for="date_filter">Date Filter:</label>
-                <select name="date_filter" id="date_filter" class="form-control">
-                    <option value="">None</option>
-                    <option value="weekly" {{ request('date_filter') == 'weekly' ? 'selected' : '' }}>Weekly</option>
-                    <option value="monthly" {{ request('date_filter') == 'monthly' ? 'selected' : '' }}>Monthly</option>
-                </select>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
-        <a href="{{ route('report.download', ['start_date' => request('start_date'), 'end_date' => request('end_date'), 'date_filter' => request('date_filter')]) }}"
-            class="btn btn-secondary mt-3">Download PDF</a>
-    </form>
+<div style="left:200px;" class="custom-tabs-container">
 
     <!-- Report data in tabs -->
-    <ul class="nav nav-tabs" id="companyTabs" role="tablist">
-        @foreach ($report['companies'] as $index => $company)
+    <ul class="nav nav-tabs" id="customTab2" role="tablist">
+        <?php
+$i = 0;
+                        ?>
+        @foreach ($companies as $company)
         <li class="nav-item" role="presentation">
-            <button class="nav-link {{ $index == 0 ? 'active' : '' }}" id="tab-{{ $company['company_id'] }}"
-                data-bs-toggle="tab" data-bs-target="#content-{{ $company['company_id'] }}" type="button" role="tab"
-                aria-controls="content-{{ $company['company_id'] }}"
-                aria-selected="{{ $index == 0 ? 'true' : 'false' }}">
-                {{ $company['company_name'] }}
-            </button>
+            <a id="tab-one{{$company->name}}" data-bs-toggle="tab" href="#one{{$company->name}}" role="tab"
+                aria-controls="one{{$company->name}}" aria-selected="true" @if ($i==0) class="nav-link active" @else
+                class="nav-link" @endif> {{$company->name}} Company</a>
         </li>
+        <?php    $i = +1; ?>
         @endforeach
     </ul>
-    <div class="tab-content" id="companyTabsContent">
-        @foreach ($report['companies'] as $index => $company)
-        <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" id="content-{{ $company['company_id'] }}"
-            role="tabpanel" aria-labelledby="tab-{{ $company['company_id'] }}">
-            <ul>
-                <li>Total Students: {{ $company['total_students'] }}</li>
-                <li>Total Eligible Students: {{ $company['total_eligible'] }}</li>
-                <li>Total Ineligible Students: {{ $company['total_ineligible'] }}</li>
-                <li>Percentage Eligible: {{ $company['percent_eligible'] }}%</li>
-                <li>Percentage Ineligible: {{ $company['percent_ineligible'] }}%</li>
-            </ul>
 
-            <h2>Guard Areas Per Company</h2>
-            <table class="table">
+
+    <div class="tab-content h-300">
+        @for ($j = 0; $j < count($report); ++$j) <div id="one{{$report[$j]['company_name']}}" @if ($j==0)
+            class="tab-pane fade show active" @else class="tab-pane fade" @endif role="tabpanel">
+            @php
+            $data = $report[$j]['data'];
+            @endphp
+            <div class="d-flex  justify-content-end">
+                <a href="">
+                    <button title="Download report" class="btn btn-sm btn-success"><i class="gap 2 bi bi-download"></i>
+                        Report</button>
+                </a>
+            </div>
+            <h4>Company Summary</h4>
+
+            <table style="width: 50%" class="table table-striped truncate m-0">
                 <thead>
-                    <tr>
-                        <th>Company ID</th>
-                        <th>Total Guard Areas</th>
-                    </tr>
+                    @php
+                    $i = 0;
+                    @endphp
+
                 </thead>
                 <tbody>
-                    @foreach ($report['guard_areas'] as $area)
-                    @if ($area->company_id == $company['company_id'])
+
                     <tr>
-                        <td>{{ $area->company_id }}</td>
-                        <td>{{ $area->total_guard_areas }}</td>
+                        <td>{{++$i}}</td>
+                        <td>Total Students</td>
+                        <td>{{ $data['totalStudents'] }}</td>
                     </tr>
-                    @endif
-                    @endforeach
+                    <tr>
+                        <td>{{++$i}}</td>
+                        <td>Eligible Students</td>
+                        <td>{{ $data['totalEligibleStudents'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{++$i}}</td>
+                        <td>Ineligible Students</td>
+                        <td>{{ $data['totalIneligibleStudents'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{++$i}}</td>
+                        <td>Eligible Students percentage</td>
+                        <td> {{$data['eligibleStudentsPercent']}}%</td>
+                    </tr>
+                    <tr>
+                        <td>{{++$i}}</td>
+                        <td>Ineligible Students percentage</td>
+                        <td> {{$data['InEligibleStudentsPercent']}}%</td>
+                    </tr>
+                    <tr>
+                        <td>{{++$i}}</td>
+                        <td>Guard Areas</td>
+                        <td> {{$data['guardAreas']}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{++$i}}</td>
+                        <td>Patrol Areas</td>
+                        <td> {{$data['patrolAreas']}}</td>
+                    </tr>
+
+
                 </tbody>
             </table>
 
-            <h2>Patrol Areas Per Company</h2>
-            <table class="table">
+            <table style="width: 50%" class="table mb-4">
                 <thead>
                     <tr>
-                        <th>Company ID</th>
-                        <th>Total Patrol Areas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($report['patrol_areas'] as $area)
-                    @if ($area->company_id == $company['company_id'])
-                    <tr>
-                        <td>{{ $area->company_id }}</td>
-                        <td>{{ $area->total_patrol_areas }}</td>
-                    </tr>
-                    @endif
-                    @endforeach
-                </tbody>
-            </table>
-
-            <h2>Students Required Per Day</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Company ID</th>
-                        <th>Total Required Per Day</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($report['students_required_per_day'] as $item)
-                    @if ($item->company_id == $company['company_id'])
-                    <tr>
-                        <td>{{ $item->company_id }}</td>
-                        <td>{{ $item->total_required_per_day }}</td>
-                    </tr>
-                    @endif
-                    @endforeach
-                </tbody>
-            </table>
-
-            <h2>Current Round Status</h2>
-            <ul>
-                @foreach ($report['current_round_status'] as $status)
-                @if ($status->company_id == $company['company_id'])
-                <li>Company ID: {{ $status->company_id }}</li>
-                <li>Current Round: {{ $status->current_round }}</li>
-                @endif
-                @endforeach
-            </ul>
-
-            <h2>Round Attendance</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Company ID</th>
+                        <th></th>
+                        <th>Current round</th>
                         <th>Attained Current Round</th>
                         <th>Exceeded Current Round</th>
                         <th>Not Attained Current Round</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($report['round_attendance'] as $attendance)
-                    @if ($attendance->company_id == $company['company_id'])
                     <tr>
-                        <td>{{ $attendance->company_id }}</td>
-                        <td>{{ $attendance->attained_current_round }}</td>
-                        <td>{{ $attendance->exceeded_current_round }}</td>
-                        <td>{{ $attendance->not_attained_current_round }}</td>
+                        <td></td>
+                        <td>{{$data['current_round']}}</td>
+                        <td>{{$data['attained_current_round']}}</td>
+                        <td>{{$data['NotAttained_current_round']}}</td>
+                        <td>{{$data['exceededAttained_current_round']}}</td>
+
                     </tr>
-                    @endif
-                    @endforeach
                 </tbody>
             </table>
+            <div>
+                <h2>Ineligible Students Based on Vitengo</h2>
+                @foreach ($data['vitengo'] as $kitengo)
+                @if(count($kitengo['students']) > 0)
+                <h2>{{ $kitengo['name'] }}</h2>
+                <table style="width: 50%" class="table table-striped truncate m-0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Names</th>
 
-            <h2>Ineligible Students Based on Vitengos</h2>
-            @foreach ($report['vitengo_categories'][$company['company_id']] ?? [] as $vitengo => $students)
-            <h3>{{ $vitengo }}</h3>
-            @php
-                $i = 0;
-            @endphp
-            <table class="table table-striped truncate m-0">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Names</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach ($students as $student)
-                    <tr>
-                        <td>{{ ++$i }}</td>
-                        <td>{{ $student }}</td>
-                    </tr>
+                            <th>Platoon</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $n =0; @endphp
+                        @foreach ($kitengo['students'] as $student)
+                        <tr>
+                            <td>{{++$n}}</td>
+                            <td>{{$student->first_name}} {{$student->last_name}}</td>
+                            <td>{{$student->platoon}}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                @endif
                 @endforeach
-                </tbody>
-            </table>
-            @endforeach
 
-            <h2>Ineligible Students Based on Emergency</h2>
-            @foreach ($report['emergency_categories'][$company['company_id']] ?? [] as $emergency)
-            <p>{{ $emergency['name'] }} - Reason: {{ $emergency['reason'] }}</p>
-            @endforeach
+                <h2>EMERGENCE</h2>
+                <table style="width: 50%" class="table table-striped truncate m-0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Names</th>
+                            <th>Reason</th>
+                            <th>Platoon</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $n =0; @endphp
+                        @foreach ($data['emergencyStudents'] as $student)
+                        <tr>
+                            <td>{{++$n}}</td>
+                            <td>{{$student->first_name}} {{$student->last_name}}</td>
+                            <td>{{$student->beat_emergency}}</td>
+                            <td>{{$student->platoon}}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-            <h2>Ineligible Students with String Reasons</h2>
-            @foreach ($report['string_reasons'][$company['company_id']] ?? [] as $reason)
-            <p>{{ $reason['name'] }} - Reason: {{ $reason['reason'] }}</p>
-            @endforeach
-        </div>
-        @endforeach
+
     </div>
+    @endfor
 </div>
 
 @endsection
