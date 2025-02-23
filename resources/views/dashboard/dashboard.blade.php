@@ -11,7 +11,7 @@
             <div id="radial2"></div>
             </div>
             <div class="d-flex flex-column">
-            <h2 class="lh-1">86</h2>
+            <h2 class="lh-1">{{count($staffs)}}</h2>
             <p class="m-0 opacity-50">Staffs Present</p>
             </div>
         </div>
@@ -21,7 +21,7 @@
             <i class="bi bi-arrow-right ms-2"></i>
             </a>
             <div class="text-end">
-            <p class="mb-0 text-success">26%</p>
+            <p class="mb-0 text-success">100%</p>
             <span class="badge bg-success-subtle text-success small">Today</span>
             </div>
         </div>
@@ -36,7 +36,7 @@
             <div id="radial1"></div>
             </div>
             <div class="d-flex flex-column">
-            <h2 class="lh-1">4690</h2>
+            <h2 class="lh-1">{{ count($denttotal) }}</h2>
             <p class="m-0 opacity-50">Students Present</p>
             </div>
         </div>
@@ -61,7 +61,7 @@
             <div id="radial3"></div>
             </div>
             <div class="d-flex flex-column">
-            <h2 class="lh-1">26</h2>
+            <h2 class="lh-1">{{ count($patients) }}</h2>
             <p class="m-0 opacity-50">Sick Students (ED)</p>
             </div>
         </div>
@@ -71,7 +71,7 @@
             <i class="bi bi-arrow-right ms-2"></i>
             </a>
             <div class="text-end">
-            <p class="mb-0 text-info">0.5%</p>
+            <p class="mb-0 text-info">0.0%</p>
             <span class="badge bg-info-subtle text-info small">Today</span>
             </div>
         </div>
@@ -86,7 +86,7 @@
             <div id="radial4"></div>
             </div>
             <div class="d-flex flex-column">
-            <h2 class="m-0 lh-1">120</h2>
+            <h2 class="m-0 lh-1">{{ count($beats) }}</h2>
             <p class="m-0 opacity-50">Guards & Patrols</p>
             </div>
         </div>
@@ -111,7 +111,7 @@
     <div class="col-xxl-6 col-sm-12 col-12">
     <div class="card mb-4 card-height-420">
         <div class="card-header">
-        <h5 class="card-title">Sales</h5>
+        <h5 class="card-title">Grouped Bar Graph</h5>
         </div>
         <div class="card-body">
 

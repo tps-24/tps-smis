@@ -16,17 +16,17 @@ class DatabaseSeeder extends Seeder
         
 
         $this->call([
-            PermissionTableSeeder::class,
-            CreateAdminUserSeeder::class,
-            BeatTypeSeeder::class,
-            AreaSeeder::class,
+            // PermissionTableSeeder::class,
+            // CreateAdminUserSeeder::class,
+            // BeatTypeSeeder::class,
+            // AreaSeeder::class,
             VitengoSeeder::class,
-            CompanySeeder::class,
-            PlatoonSeeder::class,
-            AttendenceTypeSeeder::class,
-            AttendenceSeeder::class,
-            GradingSystemsTableSeeder::class,
-            PatientsTableSeeder::class,
+            // CompanySeeder::class,
+            // PlatoonSeeder::class,
+            // AttendenceTypeSeeder::class,
+            // AttendenceSeeder::class,
+            // GradingSystemsTableSeeder::class,
+            // PatientsTableSeeder::class,
         ]);
 
         // User::factory(10)->create();

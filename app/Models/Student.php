@@ -19,7 +19,7 @@ class Student extends Model
         'next_kin_relationship', 'next_kin_address', 'next_of_kin', 'profile_complete', 'photo', 
         'status', 'approved_at', 'rejected_at', 'reject_reason', 'approved_by', 
         'rejected_by', 'transcript_printed', 'certificate_printed', 'printed_by', 
-        'reprint_reason'
+        'reprint_reason','beat_exclusion_vitengo_id','beat_emergency'
     ];
 
     public function user()
@@ -29,6 +29,11 @@ class Student extends Model
     public function programme()
     {
         return $this->belongsTo(Programme::class);
+    }
+
+    public function vitengo()
+    {
+        return $this->belongsTo(Vitengo::class);
     }
 
     public function mps()

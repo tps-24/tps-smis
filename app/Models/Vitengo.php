@@ -11,4 +11,9 @@ class Vitengo extends Model
         'description',
         'status',
     ];
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }

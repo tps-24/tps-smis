@@ -18,6 +18,11 @@ class VitengoSeeder extends Seeder
         ]);
 
         Vitengo::create([
+            "name" => "Ujenzi",
+            "description"=> "Taking care of kujenga."
+        ]);
+
+        Vitengo::create([
             "name" => "Hospital",
             "description"=> "Diagnosis and treatment."
         ]);

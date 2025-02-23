@@ -121,10 +121,11 @@
                                                 <td>{{ $beat->start_at }}</td>
                                                 <td>{{ $beat->end_at }}</td>
                                                 <td>
-                                                    <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
+                                                <a href="{{route('beats.edit', $beat->id)}}"><button class="btn btn-primary btn-sm">Edit</button></a> 
+                                                    <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
                                                         @csrf @method('DELETE')
                                                         <button class="btn btn-danger btn-sm">Delete</button>
-                                                    </form>
+                                                    </form> -->
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -178,10 +179,11 @@
                                                 <td>{{ $beat->start_at }}</td>
                                                 <td>{{ $beat->end_at }}</td>
                                                 <td>
-                                                    <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
+                                                <a href="{{route('beats.edit', $beat->id)}}"><button class="btn btn-primary btn-sm">Edit</button></a> 
+                                                    <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
                                                         @csrf @method('DELETE')
                                                         <button class="btn btn-danger btn-sm">Delete</button>
-                                                    </form>
+                                                    </form> -->
                                                 </td>
                                             </tr>
                                         @endforeach
