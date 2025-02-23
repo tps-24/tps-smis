@@ -535,4 +535,52 @@ class AttendenceController extends Controller
         $pdf = Pdf::loadView('attendences.daily_report', compact('company', 'date'));
         return $pdf->download($date . "-" . $company->name . "-attendance.pdf");
     }
+
+    public function changanua($attendenceId){
+        $attendence = Attendence::find($attendenceId);
+        $platoon = $attendence->platoon;
+        $absent = $attendence->absent_student_ids !=null? explode(",",$attendence->absent_student_ids): [];
+        $sentry = $attendence->sentry_student_ids !=null? explode(",",$attendence->sentry_student_ids): [];
+        $mess = $attendence->mess_student_ids !=null? explode(",",$attendence->mess_student_ids): [];
+        $adm = $attendence->adm_student_ids !=null? explode(",",$attendence->adm_student_ids): [];
+        $off = $attendence->off_student_ids !=null? explode(",",$attendence->off_student_ids): [];
+      
+        //return $mess;
+        $notEligibleStudent_ids = array_merge($absent,$sentry,$mess, $adm,$off);
+        $students = $platoon->students->whereNotIn('id',$notEligibleStudent_ids)->values();
+        //return $students->take(2);
+
+        return view('attendences.changanua', compact('students', 'attendence'));
+    }
+
+    public function storeMchanganuo(Request $request,$attendenceId){
+        $attendence = Attendence::find($attendenceId);
+        $ids = $request->input('student_ids');
+
+        if($request->type == "sentry"){
+            $attendence->sentry_student_ids = implode(",",$ids);
+            $attendence->sentry = count($ids);
+            $attendence->present -= count($ids);
+        }else if($request->type == "off"){
+            $attendence->off_student_ids = implode(",",$ids);
+            $attendence->off = count($ids);
+            $attendence->present -= count($ids);
+        }else if($request->type == "adm"){
+            $attendence->adm_student_ids = implode(",",$ids);
+            $attendence->adm = count($ids);
+            $attendence->present -= count($ids);
+        }else if($request->type == "mess"){
+            $attendence->mess_student_ids = implode(",",$ids);
+            $attendence->mess = count($ids);
+            $attendence->present -= count($ids);
+        }else if($request->type == "safari"){
+            $attendence->safari_student_ids = implode(",",$ids);
+            $attendence->safari = count($ids);
+            $attendence->present -= count($ids);
+        }
+        
+        $attendence->save();
+
+        return redirect()->to('attendences/type/'.$attendence->attendenceType_id)->with('success', "Attendance updated successfully.");
+    }
 }

@@ -275,6 +275,9 @@ Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']
         Route::post('store-safari/{attendence_id}', action: 'storeSafari');
         Route::get('today/{company_id}/{type}','today');
         Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
+        Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
+        Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
+
         //Route::get('today/{company_id}/{$type}', 'today')->name('attendances.summary');
     });
 

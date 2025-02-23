@@ -63,6 +63,7 @@
                                 data-bs-target="#MoreAbsent{{$attendence->id}}">Absents</button>
                             <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#MoreSafari{{$attendence->id}}">Safari</button>
+                               <a href="{{ route('attendences.changanua',['attendenceId'=> $attendence->id]) }}"> <button class="btn  btn-info btn-sm" >More</button></a>
                             <div class="modal fade" id="MoreAbsent{{$attendence->id}}" tabindex="-1"
                                 aria-labelledby="statusModalLabelMore{{$attendence->id}}" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -97,7 +98,7 @@
                                         
                                         </div>
                                     </div>
-                                </div>
+                              /div>
                             </div>
                             <div class="modal fade" id="MoreSafari{{$attendence->id}}" tabindex="-1"
                                 aria-labelledby="statusModalLabelMore{{$attendence->id}}" aria-hidden="true">
@@ -112,6 +113,16 @@
                                                 aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
+                                            <div class="d-flex gap-2">
+                                                <label for="">Select category</label>
+                                                <select style="width: 50%;" name="" id="" class="form-control">
+                                                    <option value="" disabled selected>select</option>
+                                                    <option value="">Mess</option>
+                                                    <option value="">Sentry</option>
+                                                    <option value="">Off</option>
+                                                    <option value="">Safari</option>
+                                                </select>
+                                            </div>
                                             <ol>
                                                 @foreach($attendence->safari_students as $student)
                                                     @if ($student != null)
