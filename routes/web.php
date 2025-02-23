@@ -37,6 +37,7 @@ use App\Http\Controllers\GuardAreaController;
 use App\Http\Controllers\PatrolAreaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\DownloadController;
+use Carbon\Carbon;
 
 
 require __DIR__ . '/auth.php';
@@ -46,7 +47,22 @@ Route::get('/', function () {
         if (auth()->user()->hasRole('Student')) {
             return view('dashboard.student_dashboard', compact('pending_message'));
         } else {
-            return view('dashboard/dashboard');
+            $denttotal = App\Models\Student::where('session_programme_id',1)->get();
+            $dentpresent = App\Models\Student::where('session_programme_id',1)->where('beat_status',1)->get();
+            $beats = App\Models\Beat::where('date',Carbon::today()->toDateString())->get('student_ids');
+            $patients = App\Models\Patient::where('created_at',Carbon::today()->toDateString())->get('student_id');
+            $staffs = App\Models\Staff::get('forceNumber');
+            // foreach ($totalScore as $student => $scores) {
+            //     $beat = count($scores);
+            // }
+//             $totalStudents = 0;
+// foreach ($beats as $beat) {
+//     $studentCounts = json_decode($beat->student_counts, true); // Assuming student_counts is a JSON-encoded array in Beat model
+//     $totalStudents += count($studentCounts);
+// }  
+            
+
+            return view('dashboard/dashboard', compact('denttotal','dentpresent','beats','patients', 'staffs'));
         }
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -61,7 +77,7 @@ Route::group(['middleware' => 'session_programme'], function () {
     // Or i will join it with auth --Recommended
 });
 
-
+Route::post('/beats/{id}', [BeatController::class, 'update'])->name('beat.update');
 // Route::get('/generate-beats', [BeatController::class, 'showGenerateBeatsForm'])->name('generate.beats.form');
 // Route::post('/generate-beats', [BeatController::class, 'generateBeats'])->name('generate.beats');
 // Route to display the generated beats
@@ -77,12 +93,21 @@ Route::group(['middleware' => 'session_programme'], function () {
 Route::get('/beats/generate', [BeatController::class, 'beatCreate'])->name('beats.beatCreate');
 Route::get('/beats', [BeatController::class, 'beatsByDate'])->name('beats.byDate');
 Route::delete('/beats/{id}', [BeatController::class, 'destroy'])->name('beats.destroy');
-
+Route::get('/beats/{id}/edit', [BeatController::class, 'edit'])->name('beats.edit');
 Route::post('/fill-beats', [BeatController::class, 'fillBeats'])->name('beats.fillBeats');
 // Route::get('/beats', [BeatController::class, 'showBeats'])->name('beats.index');
 Route::get('/beats/{beat}', [BeatController::class, 'showBeat'])->name('beats.show');
 
 Route::get('/beats/pdf/{company}', [BeatController::class, 'generatePDF'])->name('beats.generatePDF');
+
+// Route to generate and display the report
+Route::get('/report/generate', [BeatController::class, 'showReport'])->name('report.generate');
+
+// Route to download the report as a PDF
+Route::get('/report/download', [BeatController::class, 'downloadReport'])->name('report.download');
+
+
+
 
 
 
@@ -120,11 +145,11 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     
 });
 
-Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
 Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
 //Route::resource('students', StudentController::class);
 Route::group(['middleware' => ['auth']], function () {
+    Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         Route::get('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');

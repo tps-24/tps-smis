@@ -67,7 +67,7 @@ public function edit($beat_id){
     $beat  = Beat::find($beat_id);
     $beats  = Beat::where('id', $beat_id)->get();
     $stud =     Student::whereIn('id', json_decode($beat->student_ids))->get();
-    $eligible_students = Student::where('company_id',2)->whereIn('platoon',[8,9,10,11,12,13,14])->where('beat_round',1)->where('beat_status',1)->get();
+    $eligible_students = Student::where('company_id',2)->whereIn('platoon',[1,2,3,4,5,6,7])->where('beat_round',1)->where('beat_status',1)->get();
     return  view('beats.edit', compact('beat','beats', 'eligible_students', 'stud'));
 }
 
@@ -87,11 +87,18 @@ public function update(Request $request, $beat_id){
         return ($key !== false) ? $student[$key] : $value;
     }, $assignedStudentIds);
 
+    // dd($replace_student[0]);
+  
+    
         if (!empty($replace_student)) {
             Student::whereIn('id', $replace_student)
                 ->where('beat_round', '>', 0) // Prevent negative values
                 ->decrement('beat_round');
         }
+        
+
+    //  dd($newArray);
+
 
     if ($beat) {
         $beat->update([
@@ -107,6 +114,91 @@ public function update(Request $request, $beat_id){
 
     return redirect()->route('beats.byDate')->with('success', 'Beat updated successfully.');
 }
+
+//     public function generatePDF(Request $request, $companyId)
+// {
+//     $date = $request->input('date', Carbon::today()->toDateString());
+
+//     $company = Company::where('id', $companyId)
+//         ->where(function ($query) use ($date) {
+//             $query->whereHas('guardAreas.beats', function ($query) use ($date) {
+//                 $query->where('date', $date);
+//             })
+//             ->orWhereHas('patrolAreas.beats', function ($query) use ($date) {
+//                 $query->where('date', $date);
+//             });
+//         })
+//         ->with([
+//             'guardAreas.beats.students' => function ($query) use ($date) {
+//                 $query->where('beats.date', $date);
+//             },
+//             'patrolAreas.beats.students' => function ($query) use ($date) {
+//                 $query->where('beats.date', $date);
+//             }
+//         ])
+//         ->firstOrFail();
+
+//     // 🟢 Step 1: Initialize summary array
+//     $summary = [];
+//     $totalPlatoonCount = [];
+
+//     // 🟢 Step 2: Group students by time slot and platoon
+//     foreach ($company->guardAreas as $area) {
+//         foreach ($area->beats as $beat) {
+//             $timeSlot = $beat->start_at . ' - ' . $beat->end_at;
+
+//             foreach ($beat->students as $student) {
+//                 $platoon = $student->platoon;
+
+//                 if (!isset($summary[$timeSlot][$platoon])) {
+//                     $summary[$timeSlot][$platoon] = 0;
+//                 }
+//                 $summary[$timeSlot][$platoon]++;
+
+//                 // Count total students per platoon
+//                 if (!isset($totalPlatoonCount[$platoon])) {
+//                     $totalPlatoonCount[$platoon] = 0;
+//                 }
+//                 $totalPlatoonCount[$platoon]++;
+//             }
+//         }
+//     }
+
+//     foreach ($company->patrolAreas as $area) {
+//         foreach ($area->beats as $beat) {
+//             $timeSlot = $beat->start_at . ' - ' . $beat->end_at;
+
+//             foreach ($beat->students as $student) {
+//                 $platoon = $student->platoon;
+
+//                 if (!isset($summary[$timeSlot][$platoon])) {
+//                     $summary[$timeSlot][$platoon] = 0;
+//                 }
+//                 $summary[$timeSlot][$platoon]++;
+
+//                 // Count total students per platoon
+//                 if (!isset($totalPlatoonCount[$platoon])) {
+//                     $totalPlatoonCount[$platoon] = 0;
+//                 }
+//                 $totalPlatoonCount[$platoon]++;
+//             }
+//         }
+//     }
+
+//     // 🟢 Step 3: Sort by time slot and platoon number
+//     ksort($summary);
+//     ksort($totalPlatoonCount);
+//     foreach ($summary as &$platoonData) {
+//         ksort($platoonData);
+//     }
+
+//     // 🟢 Step 4: Generate PDF and pass summary + total platoon count
+//     $pdf = Pdf::loadView('beats.pdf', compact('company', 'date', 'summary', 'totalPlatoonCount'))
+//         ->setPaper('a4', 'landscape');
+
+//     return $pdf->download('beats_' . $company->name . '_' . $date . '.pdf');
+// }
+
 
     public function generatePDF(Request $request, $companyId)
     {
@@ -657,6 +749,7 @@ public function downloadReport(Request $request)
     return $pdf->download('beat_report.pdf');
 }
 
+
 private function generateBeatReport($companyId = null, $startDate = null, $endDate = null, $dateFilter = null)
 {
     $companies = is_null($companyId) ? Company::all() : Company::where('id', $companyId)->get();
@@ -705,42 +798,34 @@ private function generateBeatReport($companyId = null, $startDate = null, $endDa
         )
         ->groupBy('company_id')
         ->get();
+
     // Categorize ineligible students
     $vitengoCategories = [];
     $emergencyCategories = [];
     $stringReasons = [];
 
     foreach ($ineligibleStudents as $student) {
-        
-        $studentNames = explode(',', $student->student_names);
         $exclusionVitengoIds = explode(',', $student->exclusion_vitengo_ids);
-        $beatEmergencies = explode(',', $student->beat_emergencies);
-
-        foreach ($studentNames as $index => $name) {
-            $vitengoId = $exclusionVitengoIds[$index] ?? null;
+        foreach ($exclusionVitengoIds as $vitengoId) {
             if ($vitengoId) {
                 $vitengo = DB::table('vitengos')->where('id', $vitengoId)->first();
-                if ($vitengo) {
-                    $vitengoCategories[$student->company_id][$vitengo->name][] = $name;
-                } else {
-                    $vitengoCategories[$student->company_id]['Unknown Vitengo'][] = $name;
-                }
+                $vitengoCategories[$student->company_id][$vitengo->name][] = $student->student_names;
             }
+        }
 
-            $emergency = $beatEmergencies[$index] ?? null;
-            if ($emergency) {
-                if (is_numeric($emergency)) {
-                    $patient = DB::table('patients')->where('id', $emergency)->first();
-                    $emergencyCategories[$student->company_id][] = [
-                        'name' => $name,
-                        'reason' => $patient ? $patient->reason : 'Unknown',
-                    ];
-                } else {
-                    $stringReasons[$student->company_id][] = [
-                        'name' => $name,
-                        'reason' => $emergency,
-                    ];
-                }
+        $beatEmergencies = explode(',', $student->beat_emergencies);
+        foreach ($beatEmergencies as $emergency) {
+            if (is_numeric($emergency)) {
+                $patient = DB::table('patients')->where('id', $emergency)->first();
+                $emergencyCategories[$student->company_id][] = [
+                    'reason' => $patient ? $patient->reason : 'Unknown',
+                    'student' => $student->student_names,
+                ];
+            } else {
+                $stringReasons[$student->company_id][] = [
+                    'reason' => $emergency,
+                    'student' => $student->student_names,
+                ];
             }
         }
     }
@@ -792,14 +877,14 @@ private function generateBeatReport($companyId = null, $startDate = null, $endDa
 
     // Calculate student round attendance
     $roundAttendance = DB::table('students')
-    ->where('session_programme_id', 1)
-    ->select('students.company_id', 
-        DB::raw('count(case when beat_round = beat_rounds.current_round then 1 end) as attained_current_round'),
-        DB::raw('count(case when beat_round > beat_rounds.current_round then 1 end) as exceeded_current_round'),
-        DB::raw('count(case when beat_round < beat_rounds.current_round then 1 end) as not_attained_current_round'))
-    ->leftJoin('beat_rounds', 'students.company_id', '=', 'beat_rounds.company_id')
-    ->groupBy('students.company_id', 'beat_rounds.current_round')
-    ->get();
+        ->where('session_programme_id', 1)
+        ->select('students.company_id', 
+            DB::raw('count(case when beat_round = beat_rounds.current_round then 1 end) as attained_current_round'),
+            DB::raw('count(case when beat_round > beat_rounds.current_round then 1 end) as exceeded_current_round'),
+            DB::raw('count(case when beat_round < beat_rounds.current_round then 1 end) as not_attained_current_round'))
+        ->leftJoin('beat_rounds', 'students.company_id', '=', 'beat_rounds.company_id')
+        ->groupBy('students.company_id', 'beat_rounds.current_round')
+        ->get();
 
     // Compile the report data
     $report = [
