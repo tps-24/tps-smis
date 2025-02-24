@@ -17,118 +17,165 @@
 
 @endsection
 @section('content')
-    <h5>Please check absent students.</h5>
+    <h5>Changanua</h5>
 
     <div class="table-responsive">
         <form action="{{ route('attendences.storeMchanganuo', ['attendenceId' => $attendence->id]) }}" method="post">
             @csrf
             @method("POST")
             <div class="d-flex gap-2">
-                <label for="">Select category</label>
-                <select style="width: 10%;" name="type" id="" class="form-control">
-                    <option value="" disabled selected>select</option>
-                    <option value="mess">Mess</option>
-                    <option value="sentry">Sentry</option>
-                    <option value="off">Off</option>
-                    <option value="safari">Safari</option>
-                </select>
+                <input class="form-check-input" type="radio" name="type" value="mess">
+                <label for="">Mess</label>
+
+                <input class="form-check-input" type="radio" name="type" value="sentry">
+                <label for="">Sentry</label>
+
+                <input class="form-check-input" type="radio" name="type" value="off">
+                <label for="">Off</label>
+
+                <input class="form-check-input" type="radio" name="type" value="safari">
+                <label for="">Safari</label>
             </div>
 
             <div class="row d-flex" style="width: 100%; position: relative;">
                 <div class="col-2" style="width: 40%">
                     <div class="card">
                         <div class="card-body">
-                        <table class="table table-striped truncate m-0">
-                        <thead>
-                            <tr>
-                                <th>Names</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($students as $student)
-                                <tr class="item">
-                                    <td>
-                                        <div class="form-check">
-                                            <input class="form-check-input" name="student_ids[]" type="checkbox"
-                                                value="{{$student->id}}" id="defaultCheck" .{{$student->id}}>
-                                            <label class="form-check-label" for="defaultCheck1">{{$student->first_name}}
-                                                {{$student->middle_name}} {{$student->last_name}}</label>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            <table class="table table-striped truncate m-0">
+                                <thead>
+                                    <tr>
+                                        <th>Names</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($students as $student)
+                                        <tr class="item">
+                                            <td>
+                                                <div class="form-check">
+                                                    <input id="item-child" class="form-check-input" name="student_ids[]"
+                                                        type="checkbox" value="{{$student->id}}" id="defaultCheck"
+                                                        .{{$student->id}}>
+                                                    <label class="form-check-label" for="defaultCheck1">{{$student->first_name}}
+                                                        {{$student->middle_name}} {{$student->last_name}}</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div class="col-2" style="width: 45%; position: fixed; right: 1%;">
-                <div class="card">
-                <div class="card-body">
-                        <div id="mess">
-                            <h4>Mess Students</h4>
-                        </div>
+                <div class="col-2" style="width: 45%; right: 1%; overflow: auto; ">
+                    <div class="card">
+                        <div class="card-body">
+                            <form action="{{ route('attendences.storeMchanganuo', ['attendenceId' => $attendence->id]) }}"
+                                method="POST">
+                                @csrf
+                                @method('POST')
 
-                        <div id="sentry" class="mt-4">
-                            <h4>Sentry Students</h4>
-                        </div>
+                                <div id="mess">
+                                    <h4>Mess Students</h4>
+                                    @foreach ($mess_students as $student)
+                                        <div class="form-check">
+                                            <input id="item-child" class="form-check-input" name="student_ids[]" type="checkbox"
+                                                checked value="{{$student->id}}" id="defaultCheck" .{{$student->id}}>
+                                            <label class="form-check-label" for="defaultCheck1">{{$student->first_name}}
+                                                {{$student->middle_name}} {{$student->last_name}}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
 
-                        <div id="off" class="mt-4">
-                            <h4>Off Students</h4>
-                        </div>
+                                <div id="sentry" class="mt-4">
+                                    <h4>Sentry Students</h4>
+                                    @foreach ($sentry_students as $student)
+                                        <div class="form-check">
+                                            <input id="item-child" class="form-check-input" name="student_ids[]" type="checkbox"
+                                                checked value="{{$student->id}}" id="defaultCheck" .{{$student->id}}>
+                                            <label class="form-check-label" for="defaultCheck1">{{$student->first_name}}
+                                                {{$student->middle_name}} {{$student->last_name}}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
 
-                        <div id="safari" class="mt-4">
-                            <h4>Safari Students</h4>
+                                <div id="off" class="mt-4">
+                                    <h4>Off Students</h4>
+                                    @foreach ($off_students as $student)
+                                        <div class="form-check">
+                                            <input id="item-child" class="form-check-input" name="student_ids[]" type="checkbox"
+                                                checked value="{{$student->id}}" id="defaultCheck" .{{$student->id}}>
+                                            <label class="form-check-label" for="defaultCheck1">{{$student->first_name}}
+                                                {{$student->middle_name}} {{$student->last_name}}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <div id="safari" class="mt-4">
+                                    <h4>Safari Students</h4>
+                                    @foreach ($safari_students as $student)
+                                        <div class="form-check">
+                                            <input id="item-child" class="form-check-input" name="student_ids[]" type="checkbox"
+                                                checked value="{{$student->id}}" id="defaultCheck" .{{$student->id}}>
+                                            <label class="form-check-label" for="defaultCheck1">{{$student->first_name}}
+                                                {{$student->middle_name}} {{$student->last_name}}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
                         </div>
-                    </div>
                     </div>
                 </div>
             </div></br>
 
 
 
-            <div class="d-flex gap-2 justify-content-end">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
+            <!-- <div class="d-flex gap-2 justify-content-end">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div> -->
         </form>
         <script>
 
-document.addEventListener('DOMContentLoaded', function() {
-            // Get all checkboxes with the class 'item'
-            const checkboxes = document.querySelectorAll('.item');
+            document.querySelectorAll('#item-child').forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    let selectedCategoryRadio = document.querySelector('.form-check-input[name="type"]:checked');
 
-            // Loop through each checkbox and add an event listener for the 'change' event
-            checkboxes.forEach(function(checkbox) {
-                checkbox.addEventListener('change', function() {
-                    // Call the function to handle the checkbox move
-                    moveCheckbox(checkbox);
+                    if (this.checked) {
+                        //let studentLabel = this.nextElementSibling; // get the sibling label
+                        let categoryDiv = document.getElementById(selectedCategoryRadio.value);
+
+                        let checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'form-check-input';
+                        checkbox.name = selectedCategoryRadio.value + '_student_ids[]'
+                        checkbox.value = this.value
+                        checkbox.checked = true;
+                        //checkbox.disabled = true
+
+
+                        // Create the label element
+                        let checkboxLabel = document.createElement('label');
+                        checkboxLabel.className = 'form-check-label';
+                        checkboxLabel.innerText = this.nextElementSibling.innerText;
+                        // Create a new div for the student
+                        let newStudentDiv = document.createElement('div');
+                        newStudentDiv.className = 'students';
+                        newStudentDiv.innerHTML = this.parentNode.innerHTML;
+
+                        // Add the new div to the mess section
+                        categoryDiv.appendChild(checkbox);
+                        categoryDiv.appendChild(checkboxLabel);
+                        let breakElement = document.createElement('br');
+                        categoryDiv.appendChild(breakElement);
+
+                        // Optionally remove the checkbox and label from the form
+                        this.parentNode.remove();
+                    }
                 });
             });
 
-            // Add an event listener to the button to trigger the change event for a specific checkbox
-            document.getElementById('moveItemBtn').addEventListener('click', function() {
-                // Get the specific checkbox to move (e.g., item2)
-                const itemToMove = document.getElementById('item2');
-
-                // Programmatically check the checkbox
-                itemToMove.checked = true;
-
-                // Trigger the change event
-                const event = new Event('change');
-                itemToMove.dispatchEvent(event);
-            });
-        });
-
-        // Function to handle the checkbox move
-        function moveCheckbox(checkbox) {
-            // Get the destination div
-            const destinationDiv = document.getElementById('destination-div');
-
-            // Append the checkbox to the destination div if checked
-            if (checkbox.checked) {
-                destinationDiv.appendChild(checkbox);
-            }
-        }
-    </script>
+        </script>
 
 @endsection

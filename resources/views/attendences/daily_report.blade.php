@@ -32,11 +32,14 @@
             transform: translate(-50%, -50%);
             z-index: -1;
         }
+
         .page-break {
             page-break-after: always;
         }
+
         body {
-            padding: 20px; /* You can adjust the padding value as needed */
+            padding: 20px;
+            /* You can adjust the padding value as needed */
         }
     </style>
 </head>
@@ -80,6 +83,10 @@
                     <tbody>
                         @php
                             $absent_students = [];
+                            $sentry_students = [];
+                            $mess_students = [];
+                            $off_students = [];
+                            $safari_students = [];
                             $total_present = 0;
                             $total_absent = 0;
                             $total_sentry = 0;
@@ -104,10 +111,42 @@
                                                         $total_male += $attendance[0]->male;
                                                         $total_female += $attendance[0]->female;
                                                         $grand_total += $attendance[0]->total;
-                                                        $absent_ids = explode(",", $attendance[0]->absent_student_ids);
+                                                        $absent_ids = $attendance[0]->absent_student_ids !=null? explode(",", $attendance[0]->absent_student_ids):[];
+                                                        $sentry_student_ids = $attendance[0]->mess_student_ids !=null? explode(",", $attendance[0]->sentry_student_ids):[];
+                                                        $mess_student_ids = $attendance[0]->mess_student_ids !=null? explode(",", $attendance[0]->mess_student_ids): [];
+                                                        $off_student_ids =$attendance[0]->off_student_ids !=null?  explode(",", $attendance[0]->off_student_ids): [];
+                                                        $safari_student_ids = $attendance[0]->safari_student_ids !=null? explode(",", $attendance[0]->safari_student_ids): [];
+                                                        
+
+                                                        /**if (count($mess_student_ids) > 0) {
+                                                            $mess_students = Student::whereIn('id', $mess_student_ids);
+                                                        }
+                                                        if (count($off_student_ids) > 0) {
+                                                            $off_students = Student::whereIn('id', $off_student_ids);
+                                                        }
+
+                                                        if (count($safari_student_ids) > 0) {
+                                                            $safari_students = Student::whereIn('id', $safari_student_ids);
+                                                        }
+                                                            **/
                                                         for ($i = 0; $i < count($absent_ids); ++$i) {
                                                             array_push($absent_students, Student::find($absent_ids[$i]));
                                                         }
+                                                        for ($i = 0; $i < count($sentry_student_ids); ++$i) {
+                                                            array_push($sentry_students, Student::find($sentry_student_ids[$i]));
+                                                        }
+                                                        
+                                                        for ($i = 0; $i < count($mess_student_ids); ++$i) {
+                                                         array_push($mess_students, Student::find($mess_student_ids[$i]));
+                                                        }
+
+                                                        for ($i = 0; $i < count($off_student_ids); ++$i) {
+                                                            array_push($off_students, Student::find($off_student_ids[$i]));
+                                                        }
+                                                        for ($i = 0; $i < count($safari_student_ids); ++$i) {
+                                                            array_push($safari_students, Student::find($safari_student_ids[$i]));
+                                                        }
+                                                        
                                                     }      
                                                 @endphp
                                                 <tr>
@@ -143,14 +182,128 @@
                         </tr>
                     </tbody>
                 </table>
-
-
-
             </div>
         </div>
     </center>
+    @if (count($sentry_students)>0)
     <div class="table-container" style="width: 50%;">
-        <center> <h4>Absent Students</h4></center>
+        <center>
+            <h4>Sentry Students</h4>
+        </center>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Names</th>
+                    <th>Platoon</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for ($i = 0; $i < count($sentry_students); $i++)
+                    <tr>
+                    <td>{{ $i + 1 }}</td>
+                        <td>{{ $absent_students[$i]->first_name }} {{ $absent_students[$i]->middle_name }}
+                            {{ $absent_students[$i]->last_name }}</td>
+                        <td>{{ $absent_students[$i]->platoon }}</td>
+                    </tr>
+                @endfor
+
+            </tbody>
+        </table>
+
+    </div>@endif
+    @if (count($mess_students)>0)
+    <div class="table-container" style="width: 50%;">
+        <center>
+            <h4>Messy Students</h4>
+        </center>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Names</th>
+                    <th>Platoon</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for ($i = 0; $i < count($mess_students); $i++)
+            @if ($mess_students[$i] !== null)
+                    <tr>
+                    <td>{{ $i + 1 }}</td>
+                        <td>{{ $mess_students[$i]->first_name }} {{ $mess_students[$i]->middle_name }} {{ $mess_students[$i]->last_name }}</td>
+                        <td>{{ $mess_students[$i]->platoon }}</td>
+                    </tr>
+                    @endif
+                @endfor
+
+            </tbody>
+        </table>
+
+    </div>
+    @endif
+    @if (count($safari_students)>0)
+    <div class="table-container" style="width: 50%;">
+        <center>
+            <h4>Safari Students</h4>
+        </center>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Names</th>
+                    <th>Platoon</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for ($i = 0; $i < count($safari_students); $i++)
+            @if ($safari_students[$i] !== null)
+                    <tr>
+                    <td>{{ $i + 1 }}</td>
+                        <td>{{ $safari_students[$i]->first_name }} {{ $safari_students[$i]->middle_name }} {{ $safari_students[$i]->last_name }}</td>
+                        <td>{{ $safari_students[$i]->platoon }}</td>
+                    </tr>
+                    @endif
+                @endfor
+
+            </tbody>
+        </table>
+
+    </div>
+    @endif
+    @if (count($off_students)>0)
+    <div class="table-container" style="width: 50%;">
+        <center>
+            <h4>Off Students</h4>
+        </center>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Names</th>
+                    <th>Platoon</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for ($i = 0; $i < count($off_students); $i++)
+            @if ($off_students[$i] !== null)
+                    <tr>
+                    <td>{{ $i + 1 }}</td>
+                        <td>{{ $off_students[$i]->first_name }} {{ $off_students[$i]->middle_name }} {{ $off_students[$i]->last_name }}</td>
+                        <td>{{ $off_students[$i]->platoon }}</td>
+                    </tr>
+                    @endif
+                @endfor
+
+            </tbody>
+        </table>
+
+    </div>
+    @endif
+    @if (count($absent_students)>0)
+    <div class="table-container" style="width: 50%;">
+        <center>
+            <h4>Absent Students</h4>
+        </center>
         <table>
             <thead>
                 <tr>
@@ -163,13 +316,15 @@
                 @for ($i = 0; $i < count($absent_students); $i++)
                     <tr>
                         <td>{{ $i + 1 }}</td>
-                        <td>{{ $absent_students[$i]->first_name }} {{ $absent_students[$i]->middle_name }} {{ $absent_students[$i]->last_name }}</td>
+                        <td>{{ $absent_students[$i]->first_name }} {{ $absent_students[$i]->middle_name }}
+                            {{ $absent_students[$i]->last_name }}</td>
                         <td>{{ $absent_students[$i]->platoon }}</td>
                     </tr>
                 @endfor
             </tbody>
         </table>
-    </div>
+    </div
+    @endif
 </body>
 
 </html>
