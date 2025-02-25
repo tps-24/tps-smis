@@ -45,6 +45,13 @@ class NotificationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
+
+     public function showNotifications($announcementIds)
+     {
+         $notification = Announcement::whereIn('id',[$announcementIds])->get()[0];
+         //return $announcement;
+         return view('notifications.view', compact('notification'));
+     }
     public function edit(string $id)
     {
         //

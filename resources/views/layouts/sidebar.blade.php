@@ -253,7 +253,7 @@
     <li>
       <a href="/tps-smis/mps">
         <i class="bi bi-wallet2"></i>
-        <span class="menu-text">MPS</span>
+        <span class="menu-text">Lock Up</span>
       </a>
     </li>
 

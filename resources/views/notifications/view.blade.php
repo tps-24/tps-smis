@@ -16,12 +16,11 @@
 @endsection
 
 @section('content')
-{{ $ids }}
 <div class="row">
 
 <div class="col-12">
       <!-- Notifications Container Start -->
-      <h5 class="m-0 text-primary py-2"> Title: {{ $notification->title }}</h5>
+      <h5 class="m-0 text-{{ $notification->type }} py-2"> Title: {{ $notification->title }}</h5>
         <p>
             {{ $notification->message }}
         </p>

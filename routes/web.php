@@ -301,12 +301,15 @@ Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']
         Route::get('today/{company_id}/{type}','today');
         Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
         Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
-        Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
+        Route::post('storeMchanganuo/{attendenceId}/',' ')->name('attendences.storeMchanganuo');
 
         //Route::get('today/{company_id}/{$type}', 'today')->name('attendances.summary');
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
+    Route::get('notifications/showNotifications/{notificationIds}',[NotificationController::class,'showNotifications'])->name('notifications.showNotifications'); 
+
+    Route::get('announcement/download/file/{documentPath}',[AnnouncementController::class,'downloadFile'])->name('download.file'); 
 
 });
 

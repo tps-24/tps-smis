@@ -545,14 +545,12 @@ class AttendenceController extends Controller
         $safari = $attendence->safari_student_ids !=null? explode(",",$attendence->safari_student_ids): [];
         $off = $attendence->off_student_ids !=null? explode(",",$attendence->off_student_ids): [];
       
-        //return $mess;
         $notEligibleStudent_ids = array_merge($absent,$sentry,$mess, $safari,$off);
         $students = $platoon->students->whereNotIn('id',$notEligibleStudent_ids)->values();
         $sentry_students =  $platoon->students->whereIn('id',$sentry)->values();
         $mess_students =  $platoon->students->whereIn('id',$mess)->values();
         $off_students =  $platoon->students->whereIn('id',$off)->values();
         $safari_students =  $platoon->students->whereIn('id',$safari)->values();
-        //return $students->take(2);
 
         return view(
             'attendences.changanua', 
