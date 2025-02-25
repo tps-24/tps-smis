@@ -348,5 +348,54 @@
         </tfoot>
     </table>
 
+    <!-- <h1>Beats Summary for {{ $date->format('d/m/Y') }}</h1>
+<table>
+    <thead>
+        <tr>
+            <th rowspan="3">Platoon</th>
+            <th colspan="{{ count($summary) * 2 }}">Time Slots</th>
+            <th rowspan="3">Total</th>
+        </tr>
+        <tr>
+            @foreach(array_keys($summary) as $timeSlot)
+                @php
+                    list($startTime, $endTime) = explode(' - ', $timeSlot);
+                @endphp
+                <th colspan="2">{{ \Carbon\Carbon::parse($startTime)->format('H:i') }} - {{ \Carbon\Carbon::parse($endTime)->format('H:i') }}</th>
+            @endforeach
+        </tr>
+        <tr>
+            @foreach(array_keys($summary) as $timeSlot)
+                <th>ME</th>
+                <th>KE</th>
+            @endforeach
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($totalPlatoonCount as $platoon => $totals)
+            <tr>
+                <td class="center"><strong>{{ htmlspecialchars((string)$platoon) }}</strong></td>
+                @foreach($summary as $timeSlot => $platoons)
+                    <td>{{ htmlspecialchars((string)($platoons[$platoon]['M'] ?? 0)) }}</td>
+                    <td>{{ htmlspecialchars((string)($platoons[$platoon]['F'] ?? 0)) }}</td>
+                @endforeach
+                <td class="highlight">{{ htmlspecialchars((string)$totals) }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            @foreach($summary as $timeSlot => $platoons)
+                <th class="highlight">{{ htmlspecialchars((string)array_sum(array_column($platoons, 'M'))) }}</th>
+                <th class="highlight">{{ htmlspecialchars((string)array_sum(array_column($platoons, 'F'))) }}</th>
+            @endforeach
+            <th class="highlight">{{ htmlspecialchars((string)array_sum(array_column($totalPlatoonCount, 'total'))) }}</th>
+        </tr>
+    </tfoot>
+</table> -->
+
+
+
 </body>
 </html>  

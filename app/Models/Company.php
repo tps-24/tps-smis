@@ -13,13 +13,12 @@ class Company extends Model
         'name'
     ];
 
-    public function platoons(){
-        return $this->hasMany(Platoon::class,'company_id','id');
-    }
+    // public function platoons(){
+    //     return $this->hasMany(Platoon::class,'company_id','id');
+    // }
 
-    public function students()
-    {
-        return $this->hasMany(Student::class, 'company_id');
+    public function students(){
+        return $this->hasMany(Student::class,'company','name');
     }
     
 
@@ -32,7 +31,7 @@ class Company extends Model
     {
         return $this->hasMany(PatrolArea::class);
     }
-    // public function platoons(){
-    //     return $this->hasMany(Platoon::class);
-    // } 
+    public function platoons(){
+        return $this->hasMany(Platoon::class);
+    } 
 }

@@ -31,7 +31,7 @@
 
     <!-- Scrollbar CSS -->
     <link rel="stylesheet" href="/tps-smis/resources/assets/vendor/overlay-scroll/OverlayScrollbars.min.css" />
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
       .error{
         color: red;

@@ -27,6 +27,10 @@ return new class extends Migration
             $table->integer('total');
             $table->string('absent_student_ids')->nullable();
             $table->string('safari_student_ids')->nullable();
+            $table->string('sentry_student_ids')->nullable();
+            $table->string('adm_student_ids')->nullable();
+            $table->string('mess_student_ids')->nullable();
+            $table->string('off_student_ids')->nullable();
             $table->timestamps();
 
             $table->foreign('attendenceType_id')->references('id')->on('attendence_types')->onupdate('update')->ondelete('null');

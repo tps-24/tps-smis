@@ -37,6 +37,7 @@ use App\Http\Controllers\GuardAreaController;
 use App\Http\Controllers\PatrolAreaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\DownloadController;
+use Carbon\Carbon;
 
 
 require __DIR__ . '/auth.php';
@@ -46,7 +47,22 @@ Route::get('/', function () {
         if (auth()->user()->hasRole('Student')) {
             return view('dashboard.student_dashboard', compact('pending_message'));
         } else {
-            return view('dashboard/dashboard');
+            $denttotal = App\Models\Student::where('session_programme_id',1)->get();
+            $dentpresent = App\Models\Student::where('session_programme_id',1)->where('beat_status',1)->get();
+            $beats = App\Models\Beat::where('date',Carbon::today()->toDateString())->get('student_ids');
+            $patients = App\Models\Patient::where('created_at',Carbon::today()->toDateString())->get('student_id');
+            $staffs = App\Models\Staff::get('forceNumber');
+            // foreach ($totalScore as $student => $scores) {
+            //     $beat = count($scores);
+            // }
+//             $totalStudents = 0;
+// foreach ($beats as $beat) {
+//     $studentCounts = json_decode($beat->student_counts, true); // Assuming student_counts is a JSON-encoded array in Beat model
+//     $totalStudents += count($studentCounts);
+// }  
+            
+
+            return view('dashboard/dashboard', compact('denttotal','dentpresent','beats','patients', 'staffs'));
         }
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -61,7 +77,7 @@ Route::group(['middleware' => 'session_programme'], function () {
     // Or i will join it with auth --Recommended
 });
 
-
+Route::post('/beats/{id}', [BeatController::class, 'update'])->name('beat.update');
 // Route::get('/generate-beats', [BeatController::class, 'showGenerateBeatsForm'])->name('generate.beats.form');
 // Route::post('/generate-beats', [BeatController::class, 'generateBeats'])->name('generate.beats');
 // Route to display the generated beats
@@ -77,12 +93,21 @@ Route::group(['middleware' => 'session_programme'], function () {
 Route::get('/beats/generate', [BeatController::class, 'beatCreate'])->name('beats.beatCreate');
 Route::get('/beats', [BeatController::class, 'beatsByDate'])->name('beats.byDate');
 Route::delete('/beats/{id}', [BeatController::class, 'destroy'])->name('beats.destroy');
-
+Route::get('/beats/{id}/edit', [BeatController::class, 'edit'])->name('beats.edit');
 Route::post('/fill-beats', [BeatController::class, 'fillBeats'])->name('beats.fillBeats');
 // Route::get('/beats', [BeatController::class, 'showBeats'])->name('beats.index');
 Route::get('/beats/{beat}', [BeatController::class, 'showBeat'])->name('beats.show');
 
 Route::get('/beats/pdf/{company}', [BeatController::class, 'generatePDF'])->name('beats.generatePDF');
+
+// Route to generate and display the report
+Route::get('/report/generate', [BeatController::class, 'showReport'])->name('report.generate');
+
+// Route to download the report as a PDF
+Route::get('/report/download', [BeatController::class, 'downloadReport'])->name('report.download');
+
+
+
 
 
 
@@ -120,11 +145,11 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     
 });
 
-Route::get('/home', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
 Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
 //Route::resource('students', StudentController::class);
 Route::group(['middleware' => ['auth']], function () {
+    Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         Route::get('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
@@ -195,6 +220,10 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
 
     
     // Define the custom route first
+
+    // routes/web.php
+Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
+
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
@@ -260,17 +289,21 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
 
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
         Route::get('type-test/{type_id}', 'attendence');
-        Route::get('type/{type_id}', 'attendence');
+        Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
         Route::post('create/{type_id}', 'create');
         Route::get('edit/{id}', 'edit');
         Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
         Route::post('{id}/update', 'update');
-        Route::get('list-absent_students/{list_type}/{attendence_id}', action: 'list');
+        Route::get('list-absent_students/{list_type}/{attendence_id}/{date}', action: 'list');
         Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
-        Route::post('store-absents/{attendence_id}', action: 'storeAbsent');
+        Route::post('store-absents/{attendence_id}/{date}', action: 'storeAbsent');
         Route::post('store-safari/{attendence_id}', action: 'storeSafari');
         Route::get('today/{company_id}/{type}','today');
-        Route::get('today/{company_id}/{$type}', 'today')->name('today_attendance');
+        Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
+        Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
+        Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
+
+        //Route::get('today/{company_id}/{$type}', 'today')->name('attendances.summary');
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
@@ -279,7 +312,7 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
 
 
 
-Route::get('/today/{company_id}/{type}', [AttendenceController::class, 'today']);
+Route::get('/today/{company_id}/{type}/{date}', [AttendenceController::class, 'today']);
 
 
 Auth::routes();
@@ -372,7 +405,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file'); // Download file
 });
 
-Route::get('test', [BeatController::class,'test']);
+//Route::get('test', [AttendenceController::class,'generatePdf']);
 
 // Route::post('/pusher/auth', function (\Illuminate\Http\Request $request) {
 //     return true;

@@ -286,11 +286,8 @@
           <a href="{{url('beats')}}">Generate Beat</a>
         </li>
         <li>
-          <a href="{{url('beats/history')}}">Beat History</a>
+          <a href="{{url('/report/generate')}}">Beat History</a>
         </li>
-        <!-- <li>
-          <a href="{{url('beats/generate')}}">Generate Beat</a>
-        </li> -->
       </ul>
     </li>
     @endcan()

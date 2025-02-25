@@ -7,8 +7,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-smis/attendences/">Attendences</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><a href="#">Today Attendence</a>
+                <li class="breadcrumb-item active"><a href="/tps-smis/attendences/">Attendences</a></li>
                 </li>
             </ol>
         </nav>
@@ -22,6 +21,12 @@
 @if (count($attendences) == 0)
     <h1>No attendence recorded today.</h1>
 @else
+<h4>Attendances for {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}.</h4>
+<div class="d-flex  justify-content-end">
+    <a href="{{ route('attendences.generatePdf',['companyId'=>$company->id,'date'=>$date]) }}">
+        <button title="Download report" class="btn btn-sm btn-success"><i class="gap 2 bi bi-download"></i> Report</button>
+    </a>
+</div>
     <div class="table-responsive">
         <table class="table table-striped truncate m-0">
             <thead>
@@ -33,6 +38,8 @@
                     <th>Mess</th>
                     <th>Off</th>
                     <th>Safari</th>
+                    <th>ME</th>
+                    <th>KE</th>
                     <th>Total</th>
                     <th width="280px">Actions</th>
                 </tr>
@@ -48,12 +55,15 @@
                         <td>{{$attendence->mess}}</td>
                         <td>{{$attendence->off}}</td>
                         <td>{{$attendence->safari}}</td>
+                        <td>{{$attendence->male}}</td>
+                        <td>{{$attendence->female}}</td>
                         <td>{{$attendence->total}}</td>
                         <td>
                             <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#MoreAbsent{{$attendence->id}}">Absents</button>
-                            <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#MoreSafari{{$attendence->id}}">Safari</button>
+                                @if ($attendence->created_at->diffInHours(\Carbon\Carbon::now()) < 2 )
+                                 <a href="{{ route('attendences.changanua',['attendenceId'=> $attendence->id]) }}"> <button class="btn  btn-info btn-sm" >Mchanganuo</button></a>                               
+                                @endif
                             <div class="modal fade" id="MoreAbsent{{$attendence->id}}" tabindex="-1"
                                 aria-labelledby="statusModalLabelMore{{$attendence->id}}" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -83,46 +93,13 @@
                                         </div>
                                         <div class="modal-footer">
                                             <a
-                                                href="{{url('attendences/list-absent_students/' . $company->id . '/' . $attendence->id)}}"><button
+                                                href="{{url('attendences/list-absent_students/' . $company->id . '/' . $attendence->id.'/'.$date)}}"><button
                                                     class="btn btn-sm btn-primary">Add absents</button></a>
                                         
                                         </div>
                                     </div>
-                                </div>
                             </div>
-                            <div class="modal fade" id="MoreSafari{{$attendence->id}}" tabindex="-1"
-                                aria-labelledby="statusModalLabelMore{{$attendence->id}}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="statusModalLabelMore">
-                                                Safari Students
-                                            </h5>
-
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <ol>
-                                                @foreach($attendence->safari_students as $student)
-                                                    @if ($student != null)
-                                                        <li>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
-                                                        </li>
-                                                    @else
-                                                        <p>No safari students recorded.</p>
-                                                    @endif
-                                                @endforeach
-                                            </ol>
-
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a
-                                                href="{{url('attendences/list-safari_students/' . $company->id . '/' . $attendence->id)}}"><button
-                                                    class="btn btn-sm btn-primary">Add safari</button></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </td>
                     </tr>
                 @endforeach
