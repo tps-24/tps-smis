@@ -2,6 +2,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <title>TPS - SMIS</title>
 
     <!-- Meta -->
@@ -14,6 +15,8 @@
     <meta property="og:type" content="Management System">
     <meta property="og:site_name" content="TPS - Moshi">
     <link rel="shortcut icon" href="/tps-smis/resources/assets/images/favicon.svg" />
+   
+
 
     <!-- *************
 			************ CSS Files *************

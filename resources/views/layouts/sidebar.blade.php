@@ -218,13 +218,22 @@
             </a>
         </li> 
 
-        
-       
+      
+      <li class="treeview">
+      <a href="#!">
+      <i class="bi bi-hospital"></i>
+        <span class="menu-text">Hospital</span>
+      </a>
+      <ul class="treeview-menu">
+        <li>
+          <a href="{{ route('dispensary.page') }}">Hospital Dashboard</a>
+        </li>
+
         @can('hospital-create')
         <li>
             <a href="{{ route('hospital.index') }}">
                 <i class="bi bi-hospital"></i>
-                <span class="menu-text">Hospital</span>
+                <span class="menu-text">Sir Major Panel</span>
             </a>
         </li>
     @endcan()
@@ -247,6 +256,8 @@
         </a>
     </li>
     @endcan()
+    </ul>
+      </li>
 
 
     @can('mps-list')

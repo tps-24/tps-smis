@@ -321,7 +321,6 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
 
 
 
-Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
 Route::get('/hospital/viewDetails/{timeframe}', [PatientController::class, 'viewDetails'])->name('hospital.viewDetails');
 Route::get('/hospital/show/{id}', [PatientController::class, 'show'])->name('hospital.show');
 
@@ -332,18 +331,17 @@ Route::put('/patients/{id}/update-status', [PatientController::class, 'updateSta
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
-
-
-
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
 Route::post('/patients/submit', [PatientController::class, 'submit'])->name('patients.submit');
 Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve'); 
 Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name('patients.reject');
 Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
 Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
+Route::get('/dispensary', [PatientController::class, 'dispensaryPage'])->name('dispensary.page');
+
 
 // 🚀 Routes for Sending to Receptionist
-Route::post('/patients/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('patients.sendToReceptionist');
+Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
 Route::post('/hospital/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('hospital.sendToReceptionist');
 
 // 💼 Receptionist Routes
@@ -384,4 +382,11 @@ Route::get('test', [BeatController::class,'test']);
 //         return response()->json(['message' => 'Unauthorized'], 403);
 //     }
 // });
+
+
+
+
+
+
+
 
