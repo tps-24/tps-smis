@@ -835,4 +835,21 @@ private function generateBeatReport($companyId = null, $startDate = null, $endDa
         $beat->delete();
         return redirect()->route('beats.index')->with('success', 'Beat deleted successfully!');
     }
+
+    public function beatReserves($companyId, $date){
+        $reserves = BeatReserve::where('company_id', $companyId)->where('beat_date', $date)->get();
+        $company= Company::find($companyId);
+        return view('beats.reserves', compact('date', 'reserves', 'company'));
+    }
+
+    public function approveReserve($type,$studentId){
+        $student = Student::find($studentId);
+        $student->beat_status = 1;
+        if($type == "approve"){
+            $student->increment('beat_round');
+        }
+        $student->save();
+
+        return redirect()->back()->with('success','Reserve '.$type.'d successfully.');
+    }
 }

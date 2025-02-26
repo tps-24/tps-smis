@@ -1,0 +1,41 @@
+@extends('layouts.main')
+@section('scrumb')
+    <!-- Scrumb starts -->
+    <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+        <div class="container-fluid">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/tps-smis/staff/">Staff</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a href="#">Upload</a></li>
+                </ol>
+            </nav>
+        </div>
+    </nav>
+    <!-- Scrumb ends -->
+
+@endsection
+@section('content')
+    @session('success')
+        <div class="alert alert-success alert-dismissible " role="alert">
+            {{ $value }}
+        </div>
+    @endsession
+    <div class="d-flex justify-content-between">
+        <a href="{{ route('staffDownloadSample') }}"><button style="height: 30px;" class="btn btn-sm btn-success"><i
+                    class="bi bi-download"></i>Download sample</button></a>
+
+        <form method="POST" action="{{route('staff.bulkimport')}}" style="display:inline" enctype="multipart/form-data">
+            @csrf
+            @method('POST')
+            <div class="d-flex gap-2" style="float:right;">
+                <input style="height: 30px; width: 60%;" required type="file" name="import_file" class="form-control">
+                <button title="Upload by CSV/excel file" type="submit" class="btn btn-primary btn-sm"> <i class="bi bi-upload"></i>Upload
+                    Staff</i></button>
+            </div>
+        </form>
+    </div>
+    <div>
+        Maelekezo
+    </div>
+@endsection

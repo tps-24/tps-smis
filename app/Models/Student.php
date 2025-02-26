@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Auth;
 
+
+
 class Student extends Model
 {
     protected $casts = [
@@ -45,9 +47,16 @@ class Student extends Model
         return $this->hasMany(Platoon::class, 'name', 'id');
     }
 
+
     public function company()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Company::class, 'company_id');
+    }
+    
+
+    public function patients()
+    {
+        return $this->hasMany(Patient::class);
     }
     // public function programme()
     // {

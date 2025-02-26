@@ -35,14 +35,8 @@
       <div class="row">
       @can('student-create')
       <div class="col">
-      <form method="POST" action="{{route('staff.bulkimport')}}" style="display:inline"
-      enctype="multipart/form-data">
-      @csrf
-      @method('POST')
-      <input style="height: 30px; width: 50%" required type="file" name="import_file" class="form-control mb-2">
-      <button title="Upload by CSV/excel file" type="submit" class="btn btn-primary btn-sm">Upload
-        Staff</i></button>
-      </form>
+      <a href="{{ route('uploadStaff') }}" class="btn btn-sm btn-primary">Upload Staff</a>
+      
       </div>
       <div class="pull-right col" style="margin-right: 0px;">
       <a class="btn btn-success mb-2 btn-sm" href="{{ route('staffs.create') }}"

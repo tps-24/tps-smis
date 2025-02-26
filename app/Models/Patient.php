@@ -29,6 +29,7 @@ class Patient extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
+    
     /**
      * Define the relationship to the User model for tracking updates.
      */
@@ -36,6 +37,12 @@ class Patient extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function company()
+{
+    return $this->belongsTo(Company::class, 'company_id');
+}
+
 
     /**
      * Scope for filtering by status.
@@ -63,8 +70,6 @@ class Patient extends Model
         });
     }
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class, 'company_id');
-    }
+   
+
 }

@@ -37,96 +37,69 @@ class PatientController extends Controller
             'index'
         ]);
     }
+
     
     public function index(Request $request)
     {
-        $sirMajor = Auth::user();
+        $user = auth()->user();
+        $assignedCompany = Company::find($user->company_id);
     
-        // Ensure Sir Major only sees their company's data
-        $patients = collect();
-        $message = 'Please enter the required criteria to find patient details.';
+        // Start query
+        $query = Student::where('company_id', $user->company_id);
     
-        if ($request->has('company_id') || $request->has('platoon') || $request->has('fullname')) {
-            $query = Patient::with('student') // ✅ Ensure we load the student relationship
-            ->whereHas('student', function ($q) use ($sirMajor) {
-                $q->where('company_id', $sirMajor->company_id);
-            });
-
-            
-        if ($request->filled('company_id')) {
-            $query->whereHas('student', function ($q) use ($request) {
-                $q->where('company_id', $request->input('company_id'));
+        if ($request->platoon) {
+            $query->where('platoon', $request->platoon);
+        }
+    
+        if ($request->fullname) {
+            $query->where(function ($q) use ($request) {
+                $q->where('first_name', 'LIKE', "%{$request->fullname}%")
+                  ->orWhere('last_name', 'LIKE', "%{$request->fullname}%");
             });
         }
-
-        if ($request->filled('platoon')) {
-            $query->whereHas('student', function ($q) use ($request) {
-                $q->where('platoon', $request->input('platoon'));
-            });
-        }
-
-        if ($request->filled('fullname')) {
-            $names = explode(' ', $request->input('fullname'));
-            $query->whereHas('student', function ($subQuery) use ($names) {
-                foreach ($names as $name) {
-                    $subQuery->where(function ($q) use ($name) {
-                        $q->orWhere('first_name', 'LIKE', '%' . $name . '%')
-                          ->orWhere('middle_name', 'LIKE', '%' . $name . '%')
-                          ->orWhere('last_name', 'LIKE', '%' . $name . '%');
-                    });
-                }
-            });
-        }
-
-            // ✅ Order by first name in ascending order
-         $patients = $query->orderBy(Student::select('first_name')
-            ->whereColumn('students.id', 'patients.student_id'))->get();   
-             
-         $message = $patients->isEmpty() ? 'No students found with the given criteria.' : '';
-    }
     
+        // Only apply Student ID filter if it is provided
+        if ($request->filled('student_id')) {
+            $query->where('id', (int) $request->student_id);
+        }
+    
+        $studentDetails = $query->get(); // Use 'get()' to return multiple students
+    
+        $message = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
+    
+   // Statistics Calculation
+$today = Carbon::today();
+$thisWeek = Carbon::now()->startOfWeek();
+$thisMonth = Carbon::now()->startOfMonth();
 
-    // ✅ Statistics for Sir Major (Filtered by their company)
-    $today = Carbon::today();
-    $thisWeek = Carbon::now()->startOfWeek();
+// Ensure we count from the 'patients' table, not 'students'
+$dailyCount = Patient::whereDate('created_at', $today)
+    ->where('company_id', $user->company_id)
+    ->count();
 
-    $thisMonth = Carbon::now()->startOfMonth();
-    $thisYear = Carbon::now()->startOfYear();
+$weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
+    ->where('company_id', $user->company_id)
+    ->count();
 
-    $dailyCount = Patient::where('company_id', $sirMajor->company_id)
-                        ->whereDate('created_at', $today)
-                        ->count();
+$monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
+    ->where('company_id', $user->company_id)
+    ->count();
 
-    $weeklyCount = Patient::where('company_id', $sirMajor->company_id)
-                        ->whereBetween('created_at', [$thisWeek, Carbon::now()])
-                        ->count();
+// Pie Chart Data (Annual Summary)
+$patientStats = Patient::whereYear('created_at', now()->year)
+    ->where('company_id', $user->company_id)
+    ->selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+    ->groupBy('month')
+    ->pluck('count', 'month')
+    ->toArray();
 
-    $monthlyCount = Patient::where('company_id', $sirMajor->company_id)
-                        ->whereBetween('created_at', [$thisMonth, Carbon::now()])
-                        ->count();
-
-    // // ✅ Get Doctor's details for each student
-    // $doctorDetails = Patient::where('company', $sirMajor->company)
-    //                     ->whereNotNull('excuse_type') // Only patients with doctor input
-    //                     ->orderBy('created_at', 'desc')
-    //                     ->get(['first_name', 'last_name', 'excuse_type', 'rest_days', 'created_at']);
-
+// Ensure all months are included
+$patientStats = array_replace(array_fill(1, 12, 0), $patientStats);
 
 
-
-     // ✅ Fix the error by selecting student details from the relationship
-     $doctorDetails = Patient::with('student:id,first_name,last_name') // Load only required student fields
-     ->where('company_id', $sirMajor->company_id)
-     ->whereNotNull('excuse_type') // Only patients with doctor input
-     ->orderBy('created_at', 'desc')
-     ->get();
-     return view('hospital.index', compact('patients', 'message', 'dailyCount', 'weeklyCount', 'monthlyCount', 'doctorDetails'));
-
-// // ✅ Update view to use `student->first_name` instead of `first_name`
-// return view('hospital.index', compact('patients', 'message', 'doctorDetails'));
-// }
+    return view('hospital.index', compact( 'message','user', 'assignedCompany', 'dailyCount', 'weeklyCount', 'monthlyCount', 'studentDetails'));
 }
-
+    
 public function show($id)
 {
     // Fetch patient details from the database
@@ -164,6 +137,30 @@ public function sendToReceptionist(Request $request)
     return redirect()->route('hospital.index')->with('success', 'Details sent to receptionist for approval.');
 }
 
+
+public function sendForApproval(Request $request)
+{
+    $request->validate([
+        'student_id' => 'required|exists:students,id',
+    ]);
+
+    $student = Student::findOrFail($request->student_id);
+
+    // Check if already pending
+    if (Patient::where('student_id', $student->id)->where('status', 'pending')->exists()) {
+        return response()->json(['message' => 'Patient details already sent for approval.'], 400);
+    }
+
+    // Create new patient record for approval
+    Patient::create([
+        'student_id' => $student->id,
+        'company_id' => $student->company_id,
+        'platoon' => $student->platoon,
+        'status' => 'pending',
+    ]);
+
+    return response()->json(['message' => 'Patient details sent for approval successfully.']);
+}
 
 public function receptionistIndex()
 {
@@ -284,5 +281,43 @@ public function viewDetails(Request $request, $timeframe)
 
     return view('hospital.viewDetails', compact('patients', 'timeframe'));
 }
+
+public function dispensaryPage(Request $request)
+{
+    $query = Patient::query();
+
+    // Filter by company_id if provided
+    if ($request->filled('company_id')) {
+        $query->where('company_id', $request->company_id);
+    }
+
+    // Filter by platoon if provided
+    if ($request->filled('platoon')) {
+        $query->where('platoon', $request->platoon);
+    }
+
+    $today = Carbon::today();
+    $thisWeek = Carbon::now()->startOfWeek();
+    $thisMonth = Carbon::now()->startOfMonth();
+    $thisYear = Carbon::now()->startOfYear();
+
+    // Count statistics based on the selected filters
+    $dailyCount = (clone $query)->whereDate('created_at', $today)->count();
+    $weeklyCount = (clone $query)->whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
+    $monthlyCount = (clone $query)->whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
+
+    // Fetch list of companies
+    $companies = Company::all();
+
+    // Patient distribution for the selected year (used in Pie Chart)
+    $patientDistribution = (clone $query)
+        ->whereBetween('created_at', [$thisYear, Carbon::now()])
+        ->selectRaw('platoon, COUNT(*) as count')
+        ->groupBy('platoon')
+        ->pluck('count', 'platoon');
+
+    return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies'));
+}
+
 
 }
