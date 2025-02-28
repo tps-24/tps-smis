@@ -842,14 +842,58 @@ private function generateBeatReport($companyId = null, $startDate = null, $endDa
         return view('beats.reserves', compact('date', 'reserves', 'company'));
     }
 
-    public function approveReserve($type,$studentId){
+    public function approveReserve($studentId){
         $student = Student::find($studentId);
         $student->beat_status = 1;
-        if($type == "approve"){
-            $student->increment('beat_round');
-        }
         $student->save();
 
-        return redirect()->back()->with('success','Reserve '.$type.'d successfully.');
+        return redirect()->back()->with('success','Reserve released successfully.');
+    }
+
+    public function beatReserveReplace($reserveId,$studentId,$date, $beatReserveId){
+        $student = Student::find($studentId);
+        $reserve = Student::find($reserveId);
+        $beat_reserve = BeatReserve::find($beatReserveId);
+        $reserve->beat_status = 1;
+        
+        $reserve->increment('beat_round');
+        $beat_reserve->replaced_student_id = $student->id;
+        $beat_reserve->released =1;
+        $student->decrement('beat_round');
+        $beat_reserve->save();
+        $reserve->save();
+        $student->save();
+
+        return redirect()->route('beats.reserves',['companyId'=>$reserve->company_id, 'date'=>$date])->with('success','Reserve replaced successfully.');
+    }
+
+
+    public function beatReplacementStudent($studentId, $date, $beatReserveId){
+
+        $reserve = Student::find($studentId);
+        $company = Company::find($reserve->company_id);
+        
+        $patrol_areas = $company->patrolAreas;
+        $guard_areas = $company->guardAreas;
+        $beat_students = [];
+        foreach($patrol_areas as $area){
+            $beats = $area->beats->where('date',$date);
+            
+            if(count($beats)>0)
+            foreach($beats as $beat){
+                $beat_students = array_merge($beat_students, json_decode($beat->student_ids));
+            }   
+        }
+
+        foreach($guard_areas as $area){
+            $beats = $area->beats->where('date',$date);
+            if(count($beats)>0)
+            foreach($beats as $beat){
+                $beat_students = array_merge($beat_students, json_decode($beat->student_ids));
+            }          
+        }
+        $students = Student::whereIn('id', $beat_students)->orderBy('first_name')->get();
+        
+        return view('beats.reserve_replacement',compact('reserve','students','company','date','beatReserveId'));
     }
 }

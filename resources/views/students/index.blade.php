@@ -40,14 +40,14 @@
           <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name" placeholder="name(option)">
             <!-- Company Dropdown -->
             <select class="form-select me-2" name="company_id" required>
-                <option value="">Select Company</option>
+                <option value="" selected disabled>Select Company</option>
                 @foreach ($companies as $company)
                 <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
                 @endforeach
             </select>
             <!-- Platoon Dropdown -->
             <select onchange="this.form.submit()" class="form-select me-2" name="platoon" required>
-                <option value="">Select Platoon</option>
+                <option value="" selected disabled>Select Platoon</option>
                 @for ($i = 1; $i < 15; $i++)
                     <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
                 @endfor
@@ -72,6 +72,9 @@
 </div>
 
 <div class="card-body">
+  @if ($students->isEmpty())
+ <h3>No student available for provided criteria.</h3> 
+@else
   <div class="table-outer">
     <div class="table-responsive">
       <table class="table table-striped truncate m-0">
@@ -115,7 +118,7 @@
           <a class="btn btn-warning btn-sm" href="{{ route('students.deactivate_beat_status', $student->id) }}">
           Deactivate</a>
           @else
-          <a class="btn btn-warning btn-sm" href="{{ route('students.activate_beat_status', $student->id) }}">
+          <a class="btn btn-primary btn-sm" href="{{ route('students.activate_beat_status', $student->id) }}">
           Activate</a>
           @endif
           <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
@@ -155,7 +158,7 @@
       </table>
     </div>
   </div>
-
+@endif
 </div>
 
 {!! $students->links('pagination::bootstrap-5') !!}

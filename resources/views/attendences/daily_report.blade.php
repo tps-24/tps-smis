@@ -156,7 +156,7 @@
                                                     <td>{{ $attendance[0]->sentry ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->safari ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->off ?? '-' }}</td>
-                                                    <td>{{ $attendance[0]->messy ?? '-' }}</td>
+                                                    <td>{{ $attendance[0]->mess ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->sick ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->male ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->female ?? '-' }}</td>

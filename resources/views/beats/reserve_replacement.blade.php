@@ -17,12 +17,13 @@
 @endsection
 
 @section('content')
-@session('success')
-    <div class="alert alert-success" role="alert">
-    {{ $value }}
-    </div>
-  @endsession
-    <h2>{{ $company->description }} Beats Reserves for {{ $date }}</h2>
+    @session('success')
+        <div class="alert alert-success" role="alert">
+            {{ $value }}
+        </div>
+    @endsession
+    <h2>{{ $company->description }} Beats Reserves Replacement for {{ $date }}</h2>
+    <h4>Reserve : {{ $reserve->first_name }} {{ $reserve->last_name }} PLT-{{ $reserve->platoon }}</h4>
     @php
         $i = 0;
     @endphp
@@ -39,26 +40,26 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($reserves as $reserve)
-                            <tr>
-                                
+                        @foreach ($students as $student)
+                            <in>
+
                                 <td>{{ ++$i }}.</td>
-                                <td>{{ $reserve->student->first_name }} {{ $reserve->student->middle_name }} {{ $reserve->student->last_name }}</td>
-                                <td>{{ $reserve->student->platoon }}</td>
-                                @if($reserve->student->beat_status != 1 )
                                 <td>
-                                <a class="btn btn-primary btn-sm" href="{{ route('beats.approve-reserve', ['studentId' =>$reserve->student_id]) }}">Release</a>
-                                <a class="btn btn-primary btn-sm" href="{{ route('beats.reserve-replacement', ['reserveId' =>$reserve->student_id,'date'=>$reserve->beat_date,'beatReserveId'=>$reserve->id]) }}">Replace</a>
+                                    {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
+                                    </input>
                                 </td>
+
+                                <td>{{ $student->platoon }}</td>
+                                <td><a href="{{ route('beats.replace-reserve',['reserveId'=>$reserve->id, 'studentId'=>$student->id, 'date'=>$date,'beatReserveId'=>$beatReserveId]) }}" class="btn btn-sm btn-primary">Replace</a></td>
+                                @if($student->beat_status != 1)
+
                                 @endif
-                            </tr>
+                                </tr>
                         @endforeach
                     </tbody>
                 </table>
-
             </div>
         </div>
     </div>
-
 
 @endsection

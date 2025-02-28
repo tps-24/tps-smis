@@ -31,7 +31,7 @@
             @method('POST')
             <div class="d-flex gap-2" style="float:right;">
                 <input style="height: 30px; width: 60%" required type="file" name="import_file" class="form-control mb-2">
-                <button title="Upload by CSV/excel file" type="submit" class="btn btn-primary btn-sm"> <i class="bi bi-upload"></i>Upload
+                <button style="height: 30px;" title="Upload by CSV/excel file" type="submit" class="btn btn-primary btn-sm"> <i class="bi bi-upload"></i>Upload
                     Students</i></button>
             </div>
         </form>
