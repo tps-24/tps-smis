@@ -37,6 +37,7 @@ use App\Http\Controllers\GuardAreaController;
 use App\Http\Controllers\PatrolAreaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\MPSVisitorController;
 use Carbon\Carbon;
 
 
@@ -108,8 +109,21 @@ Route::get('/report/generate', [BeatController::class, 'showReport'])->name('rep
 // Route to download the report as a PDF
 Route::get('/report/history/{companyId}', [BeatController::class, 'downloadHistoryPdf'])->name('report.history');
 
+Route::get('/beats/reserves/{companyId}/{date}', [BeatController::class, 'beatReserves'])->name('beats.reserves');
+Route::get('/beats/approve-reserve/{studentId}', [BeatController::class, 'approveReserve'])->name('beats.approve-reserve');
+Route::get('/beats/reserve-replacement/{reserveId}/{date}/{beatReserveId}', [BeatController::class, 'beatReplacementStudent'])->name('beats.reserve-replacement');
+Route::get('/beats/replace-reserve/{reserveId}/{studentId}/{date}/{beatReserveId}', [BeatController::class, 'beatReserveReplace'])->name('beats.replace-reserve');
 
+Route::get('/students/downloadSample', [StudentController::class, 'downloadSample'])->name('studentDownloadSample');
+Route::get('/staff/downloadSample', [StaffController::class, 'downloadSample'])->name('staffDownloadSample');
 
+Route::get('students/upload-students', function(){
+    return view('students.bulk_upload_explanation');
+})->name('uploadStudents');
+
+Route::get('staff/upload-staff', function(){
+    return view('staffs.bulk_upload_explanation');
+})->name('uploadStaff');
 
 
 
@@ -154,9 +168,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/print-certificates', [FinalResultController::class, 'studentList'])->name('studentList');
 
+   
     Route::controller(StudentController::class)->prefix('students')->group(function () {
-        Route::get('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
-        Route::get('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
+        Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
+        Route::post('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
         /**
          * 
          *  Wizard route for student registration
@@ -177,16 +192,47 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
         Route::post('{id}/delete', 'destroy');
+        
         Route::post('bulkimport', 'import');
 
 
     });
+
+
+    Route::resource('students', StudentController::class);  
+    
+});
+
+Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
+Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
+//Route::resource('students', StudentController::class);
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
+
+    
     
     // Define the custom route first
     Route::post(
         '/programmes/{programmeId}/semesters/{semesterId}/session/{sessionProgrammeId}/assign-courses',
         [ProgrammeController::class, 'assignCoursesToSemester']
     );
+
+
+    Route::controller(MPSController::class)->prefix('mps')->group(function () {
+        Route::post('search', 'search');
+        Route::post('store/{id}', 'store');
+        Route::post('release/{id}', 'release');
+        Route::get('{company}/company', 'company');
+    });
+
+    Route::controller(MPSVisitorController::class)->prefix('visitors')->group(function () {
+        Route::post('index','index')->name('visitors.index');
+        Route::post('store/{studentId}','store')->name('visitors.store');
+        Route::post('update/{studentId}','update')->name('visitors.update');
+        Route::post('search-student','searchStudent')->name('visitors.searchStudent');
+    });
+
+
     Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
     Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
@@ -219,6 +265,7 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
     Route::resource('staffs', StaffController::class);
     Route::resource('campuses', CampusController::class);
     Route::resource('announcements', AnnouncementController::class);
+    Route::resource('visitors', MPSVisitorController::class);
 
 
     
@@ -279,12 +326,7 @@ Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']
 
     });
 
-    Route::controller(MPSController::class)->prefix('mps')->group(function () {
-        Route::post('search', 'search');
-        Route::post('store/{id}', 'store');
-        Route::post('release/{id}', 'release');
-        Route::get('{company}/company', 'company');
-    });
+
 
 
 
@@ -310,6 +352,9 @@ Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
+    Route::get('notifications/showNotifications/{notificationIds}',[NotificationController::class,'showNotifications'])->name('notifications.showNotifications'); 
+
+    Route::get('announcement/download/file/{documentPath}',[AnnouncementController::class,'downloadFile'])->name('download.file'); 
 
 });
 
@@ -348,7 +393,6 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
     Route::post('{id}/delete', 'destroy');
     Route::post('bulkimport', 'import');
 
-
 });
 //end
 
@@ -357,7 +401,6 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
 
 
 
-Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
 Route::get('/hospital/viewDetails/{timeframe}', [PatientController::class, 'viewDetails'])->name('hospital.viewDetails');
 Route::get('/hospital/show/{id}', [PatientController::class, 'show'])->name('hospital.show');
 
@@ -368,18 +411,17 @@ Route::put('/patients/{id}/update-status', [PatientController::class, 'updateSta
 
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
-
-
-
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
 Route::post('/patients/submit', [PatientController::class, 'submit'])->name('patients.submit');
 Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve'); 
 Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name('patients.reject');
 Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
 Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
+Route::get('/dispensary', [PatientController::class, 'dispensaryPage'])->name('dispensary.page');
+
 
 // 🚀 Routes for Sending to Receptionist
-Route::post('/patients/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('patients.sendToReceptionist');
+Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
 Route::post('/hospital/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('hospital.sendToReceptionist');
 
 // 💼 Receptionist Routes
@@ -410,7 +452,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file'); // Download file
 });
 
-//Route::get('test', [AttendenceController::class,'generatePdf']);
+Route::get('test', [BeatController::class,'beatReplacementStudent']);
 
 // Route::post('/pusher/auth', function (\Illuminate\Http\Request $request) {
 //     return true;
@@ -420,4 +462,11 @@ Route::middleware(['auth'])->group(function () {
 //         return response()->json(['message' => 'Unauthorized'], 403);
 //     }
 // });
+
+
+
+
+
+
+
 

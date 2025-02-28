@@ -17,9 +17,9 @@ class MPSController extends Controller
     {
 
         $this->middleware('permission:mps-list|mps-create|mps-edit|mps-delete', ['only' => ['index']]);
-        $this->middleware('permission:attendance-create', ['only' => ['create', 'store',]]);
-        $this->middleware('permission:attendance-edit', ['only' => ['edit', 'update','release']]);
-        $this->middleware('permission:attendance-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:mps-create', ['only' => ['create', 'store',]]);
+        $this->middleware('permission:mps-edit', ['only' => ['edit', 'update','release']]);
+        $this->middleware('permission:mps-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -147,6 +147,21 @@ class MPSController extends Controller
         //return redirect()->back()->with('student',$student);
     }
 
+    private function searchStudent($company_id, $platoon, $name = null){
+        $students = Student::where('platoon', $platoon)->where('company_id', $company_id);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        if ($name) {
+            $students = $students->where(function ($query) use ($name) {
+                $query->where('first_name', 'like', '%' . $name . '%')
+                    ->orWhere('last_name', 'like', '%' . $name . '%')
+                    ->orWhere('middle_name', 'like', '%' . $name . '%');
+            });
+        }
+        $students = $students->get();
+        return $students;
+    }
+
+    
+
     public function release(Request $request, $mPSstudent)
     {
         $mPSstudent = MPS::find($mPSstudent);
@@ -158,11 +173,12 @@ class MPSController extends Controller
         return redirect()->back()->with('success', 'Student released successfuly.');
     }
 
-    public function company($companyName)
+    public function company($companyId)
     {
-        $mpsStudents = MPS::join('students', 'm_p_s.student_id', 'students.id')->join('companies', 'students.company', 'companies.name')
-                        ->where('students.company', $companyName)->get();
-                        $scrumbName = $companyName;
+        $company = Company::find($companyId);
+        $mpsStudents = MPS::join('students', 'm_p_s.student_id', 'students.id')->join('companies', 'students.company_id', 'companies.name')
+                        ->where('students.company_id', $companyId)->get();
+                        $scrumbName = $company->name;
         return view('mps.index', compact('mpsStudents', 'scrumbName'));
 
     }

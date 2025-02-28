@@ -1,64 +1,61 @@
 @extends('layouts.main')
 @section('scrumb')
-<!-- Scrumb starts -->
-<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
-  <div class="container-fluid">
+  <!-- Scrumb starts -->
+  <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+    <div class="container-fluid">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="/tps-smis/students/">Students</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">List</a></li>
+      <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
+      <li class="breadcrumb-item"><a href="/tps-smis/students/">Students</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="#">List</a></li>
       </ol>
     </nav>
-  </div>
-</nav>
-<!-- Scrumb ends -->
+    </div>
+  </nav>
+  <!-- Scrumb ends -->
 
 @endsection
 
 @section('content')
 
-<div class="row">
-  @session('success')
+  <div class="row">
+    @session('success')
     <div class="alert alert-success" role="alert">
     {{ $value }}
     </div>
   @endsession
-  <div class="row">
+    <div class="row">
     @can('student-create')
     <div class="col-3">
-      <form method="POST" action="{{url('students/bulkimport')}}" style="display:inline" enctype="multipart/form-data">
-        @csrf
-        @method('POST')
-        <input style="height: 30px; width: 50%" required type="file" name="import_file" class="form-control mb-2">
-        <button title="Upload by CSV/excel file" type="submit" class="btn btn-primary btn-sm">Upload
-          Students</i></button>
-      </form>
+      <a href="{{ route('uploadStudents') }}" class="btn btn-sm btn-primary">Upload Students</a>
     </div>
-    @endcan
+  @endcan
     <div class="col-6 " style="float: right;">
       <form class="d-flex" action="{{route('students.search')}}" method="POST">
-        <!-- <div class="mx-auto p-2" style="width: 200px;"> Search </div> -->
-        @csrf
-        @method("POST")
-        <div class="d-flex">
-          <!-- Name Search -->
-          <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name" placeholder="name(option)">
-            <!-- Company Dropdown -->
-            <select class="form-select me-2" name="company_id" required>
-                <option value="">Select Company</option>
-                @foreach ($companies as $company)
-                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
-                @endforeach
-            </select>
-            <!-- Platoon Dropdown -->
-            <select onchange="this.form.submit()" class="form-select me-2" name="platoon" required>
-                <option value="">Select Platoon</option>
-                @for ($i = 1; $i < 15; $i++)
-                    <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
-                @endfor
-            </select>
-            </div>
+      <!-- <div class="mx-auto p-2" style="width: 200px;"> Search </div> -->
+      @csrf
+      @method("POST")
+      <div class="d-flex">
+        <!-- Name Search -->
+        <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name"
+        placeholder="name(option)">
+        <!-- Company Dropdown -->
+        <select class="form-select me-2" name="company_id" required>
+        <option value="" selected disabled>Select Company</option>
+        @foreach ($companies as $company)
+      <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+        {{ $company->name }}
+      </option>
+    @endforeach
+        </select>
+        <!-- Platoon Dropdown -->
+        <select onchange="this.form.submit()" class="form-select me-2" name="platoon" required>
+        <option value="" selected disabled>Select Platoon</option>
+        @for ($i = 1; $i < 15; $i++)
+      <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
+    @endfor
+        </select>
+      </div>
       </form>
     </div>
 
@@ -69,101 +66,134 @@
     </div> -->
     @can('student-create')
     <div class="col-3 pull-right">
-    
+
       <a class="btn btn-success mb-2 btn-sm" href="{{ url('students/create') }}"
-        style="float:right !important; margin-right:-22px"><i class="fa fa-plus"></i> Create New Student</a>
+      style="float:right !important; margin-right:-22px"><i class="fa fa-plus"></i> Create New Student</a>
     </div>
-    @endcan
+  @endcan
+    </div>
   </div>
-</div>
 
-<div class="card-body">
+  <div class="card-body">
+    @if ($students->isEmpty())
+    <h3>No student available for provided criteria.</h3>
+  @else
   <div class="table-outer">
-    <div class="table-responsive">
-      <table class="table table-striped truncate m-0">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Force Number</th>
-            <th>Name</th>
-            <th>Company</th>
-            <th>Platoon</th>
-            <th>Phone</th>
-            <th>Home Region</th>
-            <th width="280px">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php $i = 0;?>
-          @foreach ($students as $key => $student)
+  <div class="table-responsive">
+    <table class="table table-striped truncate m-0">
+    <thead>
+    <tr>
+    <th>No</th>
+    <th>Force Number</th>
+    <th>Name</th>
+    <th>Company</th>
+    <th>Platoon</th>
+    <th>Phone</th>
+    <th>Home Region</th>
+    <th></th>
+    <th width="280px">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php  $i = 0;?>
+    @foreach ($students as $key => $student)
 
-        <tr>
-        <td>{{++$i}}</td>
-        <td>{{$student->force_number ?? ''}}</td>
-        <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
-        <td>{{$student->company->name ?? ''}}</td>
-        <td>{{$student->platoon}}</td>
-        <td>{{$student->phone}}</td>
-        <td>{{$student->home_region}}</td>
-        <td>
-          @can('student-list')
-          <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">
-          Show</a>
-          @endcan
-          @can('student-edit')
-          <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
-          @endcan
-          @can('student-delete')
-          <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-          data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
-          @endcan
-          @if ($student->beat_status == 1)
-          <a class="btn btn-warning btn-sm" href="{{ route('students.deactivate_beat_status', $student->id) }}">
-          Deactivate</a>
-          @else
-          <a class="btn btn-warning btn-sm" href="{{ route('students.activate_beat_status', $student->id) }}">
-          Activate</a>
-          @endif
-          <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
-          aria-labelledby="createNewContactLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-header flex-column">
-              <div class="text-center">
-              <h4 class="text-danger">Delete Student</h4>
-              </div>
-            </div>
-            <div class="modal-body">
-              <h5>You are about to delete {{$student->first_name}} {{$student->middle_name}}
-              {{$student->last_name}}.
-              </h5>
-              <p>Please confirm to delete.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">
-              Cancel
-              </button>
-              <form method="POST" action="{{url('students/' . $student->id . '/delete')}}"
-              style="display:inline">
-              @csrf
-              @method('POST')
-              <button type="submit" class="btn btn-danger btn-sm">Confirm</i></button>
-              </form>
-            </div>
-            </div>
-          </div>
-          </div>
-        </td>
+    <tr>
+    <td>{{++$i}}</td>
+    <td>{{$student->force_number ?? ''}}</td>
+    <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
+    <td>{{$student->company->name ?? ''}}</td>
+    <td>{{$student->platoon}}</td>
+    <td>{{$student->phone}}</td>
+    <td>{{$student->home_region}}</td>
+    <td style="height: 50%;">
+      @if($student->beat_status == '1')
+      <form action="{{ route('students.deactivate_beat_status', $student->id) }}" method="POST"
+      id="toggleForm{{ $student->id }}">
+      @csrf
+      <div class="form-check form-switch">
+      <input  class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}" name="status{{ $student->id }}"
+      @if($student->beat_status == '1') checked @endif>
+      <label class="form-check-label" for="statusToggle">Active</label>
+      </div>
+      <button type="submit" style="display: none;">Submit</button>
+      </form>
 
-        </tr>
-      @endforeach
-        </tbody>
-      </table>
+    @else
+      <form action="{{ route('students.activate_beat_status', $student->id) }}" method="POST" id="toggleForm{{ $student->id }}"
+      class="d-flex gap-2">
+      @csrf
+      <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}" name="status{{ $student->id }}">
+      <label class="form-check-label" for="statusToggle">Inactive</label>
+      </div>
+      <button type="submit" style="display: none;">Submit</button>
+      </form>
+    @endif  
+
+    </td>
+    <td>
+      @can('student-list')
+      <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">
+      Show</a>
+    @endcan
+      @can('student-edit')
+      <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
+    @endcan
+
+      @can('student-delete')
+      <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+    data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
+    @endcan
+    </td>
+    
+    <script>
+      // Listen for changes to the toggle
+      document.getElementById('statusToggle{{ $student->id }}').addEventListener('change', function () {
+      // Automatically submit the form when toggle is changed
+      document.getElementById('toggleForm{{ $student->id }}').submit();
+      });
+    </script>
+
+    <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
+      aria-labelledby="createNewContactLabel" aria-hidden="true">
+      <div class="modal-dialog">
+      <div class="modal-content">
+      <div class="modal-header flex-column">
+      <div class="text-center">
+      <h4 class="text-danger">Delete Student</h4>
+      </div>
+      </div>
+      <div class="modal-body">
+      <h5>You are about to delete {{$student->first_name}} {{$student->middle_name}}
+      {{$student->last_name}}.
+      </h5>
+      <p>Please confirm to delete.</p>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">
+      Cancel
+      </button>
+      <form method="POST" action="{{url('students/' . $student->id . '/delete')}}" style="display:inline">
+      @csrf
+      @method('POST')
+      <button type="submit" class="btn btn-danger btn-sm">Confirm</i></button>
+      </form>
+      </div>
+      </div>
+      </div>
     </div>
+    </td>
+
+    </tr>
+  @endforeach
+    </tbody>
+    </table>
+  </div>
+  </div>
+@endif
   </div>
 
-</div>
-
-{!! $students->links('pagination::bootstrap-5') !!}
+  {!! $students->links('pagination::bootstrap-5') !!}
 
 @endsection

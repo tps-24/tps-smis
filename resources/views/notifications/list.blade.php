@@ -24,7 +24,8 @@
                         notification_ids = notification_ids.concat(JSON.stringify(data.id));                        
                     }else{
                         notification_ids = notification_ids.concat(",",JSON.stringify(data.id));                        
-                    }                  
+                    }         
+                             
                     //let url_link = notifications.join();
                     //alert(url_link)
                     // Update notification count
@@ -36,15 +37,16 @@
 
                     // Show alert with announcement data
                     //alert(`Title: ${announcement.title}\nMessage: ${announcement.message}`);
-
-                    
+                    var encodedId = encodeURIComponent(data.id);
+                    url = `{{ route('notifications.showNotifications',['notificationIds'=>'announcement_id']) }}`;
+                    url = url.replace('announcement_id', [encodedId]);
                     // Add notification to the dropdown
                     var notificationsContainer = document.querySelector('.dropdown-menu .mx-3.d-flex.flex-column');
                     var notificationItem = document.createElement('div');
                     notificationItem.className = 'notification-item';
                     notificationItem.innerHTML = `
                         <div class="bg-${notification.type}-subtle border border-${notification.type} px-3 py-2 rounded-1"> 
-                            <a href="notifications/${data.category}/${data.type}/${data.id}/${notification_ids}]" class="dropdown-item text-${notification.type} d-flex align-items-center">
+                            <a href="${url}" class="dropdown-item text-${notification.type} d-flex align-items-center">
                                 ${notification.title}
                             </a>
                             <p class="small m-0">${notification.created_at}</p>
@@ -90,7 +92,7 @@
                             </div>
                         </div>
                         <div class="d-grid m-3">
-                            <a href="javascript:void(0)" class="btn btn-primary">View all</a>
+                            <a id="viewAll" href="javascript:void(0)" class="btn btn-primary">View all</a>
                         </div>
                     </div>
                 </div>

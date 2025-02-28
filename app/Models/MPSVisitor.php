@@ -4,22 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MPS extends Model
+class MPSVisitor extends Model
 {
-    protected $fillable = [
-        'added_by',
+    protected $fillable=[
         'student_id',
-        'arrested_at',
-        'days',
-        'description'
+        'visited_at',
+        'names',
+        'phone',
+        'relationship',
+        'welcomed_by'
     ];
+
     protected $casts = [
-        "arrested_at" => "datetime",
+        "visited_at" => "datetime",
     ];
     public function student(){
         return $this->belongsTo(Student::class, 'student_id', 'id');
     }
     public function staff(){
-        return $this->belongsTo(User::class, 'added_by', 'id');
+        return $this->belongsTo(User::class, 'welcomed_by', 'id');
     }
 }

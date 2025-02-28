@@ -1,34 +1,34 @@
 @extends('layouts.main')
 @section('scrumb')
-<!-- Scrumb starts -->
-<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
-    <div class="container-fluid">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-smis/mps/">Lock Up</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><a href="#">Search</a></li>
-            </ol>
-        </nav>
-    </div>
-</nav>
-<!-- Scrumb ends -->
+    <!-- Scrumb starts -->
+    <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+        <div class="container-fluid">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/tps-smis/" id="home">Home</a></li>
+                    <li class="breadcrumb-item "><a href="#">MPS</a></li>
+                    <li class="breadcrumb-item "><a href="#">Visitors</a></li>
+                    <li class="breadcrumb-item active"><a href="#">Create</a></li>
+                </ol>
+            </nav>
+        </div>
+    </nav>
+    <!-- Scrumb ends -->
 
 @endsection
 @section('content')
-<!-- Success Message -->
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
+    @session('success')
+        <div class="alert alert-success" role="alert">
+            {{ $value }}
+        </div>
+    @endsession  
 <div class="card-body">
-    <form action="{{url('/mps/search')}}" method="POST" class="d-flex justify-content-between mb-3">
+    <form action="{{ route('visitors.searchStudent') }}" method="POST" class="d-flex justify-content-between mb-3">
         @csrf
         <div class="d-flex">
             <!-- Company Dropdown -->
             <select class="form-select me-2" name="company_id" required>
-                <option value="">Select Company</option>
+                <option value="" selected disabled>Select Company</option>
                 @foreach ($companies as $company)
                 <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
                 @endforeach
@@ -63,7 +63,7 @@
                             @foreach ($students as $student)
                                 <tr>
                                     <td>{{ ++$i }}.</td>
-                                    <td>{{$student->first_name}} {{$student->last_name}}</td>
+                                    <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
                                     <td>{{$student->company->name}}</td>
                                     <td>{{$student->platoon}}</td>
                                     <td>
@@ -78,41 +78,45 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="statusModalLabel{{  $student->id ?? ''}}">Enter
-                                                            Student Details for {{ $student->first_name }} {{ $student->last_name }}
+                                                            Visitor Details for {{ $student->first_name }} {{ $student->last_name }}
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="{{url('/mps/store/' . $student->id)}}" method="POST">
+                                                        <form action="{{url('/visitors/store/' . $student->id)}}" method="POST">
                                                             @csrf
-
                                                             @method('POST')
-
                                                             <div class="mb-3">
-                                                                <label for="excuseType" class="form-label">Arrested At</label>
+                                                                <label for="visitor_name" class="form-label">Visitor Name</label>
+                                                                <input class="form-control"   type="text" required
+                                                                    name="visitor_name">
+                                                            </div>
+                                                            @error('visitor_name')
+                                                                <div class="error">{{ $message }}</div>
+                                                            @enderror
+                                                            <div class="mb-3">
+                                                                <label for="visitor_phone" class="form-label">Visitor Phone</label>
+                                                                <input class="form-control"   type="text" required
+                                                                    name="visitor_phone">
+                                                            </div>
+                                                            @error('visitor_phone')
+                                                                <div class="error">{{ $message }}</div>
+                                                            @enderror
+                                                            <div class="mb-3">
+                                                                <label for="visitor_relation" class="form-label">Visitor Relation</label>
+                                                                <input class="form-control"   type="text" required
+                                                                    name="visitor_relation">
+                                                            </div>
+                                                            @error('visitor_relation')
+                                                                <div class="error">{{ $message }}</div>
+                                                            @enderror
+                                                            <div class="mb-3">
+                                                                <label for="visted_at" class="form-label">Visited At</label>
                                                                 <input class="form-control" type="datetime-local" required
-                                                                    name="arrested_at">
+                                                                    name="visited_at">
                                                             </div>
-                                                            @error('arrested_at')
-                                                                <div class="error">{{ $message }}</div>
-                                                            @enderror
-
-                                                            <div class="mb-3">
-                                                                <label for="excuseType" class="form-label">Days</label>
-                                                                <input class="form-control" value="1" min="1" type="number" required
-                                                                    name="days">
-                                                            </div>
-                                                            @error('days')
-                                                                <div class="error">{{ $message }}</div>
-                                                            @enderror
-
-                                                            <div class="mb-3">
-                                                                <label for="description" class="form-label">Description</label>
-                                                                <textarea class="form-control" id="" name="description" rows="3"
-                                                                    required></textarea>
-                                                            </div>
-                                                            @error('description')
+                                                            @error('visited_at')
                                                                 <div class="error">{{ $message }}</div>
                                                             @enderror
                                                             <div style="display: flex; justify-content: flex-end; margin-right: 2px;">
@@ -137,5 +141,4 @@
         <h4>Please seearch the student.</h4>
     @endif
 </div>
-
 @endsection

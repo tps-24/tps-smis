@@ -61,9 +61,9 @@
                         <td>
                             <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#MoreAbsent{{$attendence->id}}">Absents</button>
-                            <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#MoreSafari{{$attendence->id}}">Safari</button>
-                               <a href="{{ route('attendences.changanua',['attendenceId'=> $attendence->id]) }}"> <button class="btn  btn-info btn-sm" >More</button></a>
+                                @if ($attendence->created_at->diffInHours(\Carbon\Carbon::now()) < 2 )
+                                 <a href="{{ route('attendences.changanua',['attendenceId'=> $attendence->id]) }}"> <button class="btn  btn-info btn-sm" >Mchanganuo</button></a>                               
+                                @endif
                             <div class="modal fade" id="MoreAbsent{{$attendence->id}}" tabindex="-1"
                                 aria-labelledby="statusModalLabelMore{{$attendence->id}}" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -98,51 +98,8 @@
                                         
                                         </div>
                                     </div>
-                              /div>
                             </div>
-                            <div class="modal fade" id="MoreSafari{{$attendence->id}}" tabindex="-1"
-                                aria-labelledby="statusModalLabelMore{{$attendence->id}}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="statusModalLabelMore">
-                                                Safari Students
-                                            </h5>
-
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="d-flex gap-2">
-                                                <label for="">Select category</label>
-                                                <select style="width: 50%;" name="" id="" class="form-control">
-                                                    <option value="" disabled selected>select</option>
-                                                    <option value="">Mess</option>
-                                                    <option value="">Sentry</option>
-                                                    <option value="">Off</option>
-                                                    <option value="">Safari</option>
-                                                </select>
-                                            </div>
-                                            <ol>
-                                                @foreach($attendence->safari_students as $student)
-                                                    @if ($student != null)
-                                                        <li>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
-                                                        </li>
-                                                    @else
-                                                        <p>No safari students recorded.</p>
-                                                    @endif
-                                                @endforeach
-                                            </ol>
-
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a
-                                                href="{{url('attendences/list-safari_students/' . $company->id . '/' . $attendence->id)}}"><button
-                                                    class="btn btn-sm btn-primary">Add safari</button></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </td>
                     </tr>
                 @endforeach

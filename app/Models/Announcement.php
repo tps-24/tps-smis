@@ -10,6 +10,9 @@ class Announcement extends Model
         'title',
         'message',
         'type',
+        'audience',
+        'company',
+        'document_path',
         'posted_by',
         'expires_at',
     ];

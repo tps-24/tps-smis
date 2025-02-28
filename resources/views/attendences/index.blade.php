@@ -226,7 +226,7 @@
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-between mt-1">
                                                                     <a class="text-primary ms-4"
-                                                                        href="{{url("mps/" . $companies[$j]->name . "/company")}}">
+                                                                        href="{{url("mps/" . $companies[$j]->id . "/company")}}">
                                                                         <span>View</span>
                                                                     </a>
                                                                 </div>

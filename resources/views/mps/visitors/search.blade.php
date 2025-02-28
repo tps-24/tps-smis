@@ -6,8 +6,8 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-smis/mps/">Lock Up</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><a href="#">Search</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/mps/">MPS</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a href="#">Visitors</a></li>
             </ol>
         </nav>
     </div>
@@ -23,7 +23,7 @@
     </div>
 @endif
 <div class="card-body">
-    <form action="{{url('/mps/search')}}" method="POST" class="d-flex justify-content-between mb-3">
+    <form action="" method="POST" class="d-flex justify-content-between mb-3">
         @csrf
         <div class="d-flex">
             <!-- Company Dropdown -->

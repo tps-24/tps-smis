@@ -47,7 +47,7 @@ class AttendenceController extends Controller
         $attendenceType = AttendenceType::find($attendenceType_id);
         $platoon = Platoon::find($request->platoon);
 
-        $students = Student::where('company_id', $platoon->company_id)->where('platoon', $platoon->name)->where('session_programme_id', 1)->get();
+        $students = Student::where('company_id', $platoon->company_id)->where('session_programme_id',$this->selectedSessionId)->where('platoon', $platoon->name)->get();
         return view(
             'attendences/create',
             compact('students', 'attendenceType', 'platoon')
@@ -309,7 +309,7 @@ class AttendenceController extends Controller
     public function list($list_type, $attendence_id, $date)
     {
         $attendence = Attendence::find($attendence_id);
-        $students = $attendence->platoon->students()->where('session_programme_id', 1)->orderBy('first_name')->get();
+        $students = $attendence->platoon->students()->where('session_programme_id',$this->selectedSessionId)->orderBy('first_name')->get();
         $absent_student_ids = explode(",", $attendence->absent_student_ids);
         // $students = Company::join('students', 'companies.name', 'students.company')->join('platoons', 'platoons.id', 'students.platoon')
         //     ->where('students.company', 'HQ')->where('students.platoon', '1')->get('students.*');
@@ -542,41 +542,58 @@ class AttendenceController extends Controller
         $absent = $attendence->absent_student_ids !=null? explode(",",$attendence->absent_student_ids): [];
         $sentry = $attendence->sentry_student_ids !=null? explode(",",$attendence->sentry_student_ids): [];
         $mess = $attendence->mess_student_ids !=null? explode(",",$attendence->mess_student_ids): [];
-        $adm = $attendence->adm_student_ids !=null? explode(",",$attendence->adm_student_ids): [];
+        $safari = $attendence->safari_student_ids !=null? explode(",",$attendence->safari_student_ids): [];
         $off = $attendence->off_student_ids !=null? explode(",",$attendence->off_student_ids): [];
       
-        //return $mess;
-        $notEligibleStudent_ids = array_merge($absent,$sentry,$mess, $adm,$off);
-        $students = $platoon->students->whereNotIn('id',$notEligibleStudent_ids)->values();
-        //return $students->take(2);
+        $notEligibleStudent_ids = array_merge($absent,$sentry,$mess, $safari,$off);
+        $students = $platoon->students->where('session_programme_id',$this->selectedSessionId)->whereNotIn('id',$notEligibleStudent_ids)->values();
+        $sentry_students =  $platoon->students->whereIn('id',$sentry)->values();
+        $mess_students =  $platoon->students->whereIn('id',$mess)->values();
+        $off_students =  $platoon->students->whereIn('id',$off)->values();
+        $safari_students =  $platoon->students->whereIn('id',$safari)->values();
 
-        return view('attendences.changanua', compact('students', 'attendence'));
+        return view(
+            'attendences.changanua', 
+            compact(
+                'students', 
+                'attendence',
+                'sentry_students',
+                'mess_students',
+                'off_students',
+                'safari_students'
+            ));
     }
 
     public function storeMchanganuo(Request $request,$attendenceId){
         $attendence = Attendence::find($attendenceId);
-        $ids = $request->input('student_ids');
-
-        if($request->type == "sentry"){
-            $attendence->sentry_student_ids = implode(",",$ids);
-            $attendence->sentry = count($ids);
-            $attendence->present -= count($ids);
-        }else if($request->type == "off"){
-            $attendence->off_student_ids = implode(",",$ids);
-            $attendence->off = count($ids);
-            $attendence->present -= count($ids);
-        }else if($request->type == "adm"){
-            $attendence->adm_student_ids = implode(",",$ids);
-            $attendence->adm = count($ids);
-            $attendence->present -= count($ids);
-        }else if($request->type == "mess"){
-            $attendence->mess_student_ids = implode(",",$ids);
-            $attendence->mess = count($ids);
-            $attendence->present -= count($ids);
-        }else if($request->type == "safari"){
-            $attendence->safari_student_ids = implode(",",$ids);
-            $attendence->safari = count($ids);
-            $attendence->present -= count($ids);
+        $sentry_ids = $request->input('sentry_student_ids');
+        $off_ids = $request->input('off_student_ids');
+        $mess_ids = $request->input('mess_student_ids');
+        $safari_ids = $request->input('safari_student_ids');
+        //return $sentry_ids;
+        if($sentry_ids){
+            $attendence->sentry_student_ids = implode(",",$sentry_ids);
+            $attendence->sentry = count($sentry_ids);
+            $attendence->present -= count($sentry_ids);
+        }
+        if($off_ids){
+            $attendence->off_student_ids = implode(",",$off_ids);
+            $attendence->off = count($off_ids);
+            $attendence->present -= count($off_ids);
+        }
+        //}else if($request->type == "adm"){
+            // $attendence->adm_student_ids = implode(",",$ids);
+            // $attendence->adm = count($ids);
+            // $attendence->present -= count($ids);
+            if($mess_ids){
+            $attendence->mess_student_ids = implode(",",$mess_ids);
+            $attendence->mess = count($mess_ids);
+            $attendence->present -= count($mess_ids);
+            }
+            if($safari_ids){
+            $attendence->safari_student_ids = implode(",",$safari_ids);
+            $attendence->safari = count($safari_ids);
+            $attendence->present -= count($safari_ids);
         }
         
         $attendence->save();
