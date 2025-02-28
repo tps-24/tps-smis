@@ -157,8 +157,8 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
    
     Route::controller(StudentController::class)->prefix('students')->group(function () {
-        Route::get('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
-        Route::get('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
+        Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
+        Route::post('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
         /**
          * 
          *  Wizard route for student registration
