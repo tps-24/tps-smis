@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::table('beat_reserves', function (Blueprint $table) {
             $table->unsignedBigInteger('replaced_student_id')->after('student_id')->nullable();
-            $table->boolean('released')->default(0);
+            $table->string('replacement_reason')->after('replaced_student_id')->nullable();
+            $table->boolean('released')->after('replacement_reason')->default(0);
 
         });
     }
@@ -25,6 +26,7 @@ return new class extends Migration
     {
         Schema::table('beat_reserves', function (Blueprint $table) {
             $table->dropColumn('replaced_student_id');
+            $table->dropColumn('replacement_reason');
             $table->dropColumn('released');
         });
     }

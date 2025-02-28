@@ -850,7 +850,11 @@ private function generateBeatReport($companyId = null, $startDate = null, $endDa
         return redirect()->back()->with('success','Reserve released successfully.');
     }
 
-    public function beatReserveReplace($reserveId,$studentId,$date, $beatReserveId){
+    public function beatReserveReplace(Request $request,$reserveId,$studentId,$date, $beatReserveId){
+        
+        $request->validate([
+            'replacement_reason' => 'required|string'
+        ]);
         $student = Student::find($studentId);
         $reserve = Student::find($reserveId);
         $beat_reserve = BeatReserve::find($beatReserveId);
@@ -859,6 +863,7 @@ private function generateBeatReport($companyId = null, $startDate = null, $endDa
         $reserve->increment('beat_round');
         $beat_reserve->replaced_student_id = $student->id;
         $beat_reserve->released =1;
+        $beat_reserve->replacement_reason = $request->replacement_reason;
         $student->decrement('beat_round');
         $beat_reserve->save();
         $reserve->save();

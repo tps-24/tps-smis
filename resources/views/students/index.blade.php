@@ -90,8 +90,8 @@
     <th>Platoon</th>
     <th>Phone</th>
     <th>Home Region</th>
+    <th>Action</th>
     <th></th>
-    <th width="280px">Action</th>
     </tr>
     </thead>
     <tbody>
@@ -106,32 +106,7 @@
     <td>{{$student->platoon}}</td>
     <td>{{$student->phone}}</td>
     <td>{{$student->home_region}}</td>
-    <td style="height: 50%;">
-      @if($student->beat_status == '1')
-      <form action="{{ route('students.deactivate_beat_status', $student->id) }}" method="POST"
-      id="toggleForm{{ $student->id }}">
-      @csrf
-      <div class="form-check form-switch">
-      <input  class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}" name="status{{ $student->id }}"
-      @if($student->beat_status == '1') checked @endif>
-      <label class="form-check-label" for="statusToggle">Active</label>
-      </div>
-      <button type="submit" style="display: none;">Submit</button>
-      </form>
 
-    @else
-      <form action="{{ route('students.activate_beat_status', $student->id) }}" method="POST" id="toggleForm{{ $student->id }}"
-      class="d-flex gap-2">
-      @csrf
-      <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}" name="status{{ $student->id }}">
-      <label class="form-check-label" for="statusToggle">Inactive</label>
-      </div>
-      <button type="submit" style="display: none;">Submit</button>
-      </form>
-    @endif  
-
-    </td>
     <td>
       @can('student-list')
       <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">
@@ -145,8 +120,31 @@
       <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
     data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
     @endcan
-    </td>
     
+    </td>
+    <td>
+    @if($student->beat_status == '1')
+      <form action="{{ route('students.deactivate_beat_status', $student->id) }}" method="POST"
+      id="toggleForm{{ $student->id }}">
+      @csrf
+      <div class="form-check form-switch">
+      <input  class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}" name="status{{ $student->id }}"
+      @if($student->beat_status == '1') checked @endif>
+      </div>
+      <button type="submit" style="display: none;">Submit</button>
+      </form>
+
+    @else
+      <form action="{{ route('students.activate_beat_status', $student->id) }}" method="POST" id="toggleForm{{ $student->id }}"
+      class="d-flex gap-2">
+      @csrf
+      <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}" name="status{{ $student->id }}">
+      </div>
+      <button type="submit" style="display: none;">Submit</button>
+      </form>
+    @endif  
+    </td>
     <script>
       // Listen for changes to the toggle
       document.getElementById('statusToggle{{ $student->id }}').addEventListener('change', function () {
