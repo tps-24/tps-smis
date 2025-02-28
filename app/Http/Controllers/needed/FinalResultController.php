@@ -10,10 +10,6 @@ use App\Models\Enrollment;
 use App\Models\Company;
 use App\Services\FinalResultService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
 
 class FinalResultController extends Controller
 {
@@ -28,20 +24,9 @@ class FinalResultController extends Controller
         
         $selectedSessionId = session('selected_session');
         if (!$selectedSessionId)
-            $selectedSessionId = 4;
+            $selectedSessionId = 1;
         $students = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
-        $companiesy = Company::all();
-
-        $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId);
-        })
-        ->with(['students' => function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId)->orderBy('platoon');
-        }])
-        ->get();
-
-        // dd($companies);
-
+        $companies = Company::all();
         return view('final_results.student_certificate', compact('students', 'companies'));
 
     }
@@ -156,27 +141,4 @@ class FinalResultController extends Controller
         return redirect()->route('final_results.index')
                          ->with('success', 'Final results generated successfully.');
     }
-
-    public function generateTranscript(Request $request)
-    {
-        // dd($request->input());
-        $selectedStudentIds = $request->input('selected_students');
-        if (empty($selectedStudentIds)) {
-            return redirect()->back()->with('error', 'No students selected.');
-        }
-        
-        $students = Student::whereIn('id', $selectedStudentIds)->with('finalResults')->get();
-
-        // dd($students);
-        
-        // Query data from 'final_results' table and process certificates
-        // Generate and return PDF with selected students' certificates
-        
-        // Example (using a package like Dompdf or another PDF library):
-        $pdf = PDF::loadView('final_results.pdf', compact('students'))->setPaper('a4', 'landscape');
-        // Return the PDF content as a response to be rendered in a new browser window
-        return $pdf->stream('final_results.pdf');
-        
-    }
-
 }

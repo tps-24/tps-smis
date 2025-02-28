@@ -47,7 +47,7 @@ class AttendenceController extends Controller
         $attendenceType = AttendenceType::find($attendenceType_id);
         $platoon = Platoon::find($request->platoon);
 
-        $students = Student::where('company_id', $platoon->company_id)->where('platoon', $platoon->name)->get();
+        $students = Student::where('company_id', $platoon->company_id)->where('platoon', $platoon->name)->where('session_programme_id', 1)->get();
         return view(
             'attendences/create',
             compact('students', 'attendenceType', 'platoon')
@@ -309,7 +309,7 @@ class AttendenceController extends Controller
     public function list($list_type, $attendence_id, $date)
     {
         $attendence = Attendence::find($attendence_id);
-        $students = $attendence->platoon->students()->orderBy('first_name')->get();
+        $students = $attendence->platoon->students()->where('session_programme_id', 1)->orderBy('first_name')->get();
         $absent_student_ids = explode(",", $attendence->absent_student_ids);
         // $students = Company::join('students', 'companies.name', 'students.company')->join('platoons', 'platoons.id', 'students.platoon')
         //     ->where('students.company', 'HQ')->where('students.platoon', '1')->get('students.*');
