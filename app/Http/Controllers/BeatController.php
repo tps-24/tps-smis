@@ -373,9 +373,17 @@ public function fillBeats(Request $request)
             $beat->students()->attach(json_decode($beatData['student_ids']));
         }
 
+        $current_beat_round = Student::max('beat_round');
         // Save reserve students
+    
         foreach ($reserveStudents as $reserve) {
-            BeatReserve::create($reserve);
+            //BeatReserve::create($reserve);
+            BeatReserve::Create([
+                'student_id' => $reserve['student_id'],
+                'company_id' => $reserve['company_id'],
+                'beat_date' => $reserve['beat_date'],
+                'beat_round' => $current_beat_round
+            ]);
         }
 
         // Save leaders on duty
@@ -687,7 +695,7 @@ private function beatHistory($company){
         $hospitalStudents = $students->where('beat_exclusion_vitengo_id',3)->values();
         $emergencyStudents = $students->whereNotNull('beat_emergency')->where('beat_status', 0)->values();
 
-        
+
         
     // Fetch guard and patrol areas with proper time filters
     $_guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());

@@ -14,7 +14,8 @@ class BeatReserve extends Model
     protected $fillable = [
         'company_id',
         'student_id',
-        'beat_date'
+        'beat_date',
+        'beat_round'
     ];
 
     public function student()
