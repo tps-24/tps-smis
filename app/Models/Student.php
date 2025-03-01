@@ -28,6 +28,11 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function finalResults()
+    {
+        return $this->hasMany(FinalResult::class);
+    }
     public function programme()
     {
         return $this->belongsTo(Programme::class);

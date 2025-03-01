@@ -183,9 +183,9 @@
       </li>
     @endcan()
 
-      @can('print-certificate')
-      <li>
-      <a href="#">
+    @can('print-certificate')
+    <li>
+      <a href="{{url('/print-certificates')}}">
         <i class="bi bi-printer"></i>
         <span class="menu-text">Print Certificate(s)</span>
       </a>

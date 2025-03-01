@@ -100,12 +100,14 @@ Route::post('/fill-beats', [BeatController::class, 'fillBeats'])->name('beats.fi
 Route::get('/beats/{beat}', [BeatController::class, 'showBeat'])->name('beats.show');
 
 Route::get('/beats/pdf/{company}', [BeatController::class, 'generatePDF'])->name('beats.generatePDF');
+Route::post('/generate-transcript', [FinalResultController::class, 'generateTranscript'])->name('final.generateTranscript');
+
 
 // Route to generate and display the report
 Route::get('/report/generate', [BeatController::class, 'showReport'])->name('report.generate');
-
+Route::get('/report/generate', [BeatController::class, 'showReport'])->name('report.generate');
 // Route to download the report as a PDF
-Route::get('/report/download', [BeatController::class, 'downloadReport'])->name('report.download');
+Route::get('/report/history/{companyId}', [BeatController::class, 'downloadHistoryPdf'])->name('report.history');
 
 Route::get('/beats/reserves/{companyId}/{date}', [BeatController::class, 'beatReserves'])->name('beats.reserves');
 Route::get('/beats/approve-reserve/{studentId}', [BeatController::class, 'approveReserve'])->name('beats.approve-reserve');
@@ -155,6 +157,17 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
     Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
     Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
+    Route::resource('students', StudentController::class);  
+    
+});
+
+Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
+Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
+//Route::resource('students', StudentController::class);
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/print-certificates', [FinalResultController::class, 'studentList'])->name('studentList');
+
    
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');

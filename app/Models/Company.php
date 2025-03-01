@@ -18,7 +18,7 @@ class Company extends Model
     // }
 
     public function students(){
-        return $this->hasMany(Student::class,'company','name');
+        return $this->hasMany(Student::class);
     }
     
 
@@ -33,5 +33,9 @@ class Company extends Model
     }
     public function platoons(){
         return $this->hasMany(Platoon::class);
+    } 
+
+    public function beatRound(){
+        return $this->hasMany(BeatRound::class);
     } 
 }

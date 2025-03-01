@@ -9,11 +9,12 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Company;
 use App\Services\FinalResultService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
+
 
 class FinalResultController extends Controller
 {
@@ -27,24 +28,52 @@ class FinalResultController extends Controller
     public function studentList(){
         
         $selectedSessionId = session('selected_session');
-        if (!$selectedSessionId)
-            $selectedSessionId = 4;
-        $students = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
-        $companiesy = Company::all();
+        if (!$selectedSessionId){
+            $selectedSessionId = 1;
+        }
 
-        $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId);
-        })
-        ->with(['students' => function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId)->orderBy('platoon');
-        }])
-        ->get();
+        $companies = Company::all();
 
-        // dd($companies);
+        foreach($companies as $company){
+            $students = Student::where('session_programme_id', 2)->where('company_id', $company)->orderBy('platoon')->paginate(20);
+        }
 
         return view('final_results.student_certificate', compact('students', 'companies'));
-
     }
+
+    
+    // public function generateCertificate(Request $request, $studentId)
+    // {
+    //     dd();
+    //     $date = $request->input('date', Carbon::today()->toDateString());
+
+    //     $results = FinalResult::where('student_id', $studentId)->firstOrFail();
+
+    //     // return view('beats_summary', compact('company', 'date', 'summary', 'totalPlatoonCount'));
+        
+    //     $pdf = Pdf::loadView('final_results.pdf', compact('results'))
+    //         ->setPaper('a4', 'landscape');
+
+    //     return $pdf->download('transcript_' . $results->student_id . '_' . $date . '.pdf');
+    // }  
+
+    public function generateTranscript(Request $request)
+    {
+        dd($request);
+        $selectedStudentIds = $request->input('selected_students');
+        if (empty($selectedStudentIds)) {
+            return redirect()->back()->with('error', 'No students selected.');
+        }
+        
+        $students = Student::whereIn('id', $selectedStudentIds)->with('finalResults')->get();
+        
+        // Example (using a package like Dompdf or another PDF library):
+        $pdf = PDF::loadView('certificates.pdf', compact('students'));
+        return $pdf->download('certificates.pdf');
+    }
+
+
+
     public function index()
     {
         $finalResults = FinalResult::with(['student', 'semester', 'course'])->get();
@@ -156,27 +185,4 @@ class FinalResultController extends Controller
         return redirect()->route('final_results.index')
                          ->with('success', 'Final results generated successfully.');
     }
-
-    public function generateTranscript(Request $request)
-    {
-        // dd($request->input());
-        $selectedStudentIds = $request->input('selected_students');
-        if (empty($selectedStudentIds)) {
-            return redirect()->back()->with('error', 'No students selected.');
-        }
-        
-        $students = Student::whereIn('id', $selectedStudentIds)->with('finalResults')->get();
-
-        // dd($students);
-        
-        // Query data from 'final_results' table and process certificates
-        // Generate and return PDF with selected students' certificates
-        
-        // Example (using a package like Dompdf or another PDF library):
-        $pdf = PDF::loadView('final_results.pdf', compact('students'))->setPaper('a4', 'landscape');
-        // Return the PDF content as a response to be rendered in a new browser window
-        return $pdf->stream('final_results.pdf');
-        
-    }
-
 }

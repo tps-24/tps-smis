@@ -67,7 +67,7 @@ public function edit($beat_id){
     $beat  = Beat::find($beat_id);
     $beats  = Beat::where('id', $beat_id)->get();
     $stud =     Student::whereIn('id', json_decode($beat->student_ids))->get();
-    $eligible_students = Student::where('company_id',2)->whereIn('platoon',[8,9,10,11,12,13,14])->where('beat_round',1)->where('beat_status',1)->get();
+    $eligible_students = Student::where('company_id',2)->whereIn('platoon',[1,2,3,4,5,6,7])->where('beat_round',2)->where('beat_status',1)->get();
     return  view('beats.edit', compact('beat','beats', 'eligible_students', 'stud'));
 }
 
@@ -637,6 +637,24 @@ $additionalReserves = $additionalMaleReserves->merge($additionalFemaleReserves)
 //Beat Report
 public function showReport(Request $request)
 {
+    $companies = Company::all();
+    $report = [];
+    foreach($companies as $company){
+        array_push($report, $this->beatHistory($company));
+    }
+    return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
+}
+
+public function downloadHistoryPdf($companyId){
+    $company = Company::find($companyId);
+    $report = $this->beatHistory($company);
+    //return view('beats.historyPdf', compact('report'));
+    $pdf = Pdf::loadView('beats.historyPdf', compact('report'));
+    return $pdf->download("history.pdf");
+}
+
+public function showReport2(Request $request)
+{
     $startDate = $request->input('start_date', null);
     $endDate = $request->input('end_date', null);
     $dateFilter = $request->input('date_filter', null);
@@ -645,6 +663,90 @@ public function showReport(Request $request)
     
     return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
 }
+
+private function beatHistory($company){
+    // $companies = Company::all();
+    // $report = [];
+    //foreach($companies as $company){
+        $students = $company->students->where('session_programme_id', 1);
+        $totalStudents = count($students);
+        $totalEligibleStudents = count($students->whereIn('beat_status', [1,2,3]));
+        $totalIneligibleStudents = count($students->whereNotIn('beat_status',[1,2,3]));
+        $eligibleStudentsPercent = round((($totalStudents-$totalIneligibleStudents )/$totalStudents) *100, 2);
+        $InEligibleStudentsPercent = round((($totalIneligibleStudents )/$totalStudents) *100, 2);
+
+        $guardAreas = count($company->guardAreas);
+        $patrolAreas = count($company->patrolAreas);
+        $current_round = $company->beatRound[0]->current_round;
+        $attained_current_round = count($students->whereIn('beat_status', [1,2,3])->where('beat_round',$current_round)->values());
+        $NotAttained_current_round = count($students->whereIn('beat_status', [1])->where('beat_round','<',$current_round)->values());
+        $exceededAttained_current_round = count($students->whereIn('beat_status', [1])->where('beat_round','>',$current_round)->values());
+
+        $ICTStudents = $students->where('beat_exclusion_vitengo_id',1)->values();
+        $ujenziStudents = $students->where('beat_exclusion_vitengo_id',2)->values();
+        $hospitalStudents = $students->where('beat_exclusion_vitengo_id',3)->values();
+        $emergencyStudents = $students->whereNotNull('beat_emergency')->where('beat_status', 0)->values();
+
+        
+        
+    // Fetch guard and patrol areas with proper time filters
+    $_guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());
+    $_patrolAreas = $this->filterAreasByTimeExceptions(PatrolArea::all());
+        $number_of_guards = 0;
+        foreach($_guardAreas as $_guardArea){
+            if($company->id == $_guardArea['area']['company_id']){
+                $number_of_guards += $_guardArea['area']['number_of_guards'];
+            }
+        }
+
+        foreach($_patrolAreas as $_patrolArea){
+            if($company->id == $_patrolArea['area']['company_id']){
+                $number_of_guards += $_patrolArea['area']['number_of_guards'];
+            }
+        }
+        
+        
+        $days_per_round = round(($totalEligibleStudents/$number_of_guards), 0);
+        $company = [
+            'company_id' => $company->id,
+            'company_name' =>$company->name,
+            'data'=>[
+                'totalStudents' => $totalStudents,
+                'totalIneligibleStudents' => $totalIneligibleStudents,
+                'totalEligibleStudents' => $totalEligibleStudents,
+                'eligibleStudentsPercent' => $eligibleStudentsPercent,
+                'InEligibleStudentsPercent' => $InEligibleStudentsPercent,
+                'guardAreas'=> $guardAreas,
+                'patrolAreas'=> $patrolAreas,
+                'current_round' => $current_round,
+                'attained_current_round'=> $attained_current_round,
+                'NotAttained_current_round' => $NotAttained_current_round,
+                'exceededAttained_current_round'=>$exceededAttained_current_round,
+                'number_of_guards' => $number_of_guards,
+                'days_per_round' => $days_per_round,
+                'vitengo' => [
+                    [
+                    'name' => 'ICT',
+                    'students' => $ICTStudents
+                    ],
+                    [
+                        'name' => 'UJENZI',
+                        'students' => $ujenziStudents
+                    ],
+                    [
+                        'name' => 'HOSPITAL',
+                        'students' => $hospitalStudents
+                    ],
+
+                ],
+                'emergencyStudents' => $emergencyStudents
+            ]
+            ];
+            //array_push($report, $company);
+    //}
+    return $company;
+}
+
 
 public function downloadReport(Request $request)
 {
