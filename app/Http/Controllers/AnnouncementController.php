@@ -10,10 +10,22 @@ use Illuminate\Support\Facades\Auth;
 
 class AnnouncementController extends Controller
 {
+    private $selectedSessionId;
+    public function __construct()
+    {
+        $this->selectedSessionId = session('selected_session');
+        if (!$this->selectedSessionId)
+            $this->selectedSessionId = 1;
+
+        $this->middleware('permission:announcement-list|announcement-create|announcement-edit', ['only' => ['index', 'show', 'edit']]);
+        $this->middleware('permission:attendance-create', ['only' => ['create', 'store', 'update']]);
+        $this->middleware('permission:announcement-delete', ['only' => ['destroy']]);
+
+
+    }
     public function index()
     {
-        $announcements = Announcement::where('expires_at', '>', Carbon::now())->get();
-        //broadcast(new NotificationEvent($announcements[0]->title,$announcements[0]->type, 'announcement', $announcements[0], $announcements[0]->id));
+        $announcements = Announcement::where('expires_at', '>', Carbon::now())->orderBy('created_at', 'desc')->get();
         return view('announcements.index', compact('announcements'));
     }
 
@@ -27,24 +39,39 @@ class AnnouncementController extends Controller
         $request->validate([
             'title' => 'required',
             'message' => 'required',
+            'document' => 'required|mimes:pdf|max:5120',//5MB
             'type' => 'required',
+            'audience' => 'required',
             'expires_at' => 'nullable|date',
         ]);
 
         $expiresAt = $request->input('expires_at');
         if ($expiresAt) {
-            $expiresAt = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $expiresAt);
+            $expiresAt = Carbon::createFromFormat('Y-m-d\TH:i', $expiresAt);
         }
-       $announcement = Announcement::create(
-            [
-                'title' => $request->title,
-                'message' => $request->message,
-                'type' => $request->type,
-                'posted_by'=> Auth::user()->id,
-                'expires_at' => $expiresAt,
-            ]
-        );
-        broadcast(new NotificationEvent( $announcement->title,$announcement->type, 'announcement', $announcement, $announcement->id));
+        foreach (Auth::user()->roles as $role) { {
+                $request->audience = Auth::user()->staff->company_id;
+            }
+        }
+        $announcement = new Announcement();
+        $announcement->title = $request->title;
+        $announcement->message = $request->message;
+        $announcement->type = $request->type;
+        $announcement->posted_by = $request->user()->id;
+        $announcement->expires_at = $expiresAt;
+
+        if ($file = $request->file('document')) {
+            $filePath = $file->store('uploads', 'public');
+            $announcement->document_path = $filePath;
+        }
+
+        if ($request->audience == "all") {
+            $announcement->audience = $request->audience;
+        } else {
+            $announcement->company_id = Auth::user()->staff->company_id;
+        }
+        $announcement->save();
+        broadcast(new NotificationEvent($announcement->title, $announcement->type, 'announcement', $announcement, $announcement->id));
         return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
     }
 
@@ -52,6 +79,8 @@ class AnnouncementController extends Controller
     {
         return view('announcements.show', compact('announcement'));
     }
+
+
 
     public function edit(Announcement $announcement)
     {
@@ -76,4 +105,14 @@ class AnnouncementController extends Controller
         $announcement->delete();
         return redirect()->route('announcements.index')->with('success', 'Announcement deleted successfully.');
     }
+
+    public function downloadFile ($announcementId) {
+        $announcement = Announcement::find($announcementId);
+        $path = storage_path('app/public/' . $announcement->document_path);
+        if (file_exists($path)) {
+            return response()->download($path);
+        }
+        abort(404);
+    }
+    
 }

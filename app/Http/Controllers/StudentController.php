@@ -201,7 +201,6 @@ class StudentController extends Controller
             'email' => $request->input('email'),
             'gender' => $request->input('gender'),
             'user_id' =>  $user->id,
-            'user_id' => $user->id,
             'password' => Hash::make($request->input('password')),
         ]);
 
@@ -548,10 +547,6 @@ class StudentController extends Controller
             'home_region' => 'nullable|string|min:4',
             'rank' => 'required',
             'education_level' => 'required',
-            'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
-            'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
-            'middle_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
-            'home_region' => 'required|string|min:4',
         ]);
         $companies = Company::all();
         if (empty($request->session()->get('student'))) {
@@ -677,5 +672,13 @@ class StudentController extends Controller
         $student -> beat_status = 0;
         $student->save();
          return redirect()->back()->with('success','Beat deactivated successfully.');
+    }
+
+    public function downloadSample () {
+        $path = storage_path('app/public/sample/basic recruit course students.csv');
+        if (file_exists($path)) {
+            return response()->download($path);
+        }
+        abort(404);
     }
 }

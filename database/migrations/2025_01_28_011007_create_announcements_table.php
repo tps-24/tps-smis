@@ -17,6 +17,9 @@ return new class extends Migration
             $table->text('message');
             $table->string('type')->default('info'); // e.g., success, info, danger, warning
             $table->unsignedBigInteger('posted_by');
+            $table->string('audience')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->string('document_path')->nullable();
             $table->foreign('posted_by')->references('id')->on('users');
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();

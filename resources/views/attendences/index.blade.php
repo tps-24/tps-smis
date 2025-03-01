@@ -92,7 +92,7 @@
                     <!-- Nav tabs start -->
                     <ul class="nav nav-tabs" id="customTab2" role="tablist">
                         <?php
-$i = 0;
+                            $i = 0;
                         ?>
                         @foreach ($companies as $company)
                             <li class="nav-item" role="presentation">
@@ -226,7 +226,7 @@ $i = 0;
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-between mt-1">
                                                                     <a class="text-primary ms-4"
-                                                                        href="{{url("mps/" . $companies[$j]->name . "/company")}}">
+                                                                        href="{{url("mps/" . $companies[$j]->id . "/company")}}">
                                                                         <span>View</span>
                                                                     </a>
                                                                 </div>

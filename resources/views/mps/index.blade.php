@@ -5,10 +5,11 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/tps-rms/" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-rms/mps/">MPS</a></li>
-                @if(isset($scrumbName))
-                    <li class="breadcrumb-item active" aria-current="page"><a href="#">{{$scrumbName}} Coy</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/">MPS</a></li>
+                <li class="breadcrumb-item active"><a href="/tps-smis/">Lock Up</a></li>
+                @if (isset($scrumbName))
+                <li class="breadcrumb-item active"><a href="/tps-smis/">{{ $scrumbName }}</a></li>
                 @endif
             </ol>
         </nav>

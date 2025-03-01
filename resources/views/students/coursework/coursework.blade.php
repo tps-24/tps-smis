@@ -15,6 +15,21 @@
         bottom: 10px; /* Adjust as needed */
         right: 15px;  /* Adjust as needed */
     }
+
+    
+    .table-outer {
+        overflow-x: auto;
+    }
+    .table thead th, .table tbody td {
+        border: 1px solid #dee2e6;
+    }
+    .table tbody tr:last-child td {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .nd{
+        margin-top:20px;
+    }
 </style>
 @endsection
 @section('scrumb')
@@ -33,23 +48,6 @@
 </nav>
 <!-- Scrumb ends -->
 
-@endsection
-@section('style')
-<style>
-    .table-outer {
-        overflow-x: auto;
-    }
-    .table thead th, .table tbody td {
-        border: 1px solid #dee2e6;
-    }
-    .table tbody tr:last-child td {
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .nd{
-        margin-top:20px;
-    }
-</style>
 @endsection
 @section('content')
 <!-- Row starts -->
@@ -124,14 +122,6 @@
                     @endforeach
                 </div>
             </div>
-
-
-
             </div>
-       
-
-        </div>
-    </div>
-</div>
 <!-- Row ends -->
 @endsection

@@ -7,6 +7,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            color:green !important;
         }
         .container {
             width: 100%;
@@ -120,7 +121,7 @@
             @endphp
             <!-- <h1><b>TANZANIA POLICE SCHOOL-MOSHI</b></h1> -->
             <h1>RATIBA YA MALINDO {{ strtoupper($company->description) }}</h1>
-            <h2>TAREHE {{ $date->format('d/m/Y')}}</h2>
+            <h2>TAREHE {{ $date->format('d/m/Y')}} - ROUND THREE (3)</h2>
             
         </div>
 

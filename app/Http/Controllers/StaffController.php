@@ -241,5 +241,11 @@ class StaffController extends Controller
     
         return redirect()->route('staffs.index')->with('success', 'Staff and corresponding user deleted successfully.');
     }
-    
+    public function downloadSample () {
+        $path = storage_path('app/public/sample/staff sample.csv');
+        if (file_exists($path)) {
+            return response()->download($path);
+        }
+        abort(404);
+    }
 }

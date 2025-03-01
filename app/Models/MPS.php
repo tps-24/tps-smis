@@ -19,7 +19,7 @@ class MPS extends Model
     public function student(){
         return $this->belongsTo(Student::class, 'student_id', 'id');
     }
-    // public function staff(){
-    //     return $this->belongsTo(User::class, 'added_by', 'id');
-    // }
+    public function staff(){
+        return $this->belongsTo(User::class, 'added_by', 'id');
+    }
 }
