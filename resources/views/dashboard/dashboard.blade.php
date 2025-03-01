@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="d-flex align-items-center justify-content-between mt-1">
-            <a class="text-primary" href="javascript:void(0);">
+            <a class="text-primary" href="{{ route('staffs.index') }}">
             <span>View All</span>
             <i class="bi bi-arrow-right ms-2"></i>
             </a>
@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="d-flex align-items-center justify-content-between mt-1">
-            <a class="text-primary" href="javascript:void(0);">
+            <a class="text-primary" href="/tps-smis/students">
             <span>View All</span>
             <i class="bi bi-arrow-right ms-2"></i>
             </a>
@@ -66,7 +66,7 @@
             </div>
         </div>
         <div class="d-flex align-items-center justify-content-between mt-1">
-            <a class="text-primary" href="javascript:void(0);">
+            <a class="text-primary" href="{{ route('hospital.index') }}">
             <span>View All</span>
             <i class="bi bi-arrow-right ms-2"></i>
             </a>
@@ -91,7 +91,7 @@
             </div>
         </div>
         <div class="d-flex align-items-center justify-content-between mt-1">
-            <a class="text-white" href="javascript:void(0);">
+            <a class="text-white" href="{{url('beats')}}">
             <span>View All</span>
             <i class="bi bi-arrow-right ms-2"></i>
             </a>

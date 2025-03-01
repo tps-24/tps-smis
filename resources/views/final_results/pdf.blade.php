@@ -5,10 +5,11 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
+            margin: 20px;
             padding: 0;
             width: 100%;
             height: 100%;
+            box-sizing: border-box;
         }
         .container {
             border: 5px solid #000;
@@ -20,9 +21,23 @@
         .header {
             text-align: center;
             margin-bottom: 10px;
+            position: relative;
+        }
+        .logo {
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 100px;
+        }
+        .profile-photo {
+            position: absolute;
+            right: 0;
+            top: 25px;
+            width: 100px;
         }
         .header h1, .header h2, .header p {
             margin: 2px 0;
+            font-weight: bold;
         }
         .details, .results {
             margin-bottom: 10px;
@@ -32,20 +47,40 @@
             border-collapse: collapse;
         }
         .details th, .details td, .results th, .results td {
-            border: 1px solid #000;
+            border: 2px solid #000;
             padding: 4px;
             text-align: left;
             font-size: 12px;
+            font-weight: bold;
         }
         .results th {
             background-color: #f2f2f2;
         }
+        .results-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .semester-table {
+            width: 48%;
+        }
+        .signature {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .signature div {
+            width: 30%;
+            text-align: center;
+        }
     </style>
 </head>
-@foreach($students as $student)
 <body>
+    @foreach($students as $student)
     <div class="container">
         <div class="header">
+            <img src="{{ url('resources/assets/images/logo.png') }}" alt="Logo" class="logo">
+            <img src="{{ url('storage/app/public/' . $student->photo) }}" alt="Profile Photo" class="profile-photo">
             <h1>THE UNITED REPUBLIC OF TANZANIA</h1>
             <h2>MINISTRY OF HOME AFFAIRS</h2>
             <h2>TANZANIA POLICE FORCE</h2>
@@ -78,58 +113,104 @@
                     </tr>
                 </tbody>
             </table>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Programme/Course Followed (Accredited by NACTE)</th>
+                        <th>Technician Certificate in Police Communication</th>
+                    </tr>
+                </thead>
+            </table>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>NTA Level Awarded</th>
+                        <th>National Technical Award (NTA) Level 5</th>
+                    </tr>
+                </thead>
+            </table>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Overall GPA</th>
+                        <th>Class Awarded</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ $student->overallGPA }}</td>
+                        <td>{{ $student->classAwarded }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <div class="results">
-            <h3>EXAMINATION RESULTS</h3>
-            <h4>Semester I Results</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Module Code</th>
-                        <th>Module Name</th>
-                        <th>Units</th>
-                        <th>Grade</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ $result->module_code ?? '' }}</td>
-                        <td>{{ $result->module_name  ?? ''}}</td>
-                        <td>{{ $result->units  ?? ''}}</td>
-                        <td>{{ $result->grade  ?? ''}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p>Semester I GPA: {{ $student->semesterOneGPA }}</p>
-            
-            <h4>Semester II Results</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Module Code</th>
-                        <th>Module Name</th>
-                        <th>Units</th>
-                        <th>Grade</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ $result->module_code ?? '' }}</td>
-                        <td>{{ $result->module_name  ?? ''}}</td>
-                        <td>{{ $result->units ?? '' }}</td>
-                        <td>{{ $result->grade  ?? ''}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p>Semester II GPA: {{ $student->semesterTwoGPA }}</p>
+        <div class="results-container">
+            <div class="semester-table">
+                <h4>Semester I Results</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Module Code</th>
+                            <th>Module Name</th>
+                            <th>Units</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ $result->module_code ?? ''}}</td>
+                            <td>{{ $result->module_name ?? ''}}</td>
+                            <td>{{ $result->units ?? ''}}</td>
+                            <td>{{ $result->grade ?? ''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Semester I GPA: {{ $student->semesterOneGPA }}</p>
+            </div>
+
+            <div class="semester-table">
+                <h4>Semester II Results</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Module Code</th>
+                            <th>Module Name</th>
+                            <th>Units</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ $result->module_code ?? ''}}</td>
+                            <td>{{ $result->module_name ?? ''}}</td>
+                            <td>{{ $result->units ?? ''}}</td>
+                            <td>{{ $result->grade ?? ''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Semester II GPA: {{ $student->semesterTwoGPA }}</p>
+            </div>
         </div>
-        
-        <p>Overall GPA: {{ $student->overallGPA }}</p>
-        <p>Class Awarded: {{ $student->classAwarded }}</p>
+
         <p>Date of Issue: {{ now()->toDateString() }}</p>
+
+        <div class="signature">
+            <div>
+                <p>OMARY S. KISALO - ACP</p>
+                <p>Chief Instructor</p>
+            </div>
+            <div>
+                <p>Date of Issue</p>
+                <p>{{ now()->toDateString() }}</p>
+            </div>
+        </div>
+
         <div style="page-break-after: always;"></div>
     </div>
+    @endforeach
 </body>
-@endforeach
 </html>

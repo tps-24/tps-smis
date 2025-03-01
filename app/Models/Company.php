@@ -18,7 +18,7 @@ class Company extends Model
     // }
 
     public function students(){
-        return $this->hasMany(Student::class,'company','name');
+        return $this->hasMany(Student::class);
     }
     
 
