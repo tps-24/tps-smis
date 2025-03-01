@@ -398,13 +398,10 @@ Route::get('/generate-timetable', [TimetableController::class, 'generateTimetabl
 
 //Downloader Centre Routes
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index'); // List files
-    Route::get('/downloads/upload', [DownloadController::class, 'create'])->name('downloads.create'); // Upload form
-    Route::post('/downloads/upload', [DownloadController::class, 'store'])->name('downloads.store'); // Upload action
-    Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file'); // Download file
-});
-
+Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index');
+Route::get('/downloads/upload', [DownloadController::class, 'showUploadPage'])->name('downloads.upload.page');
+Route::post('/downloads/upload', [DownloadController::class, 'upload'])->name('downloads.upload');
+Route::get('/downloads/{file}', [DownloadController::class, 'download'])->name('downloads.file');
 //Route::get('test', [AttendenceController::class,'generatePdf']);
 
 // Route::post('/pusher/auth', function (\Illuminate\Http\Request $request) {
