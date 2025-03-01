@@ -195,6 +195,33 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                <h4>RESERVED AND REPLACED STUDENTS</h4>
+                <table style="width: 100%" class="table table-striped truncate m-0">
+                    <thead>
+                        <tr>
+                            <th width="5%"></th>
+                            <th width="40%">Names</th>
+                            <th width="45%">Reason</th>
+                            <th width="10%">Platoon</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $n =0; @endphp
+                        @foreach ($data['reserveStudents'] as $reserve)
+                        @if($reserve->replaced_student_id)
+
+                        <tr>
+                            <td>{{++$n}}</td>
+                            <td>{{$reserve->student->first_name}} {{$reserve->student->last_name}}</td>
+                            <td>{{$reserve->replacement_reason}}</td>
+                            <td>{{$reserve->student->platoon}}</td>
+
+                        </tr>
+                        @endif
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
             </div>
         </div>

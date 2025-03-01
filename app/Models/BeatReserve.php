@@ -22,4 +22,9 @@ class BeatReserve extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
+    public function replacement_student()
+    {
+        return $this->belongsTo(Student::class, 'replacement_student_id', 'id');
+    }
 }

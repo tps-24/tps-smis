@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BeatRound;
 use App\Models\Student;
 use App\Models\GuardArea;
 use App\Models\PatrolArea;
@@ -370,20 +371,14 @@ public function fillBeats(Request $request)
     DB::transaction(function () use ($guardBeats, $patrolBeats, $reserveStudents, $leadersOnDuty) {
         foreach (array_merge($guardBeats, $patrolBeats) as $beatData) {
             $beat = Beat::create($beatData);
+
             $beat->students()->attach(json_decode($beatData['student_ids']));
         }
 
-        $current_beat_round = Student::max('beat_round');
         // Save reserve students
     
         foreach ($reserveStudents as $reserve) {
-            //BeatReserve::create($reserve);
-            BeatReserve::Create([
-                'student_id' => $reserve['student_id'],
-                'company_id' => $reserve['company_id'],
-                'beat_date' => $reserve['beat_date'],
-                'beat_round' => $current_beat_round
-            ]);
+            BeatReserve::create($reserve);
         }
 
         // Save leaders on duty
@@ -631,7 +626,8 @@ $additionalReserves = $additionalMaleReserves->merge($additionalFemaleReserves)
         return [
             'student_id' => $student->id,
             'company_id' => $companyId,
-            'beat_date' => $date
+            'beat_date' => $date,
+            'beat_round' => BeatRound::where('company_id', $companyId)->get()[0]->current_round?? 0
         ];
     })->toArray();
 
@@ -694,7 +690,7 @@ private function beatHistory($company){
         $ujenziStudents = $students->where('beat_exclusion_vitengo_id',2)->values();
         $hospitalStudents = $students->where('beat_exclusion_vitengo_id',3)->values();
         $emergencyStudents = $students->whereNotNull('beat_emergency')->where('beat_status', 0)->values();
-
+        $reserveStudents = BeatReserve::where('company_id', $company->id)->where('beat_round', $current_round)->get();
 
         
     // Fetch guard and patrol areas with proper time filters
@@ -724,6 +720,7 @@ private function beatHistory($company){
                 'totalEligibleStudents' => $totalEligibleStudents,
                 'eligibleStudentsPercent' => $eligibleStudentsPercent,
                 'InEligibleStudentsPercent' => $InEligibleStudentsPercent,
+                'reserveStudents' => $reserveStudents,
                 'guardAreas'=> $guardAreas,
                 'patrolAreas'=> $patrolAreas,
                 'current_round' => $current_round,

@@ -31,6 +31,7 @@ class FinalResultController extends Controller
             $selectedSessionId = 4;
         $students = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
         $companiesy = Company::all();
+        
 
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId);
@@ -40,7 +41,9 @@ class FinalResultController extends Controller
         }])
         ->get();
 
+        
         // dd($companies);
+
 
         return view('final_results.student_certificate', compact('students', 'companies'));
 
