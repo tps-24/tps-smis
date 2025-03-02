@@ -26,9 +26,9 @@ class BulkImportStaff implements ToCollection,ToModel
         if ($this->num > 5) {
             $user = new User();
             $user->name = $row[3]. " ". $row[4]. " ".$row[5];
-            $user->email = $row[6];
+            $user->email = $row[6] == null? trim(strtolower($row[3]).".".strtolower($row[5])."@tpf.go.tz") : trim($row[6]);
             $user->password= Hash::make(strtoupper($row[5]));
-            Log::info($row[3]);
+       
             $user->save();
 
             $staff = new Staff();
@@ -38,32 +38,44 @@ class BulkImportStaff implements ToCollection,ToModel
             $staff->firstName = $row[3];
             $staff->middleName = $row[4];
             $staff->lastName = $row[5];
-            $staff->email = $row[6];
+            $staff->email = $row[6] == null? trim(strtolower($row[3]).".".strtolower($row[5])."@tpf.go.tz") : trim($row[6]);
             $staff->gender = $row[7];   
             $staff->user_id = $user->id;
             $staff->created_by = "1";
             
-            $staff->DoB = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[8]))->format('Y-m-d');
-            $staff->maritalStatus = $row[9];
-            $staff->religion = $row[10];
-            $staff->tribe = $row[11];
-            $staff->phoneNumber = $row[12];
+            //$staff->DoB = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[8]))->format('Y-m-d');
+            $staff->company_id = $this->getCompanyId($row[9]);
+            $staff->maritalStatus = $row[10];
+            $staff->religion = $row[11];
+            $staff->tribe = $row[12];
+            $staff->phoneNumber = $row[13];
             
-            $staff->currentAddress = $row[13];
-            $staff->permanentAddress = $row[14];
-            $staff->department_id = $row[15];
-            $staff->designation = $row[16];
-            // $staff->educationLevel = $row[17];
-            // $staff->contractType = $row[18];
-            // $staff->joiningDate = $row[19];
-            // $staff->location = $row[20];
-            // $staff->nextofkinFullName = $row[21];
-            // $staff->nextofkinRelationship = $row[22];
-            // $staff->nextofkinPhoneNumber = $row[23];
-            // $staff->nextofkinPysicalAddress = $row[24];
+            $staff->currentAddress = $row[14];
+            $staff->permanentAddress = $row[15];
+            $staff->department_id = $row[16];
+            $staff->designation = $row[17];
+            // $staff->educationLevel = $row[18];
+            // $staff->contractType = $row[19];
+            // $staff->joiningDate = $row[20];
+            // $staff->location = $row[21];
+            // $staff->nextofkinFullName = $row[22];
+            // $staff->nextofkinRelationship = $row[23];
+            // $staff->nextofkinPhoneNumber = $row[24];
+            // $staff->nextofkinPysicalAddress = $row[25];
 
             $staff->save();
 
+        }
+    }
+    private function getCompanyId($companyName){
+        if($companyName == 'HQ'){
+            return "1";
+        }elseif($companyName == 'A'){
+            return "2";
+        }elseif($companyName == 'B'){
+            return "3";
+        }elseif($companyName == 'C'){
+            return "4";
         }
     }
 }
