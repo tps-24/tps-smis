@@ -4,47 +4,44 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Download;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
 
 class DownloadController extends Controller
 {
-    // Show all downloads
     public function index()
     {
-        $downloads = Download::latest()->get();
+        $downloads = Download::all();
         return view('downloads.index', compact('downloads'));
+
+        // $downloads = Download::orderBy('created_at', 'desc')->paginate(6);
+        // return view('downloads.index', compact('downloads'));
     }
 
-    // Show upload form (Now accessible to all users)
-    public function create()
+    public function showUploadPage()
     {
-        return view('downloads.create');
+        return view('downloads.upload');
     }
 
-    // Store uploaded file
-    public function store(Request $request)
+    public function upload(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,png|max:20480', // Max 20MB
-            'category' => 'required|string'
+            'title' => 'required|string',
+            'category' => 'required|string',
+            'file' => 'required|file|mimes:jpg,jpeg,png,gif,pdf,mp4,avi,mov,doc,docx,txt,xls,xlsx|max:20480'
         ]);
 
         $filePath = $request->file('file')->store('uploads', 'public');
 
         Download::create([
             'title' => $request->title,
-            'file_path' => $filePath,
             'category' => $request->category,
-            'uploaded_by' => Auth::id() // Save user ID who uploaded the file
+            'file_path' => $filePath,
         ]);
 
-        return redirect()->route('downloads.index')->with('success', 'File uploaded successfully.');
+        return redirect()->route('downloads.index')->with('success', 'File uploaded successfully!');
     }
 
-    // Download file
     public function download($file)
     {
-        return Storage::disk('public')->download("uploads/{$file}");
+        return response()->download(storage_path("app/public/uploads/{$file}"));
     }
 }

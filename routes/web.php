@@ -453,6 +453,11 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('test', [BeatController::class,'beatReplacementStudent']);
+Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index');
+Route::get('/downloads/upload', [DownloadController::class, 'showUploadPage'])->name('downloads.upload.page');
+Route::post('/downloads/upload', [DownloadController::class, 'upload'])->name('downloads.upload');
+Route::get('/downloads/{file}', [DownloadController::class, 'download'])->name('downloads.file');
+//Route::get('test', [AttendenceController::class,'generatePdf']);
 
 // Route::post('/pusher/auth', function (\Illuminate\Http\Request $request) {
 //     return true;
