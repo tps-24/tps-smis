@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/tps-smis/resources/assets/fonts/bootstrap/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="/tps-smis/resources/assets/css/main.min.css" />
     <link rel="stylesheet" href="/tps-smis/resources/assets/css/custom.css" />
+    <link rel="stylesheet" href="/tps-smis/resources/assets/css/mine.css" />
 
     <!-- *************
 			************ Vendor Css Files *************

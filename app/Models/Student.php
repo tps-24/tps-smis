@@ -28,6 +28,14 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function admittedStudent()
+    {
+        return $this->hasOne(AdmittedStudent::class);
+    }
+    public function studyLevel()
+    {
+        return $this->belongsTo(studyLevel::class, 'studyLevel_id');
+    }
 
     public function finalResults()
     {

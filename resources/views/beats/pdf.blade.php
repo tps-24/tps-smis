@@ -7,7 +7,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            color:green !important;
+            /* color:green !important; */
         }
         .container {
             width: 100%;
