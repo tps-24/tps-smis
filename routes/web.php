@@ -457,6 +457,11 @@ Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.
 Route::get('/downloads/upload', [DownloadController::class, 'showUploadPage'])->name('downloads.upload.page');
 Route::post('/downloads/upload', [DownloadController::class, 'upload'])->name('downloads.upload');
 Route::get('/downloads/{file}', [DownloadController::class, 'download'])->name('downloads.file');
+Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
+    ->name('downloads.delete')
+    ->middleware('auth'); // Requires login to delete
+
+
 //Route::get('test', [AttendenceController::class,'generatePdf']);
 
 // Route::post('/pusher/auth', function (\Illuminate\Http\Request $request) {
