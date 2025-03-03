@@ -25,9 +25,9 @@ class StaffController extends Controller
      */
     public function index(Request $request): View
     {
-        $staffs = Staff::orderBy('id','DESC')->paginate(5);
+        $staffs = Staff::orderBy('id','DESC')->paginate(10);
         return view('staffs.index',compact('staffs'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+            ->with('i', ($request->input('page', 1) - 1) * 10);
     }
 
     /**
@@ -242,7 +242,7 @@ class StaffController extends Controller
         return redirect()->route('staffs.index')->with('success', 'Staff and corresponding user deleted successfully.');
     }
     public function downloadSample () {
-        $path = storage_path('app/public/sample/staff sample.csv');
+        $path = storage_path('app/public/sample/staff sample.xlsx');
         if (file_exists($path)) {
             return response()->download($path);
         }
