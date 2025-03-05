@@ -56,6 +56,7 @@
             <th scope="col">PF Number</th>
             <th scope="col">Name</th>
             <th scope="col">Rank</th>
+            <th scope="col">Company</th>
             <th scope="col">Department</th>
             <th scope="col">Phone Number</th>
             <th scope="col" width="280px">Actions</th>
@@ -68,6 +69,7 @@
         <td>{{ $staff->forceNumber }}</td>
         <td>{{ $staff->firstName }} {{ $staff->middleName }} {{ $staff->lastName }}</td>
         <td>{{ $staff->rank }}</td>
+        <td>{{ $staff->company->name }}</td>
         <td>{{ $staff->department->departmentName ?? '' }}</td>
         <td>{{ $staff->phoneNumber }}</td>
         <td>

@@ -317,6 +317,12 @@
       </a>
       </li>
     @endcan()
+      <li>
+      <a href="{{ route('timesheets.index') }}">
+        <i class="bi bi-archive"></i>
+        <span class="menu-text">Time Sheet</span>
+      </a>
+      </li>
       @can('report-list')
       <li>
       <a href="#">

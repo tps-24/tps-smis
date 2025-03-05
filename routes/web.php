@@ -38,6 +38,7 @@ use App\Http\Controllers\PatrolAreaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\MPSVisitorController;
+use App\Http\Controllers\TimeSheetController;
 use Carbon\Carbon;
 
 
@@ -249,6 +250,7 @@ Route::put('patrol-areas/{patrolArea}', [PatrolAreaController::class, 'update'])
 Route::get('guard-areas/{guardArea}/edit', [GuardAreaController::class, 'edit'])->name('guard-areas.edit');
 Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->name('guard-areas.update');
 
+Route::put('timesheets/{timesheetId}', [TimeSheetController::class, 'approve'])->name('timesheets.approve');
 
     
     Route::resource('roles', RoleController::class);
@@ -266,6 +268,7 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
     Route::resource('campuses', CampusController::class);
     Route::resource('announcements', AnnouncementController::class);
     Route::resource('visitors', MPSVisitorController::class);
+    Route::resource('timesheets', TimeSheetController::class);
 
 
     
