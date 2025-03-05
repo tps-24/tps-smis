@@ -40,16 +40,14 @@ class TimeSheetController extends Controller
         
         $request->validate([
             'task' => 'required|string|max:500',
-            'time_in' => 'required|date_format:H:i',
-            'time_out' => 'required|date_format:H:i',
+            'hours' => 'required|numeric',
             'date' => 'required|date'
         ]);
 
         TimeSheet::create([
             'staff_id' => $request->user()->staff->id,
             'task' => $request->task,
-            'time_in' => $request->time_in,
-            'time_out' => $request->time_out,
+            'hours' => $request->hours,
             'date' => $request->date
         ]);
         return redirect()->route('timesheets.index')->with('success', 'Time sheet created successfully.');
@@ -83,8 +81,7 @@ class TimeSheetController extends Controller
     {
         $validated = $request->validate([
             'task' => 'required|string|max:255',
-            'time_in' => 'required|date_format:H:i',
-            'time_out' => 'required|date_format:H:i',
+            'hours' => 'required|numeric',
             'date' => 'required|date',
         ]);    
         $timeSheet = TimeSheet::findOrFail($timeSheetId);
@@ -92,8 +89,7 @@ class TimeSheetController extends Controller
             abort(403);
           }
         $timeSheet -> task= $request->task;
-        $timeSheet -> time_in= $request->time_in;
-        $timeSheet -> time_out= $request->time_out;
+        $timeSheet -> hours= $request->hours;
         $timeSheet -> date= $request->date;
         $timeSheet->save();
         return redirect()->route('timesheets.index')->with('success', 'Timesheet updated successfully.');
@@ -124,6 +120,37 @@ class TimeSheetController extends Controller
         $timeSheet->save();
 
         return redirect()->route('timesheets.index')->with('success', 'Timesheet approved successfully.');
+
+    }
+    public function reject($timeSheetId){
+        $user = Auth::user();
+        if(!Gate::allows('viewAny', $user)){
+            abort(403);
+        }
+        $timeSheet = TimeSheet::findOrFail($timeSheetId);
+
+        $timeSheet->status = "rejected";
+        $timeSheet->approved_by = $user->staff->id?? '1';
+        $timeSheet->save();
+
+        return redirect()->route('timesheets.index')->with('success', 'Timesheet rejected successfully.');
+
+    }
+    public function filter(Request $request){
+        $validated = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ]); 
+        $timesheets = [];
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $user = Auth::user();
+          if(!Gate::allows('viewAny', $user)){
+            $timesheets = TimeSheet::where('staff_id', $user->staff->id)->whereBetween('date', [$request->start_date, $request->end_date])->get();
+          }else{
+            $timesheets = TimeSheet::whereBetween('date', [$request->start_date, $request->end_date])->get();
+          }  
+        return view('time_sheets.index',compact('timesheets','start_date', 'end_date'));
 
     }
 }

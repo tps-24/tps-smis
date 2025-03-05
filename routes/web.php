@@ -249,8 +249,10 @@ Route::get('patrol-areas/{patrolArea}/edit', [PatrolAreaController::class, 'edit
 Route::put('patrol-areas/{patrolArea}', [PatrolAreaController::class, 'update'])->name('patrol-areas.update');
 Route::get('guard-areas/{guardArea}/edit', [GuardAreaController::class, 'edit'])->name('guard-areas.edit');
 Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->name('guard-areas.update');
+Route::put('timesheets/{timesheetId}/reject', [TimeSheetController::class, 'reject'])->name('timesheets.reject');
+Route::put('timesheets/{timesheetId}/approve', [TimeSheetController::class, 'approve'])->name('timesheets.approve');
+Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('timesheets.filter');
 
-Route::put('timesheets/{timesheetId}', [TimeSheetController::class, 'approve'])->name('timesheets.approve');
 
     
     Route::resource('roles', RoleController::class);

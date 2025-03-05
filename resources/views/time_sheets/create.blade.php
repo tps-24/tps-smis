@@ -26,42 +26,28 @@
         @csrf
         @method('POST')
         <div class="row gx-4">
-            <div class="col-sm-4 col-12">
+            <div class="col-sm-6 col-12">
                 <div class="card mb-2">
                     <div class="card-body">
                         <div class="m-0">
-                            <label class="form-label" for="abc">Time In</label>
-                            <input type="time" class="form-control" id="time_in" name="time_in" required
-                                value="{{old('time_in')}}">
+                            <label class="form-label" for="abc">Time(hours)</label>
+                            <input type="number" class="form-control" id="hours" name="hours" required
+                               min="1" value="{{old('hours')}}">
                         </div>
-                        @error('time_in')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 col-12">
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <div class="m-0">
-                            <label class="form-label" for="abc">Time Out</label>
-                            <input type="time" class="form-control" id="time_out" name="time_out" required
-                                value="{{old('time_out')}}">
-                        </div>
-                        @error('time_out')
+                        @error('hours')
                             <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
             </div>
 
-            <div class="col-sm-4 col-12">
+            <div class="col-sm-6 col-12">
                 <div class="card mb-2">
                     <div class="card-body">
                         <div class="m-0">
                             <label class="form-label" for="abc">Date</label>
                             <input type="date" class="form-control" id="date" name="date" required
-                                value="{{old('date')}}" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                value="{{old('date',  \Carbon\Carbon::now()->format('Y-m-d'))}}" max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                         </div>
                         @error('date')
                             <div class="error">{{ $message }}</div>

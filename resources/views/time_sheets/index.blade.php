@@ -30,6 +30,18 @@
     </div>
     <div class="card">
         <div class="card-body">
+        <form action="{{ route('timesheets.filter') }}" method="POST" class="form-inline mb-4">
+            @csrf
+            @method('POST')
+            <div style="width: 50%;" class="d-flex gap-2">
+                    <label for="">Start </label>
+                    <input style="width: 50%;" max="{{Carbon::today()->format('Y-m-d') }}" type="date" @if(isset($start_date)) value="{{ Carbon::parse($start_date)->format('Y-m-d') }}" @endif name="start_date" class="form-control" value="">
+                    <label for="">End </label>
+                    <input style="width: 50%;" max="{{Carbon::today()->format('Y-m-d') }}" type="date" @if(isset($start_date)) value="{{ Carbon::parse($end_date)->format('Y-m-d') }}" @endif name="end_date" class="form-control" value="">
+                <button  type="submit" class="btn btn-primary">Filter</button>                
+            </div>
+
+            </form>
             @if (count($timesheets) > 0)
                 <div class="table-outer">
                     <div class="table-responsive">
@@ -38,11 +50,10 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Time In</th>
-                                    <th>Time Out</th>
+                                    <th>Time(hours)</th>
                                     <th>Date</th>
                                     <th>Status</th>
-                                    <th>Approved By</th>
+                                    <th>Approved/Rejected By</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -50,8 +61,7 @@
                                 @foreach ($timesheets as $timesheet)
                                     <tr>
                                         <td>{{ ++$i}}.</td>
-                                        <td>{{ Carbon::parse($timesheet->time_in)->format('H:i') }}</td>
-                                        <td>{{ Carbon::parse($timesheet->time_out)->format('H:i') }}</td>
+                                        <td>{{ $timesheet->hours }}</td>
                                         <td>{{  Carbon::parse($timesheet->date)->format('d F, Y') }}</td>
                                         <td>{{ $timesheet->status }}</td>
                                         <td>{{ $timesheet->approvedBy->name?? '' }}</td>
@@ -62,7 +72,7 @@
                                             </button>
 
                                             @can('view-timesheet', $timesheet)
-                                              <button @if($timesheet->status == 'approved') disabled @endif class="btn btn-sm btn-warning">   <a 
+                                              <button @if($timesheet->status == 'approved' || $timesheet->status == 'rejected') disabled @endif class="btn btn-sm btn-warning">   <a 
                                                     href="{{ route('timesheets.edit', $timesheet->id) }}"> Edit</a></button>
                                             @endcan
 
@@ -70,7 +80,7 @@
                                                 style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button @if($timesheet->status == 'approved') disabled @endif class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                                <button @if($timesheet->status == 'approved' || $timesheet->status == 'rejected') disabled @endif class="btn btn-sm btn-danger" type="submit">Delete</button>
                                             </form>
                                         </td>
 
@@ -90,11 +100,20 @@
                                                     </div>
                                                     @can('viewAny', $timesheet)
                                                     <div class="modal-footer">
+                                                        <div class="d-flex gap-2">
+
                                                         <form action="{{ route('timesheets.approve', $timesheet->id) }}" method="POST">
                                                             @csrf
                                                             @method('PUT')
-                                                            <button @if($timesheet->status == 'approved') disabled @endif class="btn btn-sm btn-primary">Approve</button>
-                                                        </form>                                                       
+                                                            <button @if($timesheet->status == 'approved' || $timesheet->status == 'rejected') disabled @endif class="btn btn-sm btn-primary">Approve</button>
+                                                        </form>
+                                                        <form action="{{ route('timesheets.reject', $timesheet->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button @if($timesheet->status == 'approved' || $timesheet->status == 'rejected') disabled @endif class="btn btn-sm btn-danger">Reject</button>
+                                                        </form>                                                            
+                                                        </div>
+                                                       
                                                     </div>
                                                     @endcan
                                                 </div>

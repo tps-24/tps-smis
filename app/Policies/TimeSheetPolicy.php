@@ -45,7 +45,7 @@ class TimeSheetPolicy
         if($user->hasRole('Super Administrator') ||
         $user->hasRole('Chief Instructor') || 
         $user->hasRole('Academic Coordinator')) return true;
-        return $user->id == $timeSheet->staff->id;
+        return $user->staff->id == $timeSheet->staff->id;
     }
 
     /**

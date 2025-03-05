@@ -9,8 +9,7 @@ class TimeSheet extends Model
     protected $fillable =[
         'staff_id',
         'task',
-        'time_in',
-        'time_out',
+        'hours',
         'date'
     ];
 

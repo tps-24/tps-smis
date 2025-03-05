@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
             $table->string('task', 600);
-            $table->enum('status', ['pending', 'approved'])->default('pending');
-            $table->time('time_in')->nullable();
-            $table->time('time_out')->nullable();
+            $table->enum('status', ['pending', 'approved','rejected'])->default('pending');
+            $table->integer('hours')->nullable();
             $table->date('date');   
             $table->unsignedBigInteger('approved_by')->nullable();
             

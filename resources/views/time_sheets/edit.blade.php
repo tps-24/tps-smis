@@ -28,43 +28,29 @@
         @csrf
         @method('PUT')
         <div class="row gx-4">
-            <div class="col-sm-4 col-12">
+            <div class="col-sm-6 col-12">
                 <div class="card mb-2">
                     <div class="card-body">
-                        <div class="m-0">
-                            <label class="form-label" for="abc">Time In</label>
-                            <input type="time" class="form-control" id="time_in" name="time_in" required
-                                value="{{ Carbon::parse($timeSheet->time_in)->format('H:i') }}" value="{{old('time_in')}}">
+                    <div class="m-0">
+                            <label class="form-label" for="abc">Time(hours)</label>
+                            <input type="number" class="form-control" id="hours" name="hours" required
+                              min="1"  value="{{old('hours', $timeSheet->hours)}}">
                         </div>
-                        @error('time_in')
+                        @error('hours')
                             <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4 col-12">
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <div class="m-0">
-                            <label class="form-label" for="abc">Time Out</label>
-                            <input type="time" class="form-control" id="time_out" name="time_out" required
-                                value="{{ Carbon::parse($timeSheet->time_out)->format('H:i') }}"
-                                value="{{old('time_out')}}">
-                        </div>
-                        @error('time_out')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-            </div>
+           
 
-            <div class="col-sm-4 col-12">
+            <div class="col-sm-6 col-12">
                 <div class="card mb-2">
                     <div class="card-body">
                         <div class="m-0">
                             <label class="form-label" for="abc">Date</label>
                             <input type="date" class="form-control" id="date" name="date" required
-                                value="{{ old('date', Carbon::parse($timeSheet->date)->format('Y-m-d')) }}" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                value="{{ old('date', Carbon::parse($timeSheet->date)->format('Y-m-d')) }}" >
                         </div>
                         @error('date')
                             <div class="error">{{ $message }}</div>
