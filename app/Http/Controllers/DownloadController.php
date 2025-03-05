@@ -9,11 +9,9 @@ class DownloadController extends Controller
 {
     public function index()
     {
-        $downloads = Download::all();
-        return view('downloads.index', compact('downloads'));
-
-        // $downloads = Download::orderBy('created_at', 'desc')->paginate(6);
-        // return view('downloads.index', compact('downloads'));
+       
+         $downloads = Download::orderBy('created_at', 'desc')->paginate(6);
+         return view('downloads.index', compact('downloads'));
     }
 
     public function showUploadPage()
@@ -44,4 +42,23 @@ class DownloadController extends Controller
     {
         return response()->download(storage_path("app/public/uploads/{$file}"));
     }
+
+   public function destroy($id)
+{
+    // Ensure user is authenticated
+    if (!auth()->check()) {
+        return redirect()->route('downloads.index')->with('error', 'You must be logged in to delete documents.');
+    }
+
+    $download = Download::findOrFail($id);
+
+    // Delete file from storage
+    Storage::disk('public')->delete($download->file_path);
+
+    // Delete from database
+    $download->delete();
+
+    return redirect()->route('downloads.index')->with('success', 'Document deleted successfully!');
+}
+
 }

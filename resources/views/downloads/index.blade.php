@@ -46,14 +46,33 @@
                     <h5 class="fw-bold">{{ $download->title }}</h5>
                     <p class="text-muted">{{ $download->category }}</p>
 
-                    <!-- Download Button -->
-                    <a href="{{ route('downloads.file', basename($download->file_path)) }}" class="btn btn-success">
-                        <i class="fas fa-download"></i> Download
-                    </a>
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-center">
+                        <!-- Download Button -->
+                        <a href="{{ route('downloads.file', basename($download->file_path)) }}" class="btn btn-success me-2">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+
+                        @if(auth()->check())
+    <form action="{{ route('downloads.delete', $download->id) }}" method="POST" class="d-inline">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this document?')">
+            <i class="fas fa-trash"></i> Delete
+        </button>
+    </form>
+@endif
+
+                    </div>
                 </div>
             </div>
         </div>
         @endforeach
     </div>
+     <!-- Pagination Links -->
+     <div class="d-flex justify-content-center mt-4">
+        {{ $downloads->links('pagination::bootstrap-4') }} <!-- Pagination -->
+    </div>
 </div>
+
 @endsection
