@@ -110,7 +110,7 @@
 <div class="watermark">
         <img src="{{ asset('resources/assets/images/logo.png') }}" alt="Watermark">
 </div>
-    <div class="container" style="margin-top:-50px;">
+    <div class="container" style="margin-top:-60px;">
         <div class="header">
             <div style="text-align: center;">
                 <img src="{{ asset('resources/assets/images/logo.png') }}"  style="height:60 !important; width:50" alt="Police Logoz">
@@ -120,8 +120,8 @@
                 $date = Carbon\Carbon::parse("$date")
             @endphp
             <!-- <h1><b>TANZANIA POLICE SCHOOL-MOSHI</b></h1> -->
-            <h1>RATIBA YA MALINDO {{ strtoupper($company->description) }}</h1>
-            <h2>TAREHE {{ $date->format('d/m/Y')}} - ROUND THREE (3)</h2>
+            <h1 style="margin-top:-5px;">RATIBA YA MALINDO {{ strtoupper($company->description) }}</h1>
+            <h2 style="margin-top:-5px;">TAREHE {{ $date->format('d/m/Y')}} - ROUND THREE (3)</h2>
             
         </div>
 

@@ -6,6 +6,8 @@ use App\Models\Programme;
 use App\Models\Course;
 use App\Models\Semester;
 use App\Models\SessionProgramme;
+use App\Models\User;
+use App\Models\Staff;
 use App\Models\ProgrammeCourseSemester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -75,7 +77,24 @@ class ProgrammeCourseSemesterController extends Controller
         $sessionProgramme = SessionProgramme::findOrFail(4);
         $courses = Course::all();
 
-        return view('course_assignments.create', compact('programme', 'semester', 'sessionProgramme', 'courses'));
+        // Retrieve staff with 'instructor' role
+        $staffs = User::whereHas('roles', function($query) {
+            $query->where('name', 'Instructor');
+        })->get();
+
+        // $staffs = Staff::get();
+
+        $courses1 = $programme->courses()->wherePivot('semester_id', 1)
+        ->wherePivot('session_programme_id', 4)
+        ->orderBy('course_type', 'ASC')
+        ->get();
+        
+        $courses2 = $programme->courses()->wherePivot('semester_id', 2)
+                ->wherePivot('session_programme_id', 4)
+                ->orderBy('course_type', 'ASC')
+                ->get();
+
+        return view('course_assignments.create', compact('programme', 'semester', 'sessionProgramme', 'courses', 'courses1','courses2','staffs'));
     }
 
 

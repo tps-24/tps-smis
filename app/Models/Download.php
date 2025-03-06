@@ -8,11 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Download extends Model
 {
     use HasFactory;
-    
-    protected $fillable = ['title', 'file_path', 'category', 'uploaded_by'];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'uploaded_by');
-    }
+    protected $fillable = ['title', 'category', 'file_path', 'uploaded_by'];
 }

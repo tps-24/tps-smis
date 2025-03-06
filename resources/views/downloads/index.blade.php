@@ -1,59 +1,78 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container">
-    
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold text-primary">📂 Download Center</h2>
+        
+        <!-- Upload Floating Button -->
+        <a href="{{ route('downloads.upload.page') }}" class="btn btn-primary shadow-sm">
+            <i class="fas fa-upload"></i> Upload Document
+        </a>
+    </div>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success mt-3">{{ session('success') }}</div>
     @endif
 
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Preview</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Download</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($downloads as $download)
-                <tr>
-                    <!-- Preview File -->
-                    <td>
-                        @php
-                            $extension = pathinfo($download->file_path, PATHINFO_EXTENSION);
-                        @endphp
+    <!-- Stylish Card Grid for Downloads -->
+    <div class="row mt-4">
+        @foreach($downloads as $download)
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body text-center">
+                    @php
+                        $extension = pathinfo($download->file_path, PATHINFO_EXTENSION);
+                    @endphp
 
+                    <!-- File Preview -->
+                    <div class="file-preview mb-3">
                         @if(in_array($extension, ['jpg', 'jpeg', 'png', 'gif']))
-                            <!-- Image Preview -->
-                            <img src="{{ asset('storage/' . $download->file_path) }}" width="50" height="50" alt="Preview">
-                        @elseif(in_array($extension, ['pdf']))
-                            <!-- PDF Preview -->
-                            <iframe src="{{ asset('storage/' . $download->file_path) }}" width="100" height="50"></iframe>
+                            <img src="{{ asset('storage/' . $download->file_path) }}" class="img-fluid rounded" alt="Preview">
+                        @elseif($extension == 'pdf')
+                            <i class="fas fa-file-pdf text-danger fa-3x"></i>
                         @elseif(in_array($extension, ['mp4', 'avi', 'mov']))
-                            <!-- Video Preview -->
-                            <video width="100" height="50" controls>
-                                <source src="{{ asset('storage/' . $download->file_path) }}" type="video/{{ $extension }}">
-                                Your browser does not support the video tag.
-                            </video>
+                            <i class="fas fa-file-video text-info fa-3x"></i>
+                        @elseif(in_array($extension, ['doc', 'docx']))
+                            <i class="fas fa-file-word text-primary fa-3x"></i>
+                        @elseif(in_array($extension, ['xls', 'xlsx']))
+                            <i class="fas fa-file-excel text-success fa-3x"></i>
                         @else
-                            <!-- Default Icon for Other Files -->
-                            <i class="fas fa-file"></i>
+                            <i class="fas fa-file-alt text-secondary fa-3x"></i>
                         @endif
-                    </td>
+                    </div>
 
-                    <td>{{ $download->title }}</td>
-                    <td>{{ $download->category }}</td>
-                    <td>
-                        <a href="{{ route('downloads.file', basename($download->file_path)) }}" class="btn btn-success">
+                    <!-- File Details -->
+                    <h5 class="fw-bold">{{ $download->title }}</h5>
+                    <p class="text-muted">{{ $download->category }}</p>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-center">
+                        <!-- Download Button -->
+                        <a href="{{ route('downloads.file', basename($download->file_path)) }}" class="btn btn-success me-2">
                             <i class="fas fa-download"></i> Download
                         </a>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+
+                        @if(auth()->check())
+    <form action="{{ route('downloads.delete', $download->id) }}" method="POST" class="d-inline">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this document?')">
+            <i class="fas fa-trash"></i> Delete
+        </button>
+    </form>
+@endif
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+     <!-- Pagination Links -->
+     <div class="d-flex justify-content-center mt-4">
+        {{ $downloads->links('pagination::bootstrap-4') }} <!-- Pagination -->
+    </div>
 </div>
+
 @endsection

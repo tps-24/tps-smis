@@ -128,11 +128,19 @@
             top:120;
         }
 
-        .signature, .date-issue {
-            width: 50%;
-            /* display: inline-block; */
+        .bottom-container {
+            width: 100%;
+        }
+        .col {
+            display: inline-block;
+            width: 49%;
             vertical-align: top;
-            position:center;
+        }
+        .text-left {
+            text-align: left;
+        }
+        .text-right {
+            text-align: right;
         }
 
 
@@ -187,21 +195,21 @@
                         <td>{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</td>
                         <td>{{ \Carbon\Carbon::parse($student->dob)->format('d/m/Y') }}</td>
                         <td>{{ $student->gender }}</td>
-                        <td>{{ $student->admittedStudent->registration_number}}</td>
-                        <td>{{ $student->admittedStudent->admitted_date }}</td>
-                        <td>{{ $student->admittedStudent->completion_date }}</td>
+                        <td>{{ $student->admittedStudent->registration_number ?? ''}}</td>
+                        <td>{{ $student->admittedStudent->admitted_date ?? ''}}</td>
+                        <td>{{ $student->admittedStudent->completion_date ?? ''}}</td>
                     </tr>
                     <tr>
                         <th colspan="3">Programme/Course Followed (Accredited by NACTE)</th>
-                        <td colspan="3">{{ $student->admittedStudent->programme->programmeName}}</td>
+                        <td colspan="3">{{ $student->admittedStudent->programme->programmeName ?? ''}}</td>
                     </tr>
                     <tr>
                         <th colspan="3">NTA Level Awarded</th>
-                        <td colspan="3">{{ $student->admittedStudent->programme->studyLevel->description}}</td>
+                        <td colspan="3">{{ $student->admittedStudent->programme->studyLevel->description ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th colspan="3">Overall GPA: {{ $student->overallGPA }}</th>
-                        <td colspan="3">Class Awarded: {{ $student->classAwarded }}</td>
+                        <th colspan="3">Overall GPA: {{ $student->overallGPA ?? ''}}</th>
+                        <td colspan="3">Class Awarded: {{ $student->classAwarded ?? ''}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -267,12 +275,12 @@
             </div>
         </div>
 
-    <div class="row">
-        <div class="col signature">
+    <div class="bottom-container">
+        <div class="col text-left signature">
             <p>OMARY S. KISALO - ACP</p>
             <p>Chief Instructor</p>
         </div>
-        <div class="col date-issue">
+        <div class="col text-right date-issue">
             <p>{{ now()->toDateString() }}</p>
             <p>Date of Issue</p>
         </div>

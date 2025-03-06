@@ -26,7 +26,6 @@ class AnnouncementController extends Controller
     public function index()
     {
         $announcements = Announcement::where('expires_at', '>', Carbon::now())->orderBy('created_at', 'desc')->get();
-        broadcast(new NotificationEvent($announcements[0]->title, $announcements[0]->type, 'announcement', $announcements[0], $announcements[0]->id));
         return view('announcements.index', compact('announcements'));
     }
 
