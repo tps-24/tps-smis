@@ -38,6 +38,7 @@ use App\Http\Controllers\PatrolAreaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\MPSVisitorController;
+use App\Http\Controllers\TimeSheetController;
 use Carbon\Carbon;
 
 
@@ -53,6 +54,9 @@ Route::get('/', function () {
             $beats = App\Models\Beat::where('date',Carbon::today()->toDateString())->get('student_ids');
             $patients = App\Models\Patient::where('created_at',Carbon::today()->toDateString())->get('student_id');
             $staffs = App\Models\Staff::get('forceNumber');
+
+            $attendanceController = new AttendenceController();
+            $attendance =  $attendanceController->day_report(1, Carbon::today());
             // foreach ($totalScore as $student => $scores) {
             //     $beat = count($scores);
             // }
@@ -60,10 +64,13 @@ Route::get('/', function () {
 // foreach ($beats as $beat) {
 //     $studentCounts = json_decode($beat->student_counts, true); // Assuming student_counts is a JSON-encoded array in Beat model
 //     $totalStudents += count($studentCounts);
-// }  
-            
-
-            return view('dashboard/dashboard', compact('denttotal','dentpresent','beats','patients', 'staffs'));
+// }        
+            //$summary = $attendance->summary;
+            $dentpresent = $attendance['total_present'];
+            //$total_students = $attendance['total'];
+            //dd($attendance);
+            $percentage_present = round(100- $attendance['absent_percentage'],2);
+            return view('dashboard/dashboard', compact('denttotal','dentpresent','beats','patients', 'staffs','percentage_present'));
         }
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -116,7 +123,7 @@ Route::post('/beats/replace-reserve/{reserveId}/{studentId}/{date}/{beatReserveI
 
 Route::get('/students/downloadSample', [StudentController::class, 'downloadSample'])->name('studentDownloadSample');
 Route::get('/staff/downloadSample', [StaffController::class, 'downloadSample'])->name('staffDownloadSample');
-
+Route::get('/courseworkResult/downloadSample', [CourseworkResultController::class, 'downloadSample'])->name('courseworkResultDownloadSample');
 Route::get('students/upload-students', function(){
     return view('students.bulk_upload_explanation');
 })->name('uploadStudents');
@@ -157,6 +164,9 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
     Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
     Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
+    Route::get('/coursework/upload_explanation/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
+    Route::post('/coursework/upload/{courseId}', [CourseworkResultController::class, 'import'])->name('coursework.upload');
+
     Route::resource('students', StudentController::class);  
     
 });
@@ -248,6 +258,9 @@ Route::get('patrol-areas/{patrolArea}/edit', [PatrolAreaController::class, 'edit
 Route::put('patrol-areas/{patrolArea}', [PatrolAreaController::class, 'update'])->name('patrol-areas.update');
 Route::get('guard-areas/{guardArea}/edit', [GuardAreaController::class, 'edit'])->name('guard-areas.edit');
 Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->name('guard-areas.update');
+Route::put('timesheets/{timesheetId}/reject', [TimeSheetController::class, 'reject'])->name('timesheets.reject');
+Route::put('timesheets/{timesheetId}/approve', [TimeSheetController::class, 'approve'])->name('timesheets.approve');
+Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('timesheets.filter');
 
 
     
@@ -266,6 +279,7 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
     Route::resource('campuses', CampusController::class);
     Route::resource('announcements', AnnouncementController::class);
     Route::resource('visitors', MPSVisitorController::class);
+    Route::resource('timesheets', TimeSheetController::class);
 
 
     
@@ -273,7 +287,7 @@ Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->n
 
     // routes/web.php
 Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
-
+Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 

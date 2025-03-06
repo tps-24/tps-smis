@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseWork;
+use App\Models\Semester;
 use App\Models\AssessmentType;
 use Illuminate\Http\Request;
 
@@ -85,5 +86,9 @@ class CourseWorkController extends Controller
     public function destroy(CourseWork $courseWork)
     {
         //
+    }
+    public function getCourseworks($semesterId){
+        $semester = Semester::findOrFail($semesterId);
+        return response()->json($semester->courseWorks);
     }
 }

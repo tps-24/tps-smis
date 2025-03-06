@@ -9,6 +9,9 @@ use App\Models\CourseWork;
 use App\Models\Semester;
 use App\Models\Programme;
 use Illuminate\Http\Request;
+use App\Imports\CourseworkResultImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Validator;
 
 class CourseworkResultController extends Controller
 {
@@ -149,5 +152,44 @@ class CourseworkResultController extends Controller
     public function destroy(CourseworkResult $courseworkResult)
     {
         //
+    }
+
+    public function create_import($courseId){
+        $semesters = Semester::all();
+        $courseworks = CourseWork::all();
+        return view('course_works_results.upload_explanation', compact('semesters','courseworks', 'courseId'));
+    }
+    public function import(Request $request, $courseId)
+    {
+        $request->validate([
+            'semesterId' => 'required|exists:semesters,id', // Corrected 'exist' to 'exists' and fixed the table name
+            'courseworkId' => 'required|exists:course_works,id'
+        ]);
+        
+        $semesterId = $request->semesterId;
+         $courseworkId = $request->semesterId;;
+        $validator = Validator::make($request->all(), [
+            'import_file' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (!in_array($value->getClientOriginalExtension(), ['csv', 'xls', 'xlsx'])) {
+                        $fail('Incorrect :attribute type choose.');
+                    }
+                }
+            ],
+        ]);
+        if ($validator->fails()) {
+            return back()->with('error', $validator->errors()->first());
+        }
+        Excel::import(new CourseworkResultImport($semesterId, $courseId, $courseworkId), filePath: $request->file('import_file'));
+        return redirect()->route('coursework_results.index')->with('success', 'Coursework results Uploaded  successfully.');
+    }
+
+    public function downloadSample () {
+        $path = storage_path('app/public/sample/coursework_result.xlsx');
+        if (file_exists($path)) {
+            return response()->download($path);
+        }
+        abort(404);
     }
 }
