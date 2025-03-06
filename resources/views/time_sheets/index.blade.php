@@ -113,7 +113,6 @@
                                                             <button @if($timesheet->status == 'approved' || $timesheet->status == 'rejected') disabled @endif class="btn btn-sm btn-danger">Reject</button>
                                                         </form>                                                            
                                                         </div>
-                                                       
                                                     </div>
                                                     @endcan
                                                 </div>
