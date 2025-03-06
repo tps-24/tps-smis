@@ -50,6 +50,10 @@
                                 <a class="btn btn-primary btn-sm" href="{{ route('beats.approve-reserve', ['studentId' =>$reserve->student_id]) }}">Release</a>
                                 <a class="btn btn-primary btn-sm" href="{{ route('beats.reserve-replacement', ['reserveId' =>$reserve->student_id,'date'=>$reserve->beat_date,'beatReserveId'=>$reserve->id]) }}">Replace</a>
                                 </td>
+                                @elseif(is_null($reserve->replaced_student_id))
+                                    <td>Released</td>
+                                @else
+                                    <td>Replaced</td>
                                 @endif
                             </tr>
                         @endforeach

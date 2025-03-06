@@ -247,7 +247,7 @@
         <li>
         <a href="{{ route('hospital.index') }}">
           <i class="bi bi-hospital"></i>
-          <span class="menu-text">Sir Major Panel</span>
+          <span class="menu-text">Sick Panel</span>
         </a>
         </li>
       @endcan()
@@ -331,6 +331,12 @@
       </a>
       </li>
     @endcan()
+      <li>
+      <a href="{{ route('timesheets.index') }}">
+        <i class="bi bi-archive"></i>
+        <span class="menu-text">Time Sheet</span>
+      </a>
+      </li>
       @can('report-list')
       <li>
       <a href="#">
