@@ -421,8 +421,9 @@ Route::get('/dispensary', [PatientController::class, 'dispensaryPage'])->name('d
 
 
 // 🚀 Routes for Sending to Receptionist
-Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
+// Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
 Route::post('/hospital/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('hospital.sendToReceptionist');
+Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
 
 // 💼 Receptionist Routes
 Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->name('receptionist.index')->middleware('auth');

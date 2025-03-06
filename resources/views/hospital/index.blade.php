@@ -41,9 +41,21 @@
         <div class="card-body">
         <form action="{{ route('hospital.index') }}" method="GET" class="d-flex justify-content-between mb-3">
     <div class="d-flex">
-        <select class="form-select me-2" name="company_id">
-            <option value="{{ auth()->user()->company_id }}">{{ $assignedCompany->name ?? 'N/A' }}</option>
-        </select>
+    <select class="form-select me-2" name="company_id">
+    @if(auth()->user()->hasRole('Sir Major'))
+        <option value="{{ $assignedCompany->id ?? '' }}">{{ $assignedCompany->name ?? 'N/A' }}</option>
+    @else
+        <option value="">Select Company</option>
+        @foreach($companies as $company)
+            <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                {{ $company->name }}
+            </option>
+        @endforeach
+    @endif
+</select>
+
+
+
         <select class="form-select me-2" name="platoon">
             <option value="">Select Platoon</option>
             @for ($i = 1; $i <= 15; $i++)

@@ -233,7 +233,7 @@
         <li>
         <a href="{{ route('hospital.index') }}">
           <i class="bi bi-hospital"></i>
-          <span class="menu-text">Sir Major Panel</span>
+          <span class="menu-text">Sick Panel</span>
         </a>
         </li>
       @endcan()
