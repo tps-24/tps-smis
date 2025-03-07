@@ -69,7 +69,7 @@
         <td>{{ $staff->forceNumber }}</td>
         <td>{{ $staff->firstName }} {{ $staff->middleName }} {{ $staff->lastName }}</td>
         <td>{{ $staff->rank }}</td>
-        <td>{{ $staff->company->name }}</td>
+        <td>{{ $staff->company->name ?? '' }}</td>
         <td>{{ $staff->department->departmentName ?? '' }}</td>
         <td>{{ $staff->phoneNumber }}</td>
         <td>

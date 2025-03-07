@@ -23,4 +23,11 @@ class ProgrammeCourseSemester extends Model
     {
         return $this->belongsTo(Semester::class);
     }
+
+    public function instructors()
+    {
+        return $this->belongsToMany(User::class, 'course_instructors', 'programme_course_semester_id', 'user_id')
+                    ->withPivot('academic_year');
+    }
+
 }

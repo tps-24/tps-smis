@@ -9,5 +9,5 @@ class Download extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'category', 'file_path'];
+    protected $fillable = ['title', 'category', 'file_path', 'uploaded_by'];
 }

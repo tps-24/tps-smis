@@ -38,6 +38,7 @@ use App\Http\Controllers\PatrolAreaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\MPSVisitorController;
+use App\Http\Controllers\StaffProgrammeCourseController;
 use App\Http\Controllers\TimeSheetController;
 use Carbon\Carbon;
 
@@ -80,18 +81,6 @@ Route::group(['middleware' => 'session_programme'], function () {
 });
 
 Route::post('/beats/{id}', [BeatController::class, 'update'])->name('beat.update');
-// Route::get('/generate-beats', [BeatController::class, 'showGenerateBeatsForm'])->name('generate.beats.form');
-// Route::post('/generate-beats', [BeatController::class, 'generateBeats'])->name('generate.beats');
-// Route to display the generated beats
-// Route::get('/view-generated-beats', [BeatController::class, 'viewGeneratedBeats'])->name('view.generated.beats');
-
-// Route::get('/beats', [BeatController::class, 'index'])->name('beats.index'); // Show all beats---------
-// Route::post('/beats/generate', [BeatController::class, 'generate'])->name('beats.generate'); // Generate beats for a specific date
-
-
-// Route::get('/beats', [BeatController::class, 'index'])->name('beats.index');
-// Route::get('/beats/{id}', [BeatController::class, 'show'])->name('beats.show');
-// Route::post('/beats/generate', [BeatController::class, 'generateBeats'])->name('beats.generate');
 Route::get('/beats/generate', [BeatController::class, 'beatCreate'])->name('beats.beatCreate');
 Route::get('/beats', [BeatController::class, 'beatsByDate'])->name('beats.byDate');
 Route::delete('/beats/{id}', [BeatController::class, 'destroy'])->name('beats.destroy');
@@ -146,6 +135,19 @@ Route::get('staff/upload-staff', function(){
 //     Route::put('/approve', 'approve_presence');
 //     Route::get('/downloadPdf/{company_id}/{beatType}/{day}', 'generateTodayPdf')->name('beats.downloadPdf');
 // });
+
+Route::get('/assign-instructors', [StaffProgrammeCourseController::class, 'showAssignInstructorsForm'])->name('assign.instructors.form');
+
+Route::post('/assign-instructors', [StaffProgrammeCourseController::class, 'assignInstructors'])->name('assign.instructors');
+
+
+Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
+});
+
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    
+    Route::resource('coursework_results', CourseworkResultController::class);
+
 
 Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
 Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
@@ -242,7 +244,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
-    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::post('/students/{id}/approve', [StudentController::class, 'approveStudent'])->name('students.approve');
     Route::get('/student/complete-profile/{id}', [StudentController::class, 'completeProfile'])->name('students.complete_profile');
@@ -281,6 +283,7 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
 
     // routes/web.php
 Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
+
 Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
@@ -294,7 +297,6 @@ Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCoursew
     Route::resource('enrollments', OptionalCourseEnrollmentController::class);
     Route::resource('course_works', CourseWorkController::class);
     Route::resource('semester_exams', SemesterExamController::class);
-    Route::resource('coursework_results', CourseworkResultController::class);
     Route::resource('semester_exam_results', SemesterExamResultController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
@@ -429,8 +431,9 @@ Route::get('/dispensary', [PatientController::class, 'dispensaryPage'])->name('d
 
 
 // 🚀 Routes for Sending to Receptionist
-Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
+// Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
 Route::post('/hospital/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('hospital.sendToReceptionist');
+Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
 
 // 💼 Receptionist Routes
 Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->name('receptionist.index')->middleware('auth');
@@ -471,20 +474,3 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
 
 
 //Route::get('test', [AttendenceController::class,'generatePdf']);
-
-// Route::post('/pusher/auth', function (\Illuminate\Http\Request $request) {
-//     return true;
-//     if (!Auth::check()) {
-//         //return \Illuminate\Support\Facades\Broadcast::auth($request);
-//     //} else {
-//         return response()->json(['message' => 'Unauthorized'], 403);
-//     }
-// });
-
-
-
-
-
-
-
-

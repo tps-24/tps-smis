@@ -7,7 +7,7 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
         <li class="breadcrumb-item"><a href="#">Courses Assignments</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">Assign Course for {{ $programme->programmeName }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Assign Course(s) for {{ $programme->programmeName }}</a></li>
       </ol>
     </nav>
   </div>
@@ -16,7 +16,7 @@
 @endsection
 @section('content')
 <div class="row gx-4">
-    <div class="col-sm-8 col-12">
+    <div class="col-sm-4 col-12">
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
@@ -25,7 +25,7 @@
                             <h2>Add New Course</h2>
                         </div> -->
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('assign-courses.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('programmes.show', $programme->id) }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -108,11 +108,243 @@
      
     </div>
   
-    <div class="col-sm-4 col-12">
-        <div class="card mb-8">
-            <div class="card-body">
+    <div class="col-sm-8 col-12">
+    <div class="card mb-8">
+        <div class="card-body">
+            @if (session('success'))
+            <div class="alert alert-success">
+                <p>{{ session('success') }}</p>
+            </div>
+            @endif
+            @php
+            $i=1;
+            $j=1;
+            @endphp
+
+            <div class="table-outer">
+                <div class="table-responsive">
+                    <table class="table table-striped truncate m-0">
+                        <thead>
+                            <tr>
+                                <th colspan="6">Semester One</th>
+                            </tr>
+                            <tr>
+                                <th scope="col" width="5%">No</th>
+                                <th scope="col" width="15%">Course Code</th>
+                                <th scope="col" width="50%">Course Name</th>
+                                <th scope="col" width="15%">Course Type</th>
+                                <th scope="col" width="10%">Credit</th>
+                                <th scope="col" width="5%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($courses1 as $course)
+                            @if ($course->pivot->course_type != 'Optional')
+                            <tr>
+                                <td>{{ $i++ }}</td>
+                                <td>{{ $course->courseCode }}</td>
+                                <td>{{ $course->courseName }}</td>
+                                <td>{{ $course->pivot->course_type }}</td>
+                                <td>{{ $course->pivot->credit_weight }}</td>
+                                <td>
+                                    
+                                    <button class="btn  btn-primary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#More{{$programme->id}}">Staf</button>
+
+                                    <a class="btn btn-primary btn-sm" href="{{ route('assign-courses.edit', $course->id) }}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
+                                    <form method="POST" action="{{ route('assign-courses.destroy', $course->id) }}" style="display:inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fa-solid fa-trash"></i> Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <th colspan="6">Optional Course(s)</th>
+                            </tr>
+                            @foreach ($courses1 as $course)
+                            @if ($course->pivot->course_type === 'Optional')
+                            <tr>
+                                <td>{{ $i++ }}</td>
+                                <td>{{ $course->courseCode }}</td>
+                                <td>{{ $course->courseName }}</td>
+                                <td>{{ $course->pivot->course_type }}</td>
+                                <td>{{ $course->pivot->credit_weight }}</td>
+                                <td>
+                                    <a class="btn btn-primary btn-sm" href="{{ route('assign-courses.edit', $course->id) }}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Staff
+                                    </a>
+                                    <a class="btn btn-primary btn-sm" href="{{ route('assign-courses.edit', $course->id) }}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
+                                    <form method="POST" action="{{ route('assign-courses.destroy', $course->id) }}" style="display:inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fa-solid fa-trash"></i> Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-outer" style="margin-top:20px">
+                <div class="table-responsive">
+                    <table class="table table-striped truncate m-0">
+                        <thead>
+                            <tr>
+                                <th colspan="6">Semester Two</th>
+                            </tr>
+                            <tr>
+                                <th scope="col" width="5%">No</th>
+                                <th scope="col" width="15%">Course Code</th>
+                                <th scope="col" width="50%">Course Name</th>
+                                <th scope="col" width="15%">Course Type</th>
+                                <th scope="col" width="10%">Credit</th>
+                                <th scope="col" width="5%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($courses2 as $course)
+                            @if ($course->pivot->course_type != 'Optional')
+                            <tr>
+                                <td>{{ $j++ }}</td>
+                                <td>{{ $course->courseCode }}</td>
+                                <td>{{ $course->courseName }}</td>
+                                <td>{{ $course->pivot->course_type }}</td>
+                                <td>{{ $course->pivot->credit_weight }}</td>
+                                <td>
+                                    <!-- Button to open the modal -->
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#More{{$programme->id}}-{{$course->id}}">Staf</button>
+
+                                    <a class="btn btn-primary btn-sm" href="{{ route('assign-courses.edit', $course->id) }}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
+                                    <form method="POST" action="{{ route('assign-courses.destroy', $course->id) }}" style="display:inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fa-solid fa-trash"></i> Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <th colspan="6">Optional Course(s)</th>
+                            </tr>
+                            @foreach ($courses2 as $course)
+                            @if ($course->pivot->course_type === 'Optional')
+                            <tr>
+                                <td>{{ $j++ }}</td>
+                                <td>{{ $course->courseCode }}</td>
+                                <td>{{ $course->courseName }}</td>
+                                <td>{{ $course->pivot->course_type }}</td>
+                                <td>{{ $course->pivot->credit_weight }}</td>
+                                <td>
+                                    <!-- Button to open the modal -->
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#More{{$programme->id}}-{{$course->id}}">Staf</button>
+
+                                    <a class="btn btn-primary btn-sm" href="{{ route('assign-courses.edit', $course->id) }}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
+                                    <form method="POST" action="{{ route('assign-courses.destroy', $course->id) }}" style="display:inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fa-solid fa-trash"></i> Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endif
+                            @endforeach
+
+<!-- Modal -->
+<div class="modal fade" id="More{{$programme->id}}" tabindex="-1" aria-labelledby="statusModalLabelMore{{$programme->id}}" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabelMore">Assign Instructors to Programme Course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('assign.instructors') }}" method="POST">
+                    @csrf
+                    @method('POST')
+                    <input type="hidden" name="programme_id" value="{{ $programme->id }}">
+                    <input type="hidden" name="semester_id" value="{{ $semester->id }}">
+                    <input type="hidden" name="session_programme_id" value="{{ $sessionProgramme->id }}">
+                    <input type="hidden" name="course_id" value="{{ $course->id }}">
+                    <div class="form-group">
+                        <label for="staffIds">Instructors (Select multiple):</label>
+                        <select class="form-control" id="staffIds" name="staff_ids[]" multiple>
+                            @foreach($staffs as $staff)
+                                <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('staff_ids')
+                            <div class="error">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="academic_year">Academic Year:</label>
+                        <input type="text" class="form-control" id="academic_year" name="academic_year" required>
+                        @error('academic_year')
+                            <div class="error">{{ $message }}</div>
+                        @enderror
+                    </div><br>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Assign Instructor(s)</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+
+                                
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and Select2 JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+@endsection
+
+
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        $('#staffIds').select2({
+            width: '100%',
+            placeholder: "Select Instructors",
+            allowClear: true
+        });
+    });
+</script>
 @endsection

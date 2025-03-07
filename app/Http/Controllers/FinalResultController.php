@@ -168,7 +168,7 @@ class FinalResultController extends Controller
             return redirect()->back()->with('error', 'No students selected.');
         }
         
-        $students = Student::whereIn('id', $selectedStudentIds)->with('finalResults')->get();
+        $students = Student::whereIn('id', $selectedStudentIds)->with('finalResults')->with('admittedStudent')->get();
 
         // dd($students);
         
@@ -177,6 +177,12 @@ class FinalResultController extends Controller
         
         // Example (using a package like Dompdf or another PDF library):
         $pdf = PDF::loadView('final_results.pdf', compact('students'))->setPaper('a4', 'landscape');
+        
+        // Set the HTML5 parser option
+        // $pdf->setOptions(['isHtml5ParserEnabled' => true]);
+        
+        // Render the HTML as PDF
+        $pdf->render();
         // Return the PDF content as a response to be rendered in a new browser window
         return $pdf->stream('final_results.pdf');
         

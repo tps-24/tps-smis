@@ -24,6 +24,10 @@
     <link rel="stylesheet" href="/tps-smis/resources/assets/fonts/bootstrap/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="/tps-smis/resources/assets/css/main.min.css" />
     <link rel="stylesheet" href="/tps-smis/resources/assets/css/custom.css" />
+    <link rel="stylesheet" href="/tps-smis/resources/assets/css/mine.css" />
+    <!-- Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
 
     <!-- *************
 			************ Vendor Css Files *************

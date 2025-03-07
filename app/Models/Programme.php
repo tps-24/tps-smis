@@ -25,5 +25,15 @@ class Programme extends Model
     { 
         return $this->hasMany(Student::class); 
     }
-
+ 
+    public function studyLevel()
+    {
+        return $this->belongsTo(studyLevel::class, 'studyLevel_id');
+    }
+    
+    public function admittedStudents()
+    {
+        return $this->hasMany(AdmittedStudent::class);
+    }
+    
 }

@@ -64,5 +64,11 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+    
 
+    public function programmeCourseSemesters()
+    {
+        return $this->belongsToMany(ProgrammeCourseSemester::class, 'course_instructors', 'user_id', 'programme_course_semester_id')
+                    ->withPivot('course_id');
+    }
 }

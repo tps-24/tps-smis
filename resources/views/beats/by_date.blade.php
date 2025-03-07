@@ -81,7 +81,7 @@
                         <div class="card-header">
                             <div class="d-flex gap-2 justify-content-between">
                                 <div>
-                                    <h3>Guard Areas</h3>
+                                    <h3>Guard Areas</h3><br><br>
                                     <!-- <a href="{{ route('beats.generatePDF', $company->id) }}" class="btn btn-secondary"> PDF</a> -->
                                     <form action="{{ route('beats.generatePDF', $company->id) }}" method="GET"
                                         class="form-inline mb-4">

@@ -44,47 +44,96 @@ class PatientController extends Controller
         $user = auth()->user();
         $assignedCompany = Company::find($user->company_id);
     
-        // Start query
-        $query = Student::where('company_id', $user->company_id);
+        // Prevent errors when $assignedCompany is null
+        if (!$assignedCompany && $user->hasRole('Sir Major')) {
+            return redirect()->back()->with('error', 'Your assigned company was not found.');
+        }
     
-        if ($request->platoon) {
+        // Fetch all companies for Super Administrator, Admin, and Teacher
+        if ($user->hasRole('Super Administrator') || $user->hasRole('Admin') || $user->hasRole('Teacher')|| $user->hasRole('MPS Officer')) {
+            $companies = Company::all(); // Get all companies
+            $query = Student::query(); // No company restriction
+        } else { 
+            // Sir Major should only see students from their assigned company
+            $companies = collect([$assignedCompany]); 
+            $query = Student::where('company_id', $user->company_id);
+        }
+    
+        // Filtering
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+    
+        if ($request->filled('platoon')) {
             $query->where('platoon', $request->platoon);
         }
     
-        if ($request->fullname) {
+        if ($request->filled('fullname')) {
             $query->where(function ($q) use ($request) {
                 $q->where('first_name', 'LIKE', "%{$request->fullname}%")
                   ->orWhere('last_name', 'LIKE', "%{$request->fullname}%");
             });
         }
     
-        // Only apply Student ID filter if it is provided
         if ($request->filled('student_id')) {
             $query->where('id', (int) $request->student_id);
         }
     
-        $studentDetails = $query->get(); // Use 'get()' to return multiple students
-    
+        $studentDetails = $query->get();
         $message = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
+
     
    // Statistics Calculation
-$today = Carbon::today();
-$thisWeek = Carbon::now()->startOfWeek();
-$thisMonth = Carbon::now()->startOfMonth();
+// $today = Carbon::today();
+//  $thisWeek = Carbon::now()->startOfWeek();
+// $thisMonth = Carbon::now()->startOfMonth();
 
-// Ensure we count from the 'patients' table, not 'students'
-$dailyCount = Patient::whereDate('created_at', $today)
-    ->where('company_id', $user->company_id)
-    ->count();
+// // Ensure we count from the 'patients' table, not 'students'
+// $dailyCount = Patient::whereDate('created_at', $today)
+//     ->where('company_id', $user->company_id)
+//     ->count();
 
-$weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
-    ->where('company_id', $user->company_id)
-    ->count();
+// $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
+//     ->where('company_id', $user->company_id)
+//     ->count();
 
-$monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
-    ->where('company_id', $user->company_id)
-    ->count();
+// $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
+//     ->where('company_id', $user->company_id)
+//     ->count();
 
+    // Get the authenticated user
+    $user = auth()->user();
+
+    // Define time periods before using them
+    $today = Carbon::today();
+    $thisWeek = Carbon::now()->startOfWeek();
+    $thisMonth = Carbon::now()->startOfMonth();
+
+    // Check if the user is Super Admin or Admin
+    if ($user->hasRole(['Super Administrator', 'Admin'])) {
+        // Show statistics for all companies
+        $dailyCount = Patient::whereDate('created_at', $today)->count();
+        $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
+        $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
+    } else {
+        // Show statistics only for the assigned company
+        $dailyCount = Patient::whereDate('created_at', $today)
+            ->where('company_id', $user->company_id)
+            ->count();
+        
+        $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
+            ->where('company_id', $user->company_id)
+            ->count();
+        
+        $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
+            ->where('company_id', $user->company_id)
+            ->count();
+    }
+
+
+
+
+    
 // Pie Chart Data (Annual Summary)
 $patientStats = Patient::whereYear('created_at', now()->year)
     ->where('company_id', $user->company_id)
@@ -97,7 +146,7 @@ $patientStats = Patient::whereYear('created_at', now()->year)
 $patientStats = array_replace(array_fill(1, 12, 0), $patientStats);
 
 
-    return view('hospital.index', compact( 'message','user', 'assignedCompany', 'dailyCount', 'weeklyCount', 'monthlyCount', 'studentDetails'));
+return view('hospital.index', compact('message', 'user', 'assignedCompany', 'companies', 'dailyCount', 'weeklyCount', 'monthlyCount', 'studentDetails'));
 }
     
 public function show($id)
@@ -109,25 +158,31 @@ public function show($id)
     return view('hospital.show', compact('patient'));
 }
     
+
+
 public function sendToReceptionist(Request $request)
 {
-    $user = auth()->user();
-    
+    \Log::info('sendToReceptionist method called.');
+    \Log::info('Received student_id: ' . $request->student_id);
+
     // Validate input
     $request->validate([
         'student_id' => 'required|exists:students,id',
     ]);
 
-    // Find the student
-    $student = Student::where('id', $request->student_id)
-                      ->where('company_id', $user->company_id) // Ensure same company
-                      ->firstOrFail();
+    // Debug query
+    $student = Student::where('id', $request->student_id)->first();
+    \Log::info('Student Query Result: ' . json_encode($student));
+
+    if (!$student) {
+        \Log::error('Student with ID ' . $request->student_id . ' not found!');
+        return redirect()->back()->with('error', 'Student not found.');
+    }
 
     // Store patient details
     Patient::updateOrCreate(
         ['student_id' => $student->id],
         [
-            'student_id' => $student->id, // Store student_id instead of names
             'company_id' => $student->company_id,
             'platoon' => $student->platoon,
             'status' => 'pending',
@@ -136,7 +191,6 @@ public function sendToReceptionist(Request $request)
 
     return redirect()->route('hospital.index')->with('success', 'Details sent to receptionist for approval.');
 }
-
 
 public function sendForApproval(Request $request)
 {

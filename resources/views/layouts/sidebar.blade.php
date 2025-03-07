@@ -120,6 +120,20 @@
         <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a> <!-- For Teacher-->
         </li>
         <li>
+            <a href="#!">
+            Coursework 2
+              <i class="bi bi-caret-right-fill"></i>
+            </a>
+            <ul class="treeview-menu">
+              <li>
+              <a href="{{ route('course_works.index') }}">CA Configurations</a> <!-- Add to academic tab -->
+              </li>
+              <li>
+                <a href="#!">Nested 2.1</a>
+              </li>
+            </ul>
+        </li>
+        <li>
         <a href="#">Semester Exam (SE)</a> <!-- For Teacher-->
         </li>
         @can('optional-enrollment-list')
@@ -233,7 +247,7 @@
         <li>
         <a href="{{ route('hospital.index') }}">
           <i class="bi bi-hospital"></i>
-          <span class="menu-text">Sir Major Panel</span>
+          <span class="menu-text">Sick Panel</span>
         </a>
         </li>
       @endcan()

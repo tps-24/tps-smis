@@ -453,8 +453,8 @@ class AttendenceController extends Controller
             'total_present' => $total_present,
             'total_absent' => $total_absent,
             'total' => $total,
-            'absent_percentage' => round(($total_absent / $total) * 100, 4)
-        ];
+            'absent_percentage' => $total != 0 ? round(($total_absent / $total) * 100, 4) : 0
+        ];        
     }
     public function current_week_report($companyId)
     {
