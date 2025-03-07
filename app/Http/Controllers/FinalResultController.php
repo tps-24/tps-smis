@@ -188,4 +188,27 @@ class FinalResultController extends Controller
         
     }
 
+    public function search(Request $request, $companyId)
+    {
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 4;
+
+                    $students = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
+                    $companiesy = Company::all();
+                    
+            
+                    $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+                        $query->where('session_programme_id', $selectedSessionId);
+                    })
+                    ->with(['students' => function ($query) use ($selectedSessionId, $request, $companyId) {
+                        $query->where('session_programme_id', $selectedSessionId)
+                        ->where('company_id', $companyId)
+                        ->where('platoon', $request->platoon);
+                    }])
+                    ->get();
+        return view('final_results.student_certificate', compact('students', 'companies'));
+
+    }
+
 }

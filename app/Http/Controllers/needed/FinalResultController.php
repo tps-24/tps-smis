@@ -141,4 +141,5 @@ class FinalResultController extends Controller
         return redirect()->route('final_results.index')
                          ->with('success', 'Final results generated successfully.');
     }
+    
 }

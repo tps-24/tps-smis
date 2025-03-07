@@ -217,6 +217,8 @@ Route::group(['middleware' => ['auth']], function () {
 
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
 Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
+Route::get('students/search_certificate/{companyId}', [FinalResultController::class, 'search'])->name('students.search_certificate');
+
 //Route::resource('students', StudentController::class);
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
