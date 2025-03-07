@@ -55,8 +55,6 @@ Route::get('/', function () {
             $patients = App\Models\Patient::where('created_at',Carbon::today()->toDateString())->get('student_id');
             $staffs = App\Models\Staff::get('forceNumber');
 
-            $attendanceController = new AttendenceController();
-            $attendance =  $attendanceController->day_report(1, Carbon::today());
             // foreach ($totalScore as $student => $scores) {
             //     $beat = count($scores);
             // }
@@ -65,12 +63,8 @@ Route::get('/', function () {
 //     $studentCounts = json_decode($beat->student_counts, true); // Assuming student_counts is a JSON-encoded array in Beat model
 //     $totalStudents += count($studentCounts);
 // }        
-            //$summary = $attendance->summary;
-            $dentpresent = $attendance['total_present'];
-            //$total_students = $attendance['total'];
-            //dd($attendance);
-            $percentage_present = round(100- $attendance['absent_percentage'],2);
-            return view('dashboard/dashboard', compact('denttotal','dentpresent','beats','patients', 'staffs','percentage_present'));
+
+            return view('dashboard/dashboard', compact('denttotal','dentpresent','beats','patients', 'staffs'));
         }
 })->middleware(['auth', 'verified'])->name('dashboard');
 

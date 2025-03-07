@@ -37,7 +37,9 @@
                     @foreach ($announcements as $announcement)
                         <li class="list-group-item d-flex justify-content-between align-items-center mt-2">
                             <div>
+                                <div>
                                 <h4 class="text-{{ $announcement->type }}">{{ $announcement->title }}</h4>
+                                </div>
                                 <p> &nbsp &nbsp &nbsp{{ $announcement->message }}</p>
                                 @if($announcement->document_path)
                                     <a style="text-decoration: underline; color:blue; font-style:italic"

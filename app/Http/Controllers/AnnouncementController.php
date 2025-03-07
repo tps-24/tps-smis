@@ -39,7 +39,7 @@ class AnnouncementController extends Controller
         $request->validate([
             'title' => 'required',
             'message' => 'required',
-            'document' => 'required|mimes:pdf|max:5120',//5MB
+            'document' => 'nullable|mimes:pdf|max:5120',//5MB
             'type' => 'required',
             'audience' => 'required',
             'expires_at' => 'nullable|date',
