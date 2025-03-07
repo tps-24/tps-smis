@@ -84,23 +84,56 @@ class PatientController extends Controller
 
     
    // Statistics Calculation
-$today = Carbon::today();
-$thisWeek = Carbon::now()->startOfWeek();
-$thisMonth = Carbon::now()->startOfMonth();
+// $today = Carbon::today();
+//  $thisWeek = Carbon::now()->startOfWeek();
+// $thisMonth = Carbon::now()->startOfMonth();
 
-// Ensure we count from the 'patients' table, not 'students'
-$dailyCount = Patient::whereDate('created_at', $today)
-    ->where('company_id', $user->company_id)
-    ->count();
+// // Ensure we count from the 'patients' table, not 'students'
+// $dailyCount = Patient::whereDate('created_at', $today)
+//     ->where('company_id', $user->company_id)
+//     ->count();
 
-$weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
-    ->where('company_id', $user->company_id)
-    ->count();
+// $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
+//     ->where('company_id', $user->company_id)
+//     ->count();
 
-$monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
-    ->where('company_id', $user->company_id)
-    ->count();
+// $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
+//     ->where('company_id', $user->company_id)
+//     ->count();
 
+    // Get the authenticated user
+    $user = auth()->user();
+
+    // Define time periods before using them
+    $today = Carbon::today();
+    $thisWeek = Carbon::now()->startOfWeek();
+    $thisMonth = Carbon::now()->startOfMonth();
+
+    // Check if the user is Super Admin or Admin
+    if ($user->hasRole(['Super Administrator', 'Admin'])) {
+        // Show statistics for all companies
+        $dailyCount = Patient::whereDate('created_at', $today)->count();
+        $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
+        $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
+    } else {
+        // Show statistics only for the assigned company
+        $dailyCount = Patient::whereDate('created_at', $today)
+            ->where('company_id', $user->company_id)
+            ->count();
+        
+        $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
+            ->where('company_id', $user->company_id)
+            ->count();
+        
+        $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
+            ->where('company_id', $user->company_id)
+            ->count();
+    }
+
+
+
+
+    
 // Pie Chart Data (Annual Summary)
 $patientStats = Patient::whereYear('created_at', now()->year)
     ->where('company_id', $user->company_id)
