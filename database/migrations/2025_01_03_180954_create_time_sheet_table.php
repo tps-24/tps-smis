@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('time_sheet', function (Blueprint $table) {
             $table->id();
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
-            $table->string('task', 600);
+            $table->json('tasks');
+            $table->string('description', 600);
             $table->enum('status', ['pending', 'approved','rejected'])->default('pending');
             $table->integer('hours')->nullable();
             $table->date('date');   
