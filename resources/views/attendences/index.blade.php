@@ -136,8 +136,8 @@
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-between mt-1">
                                                                     <a class="text-primary ms-4"
-                                                                        href="{{url('/today/' . $companies[$j]->id . '/' . $page->id.'/'.$date)}}">
-                                                                        <span>View</span>
+                                                                    href="{{ route('today',['company_id'=> $companies[$j]->id, 'type' => $page->id, 'date' => $date]) }}"
+>                                                                        <span>View</span>
                                                                     </a>
                                                                 </div>
                                                             </div>

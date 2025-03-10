@@ -276,6 +276,7 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
     Route::resource('announcements', AnnouncementController::class);
     Route::resource('visitors', MPSVisitorController::class);
     Route::resource('timesheets', TimeSheetController::class);
+    Route::resource('guard-areas', GuardAreaController::class);
 
 
     
@@ -358,7 +359,7 @@ Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCoursew
         Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
         Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
 
-        //Route::get('today/{company_id}/{$type}', 'today')->name('attendances.summary');
+        Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 

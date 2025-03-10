@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\GuardArea;
+use App\Models\Company;
+use App\Models\Campus;
 use App\Models\BeatException;
 use App\Models\BeatTimeException;
 use Illuminate\Http\Request;
@@ -24,7 +26,11 @@ class GuardAreaController extends Controller
      */
     public function create()
     {
-        //
+        $beatExceptions = BeatException::all();
+        $beatTimeExceptions = BeatTimeException::all();
+        $campuses = Campus::all();
+        $companies = Company::all();
+        return view('guardArea.create', compact('beatExceptions', 'beatTimeExceptions', 'campuses', 'companies'));
     }
 
     /**
@@ -32,7 +38,28 @@ class GuardAreaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'guard_area_name' => 'required',
+            'company_id' => 'required|exists:companies,id',
+            'campus_id' => 'required|exists:campuses,id',
+            'beat_exception_ids' => 'required|array',
+            'beat_exception_ids.*' => 'required|numeric|exists:beat_exceptions,id',
+            'beat_time_exception_ids' => 'required|array',
+            'beat_time_exception_ids.*' => 'required|numeric|exists:beat_time_exceptions,id',
+            'number_of_guards' => 'required|numeric|min:1'
+        ]);
+
+        GuardArea::create(
+            [
+                'name' => $request->guard_area_name,
+                'company_id' => $request->company_id,
+                'campus_id' => $request->campus_id,
+                'added_by' => $request->user()->id,
+                'beat_exception_ids' => $request->beat_exception_ids,
+                'beat_time_exception_ids' => $request->beat_time_exception_ids,
+                'number_of_guards' => $request->number_of_guards
+            ]);
+        return redirect()->route('guardArea.index')->with('success', "New guard area created successfully.");
     }
 
     /**
@@ -53,7 +80,7 @@ class GuardAreaController extends Controller
         return view('guardArea.edit', compact('guardArea', 'beatExceptions', 'beatTimeExceptions'));
     }
 
-    
+
 
 
 
@@ -70,7 +97,7 @@ class GuardAreaController extends Controller
         ]);
 
         $data['beat_exception_ids'] = json_encode($data['beat_exception_ids']);
-        if(!empty($data['beat_time_exception_ids'])){
+        if (!empty($data['beat_time_exception_ids'])) {
             $data['beat_time_exception_ids'] = json_encode($data['beat_time_exception_ids']);
         }
 
@@ -78,7 +105,7 @@ class GuardAreaController extends Controller
 
         return redirect()->route('guard-areas.index');
     }
-    
+
     // public function update(Request $request, GuardArea $guardArea)
     // {
     //     $data = $request->validate([
@@ -89,7 +116,7 @@ class GuardAreaController extends Controller
     //     ]);
 
     //     // Directly assign the array to the model attributes
-        
+
     //     $data['beat_exception_ids'] =($data['beat_exception_ids']);
     //     if(!empty($data['beat_time_exception_ids'])){
     //         $data['beat_time_exception_ids'] = ($data['beat_time_exception_ids']);
