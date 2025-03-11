@@ -15,7 +15,9 @@ class PatientController extends Controller
     {
         $this->middleware('permission:hospital-create')->only([
             'save',
-            'sendToReceptionist'
+            'sendToReceptionist',
+            'index',
+            'sirMajorStatistics'
         ]);
 
         $this->middleware('permission:hospital-list')->only([

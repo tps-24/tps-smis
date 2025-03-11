@@ -16,7 +16,7 @@ class TimeSheetController extends Controller
         $timesheets = [];
         $user = Auth::user();
           if(!Gate::allows('viewAny', $user)){
-            $timesheets = TimeSheet::where('staff_id', $user->staff->id)->get();
+            $timesheets = TimeSheet::where('user_id', $user->id)->get();
             //abort(403);
           }else{
             $timesheets = TimeSheet::all();
@@ -47,7 +47,7 @@ class TimeSheetController extends Controller
         ]);
 
         TimeSheet::create([
-            'staff_id' => $request->user()->staff->id,
+            'user_id' => $request->user()->id,
             'description' => $request->description,
             'tasks' => json_encode($request->tasks), 
             'hours' => $request->hours,
@@ -122,7 +122,7 @@ class TimeSheetController extends Controller
         $timeSheet = TimeSheet::findOrFail($timeSheetId);
 
         $timeSheet->status = "approved";
-        $timeSheet->approved_by = $user->staff->id?? '1';
+        $timeSheet->approved_by = $user->id;
         $timeSheet->save();
 
         return redirect()->route('timesheets.index')->with('success', 'Timesheet approved successfully.');

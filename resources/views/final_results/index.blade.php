@@ -61,7 +61,10 @@
                   </tr> -->
                   </tr>
               </thead>
-              <tbody>                   
+              <tbody>  
+              @php
+                $i=1;
+              @endphp                 
               @foreach($finalResults as $finalResult)
                 <tr>
                     <!-- <td>{{ ++$i }}</td> -->
