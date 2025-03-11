@@ -40,88 +40,77 @@ class PatientController extends Controller
 
     
     public function index(Request $request)
-{
-    $user = auth()->user();
-    $selectedCompanyId = $request->company_id ?? null;
-    $assignedCompany = Company::find($user->company_id);
-
-    // Ensure Sir Major has an assigned company
-    if (!$assignedCompany && $user->hasRole('Sir Major')) {
-        return redirect()->back()->with('error', 'Your assigned company was not found.');
-    }
-
-    // Fetch companies list
-    if ($user->hasRole(['Super Administrator', 'Admin', 'Teacher', 'MPS Officer'])) {
-        $companies = Company::all();
-    } else {
-        $companies = collect([$assignedCompany]); // Sir Major only sees their assigned company
-    }
-
-    // Set company filter
-    if ($user->hasRole(['Super Administrator', 'Admin', 'Teacher', 'MPS Officer'])) {
-        $companyId = $selectedCompanyId;
-    } else {
-        $companyId = $user->company_id;
-    }
-
-    // Student Search Query
-    $query = Student::query();
+    {
+        $user = auth()->user();
     
-    if ($companyId) {
-        $query->where('company_id', $companyId);
+        // Fetch staff record for the logged-in user
+        $staff = $user->staff; 
+    
+        // Get company_id from staff table
+        $assignedCompany = $staff ? Company::find($staff->company_id) : null;
+    
+        // Check if the user has the Sir Major role and ensure they have an assigned company
+        if (!$assignedCompany && $user->hasRole('Sir Major')) {
+            return redirect()->back()->with('error', 'Your assigned company was not found.');
+        }
+    
+        // Super Admin, Admin, Teacher, and MPS Officer can view all companies
+        if ($user->hasRole(['Super Administrator', 'Admin', 'Teacher', 'MPS Officer'])) {
+            $companies = Company::all();
+            $query = Student::query();
+        } else {
+            // Sir Major can only see students from their assigned company
+            $companies = collect([$assignedCompany]);
+            $query = Student::where('company_id', $staff->company_id);
+        }
+    
+        // Filtering based on selected company
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+    
+        if ($request->filled('platoon')) {
+            $query->where('platoon', $request->platoon);
+        }
+    
+        if ($request->filled('fullname')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('first_name', 'LIKE', "%{$request->fullname}%")
+                  ->orWhere('last_name', 'LIKE', "%{$request->fullname}%");
+            });
+        }
+    
+        if ($request->filled('student_id')) {
+            $query->where('id', (int) $request->student_id);
+        }
+    
+        $studentDetails = $query->get();
+        $message = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
+    
+        // Get statistics
+        $today = Carbon::today();
+        $thisWeek = Carbon::now()->startOfWeek();
+        $thisMonth = Carbon::now()->startOfMonth();
+    
+        $companyId = $request->company_id ?? ($staff ? $staff->company_id : null);
+    
+        $query = Patient::whereDate('created_at', $today);
+        $weeklyQuery = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()]);
+        $monthlyQuery = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()]);
+    
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+            $weeklyQuery->where('company_id', $companyId);
+            $monthlyQuery->where('company_id', $companyId);
+        }
+    
+        $dailyCount = $query->count();
+        $weeklyCount = $weeklyQuery->count();
+        $monthlyCount = $monthlyQuery->count();
+    
+        return view('hospital.index', compact('message', 'user', 'assignedCompany', 'companies', 'dailyCount', 'weeklyCount', 'monthlyCount', 'studentDetails'));
     }
-
-    if ($request->filled('platoon')) {
-        $query->where('platoon', $request->platoon);
-    }
-
-    if ($request->filled('fullname')) {
-        $query->where(function ($q) use ($request) {
-            $q->where('first_name', 'LIKE', "%{$request->fullname}%")
-              ->orWhere('last_name', 'LIKE', "%{$request->fullname}%");
-        });
-    }
-
-    if ($request->filled('student_id')) {
-        $query->where('id', (int) $request->student_id);
-    }
-
-    $studentDetails = $query->get();
-    $message = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
-
-    // Statistics Calculation
-    $today = Carbon::today();
-    $thisWeek = Carbon::now()->startOfWeek();
-    $thisMonth = Carbon::now()->startOfMonth();
-
-    $dailyCount = Patient::whereDate('created_at', $today)
-        ->when($companyId, fn($q) => $q->where('company_id', $companyId))
-        ->count();
-
-    $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
-        ->when($companyId, fn($q) => $q->where('company_id', $companyId))
-        ->count();
-
-    $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
-        ->when($companyId, fn($q) => $q->where('company_id', $companyId))
-        ->count();
-
-    // Pie Chart Data (Annual Summary)
-    $patientStats = Patient::whereYear('created_at', now()->year)
-        ->when($companyId, fn($q) => $q->where('company_id', $companyId))
-        ->selectRaw('MONTH(created_at) as month, COUNT(*) as count')
-        ->groupBy('month')
-        ->pluck('count', 'month')
-        ->toArray();
-
-    // Ensure all months are included
-    $patientStats = array_replace(array_fill(1, 12, 0), $patientStats);
-
-    return view('hospital.index', compact(
-        'message', 'user', 'assignedCompany', 'companies', 'selectedCompanyId',
-        'dailyCount', 'weeklyCount', 'monthlyCount', 'studentDetails', 'patientStats'
-    ));
-}
+    
     
 public function show($id)
 {
