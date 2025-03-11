@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Patient;
+use App\Models\ExcuseType;
 use App\Models\Student;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+
 
 class PatientController extends Controller
 {
@@ -44,6 +45,7 @@ class PatientController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+
     
         // Fetch staff record for the logged-in user
         $staff = $user->staff; 
@@ -218,6 +220,22 @@ public function receptionistPage()
 }
 
 
+// public function doctorPage()
+// {
+//     if (!auth()->user()->hasRole('Doctor')) {
+//         abort(403, 'You do not have access to this page.');
+//     }
+
+//     // Fetch approved patients and include related student details
+//     $patients = Patient::where('status', 'approved')
+//                 ->with('student:id,first_name,last_name') // Load only required fields
+//                 ->get();
+
+//     $excuseTypes = ExcuseType::all(); // ✅ Fix: Fetch excuse types for the dropdown
+
+//     return view('doctor.index', compact('patients', 'excuseTypes'));
+// }
+
 public function doctorPage()
 {
     if (!auth()->user()->hasRole('Doctor')) {
@@ -226,19 +244,21 @@ public function doctorPage()
 
     // Fetch approved patients and include related student details
     $patients = Patient::where('status', 'approved')
-                ->with('student:id,first_name,last_name') // Load only required fields
+                ->with('student:id,first_name,last_name')
                 ->get();
 
-    return view('doctor.index', compact('patients'));
+    // Fetch excuse names from excuse_types table
+    $excuseTypes = ExcuseType::pluck('excuseName', 'id');
 
-    
+    return view('doctor.index', compact('patients', 'excuseTypes'));
 }
+
 
 public function saveDetails(Request $request)
 {
     $request->validate([
         'student_id' => 'required|exists:patients,id',
-        'excuse_type' => 'required|string|max:255',
+        'excuse_type_id' => 'required|exists:excuse_types,id', // Fix: Validate against excuse_types table
         'rest_days' => 'required|integer|min:1',
         'doctor_comment' => 'required|string'
     ]);
@@ -247,7 +267,7 @@ public function saveDetails(Request $request)
     
     // Save doctor's input
     $patient->update([
-        'excuse_type' => $request->excuse_type,
+        'excuse_type_id' => $request->excuse_type_id, // Fix: Store excuse_type_id instead of excuse_type
         'rest_days' => $request->rest_days,
         'doctor_comment' => $request->doctor_comment,
         'status' => 'treated', // Mark as treated
@@ -255,6 +275,7 @@ public function saveDetails(Request $request)
 
     return redirect()->route('doctor.page')->with('success', 'Patient details saved successfully.');
 }
+
 
 
 public function sirMajorStatistics()
@@ -338,5 +359,30 @@ public function dispensaryPage(Request $request)
     return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies'));
 }
 
+
+// public function store(Request $request)
+// {
+//     $request->validate([
+//         'student_id' => 'required|exists:students,id',
+//         'excuse_type_id' => 'required|exists:excuse_types,id', // Validate excuse type
+//         'status' => 'required|in:pending,approved,rejected,treated',
+//         'staff_id' => 'required|exists:staff,id',
+//         'rest_days' => 'required|integer',
+//         'doctor_comment' => 'nullable|string',
+//     ]);
+
+//     Patient::create([
+//         'student_id' => $request->student_id,
+//         'excuse_type_id' => $request->excuse_type_id,
+//         'status' => $request->status,
+//         'staff_id' => $request->staff_id,
+//         'rest_days' => $request->rest_days,
+//         'doctor_comment' => $request->doctor_comment,
+//         'company_id' => auth()->user()->staff->company_id ?? null, // Get company_id from staff
+//         'platoon' => $request->platoon ?? null, // Ensure platoon is set
+//     ]);
+
+//     return redirect()->route('patients.index')->with('success', 'Patient record added successfully.');
+// }
 
 }

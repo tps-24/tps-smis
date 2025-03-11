@@ -1,9 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<@extends('layouts.main')
 
-@section('content')
 <div class="container">
     <h2>Patient Details</h2>
     <p><strong>First Name:</strong> {{ $patient->student->first_name }}</p>

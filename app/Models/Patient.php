@@ -11,7 +11,7 @@ class Patient extends Model
 
     protected $fillable = [
         'student_id',
-        'excuse_type',
+        'excuse_type_id',
         'rest_days',
         'doctor_comment',
        
@@ -70,6 +70,9 @@ class Patient extends Model
         });
     }
 
-   
+    public function excuseType()
+    {
+        return $this->belongsTo(ExcuseType::class, 'excuse_type_id');
+    }
 
 }
