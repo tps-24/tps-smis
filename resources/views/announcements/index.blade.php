@@ -24,9 +24,11 @@
     @endsession  
 
 
+    @can('announcement-create')  
     <div style="display: flex; justify-content: end;">
         <a href="{{ route('announcements.create') }}"><button class="btn btn-sm btn-success">New</button></a>
     </div>
+    @endcan()
     <div class="card">
         <div class="card-body">
 
@@ -37,8 +39,8 @@
                     @foreach ($announcements as $announcement)
                         <li class="list-group-item d-flex justify-content-between align-items-center mt-2">
                             <div>
-                                <div>
-                                <h4 class="text-{{ $announcement->type }}">{{ $announcement->title }}</h4>
+                                <div class="mb-4">
+                                    <h4 class="text-{{ $announcement->type }}">{{ $announcement->title }}</h4>
                                 </div>
                                 <p> &nbsp &nbsp &nbsp{{ $announcement->message }}</p>
                                 @if($announcement->document_path)

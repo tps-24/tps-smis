@@ -8,3 +8,4 @@ class ExcuseType extends Model
 {
     protected $fillable = ['excuseName', 'abbreviation', 'description','created_by','updated_by']; 
 }
+

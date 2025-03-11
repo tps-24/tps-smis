@@ -79,6 +79,7 @@
             <thead>
                 <tr>
                     <th>First Name</th>
+                    <th>Middle Name</th>
                     <th>Last Name</th>
                     <th>Platoon</th>
                     <th>Company</th>
@@ -89,6 +90,7 @@
                 @foreach($studentDetails as $student)
                 <tr>
                     <td>{{ $student->first_name ?? 'N/A' }}</td>
+                    <td>{{ $student->middle_name ?? 'N/A' }}</td>
                     <td>{{ $student->last_name ?? 'N/A' }}</td>
                     <td>{{ $student->platoon ?? 'N/A' }}</td>
                     <td>{{ $student->company->name ?? 'N/A' }}</td>

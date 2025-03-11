@@ -7,8 +7,11 @@
 <div class="d-flex justify-content-end">
         <a href="{{ url()->previous() }}" class="text-danger fs-3" style="text-decoration: none;">&times;</a>
     </div>
-    <h3>Patients - {{ ucfirst($timeframe) }} View</h3>
+    <!-- Statistics Section -->
+<div class="card mb-4">
 
+    <center><h3>Patients - {{ ucfirst($timeframe) }} View</h3></center>
+</div>
     @if($patients->isNotEmpty())
         <div class="table-responsive">
             <table class="table table-striped">
@@ -31,7 +34,7 @@
                             <td>{{ optional($patient->student)->last_name ?? '-' }}</td>
                             <td>{{ $patient->platoon ?? '-' }}</td>
                             <td>{{ $patient->status ?? '-' }}</td>
-                            <td>{{ $patient->excuse_type ?? '-' }}</td>
+                            <td>{{ optional($patient->excuseType)->excuseName ?? '-' }}</td>
                             <td>{{ $patient->rest_days ?? '-' }}</td>
                             <td>{{ $patient->updated_at ?? '-' }}</td>
                             <td>
@@ -48,7 +51,7 @@
             </table>
         </div>
     @else
-        <p>No patients found for this timeframe.</p>
+        <p>No patients found for this timeframe.</p> 
     @endif
 
     <!-- ✅ Close Button -->

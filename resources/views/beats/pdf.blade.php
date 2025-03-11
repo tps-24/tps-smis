@@ -63,7 +63,7 @@
         
         .watermark {
             position: fixed;
-            top: 50%;
+            top: 45%;
             left: 50%;
             width: 200px;
             height: 200px;

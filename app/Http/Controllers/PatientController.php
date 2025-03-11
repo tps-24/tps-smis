@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Patient;
+use App\Models\ExcuseType;
 use App\Models\Student;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+
 
 class PatientController extends Controller
 {
@@ -15,7 +16,9 @@ class PatientController extends Controller
     {
         $this->middleware('permission:hospital-create')->only([
             'save',
-            'sendToReceptionist'
+            'sendToReceptionist',
+            'index',
+            'sirMajorStatistics'
         ]);
 
         $this->middleware('permission:hospital-list')->only([
@@ -28,7 +31,7 @@ class PatientController extends Controller
             'approvePatient'
         ]);
 
-        $this->middleware('permission:hospital-update')->only([
+        $this->middleware('permission:hospital-edit')->only([
             'saveDetails',
             'doctorPage'
         ]);
@@ -42,24 +45,30 @@ class PatientController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $assignedCompany = Company::find($user->company_id);
+
     
-        // Prevent errors when $assignedCompany is null
+        // Fetch staff record for the logged-in user
+        $staff = $user->staff; 
+    
+        // Get company_id from staff table
+        $assignedCompany = $staff ? Company::find($staff->company_id) : null;
+    
+        // Check if the user has the Sir Major role and ensure they have an assigned company
         if (!$assignedCompany && $user->hasRole('Sir Major')) {
             return redirect()->back()->with('error', 'Your assigned company was not found.');
         }
     
-        // Fetch all companies for Super Administrator, Admin, and Teacher
-        if ($user->hasRole('Super Administrator') || $user->hasRole('Admin') || $user->hasRole('Teacher')|| $user->hasRole('MPS Officer')) {
-            $companies = Company::all(); // Get all companies
-            $query = Student::query(); // No company restriction
-        } else { 
-            // Sir Major should only see students from their assigned company
-            $companies = collect([$assignedCompany]); 
-            $query = Student::where('company_id', $user->company_id);
+        // Super Admin, Admin, Teacher, and MPS Officer can view all companies
+        if ($user->hasRole(['Super Administrator', 'Admin', 'Teacher', 'MPS Officer'])) {
+            $companies = Company::all();
+            $query = Student::query();
+        } else {
+            // Sir Major can only see students from their assigned company
+            $companies = collect([$assignedCompany]);
+            $query = Student::where('company_id', $staff->company_id);
         }
     
-        // Filtering
+        // Filtering based on selected company
         if ($request->filled('company_id')) {
             $query->where('company_id', $request->company_id);
         }
@@ -81,73 +90,31 @@ class PatientController extends Controller
     
         $studentDetails = $query->get();
         $message = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
-
     
-   // Statistics Calculation
-// $today = Carbon::today();
-//  $thisWeek = Carbon::now()->startOfWeek();
-// $thisMonth = Carbon::now()->startOfMonth();
-
-// // Ensure we count from the 'patients' table, not 'students'
-// $dailyCount = Patient::whereDate('created_at', $today)
-//     ->where('company_id', $user->company_id)
-//     ->count();
-
-// $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
-//     ->where('company_id', $user->company_id)
-//     ->count();
-
-// $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
-//     ->where('company_id', $user->company_id)
-//     ->count();
-
-    // Get the authenticated user
-    $user = auth()->user();
-
-    // Define time periods before using them
-    $today = Carbon::today();
-    $thisWeek = Carbon::now()->startOfWeek();
-    $thisMonth = Carbon::now()->startOfMonth();
-
-    // Check if the user is Super Admin or Admin
-    if ($user->hasRole(['Super Administrator', 'Admin'])) {
-        // Show statistics for all companies
-        $dailyCount = Patient::whereDate('created_at', $today)->count();
-        $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
-        $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
-    } else {
-        // Show statistics only for the assigned company
-        $dailyCount = Patient::whereDate('created_at', $today)
-            ->where('company_id', $user->company_id)
-            ->count();
-        
-        $weeklyCount = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()])
-            ->where('company_id', $user->company_id)
-            ->count();
-        
-        $monthlyCount = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()])
-            ->where('company_id', $user->company_id)
-            ->count();
+        // Get statistics
+        $today = Carbon::today();
+        $thisWeek = Carbon::now()->startOfWeek();
+        $thisMonth = Carbon::now()->startOfMonth();
+    
+        $companyId = $request->company_id ?? ($staff ? $staff->company_id : null);
+    
+        $query = Patient::whereDate('created_at', $today);
+        $weeklyQuery = Patient::whereBetween('created_at', [$thisWeek, Carbon::now()]);
+        $monthlyQuery = Patient::whereBetween('created_at', [$thisMonth, Carbon::now()]);
+    
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+            $weeklyQuery->where('company_id', $companyId);
+            $monthlyQuery->where('company_id', $companyId);
+        }
+    
+        $dailyCount = $query->count();
+        $weeklyCount = $weeklyQuery->count();
+        $monthlyCount = $monthlyQuery->count();
+    
+        return view('hospital.index', compact('message', 'user', 'assignedCompany', 'companies', 'dailyCount', 'weeklyCount', 'monthlyCount', 'studentDetails'));
     }
-
-
-
-
     
-// Pie Chart Data (Annual Summary)
-$patientStats = Patient::whereYear('created_at', now()->year)
-    ->where('company_id', $user->company_id)
-    ->selectRaw('MONTH(created_at) as month, COUNT(*) as count')
-    ->groupBy('month')
-    ->pluck('count', 'month')
-    ->toArray();
-
-// Ensure all months are included
-$patientStats = array_replace(array_fill(1, 12, 0), $patientStats);
-
-
-return view('hospital.index', compact('message', 'user', 'assignedCompany', 'companies', 'dailyCount', 'weeklyCount', 'monthlyCount', 'studentDetails'));
-}
     
 public function show($id)
 {
@@ -253,6 +220,22 @@ public function receptionistPage()
 }
 
 
+// public function doctorPage()
+// {
+//     if (!auth()->user()->hasRole('Doctor')) {
+//         abort(403, 'You do not have access to this page.');
+//     }
+
+//     // Fetch approved patients and include related student details
+//     $patients = Patient::where('status', 'approved')
+//                 ->with('student:id,first_name,last_name') // Load only required fields
+//                 ->get();
+
+//     $excuseTypes = ExcuseType::all(); // ✅ Fix: Fetch excuse types for the dropdown
+
+//     return view('doctor.index', compact('patients', 'excuseTypes'));
+// }
+
 public function doctorPage()
 {
     if (!auth()->user()->hasRole('Doctor')) {
@@ -261,19 +244,21 @@ public function doctorPage()
 
     // Fetch approved patients and include related student details
     $patients = Patient::where('status', 'approved')
-                ->with('student:id,first_name,last_name') // Load only required fields
+                ->with('student:id,first_name,last_name')
                 ->get();
 
-    return view('doctor.index', compact('patients'));
+    // Fetch excuse names from excuse_types table
+    $excuseTypes = ExcuseType::pluck('excuseName', 'id');
 
-    
+    return view('doctor.index', compact('patients', 'excuseTypes'));
 }
+
 
 public function saveDetails(Request $request)
 {
     $request->validate([
         'student_id' => 'required|exists:patients,id',
-        'excuse_type' => 'required|string|max:255',
+        'excuse_type_id' => 'required|exists:excuse_types,id', // Fix: Validate against excuse_types table
         'rest_days' => 'required|integer|min:1',
         'doctor_comment' => 'required|string'
     ]);
@@ -282,7 +267,7 @@ public function saveDetails(Request $request)
     
     // Save doctor's input
     $patient->update([
-        'excuse_type' => $request->excuse_type,
+        'excuse_type_id' => $request->excuse_type_id, // Fix: Store excuse_type_id instead of excuse_type
         'rest_days' => $request->rest_days,
         'doctor_comment' => $request->doctor_comment,
         'status' => 'treated', // Mark as treated
@@ -290,6 +275,7 @@ public function saveDetails(Request $request)
 
     return redirect()->route('doctor.page')->with('success', 'Patient details saved successfully.');
 }
+
 
 
 public function sirMajorStatistics()
@@ -373,5 +359,30 @@ public function dispensaryPage(Request $request)
     return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies'));
 }
 
+
+// public function store(Request $request)
+// {
+//     $request->validate([
+//         'student_id' => 'required|exists:students,id',
+//         'excuse_type_id' => 'required|exists:excuse_types,id', // Validate excuse type
+//         'status' => 'required|in:pending,approved,rejected,treated',
+//         'staff_id' => 'required|exists:staff,id',
+//         'rest_days' => 'required|integer',
+//         'doctor_comment' => 'nullable|string',
+//     ]);
+
+//     Patient::create([
+//         'student_id' => $request->student_id,
+//         'excuse_type_id' => $request->excuse_type_id,
+//         'status' => $request->status,
+//         'staff_id' => $request->staff_id,
+//         'rest_days' => $request->rest_days,
+//         'doctor_comment' => $request->doctor_comment,
+//         'company_id' => auth()->user()->staff->company_id ?? null, // Get company_id from staff
+//         'platoon' => $request->platoon ?? null, // Ensure platoon is set
+//     ]);
+
+//     return redirect()->route('patients.index')->with('success', 'Patient record added successfully.');
+// }
 
 }

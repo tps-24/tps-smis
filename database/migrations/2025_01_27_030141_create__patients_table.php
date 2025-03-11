@@ -23,7 +23,6 @@ return new class extends Migration
             $table->foreignId('excuse_type_id')->constrained('excuse_types');
             $table->enum('status', ['pending', 'approved', 'rejected', 'treated'])->default('pending');
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
-    
             $table->integer('rest_days');
             $table->text('doctor_comment')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

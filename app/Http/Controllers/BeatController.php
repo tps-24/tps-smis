@@ -271,7 +271,7 @@ public function edit($beat_id){
                         $companyStudents = $femaleStudents->merge($maleStudents)->values();
                     } else {
                         // Adjust to ensure femaleCount is not equal to maleCount
-                        $femaleStudents = $femaleStudents->take($femaleCount + 2);
+                        $femaleStudents = $femaleStudents->take($femaleCount + 1);
                         $companyStudents = $maleStudents->merge($femaleStudents)->values();
                     }
                 }
@@ -281,6 +281,14 @@ public function edit($beat_id){
                     $preferredStudents = $companyStudents->where('gender', 'F');
                 } else {
                     $preferredStudents = $companyStudents->where('gender', 'M');
+                }
+
+                
+                // Prioritize muislims who fasted ... during morning and mid night
+                if ($startAt === '06:00' || $startAt === '00:00') {
+                    $preferredStudents = $companyStudents->where('fast_status', 1);
+                } else {
+                    $preferredStudents = $companyStudents->where('fast_status', 0);
                 }
 
                 if ($preferredStudents->isNotEmpty()) {

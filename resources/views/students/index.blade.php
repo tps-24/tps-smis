@@ -121,6 +121,8 @@
     @endcan
     
     </td>
+    
+    @can('beat-edit') 
     <td>
     @if($student->beat_status == '1')
       <form action="{{ route('students.deactivate_beat_status', $student->id) }}" method="POST"
@@ -144,6 +146,7 @@
       </form>
     @endif  
     </td>
+    @endcan()
     <script>
       // Listen for changes to the toggle
       document.getElementById('statusToggle{{ $student->id }}').addEventListener('change', function () {
@@ -151,6 +154,7 @@
       document.getElementById('toggleForm{{ $student->id }}').submit();
       });
     </script>
+    
 
     <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
       aria-labelledby="createNewContactLabel" aria-hidden="true">

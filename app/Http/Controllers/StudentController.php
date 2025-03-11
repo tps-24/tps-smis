@@ -681,4 +681,38 @@ class StudentController extends Controller
         }
         abort(404);
     }
+
+    public function updateFastStatus(Request $request, $studentId, $fastStatus){
+        $student = Student::findOrFail($studentId);
+        if(!$student){
+            return redirect()->back()->with('success', 'Student with the '.$studentId.' Id is not found.');
+        }
+
+        if($fastStatus == 1){
+            $student->fast_status = 1;
+        }
+        else if($fastStatus == 0){
+            $student->fast_status = 0;
+        }else{
+            return redirect()->route('students.index')->with('success','Please specify fasting status.');
+        }
+
+        $student->save();
+
+
+        return redirect()->route('students.index')->with('success','Fasting status updated successfully.');
+    }
+
+    public function toSafari($studentId){
+        $student = Student::findOrFail($studentId);
+        if(!$student){
+            return redirect()->back()->with('success', 'Student with the '.$studentId.' Id is not found.');
+        }
+
+            $student->beat_status = 4;
+        $student->save();   
+
+
+        return redirect()->route('students.index')->with('success','Beat status to Safari updated successfully.');
+    }
 }

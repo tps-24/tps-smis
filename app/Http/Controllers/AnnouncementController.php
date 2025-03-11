@@ -18,7 +18,7 @@ class AnnouncementController extends Controller
             $this->selectedSessionId = 1;
 
         $this->middleware('permission:announcement-list|announcement-create|announcement-edit', ['only' => ['index', 'show', 'edit']]);
-        $this->middleware('permission:attendance-create', ['only' => ['create', 'store', 'update']]);
+        $this->middleware('permission:announcement-create', ['only' => ['create', 'store', 'update']]);
         $this->middleware('permission:announcement-delete', ['only' => ['destroy']]);
 
 
@@ -50,9 +50,9 @@ class AnnouncementController extends Controller
             $expiresAt = Carbon::createFromFormat('Y-m-d\TH:i', $expiresAt);
         }
         foreach (Auth::user()->roles as $role) { {
-                $request->audience = Auth::user()->staff->company_id;
+                $request->audience = Auth::user()->staff->company_id?? $request->audience;
             }
-        }
+       }
         $announcement = new Announcement();
         $announcement->title = $request->title;
         $announcement->message = $request->message;
@@ -68,7 +68,7 @@ class AnnouncementController extends Controller
         if ($request->audience == "all") {
             $announcement->audience = $request->audience;
         } else {
-            $announcement->company_id = Auth::user()->staff->company_id;
+            $announcement->company_id = Auth::user()->staff->company_id?? $request->audience;
         }
         $announcement->save();
         broadcast(new NotificationEvent($announcement->title, $announcement->type, 'announcement', $announcement, $announcement->id));
