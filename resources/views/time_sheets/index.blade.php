@@ -50,6 +50,7 @@
                             <thead>
                                 <tr>
                                     <th></th>
+                                    <th>Staff</th>
                                     <th>Time(hours)</th>
                                     <th>Date</th>
                                     <th>Status</th>
@@ -61,6 +62,7 @@
                                 @foreach ($timesheets as $timesheet)
                                     <tr>
                                         <td>{{ ++$i}}.</td>
+                                        <td>{{ $timesheet->user->name}}</td>
                                         <td>{{ $timesheet->hours }}</td>
                                         <td>{{  Carbon::parse($timesheet->date)->format('d F, Y') }}</td>
                                         <td>{{ $timesheet->status }}</td>
@@ -90,7 +92,7 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title text-info" id="statusModalLabel{{  $timesheet->id ?? ''}}">
-                                                        Task Accomplished
+                                                        Task Accomplished by {{ $timesheet->user->name }}  
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>

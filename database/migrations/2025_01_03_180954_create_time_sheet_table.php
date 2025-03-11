@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('time_sheet', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->json('tasks');
             $table->string('description', 600);
             $table->enum('status', ['pending', 'approved','rejected'])->default('pending');

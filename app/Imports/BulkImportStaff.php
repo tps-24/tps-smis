@@ -24,9 +24,9 @@ class BulkImportStaff implements ToCollection,ToModel
     {
         $this->num++;
         if ($this->num > 5) {
-            // if (empty($row[1])) {
-            //     return;  // or you can use continue; depending on where the loop is
-            // }
+            if (empty($row[1])) {
+                return;  // or you can use continue; depending on where the loop is
+            }
             $user = new User();
             $user->name = $row[3]. " ". $row[4]. " ".$row[5];
             $user->email = $row[6] == null? trim(strtolower($row[3]).".".strtolower($row[5])."@tpf.go.tz") : trim($row[6]);

@@ -6,38 +6,20 @@
     @include('dashboard.partials.dashboard_content', compact('denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage'))
 </div>
 <!-- Row ends -->
- 
-<!-- Include Bootstrap and Chart.js -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- Row starts -->
 <div class="row gx-4">
     <div class="col-xxl-9 col-sm-12 col-12">
         <div class="card mb-4 card-height-420">
             <div class="card-header">
-                <h5 class="card-title">Grouped Bar Graph</h5> 
-                <select class="form-select" id="timeRange" onchange="updateChart()">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="custom">Custom</option>
-                </select>
+                <h5 class="card-title">Grouped Bar Graph</h5>
             </div>
             <div class="card-body">
 
             <div class="graph-body auto-align-graph">
                 
-    <div class="row">
-        <div class="col-md-12">            
-            <div class="mt-3" id="customDateRange" style="display: none;">
-                <input type="date" id="startDate" class="form-control mb-2" onchange="updateChart()">
-                <input type="date" id="endDate" class="form-control" onchange="updateChart()">
-            </div>
-            <canvas id="studentsStatusChart"></canvas>
-        </div>
-    </div>
-
+            
+                <div id="sales"></div>
             </div>
 
             </div>
@@ -118,63 +100,5 @@
             })
             .catch(error => console.error('Error loading data:', error));
     });
-
-
-    let chart;
-    const ctx = document.getElementById('studentsStatusChart').getContext('2d');
-
-    function updateChart() {
-        const timeRange = document.getElementById('timeRange').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        // AJAX request to get data from the server
-        fetch(`/dashboard/data?timeRange=${timeRange}&startDate=${startDate}&endDate=${endDate}`)
-            .then(response => response.json())
-            .then(data => {
-                if (chart) {
-                    chart.destroy();
-                }
-                chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.labels,
-                        datasets: [
-                            {
-                                label: 'Absents',
-                                data: data.absents,
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Sick',
-                                data: data.sick,
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Locked Up',
-                                data: data.lockedUp,
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            });
-    }
-
-
-
 </script>
 @endsection

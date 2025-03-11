@@ -7,7 +7,7 @@ class TimeSheet extends Model
 {
     protected $table = 'time_sheet';
     protected $fillable =[
-        'staff_id',
+        'user_id',
         'description',
         'tasks',
         'hours',
@@ -20,8 +20,8 @@ class TimeSheet extends Model
         'time_out' => 'datetime:H:i', // 
     ];
 
-    public function staff(){
-        return $this->belongsTo(User::class, 'staff_id', 'id');
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
     public function approvedBy(){
         return $this->belongsTo(User::class, 'approved_by', 'id');

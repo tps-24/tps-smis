@@ -50,9 +50,9 @@ class AnnouncementController extends Controller
             $expiresAt = Carbon::createFromFormat('Y-m-d\TH:i', $expiresAt);
         }
         foreach (Auth::user()->roles as $role) { {
-                $request->audience = Auth::user()->staff->company_id;
+                $request->audience = Auth::user()->staff->company_id?? $request->audience;
             }
-        }
+       }
         $announcement = new Announcement();
         $announcement->title = $request->title;
         $announcement->message = $request->message;
@@ -68,7 +68,7 @@ class AnnouncementController extends Controller
         if ($request->audience == "all") {
             $announcement->audience = $request->audience;
         } else {
-            $announcement->company_id = Auth::user()->staff->company_id;
+            $announcement->company_id = Auth::user()->staff->company_id?? $request->audience;
         }
         $announcement->save();
         broadcast(new NotificationEvent($announcement->title, $announcement->type, 'announcement', $announcement, $announcement->id));

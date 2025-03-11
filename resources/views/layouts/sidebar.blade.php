@@ -250,7 +250,7 @@
           <span class="menu-text">Sick Panel</span>
         </a>
         </li>
-      @endcan()
+        @endcan()
 
           @can('hospital-approve')
         <li>

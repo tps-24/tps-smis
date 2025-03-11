@@ -29,10 +29,9 @@ class CheckCourseInstructor
             ->exists();
 
         if (!$isInstructor) {
-            return redirect()->back()->with('error', 'You do not have access to this coursework.');
+            return redirect()->back()->with('error', 'You do not have access to this course or coursework.');
         }
 
         return $next($request);
     }
 }
-

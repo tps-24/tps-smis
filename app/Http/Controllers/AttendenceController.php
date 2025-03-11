@@ -429,12 +429,10 @@ class AttendenceController extends Controller
     public function day_report($companyId, $date)
     {
         $summary = [];
-        $company = Company::find($companyId);
-        $total_present = $total_absent = $total = 0;
-        $summary = [];
         $total_present = 0;
         $total_absent = 0;
         $total = 0;
+        $company = Company::find($companyId);
         foreach ($company->platoons as $platoon) {
             $attendances = $platoon->attendences()->whereDate('created_at', $date)->get();
             if ($attendances->isNotEmpty()) {
