@@ -32,7 +32,6 @@
   @endcan
     <div class="col-6 " style="float: right;">
       <form class="d-flex" action="{{route('students.search')}}" method="POST">
-      <!-- <div class="mx-auto p-2" style="width: 200px;"> Search </div> -->
       @csrf
       @method("POST")
       <div class="d-flex">

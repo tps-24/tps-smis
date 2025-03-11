@@ -211,6 +211,8 @@ Route::group(['middleware' => ['auth']], function () {
 
 Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
 Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
+Route::get('students/search_certificate/{companyId}', [FinalResultController::class, 'search'])->name('students.search_certificate');
+
 //Route::resource('students', StudentController::class);
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
@@ -277,14 +279,15 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
     Route::resource('visitors', MPSVisitorController::class);
     Route::resource('timesheets', TimeSheetController::class);
     Route::resource('guard-areas', GuardAreaController::class);
+    Route::resource('patrol-areas', PatrolAreaController::class);
 
 
     
     // Define the custom route first
 
     // routes/web.php
-Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
-
+    Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
+    Route::get('campanies/{campusId}', [GuardAreaController::class,'get_companies']);
 Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');

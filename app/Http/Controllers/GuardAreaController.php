@@ -18,6 +18,16 @@ class GuardAreaController extends Controller
     public function index()
     {
         $guardAreas = GuardArea::all();
+        $guardAreas = $guardAreas->map(function ($guardArea) {
+            if($guardArea->beat_exception_ids != NULL){
+              $guardArea->beat_exceptions = BeatException::whereIn('id', json_decode($guardArea->beat_exception_ids, true))->get(); 
+            }
+            if($guardArea->beat_time_exception_ids != NULL){
+                $guardArea->beat_time_exceptions = BeatException::whereIn('id', json_decode($guardArea->beat_time_exception_ids, true))->get(); 
+              }
+            return $guardArea;
+        });
+        //return $guardAreas;
         return view('guardArea.index', compact('guardAreas'));
     }
 
@@ -42,10 +52,10 @@ class GuardAreaController extends Controller
             'guard_area_name' => 'required',
             'company_id' => 'required|exists:companies,id',
             'campus_id' => 'required|exists:campuses,id',
-            'beat_exception_ids' => 'required|array',
-            'beat_exception_ids.*' => 'required|numeric|exists:beat_exceptions,id',
-            'beat_time_exception_ids' => 'required|array',
-            'beat_time_exception_ids.*' => 'required|numeric|exists:beat_time_exceptions,id',
+            'beat_exception_ids' => 'nullable|array',
+            'beat_exception_ids.*' => 'nullable|numeric|exists:beat_exceptions,id',
+            'beat_time_exception_ids' => 'nullable|array',
+            'beat_time_exception_ids.*' => 'nullable|numeric|exists:beat_time_exceptions,id',
             'number_of_guards' => 'required|numeric|min:1'
         ]);
 
@@ -55,11 +65,11 @@ class GuardAreaController extends Controller
                 'company_id' => $request->company_id,
                 'campus_id' => $request->campus_id,
                 'added_by' => $request->user()->id,
-                'beat_exception_ids' => $request->beat_exception_ids,
-                'beat_time_exception_ids' => $request->beat_time_exception_ids,
+                'beat_exception_ids' => $request->beat_exception_ids  ?  json_encode($request->beat_exception_ids): NULL,
+                'beat_time_exception_ids' => $request->beat_time_exception_ids? json_encode($request->beat_time_exception_ids): NULL,
                 'number_of_guards' => $request->number_of_guards
             ]);
-        return redirect()->route('guardArea.index')->with('success', "New guard area created successfully.");
+        return redirect()->route('guard-areas.index')->with('success', "New guard area created successfully.");
     }
 
     /**
@@ -77,33 +87,37 @@ class GuardAreaController extends Controller
     {
         $beatExceptions = BeatException::all();
         $beatTimeExceptions = BeatTimeException::all();
-        return view('guardArea.edit', compact('guardArea', 'beatExceptions', 'beatTimeExceptions'));
+        $campuses = Campus::all();
+        $companies = Company::where('campus_id', $guardArea->campus_id)->get();
+        return view('guardArea.edit', compact('guardArea','beatExceptions', 'beatTimeExceptions', 'campuses', 'companies'));
     }
-
-
-
-
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, GuardArea $guardArea)
     {
-        $data = $request->validate([
+        $request->validate([
+            'guard_area_name' => 'required',
+            'company_id' => 'required|exists:companies,id',
+            'campus_id' => 'required|exists:campuses,id',
             'beat_exception_ids' => 'nullable|array',
-            'beat_exception_ids.*' => 'integer',
+            'beat_exception_ids.*' => 'nullable|numeric|exists:beat_exceptions,id',
             'beat_time_exception_ids' => 'nullable|array',
-            'beat_time_exception_ids.*' => 'integer|nullable',
+            'beat_time_exception_ids.*' => 'nullable|numeric|exists:beat_time_exceptions,id',
+            'number_of_guards' => 'required|numeric|min:1'
         ]);
 
-        $data['beat_exception_ids'] = json_encode($data['beat_exception_ids']);
-        if (!empty($data['beat_time_exception_ids'])) {
-            $data['beat_time_exception_ids'] = json_encode($data['beat_time_exception_ids']);
-        }
+        $guardArea->name = $request->guard_area_name;
+        $guardArea->company_id = $request->company_id;
+        $guardArea->campus_id = $request->campus_id;
 
-        $guardArea->update($data);
+        $guardArea->beat_exception_ids = $request->beat_exception_ids  ?  json_encode($request->beat_exception_ids): NULL;
+        $guardArea->beat_time_exception_ids = $request->beat_time_exception_ids? json_encode($request->beat_time_exception_ids): NULL;
+        $guardArea->number_of_guards = $request->number_of_guards;
+         $guardArea->save();
 
-        return redirect()->route('guard-areas.index');
+        return redirect()->route('guard-areas.index')->with('success','Guard Area Updated successfully.');
     }
 
     // public function update(Request $request, GuardArea $guardArea)
@@ -131,8 +145,14 @@ class GuardAreaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(GuardArea $guardArea)
     {
-        //
+        $guardArea->delete();
+        return redirect()->route('guard-areas.index')->with('success','Guard area deleted successfully.');
+    }
+
+    public function get_companies($campus_id){
+        $companies = Company::where('campus_id', $campus_id)->get();
+        return response()->json($companies);
     }
 }

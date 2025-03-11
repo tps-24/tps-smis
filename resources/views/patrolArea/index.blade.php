@@ -1,92 +1,164 @@
 @extends('layouts.main')
 
 @section('scrumb')
-<!-- Scrumb starts -->
-<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
-  <div class="container-fluid">
+  <!-- Scrumb starts -->
+  <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+    <div class="container-fluid">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Course</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">Course Lists</a></li>
+      <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
+      <li class="breadcrumb-item"><a href="#">Course</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="#">Course Lists</a></li>
       </ol>
     </nav>
-  </div>
-</nav>
-<!-- Scrumb ends -->
- 
+    </div>
+  </nav>
+  <!-- Scrumb ends -->
+
 @endsection
 @section('content')
-<!-- Row starts -->
-<div class="row gx-4">
-  <div class="col-sm-12">
+  @session('success')
+    <div class="alert alert-success alert-dismissible " role="alert">
+    {{ $value }}
+    </div>
+  @endsession
+  <!-- Row starts -->
+  <div class="row gx-4">
+    <div class="col-sm-12">
     <div class="card mb-3">
       <div class="card-header">
-        
+
       </div>
-      <div class="pull-right" >
-          <a class="btn btn-success mb-2" href="{{ route('patrol-areas.create') }}" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Patrol Area</a>
+      <div class="pull-right">
+      <a class="btn btn-success mb-2" href="{{ route('patrol-areas.create') }}"
+        style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Patrol Area</a>
       </div>
-      
-
-
-
-
-      <!-- resources/views/patrol_areas/index.blade.php -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patrol Areas</title>
-</head>
-<body>
-    <h1>Patrol Areas</h1>
-    <table>
+      <h1>Patrol Areas</h1>
+      <div class="table-outer">
+      <div class="table-responsive">
+        <table class="table table-striped truncate m-0">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Start Area</th>
-                <th>End Area</th>
-                <th>Company ID</th>
-                <th>Campus ID</th>
-                <th>Added By</th>
-                <th>Number of Guards</th>
-                <th>Beat Exception IDs</th>
-                <th>Beat Time Exception IDs</th>
-                <th>Actions</th>
-            </tr>
+          <tr>
+          <th></th>
+          <th>Start Area</th>
+          <th>End Area</th>
+          <th>Company </th>
+          <th>Campus </th>
+          <th>Added By</th>
+          <th>Guards</th>
+          <th>Actions</th>
+          </tr>
         </thead>
         <tbody>
-            @foreach ($patrolAreas as $patrolArea)
-                <tr>
-                    <td>{{ $patrolArea->id }}</td>
-                    <td>{{ $patrolArea->start_area }}</td>
-                    <td>{{ $patrolArea->end_area }}</td>
-                    <td>{{ $patrolArea->company_id }}</td>
-                    <td>{{ $patrolArea->campus_id }}</td>
-                    <td>{{ $patrolArea->added_by }}</td>
-                    <td>{{ $patrolArea->number_of_guards }}</td>
-                    <td>{{ $patrolArea->beat_exception_ids }}</td>
-                    <td>{{ $patrolArea->beat_time_exception_ids }}</td>
-                    <td>
-                        <a href="{{ route('patrol-areas.show', $patrolArea->id) }}">View</a>
-                        <a href="{{ route('patrol-areas.edit', $patrolArea->id) }}">Edit</a>
-                        <form action="{{ route('patrol-areas.destroy', $patrolArea) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
+          @php
+        $i = 0;
+      @endphp
+          @foreach ($patrolAreas as $patrolArea)
+        <tr>
+        <td>{{ ++$i }}.</td>
+        <td>{{ $patrolArea->start_area }}</td>
+        <td>{{ $patrolArea->end_area }}</td>
+        <td>{{ $patrolArea->company->name }}</td>
+        <td>{{ $patrolArea->campus->campusName }}</td>
+        <td>{{ $patrolArea->addedBy->name }}</td>
+        <td>{{ $patrolArea->number_of_guards }}</td>
+        <td>
+        <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+        data-bs-target="#statusModal{{ $patrolArea->id ?? ''}}">
+        More
+        </button>
+        <form id="deleteForm{{ $patrolArea->id }}" action="{{ route('patrol-areas.destroy', $patrolArea) }}"
+        method="POST" style="display:inline;">
+        @csrf
+        @method('DELETE')
+        <button class="btn btn-sm btn-danger" onclick="confirmDelete()" type="button">Delete</button>
+        </form>
+        <script>
+        function confirmDelete() {
+          // SweetAlert confirmation
+          Swal.fire({
+          title: 'Delete Patrol Area?',
+          text: "This action cannot be undone.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'No, cancel!',
+          reverseButtons: true
+          }).then((result) => {
+          if (result.isConfirmed) {
+          // If confirmed, submit the form
+          document.getElementById('deleteForm{{ $patrolArea->id }}').submit();
+          }
+          });
+        }
+        </script>
+        </td>
+
+        <div class="modal fade" id="statusModal{{  $patrolArea->id ?? '' }}" tabindex="-1"
+        aria-labelledby="statusModalLabel{{  $patrolArea->id ?? '' }}" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+          <h5 class="modal-title" id="statusModalLabel{{  $patrolArea->id ?? ''}}">
+          {{ $patrolArea->start_area }} to {{ $patrolArea->end_area }} Exceptions
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          <div class="mb-2">
+          <span>Number of guards: {{ $patrolArea->number_of_guards }}</span>
+          </div>
+          <div class="mb-4">
+          <h3> Beat Exceptions </h3>
+          </div>
+          @if($patrolArea->beat_exceptions && $patrolArea->beat_exceptions->isNotEmpty())
+        <ol>
+        @foreach ($patrolArea->beat_exceptions as $beat_exception)
+      <li>{{ $beat_exception->name }}</li>
+    @endforeach
+        </ol>
+      @else
+      <div>
+      <h4>No Beat Exceptions</h4>
+      </div>
+    @endif
+          <div class="mb-4 mt-4">
+          <h3> Beat Time Exceptions </h3>
+          </div>
+          @if($patrolArea->beat_exceptions && $patrolArea->beat_exceptions->isNotEmpty())
+        <ol>
+        @foreach ($patrolArea->beat_time_exceptions as $beat_time_exception)
+      <li>{{ $beat_time_exception->name }}</li>
+    @endforeach
+        </ol>
+      @else
+      <div>
+      <h4>No Beat Exceptions</h4>
+      </div>
+    @endif
+          <div class="modal-footer">
+          <div class="d-flex gap-2 justify-content-center">
+          <a class="btn btn-sm btn-primary"
+            href="{{ route('patrol-areas.edit', $patrolArea) }}">Edit</a>
+          </div>
+          </div>
+          </div>
+        </div>
+        </div>
+        </div>
+        </tr>
+      @endforeach
         </tbody>
-    </table>
-</body>
-</html>
+        </table>
+      </div>
+      </div>
 
     </div>
+    </div>
   </div>
-</div>
-<!-- Row ends -->
+  <!-- Row ends -->
+
+  <!-- Include SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @endsection

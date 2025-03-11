@@ -51,7 +51,7 @@
                                     <div class="card-body">
                                         <div class="m-0">
                                             <label class="form-label" for="abc">Guard Area Name</label>
-                                            <input type="text" class="form-control" id="hours" name="guard_area_name"
+                                            <input type="text" class="form-control" id="guard_area_name" name="guard_area_name"
                                                 required placeholder="CRO MPS" value="{{old('guard_area_name')}}">
                                         </div>
                                         @error('guard_area_name')
@@ -80,8 +80,8 @@
                                 <div class="card mb-2">
                                     <div class="card-body">
                                         <div class="m-0">
-                                            <label class="form-label" for="abc">Compus</label>
-                                            <select class="form-control" name="campus_id" id="campus" required>
+                                            <label class="form-label" for="abc">Campus</label>
+                                            <select class="form-control" name="campus_id" id="campuses" required>
                                                 <option value="" disabled selected>select campus</option>
                                                 @foreach ($campuses as $campus)
                                                     <option value="{{ $campus->id }}">{{ $campus->campusName }}</option>
@@ -100,14 +100,12 @@
                                     <div class="card-body">
                                         <div class="m-0">
                                             <label class="form-label" for="abc">Company</label>
-                                            <select class="form-control" name="campus_id" id="campus" required>
+                                            <select class="form-control" name="company_id" id="companies" required>
                                                 <option value="" disabled selected>select company</option>
-                                                @foreach ($companies as $company)
-                                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                                @endforeach
+
                                             </select>
                                         </div>
-                                        @error('campus_id')
+                                        @error('company_id')
                                             <div class="error">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -164,4 +162,25 @@
 
         </div>
     </div>
+    <script>
+    document.getElementById('campuses').addEventListener('change', function () {
+        var campusId = this.value;
+        var companiesSelect = document.getElementById('companies');
+        companiesSelect.innerHTML = '<option value="">Select a company</option>'; // Clear previous options
+        var link = '/tps-smis/campanies/' + campusId;
+        if (campusId) {
+            fetch(link)
+                .then(response => response.json())
+                .then(companies => {
+                    companies.forEach(company => {
+                        var option = document.createElement('option');
+                        option.value = company.id;
+                        option.text = company.name;
+                        companiesSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching platoons:', error));
+        }
+    });
+</script>
 @endsection
