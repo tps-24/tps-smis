@@ -171,7 +171,7 @@ Route::group(['middleware' => ['auth']], function () {
         return view('staffs.bulk_upload_explanation');
     })->name('uploadStaff');
   
-    
+    Route::post('staff/search', [StaffController::class, 'search'])->name('staff.search');
     Route::get('/assign-instructors', [StaffProgrammeCourseController::class, 'showAssignInstructorsForm'])->name('assign.instructors.form');
     Route::post('/assign-instructors', [StaffProgrammeCourseController::class, 'assignInstructors'])->name('assign.instructors');
 
@@ -245,6 +245,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
+    Route::post('users/search', [UserController::class, 'search'])->name('users.search');
     
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::post('/students/{id}/approve', [StudentController::class, 'approveStudent'])->name('students.approve');

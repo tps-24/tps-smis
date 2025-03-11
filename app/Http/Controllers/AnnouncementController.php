@@ -18,7 +18,7 @@ class AnnouncementController extends Controller
             $this->selectedSessionId = 1;
 
         $this->middleware('permission:announcement-list|announcement-create|announcement-edit', ['only' => ['index', 'show', 'edit']]);
-        $this->middleware('permission:attendance-create', ['only' => ['create', 'store', 'update']]);
+        $this->middleware('permission:announcement-create', ['only' => ['create', 'store', 'update']]);
         $this->middleware('permission:announcement-delete', ['only' => ['destroy']]);
 
 

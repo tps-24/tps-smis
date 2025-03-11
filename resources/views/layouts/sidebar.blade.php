@@ -68,9 +68,11 @@
         <li>
         <a href="{{ route('staffs.index') }}">Staff Details</a>
         </li>
+        @can('staff-create')
         <li>
         <a href="{{ route('staffs.create') }}">Staff Registration</a>
         </li>
+        @endcan()
       </ul>
       </li>
     @endcan()
@@ -96,6 +98,49 @@
       </ul>
       </li>
     @endcan()
+
+    <li class="treeview">
+        <a href="#!">
+          <i class="bi bi-heart-pulse"></i>
+          <span class="menu-text">Hospital</span>
+        </a>
+        <ul class="treeview-menu">
+        @can('hospital-dashboard')
+          <li>
+            <a href="{{ route('dispensary.page') }}">Hospital Dashboard</a>
+          </li>
+        @endcan()
+
+        @can('hospital-create')
+        <li>
+        <a href="{{ route('hospital.index') }}">
+          <i class="bi bi-hospital"></i>
+          <span class="menu-text">Sick Panel</span>
+        </a>
+        </li>
+        @endcan()
+
+          @can('hospital-approve')
+        <li>
+        <a href="{{ route('receptionist.index') }}">
+          <i class="bi bi-person-lines-fill"></i>
+          <span class="menu-text">Receptionist Panel</span>
+        </a>
+        </li>
+      @endcan()
+
+
+        @can('hospital-edit')
+        <li>
+        <a href="{{ route('doctor.page') }}">
+          <i class="bi bi-stethoscope"></i>
+          <span class="menu-text">Doctor Panel</span>
+        </a>
+        </li>
+        @endcan()
+        </ul>
+      </li>
+
       @can('academic-view')
       <li class="treeview">
       <a href="#!">
@@ -232,48 +277,6 @@
         </a>
       </li>
 
-
-      <li class="treeview">
-        <a href="#!">
-          <i class="bi bi-hospital"></i>
-          <span class="menu-text">Hospital</span>
-        </a>
-        <ul class="treeview-menu">
-          <li>
-            <a href="{{ route('dispensary.page') }}">Hospital Dashboard</a>
-          </li>
-
-          @can('hospital-create')
-        <li>
-        <a href="{{ route('hospital.index') }}">
-          <i class="bi bi-hospital"></i>
-          <span class="menu-text">Sick Panel</span>
-        </a>
-        </li>
-        @endcan()
-
-          @can('hospital-approve')
-        <li>
-        <a href="{{ route('receptionist.index') }}">
-          <i class="bi bi-person-lines-fill"></i>
-          <span class="menu-text">Receptionist Panel</span>
-        </a>
-        </li>
-      @endcan()
-
-
-          @can('hospital-update')
-        <li>
-        <a href="{{ route('doctor.page') }}">
-          <i class="bi bi-stethoscope"></i>
-          <span class="menu-text">Doctor Panel</span>
-        </a>
-        </li>
-      @endcan()
-        </ul>
-      </li>
-
-
       @can('mps-list')
       <li class="treeview">
       <a href="!#">
@@ -308,9 +311,11 @@
         <span class="menu-text">Guards &amp; Patrols</span>
       </a>
       <ul class="treeview-menu">
+        @can('beat-create')
         <li>
         <a href="{{url('beats')}}">Generate Beat</a>
         </li>
+        @endcan()
         <li>
         <a href="{{url('/report/generate')}}">Beat History</a>
         </li>

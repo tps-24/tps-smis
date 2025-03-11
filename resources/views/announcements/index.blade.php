@@ -24,9 +24,11 @@
     @endsession  
 
 
+    @can('announcement-create')  
     <div style="display: flex; justify-content: end;">
         <a href="{{ route('announcements.create') }}"><button class="btn btn-sm btn-success">New</button></a>
     </div>
+    @endcan()
     <div class="card">
         <div class="card-body">
 

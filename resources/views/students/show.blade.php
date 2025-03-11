@@ -50,22 +50,30 @@
 
                 <div class="d-flex justify-content-end mt-3 gap-2">
                   @if(!($student->beat_status == 0  || $student->beat_status == 2  || $student->beat_status == 3) )
-                <a class="btn btn-primary"
+                        @can('beat-edit')  
+                        <a class="btn btn-{{ $student->beat_status == 4 ? 'primary' : 'warning'}}"
                         href="{{ route('students.toSafari', ['studentId' => $student->id ]) }}">
-                        {{ $student->beat_status == 4 ? 'Back To' : 'To  Safari' }}</a>
-                        @endif
-                    <a class="btn btn-primary"
-                        href="{{ route('updateFastingStatus', ['studentId' => $student->id, 'fastingStatus' => $student->fast_status == 0 ? 1 : 0]) }}">
-                        {{ $student->fast_status == 0 ? 'To Fasting' : 'To Not Fasting' }}</a>
+                        {{ $student->beat_status == 4 ? 'Return' : 'Safari' }}</a>    
+                        @endcan()
+                    @endif
+                        @can('beat-edit')  
+                        <a class="btn btn-{{ $student->fast_status == 0 ? 'secondary' : 'primary' }}"
+                            href="{{ route('updateFastingStatus', ['studentId' => $student->id, 'fastingStatus' => $student->fast_status == 0 ? 1 : 0]) }}">
+                            {{ $student->fast_status == 0 ? 'Fasting' : 'Not Fasting' }}</a>
+                        @endcan()
                     @if ($student->status === 'pending')
                     <form action="{{ route('students.approve', $student->id) }}" method="POST" style="display:inline">
                         @csrf
+                        @can('student-approve')  
                         <button type="submit" class="btn btn-warning" style="margin-right:5px">Approve</button>
+                        @endcan()
                     </form>
                     @else
                     <button class="btn btn-success btn-sm" style="margin-right:5px">Approved</button>
                     @endif
+                    @can('student-edit')  
                     <button class="btn btn-danger me-2">Edit Profile</button>
+                    @endcan()
                     <button class="btn btn-success">Active</button>
                     <div class="pull-right" style="margin-left:5px">
                         <a class="btn btn-primary" href="{{ route('students.index') }}"> Back</a>

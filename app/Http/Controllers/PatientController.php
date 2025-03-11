@@ -31,7 +31,7 @@ class PatientController extends Controller
             'approvePatient'
         ]);
 
-        $this->middleware('permission:hospital-update')->only([
+        $this->middleware('permission:hospital-edit')->only([
             'saveDetails',
             'doctorPage'
         ]);

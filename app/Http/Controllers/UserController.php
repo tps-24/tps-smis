@@ -30,11 +30,41 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $data = User::latest()->paginate(20);
+        $users = User::latest()->paginate(20);
+        $roles = Role::all();
   
-        return view('users.index',compact('data'))
+        return view('users.index',compact('users','roles'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
     }
+
+    public function search(Request $request)
+    {
+        // $roleName = $request->role;
+        // $roleExists = Role::where('id', $roleName)->exists();
+        // dd($roleExists);
+
+
+        $users = User::whereHas('roles', function($query) use ($request) {
+            $query->where('id', $request->role);
+        })->orderBy('name');
+
+        // dd($users);
+    
+        if ($request->name) {
+            $users = $users->where(function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->name . '%')
+                      ->orWhere('email', 'like', '%' . $request->name . '%');
+            });
+        }
+    
+        $roles = Role::all();
+    
+        $users = $users->latest()->paginate(20);
+    
+        return view('users.index', compact('users', 'roles'))
+            ->with('i', ($request->input('page', 1) - 1) * 20);
+    }
+    
     
     /**
      * Show the form for creating a new resource.

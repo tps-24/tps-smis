@@ -35,7 +35,7 @@
     }
 
     // Get the selected session ID from the session
-    $selectedSessionId = session('selected_session', $sessionProgrammes->first()->id);
+    $selectedSessionId = session('selected_session');
     @endphp
 
     @can('programme-session-list')
