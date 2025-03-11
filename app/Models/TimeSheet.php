@@ -8,7 +8,8 @@ class TimeSheet extends Model
     protected $table = 'time_sheet';
     protected $fillable =[
         'staff_id',
-        'task',
+        'description',
+        'tasks',
         'hours',
         'date'
     ];

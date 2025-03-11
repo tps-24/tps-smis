@@ -10,7 +10,6 @@ use App\Models\Course;
 use App\Models\User;
 use App\Models\ProgrammeCourseSemester;
 use App\Models\CourseInstructor;
-namespace App\Http\Controllers;
 
 
 
@@ -21,7 +20,7 @@ class StaffProgrammeCourseController extends Controller
      */
     public function getAssignedInstructors(Request $request, $programmeCourseId)
     {
-        dd($request);
+        // dd($request);
         $programmeCourse = StaffProgrammeCourse::find($programmeCourseId);
 
         if (!$programmeCourse) {
@@ -71,6 +70,7 @@ class StaffProgrammeCourseController extends Controller
 
     public function assignInstructors(Request $request)
     {
+        // dd($request);
         // Validate the incoming request data
         $validatedData = $request->validate([
             'programme_id' => 'required|exists:programmes,id',

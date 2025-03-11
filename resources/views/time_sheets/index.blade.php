@@ -89,14 +89,24 @@
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="statusModalLabel{{  $timesheet->id ?? ''}}">
-                                                            Task Description
+                                                        <h5 class="modal-title text-info" id="statusModalLabel{{  $timesheet->id ?? ''}}">
+                                                        Task Accomplished
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        {{ $timesheet->task }}
+                                                    <ol class="mb-4">
+                                                        @for($i = 0; $i<count(json_decode($timesheet->tasks)); ++$i)
+                                                            <li>{{json_decode($timesheet->tasks)[$i]}}</li>
+                                                        @endfor
+                                                    </ol>
+                                                        <div>
+                                                            <div class="mb-2 text-info">Description</div>
+                                                            <p> {{ $timesheet->description }}</p>
+                                                        </div>
+                                                       
+
                                                     </div>
                                                     @can('viewAny', $timesheet)
                                                     <div class="modal-footer">

@@ -39,14 +39,17 @@ class TimeSheetController extends Controller
     {
         
         $request->validate([
-            'task' => 'required|string|max:500',
+            'description' => 'required|string|max:500',
+            'tasks' => 'required|array',
+            'tasks.*' => 'required|string|max:255', // Ensure each task is a string with a max length
             'hours' => 'required|numeric',
             'date' => 'required|date'
         ]);
 
         TimeSheet::create([
             'staff_id' => $request->user()->staff->id,
-            'task' => $request->task,
+            'description' => $request->description,
+            'tasks' => json_encode($request->tasks), 
             'hours' => $request->hours,
             'date' => $request->date
         ]);
@@ -80,17 +83,20 @@ class TimeSheetController extends Controller
     public function update(Request $request, TimeSheet $timeSheet, $timeSheetId)
     {
         $validated = $request->validate([
-            'task' => 'required|string|max:255',
+            'description' => 'required|string|max:500',
+            'tasks' => 'required|array',
+            'tasks.*' => 'required|string|max:255', // Ensure each task is a string with a max length
             'hours' => 'required|numeric',
-            'date' => 'required|date',
+            'date' => 'required|date'
         ]);    
         $timeSheet = TimeSheet::findOrFail($timeSheetId);
         if(!Gate::allows('update-timesheet', $timeSheet)){
             abort(403);
           }
-        $timeSheet -> task= $request->task;
+        $timeSheet -> tasks= json_encode($request->tasks);
         $timeSheet -> hours= $request->hours;
         $timeSheet -> date= $request->date;
+        $timeSheet -> description= $request->description;
         $timeSheet->save();
         return redirect()->route('timesheets.index')->with('success', 'Timesheet updated successfully.');
 
