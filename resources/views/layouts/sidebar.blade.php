@@ -294,11 +294,13 @@
       </li>
     @endcan()
       <li>
-        <a href="#">
+        <a href="{{route('leaves.index')}}">
           <i class="bi bi-mouse3"></i>
           <span class="menu-text">Leave(s)</span>
         </a>
       </li>
+
+
       @can('beat-list')
       <li class="treeview">
       <a href="!#">

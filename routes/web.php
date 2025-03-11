@@ -41,7 +41,7 @@ use App\Http\Controllers\MPSVisitorController;
 use App\Http\Controllers\StaffProgrammeCourseController;
 use App\Http\Controllers\TimeSheetController;
 use Carbon\Carbon;
-
+use App\Http\Controllers\LeaveController;
 
 require __DIR__ . '/auth.php';
 
@@ -478,5 +478,13 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
     ->name('downloads.delete')
     ->middleware('auth'); // Requires login to delete
 
+   
+//Leaves Routes
 
-//Route::get('test', [AttendenceController::class,'generatePdf']);
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leaves.index');
+    Route::post('/leave-requests/{id}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
+    Route::post('/leave-requests/{id}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+});
