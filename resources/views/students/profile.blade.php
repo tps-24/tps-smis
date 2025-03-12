@@ -121,7 +121,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-person"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="forceNumber" value="{{$user->student->force_number}}" Disabled>
+                                          <input type="text" class="form-control" id="forceNumber" value="{{$user->student->force_number ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -137,7 +137,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-person"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="fullName" value="{{$user->student->first_name}} {{$user->student->middle_name}} {{$user->student->last_name}}" Disabled>
+                                          <input type="text" class="form-control" id="fullName" value="{{$user->student->first_name ?? ''}} {{$user->student->middle_name ?? ''}} {{$user->student->last_name ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -168,7 +168,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-phone"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="contactNumber" value="{{$user->student->phone}}" Disabled>
+                                          <input type="text" class="form-control" id="contactNumber" value="{{$user->student->phone ?? ''}}" Disabled>
                                         </div>
 
                                       </div>
@@ -184,7 +184,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-calendar4"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="birthDay"  value="{{$user->student->dob}}" Disabled>
+                                          <input type="text" class="form-control" id="birthDay"  value="{{$user->student->dob ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -202,9 +202,9 @@
                                             <div class="card-body" style="background-color:rgb(209, 209, 214);">
                                                 <div class="d-flex align-items-center">
                                                     <div class="p-3  me-3">
-                                                        <p>Enrolled Course: {{$user->student->programme->programmeName}}</p>
-                                                        <p>NIDA: {{$user->student->nin}}</p>
-                                                        <p>Gender: {{$user->student->gender}}</p>
+                                                        <p>Enrolled Course: {{$user->student->programme->programmeName ?? ''}}</p>
+                                                        <p>NIDA: {{$user->student->nin ?? ''}}</p>
+                                                        <p>Gender: {{$user->student->gender ?? ''}}</p>
                                                     </div>
                                                 </div>
                                             </div>

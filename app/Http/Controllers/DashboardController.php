@@ -12,6 +12,7 @@ use App\Models\Attendence;
 use App\Models\Beat;
 use App\Models\Patient;
 use App\Models\Staff;
+use App\Models\Announcement;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -65,6 +66,13 @@ class DashboardController extends Controller
             ->selectRaw('platoon, COUNT(*) as count')
             ->groupBy('platoon')
             ->pluck('count', 'platoon');
+        
+            
+        $recentAnnouncements = Announcement::where('expires_at', '>', Carbon::now())
+                                            ->orderBy('created_at', 'desc')
+                                            ->take(4)
+                                            ->get();
+            
 
 
 
@@ -89,7 +97,7 @@ class DashboardController extends Controller
             $staffsCount = Staff::count('forceNumber');
             $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
 
-            return view('dashboard.dashboard', compact('selectedSessionId', 'denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage'));
+            return view('dashboard.dashboard', compact('selectedSessionId', 'denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage', 'recentAnnouncements'));
         }
     }
 

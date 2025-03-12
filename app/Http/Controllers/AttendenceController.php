@@ -374,23 +374,26 @@ class AttendenceController extends Controller
         $platoon = Platoon::find($platoon_id);
         $students = Student::where('company_id', $platoon->company_id)
             ->where('session_programme_id', $this->selectedSessionId)
-            ->where('platoon', $platoon->id)
+            ->where('platoon', $platoon->name)
             ->pluck('id')->toArray();
-            $male = Student::where('company_id', $platoon->company_id)
+        
+        $male = Student::where('company_id', $platoon->company_id)
             ->where('session_programme_id', $this->selectedSessionId)
-            ->where('platoon', $platoon->id)
+            ->where('platoon', $platoon->name)
             ->where('gender', 'M')
             ->count();
         
         $female = Student::where('company_id', $platoon->company_id)
             ->where('session_programme_id', $this->selectedSessionId)
-            ->where('platoon', $platoon->id)
+            ->where('platoon', $platoon->name)
             ->where('gender', 'F')
             ->count();
         
         $absent_ids = array_values(array_diff($students, $ids));
 
         $total = count($students);
+        
+        
         $todayRecords = Attendence::leftJoin('platoons', 'attendences.platoon_id', 'platoons.id')
             ->where('attendences.platoon_id', $platoon_id)
             ->whereDate('attendences.created_at', Carbon::today())->get();
@@ -418,7 +421,7 @@ class AttendenceController extends Controller
             'mess' => 0,
             'female' => $female,
             'male' => $male,
-            'absent_student_ids' => implode(',', $absent_ids),
+            'absent_student_ids' => json_encode($absent_ids),
             'total' => $total
         ]);
         return redirect()->route('attendences.index')->with('page', $page);

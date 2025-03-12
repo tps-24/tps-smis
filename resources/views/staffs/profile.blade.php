@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('style')
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"> -->
 <style>
 .back{
   border-radius: 30% !important;
