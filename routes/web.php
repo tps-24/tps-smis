@@ -171,7 +171,7 @@ Route::group(['middleware' => ['auth']], function () {
         return view('staffs.bulk_upload_explanation');
     })->name('uploadStaff');
   
-    
+    Route::post('staff/search', [StaffController::class, 'search'])->name('staff.search');
     Route::get('/assign-instructors', [StaffProgrammeCourseController::class, 'showAssignInstructorsForm'])->name('assign.instructors.form');
     Route::post('/assign-instructors', [StaffProgrammeCourseController::class, 'assignInstructors'])->name('assign.instructors');
 
@@ -245,6 +245,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
+    Route::post('users/search', [UserController::class, 'search'])->name('users.search');
     
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::post('/students/{id}/approve', [StudentController::class, 'approveStudent'])->name('students.approve');
@@ -277,6 +278,22 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
     Route::resource('announcements', AnnouncementController::class);
     Route::resource('visitors', MPSVisitorController::class);
     Route::resource('timesheets', TimeSheetController::class);
+    Route::resource('guard-areas', GuardAreaController::class);
+    Route::resource('patrol-areas', PatrolAreaController::class);
+
+
+    
+    // Define the custom route first
+
+    // routes/web.php
+    Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
+    Route::get('campanies/{campusId}', [GuardAreaController::class,'get_companies']);
+    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
+
+
+
     Route::resource('grading_systems', GradingSystemController::class); 
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);
@@ -335,6 +352,8 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
         Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
         Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
         Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
+
+        Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 

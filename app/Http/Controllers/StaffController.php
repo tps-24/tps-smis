@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Staff;
+use App\Models\Company;
 use App\Models\User;
 use App\Imports\BulkImportStaff;
 use Maatwebsite\Excel\Facades\Excel;
@@ -20,13 +21,23 @@ use Auth;
 
 class StaffController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:staff-list|staff-create|staff-edit|staff-delete', ['only' => ['index','view']]);
+         $this->middleware('permission:staff-create', ['only' => ['create','store','import']]);
+         $this->middleware('permission:staff-edit', ['only' => ['edit','update','updateProfile']]);
+         $this->middleware('permission:staff-delete', ['only' => ['destroy']]);
+         $this->middleware('permission:staff-profile', ['only' => ['profile']]);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
+        $companies = Company::all();
         $staffs = Staff::orderBy('id','DESC')->paginate(10);
-        return view('staffs.index',compact('staffs'))
+        return view('staffs.index',compact('staffs', 'companies'))
             ->with('i', ($request->input('page', 1) - 1) * 10);
     }
 
@@ -247,5 +258,24 @@ class StaffController extends Controller
             return response()->download($path);
         }
         abort(404);
+    }
+    public function search(Request $request)
+    {
+
+        $staffs = Staff::where('company_id', $request->company_id)
+                    ->orderBy('firstName');
+
+        if ($request->name) {
+            $staffs = $staffs->where(function ($query) use ($request) {
+                $query->where('firstName', 'like', '%' . $request->name . '%')
+                    ->orWhere('lastName', 'like', '%' . $request->name . '%')
+                    ->orWhere('middleName', 'like', '%' . $request->name . '%');
+            });
+        }
+        $companies = Company::all();
+        $staffs = $staffs->latest()->paginate(10);
+        return view('staffs.index',compact('staffs', 'companies'))
+        ->with('i', ($request->input('page', 1) - 1) * 10);
+
     }
 }

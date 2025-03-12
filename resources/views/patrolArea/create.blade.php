@@ -6,8 +6,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-                    <li class="breadcrumb-item"><a href="#">Guard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><a href="#">Guard Areas</a></li>
+                    <li class="breadcrumb-item"><a href="#">Patrol</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a href="#">Patrol Areas</a></li>
                 </ol>
             </nav>
         </div>
@@ -22,10 +22,10 @@
                     <div class="row">
                         <div class="col-lg-12 margin-tb">
                             <div class="pull-left">
-                                <h2>Add New Guard Area</h2>
+                                <h2>Add New Patrol Area</h2>
                             </div>
                             <div class="pull-right">
-                                <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('guard-areas.index') }}"><i
+                                <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('patrol-areas.index') }}"><i
                                         class="fa fa-arrow-left"></i> Back</a>
                             </div>
                         </div>
@@ -42,20 +42,19 @@
                     @endif
 
 
-                    <form method="POST" action="{{ route('guard-areas.update', $guardArea) }}">
+                    <form method="POST" action="{{ route('patrol-areas.store') }}">
                         @csrf
-                        @method('PUT')
+                        @method('POST')
                         <div class="row gx-4">
                             <div class="col-sm-12 col-12">
                                 <div class="card mb-2">
                                     <div class="card-body">
                                         <div class="m-0">
-                                            <label class="form-label" for="abc">Guard Area Name</label>
-                                            <input type="text" class="form-control" id="hours" name="guard_area_name"
-                                                required placeholder="CRO MPS"
-                                                value="{{old('guard_area_name', $guardArea->name)}}">
+                                            <label class="form-label" for="abc">Start Area</label>
+                                            <input type="text" class="form-control" id="start_area" name="start_area"
+                                                required placeholder="CRO MPS" value="{{old('start_area')}}">
                                         </div>
-                                        @error('guard_area_name')
+                                        @error('start_area')
                                             <div class="error">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -66,10 +65,24 @@
                                 <div class="card mb-2">
                                     <div class="card-body">
                                         <div class="m-0">
-                                            <label class="form-label" for="abc">Number of guards </label>
-                                            <input type="number" min="1" class="form-control" id="number_of_guards"
-                                                name="number_of_guards" required placeholder="2"
-                                                value="{{old('number_of_guards', $guardArea->number_of_guards)}}">
+                                            <label class="form-label" for="abc">End Area</label>
+                                            <input type="text" class="form-control" id="end_area" name="end_area"
+                                                required placeholder="Assembly Hole" value="{{old('end_area')}}">
+                                        </div>
+                                        @error('end_area')
+                                            <div class="error">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12 col-12">
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <div class="m-0">
+                                            <label class="form-label" for="abc">Number of guards</label>
+                                            <input type="number" value="1" min="1" class="form-control" id="number_of_guards" name="number_of_guards"
+                                                required placeholder="2" value="{{old('number_of_guards')}}">
                                         </div>
                                         @error('number_of_guards')
                                             <div class="error">{{ $message }}</div>
@@ -86,9 +99,7 @@
                                             <select class="form-control" name="campus_id" id="campuses" required>
                                                 <option value="" disabled selected>select campus</option>
                                                 @foreach ($campuses as $campus)
-                                                    <option value="{{ $campus->id }}" {{ old('campus_id', $guardArea->campus_id) == $campus->id ? 'selected' : '' }}>
-                                                        {{ $campus->campusName }}
-                                                    </option>
+                                                    <option value="{{ $campus->id }}">{{ $campus->campusName }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -106,11 +117,7 @@
                                             <label class="form-label" for="abc">Company</label>
                                             <select class="form-control" name="company_id" id="companies" required>
                                                 <option value="" disabled selected>select company</option>
-                                                @foreach ($companies as $company)
-                                                    <option value="{{ $company->id }}" {{ old('company_id', $guardArea->company_id) == $company->id ? 'selected' : '' }}>
-                                                        {{ $company->name }}
-                                                    </option>
-                                                @endforeach
+
                                             </select>
                                         </div>
                                         @error('company_id')
@@ -127,15 +134,12 @@
                                             <label class="form-label" for="abc">Beat Exceptions </label>
                                             <select class="form-control" name="beat_exception_ids[]" id="beat_exception_ids"
                                                 multiple>
-
                                                 @foreach ($beatExceptions as $beatException)
-                                                    <option value="{{ $beatException->id }}" @if(in_array($beatException->id, json_decode($guardArea->beat_exception_ids, true) ?? [])) selected
-                                                    @endif>
-                                                        {{ $beatException->name }}
+                                                    <option value="{{ $beatException->id }}">{{ $beatException->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                        @error('beat_exception_ids')
+                                        @error('beat_exception_ids[]')
                                             <div class="error">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -150,12 +154,8 @@
                                             <select class="form-control" name="beat_time_exception_ids[]"
                                                 id="beat_time_exception_ids" multiple>
                                                 @foreach ($beatTimeExceptions as $beatTimeException)
-                                                    <option value="{{ $beatTimeException->id }}"
-                                                        @if(in_array($beatTimeException->id, json_decode($guardArea->beat_time_exception_ids, true) ?? [])) selected
-                                                        @endif>
-                                                        {{ $beatTimeException->name }}
+                                                    <option value="{{ $beatTimeException->id }}">{{ $beatTimeException->name }}
                                                     </option>
-
                                                 @endforeach
                                             </select>
                                         </div>
@@ -168,7 +168,7 @@
 
                         </div>
                         <div class="d-flex justify-content-end">
-                            <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
                         </div>
 
                     </form>

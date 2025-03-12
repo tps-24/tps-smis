@@ -38,4 +38,13 @@ class PatrolArea extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
+    }
+    public function addedBy()
+    {
+        return $this->belongsTo(User::class, 'added_by','id');
+    }
 }

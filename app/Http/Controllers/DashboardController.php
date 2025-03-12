@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\SessionProgramme;
+use App\Models\Company;
 use App\Models\Student; 
 use App\Models\Course;
 use App\Models\Attendence;
@@ -31,9 +32,49 @@ class DashboardController extends Controller
         $selectedSessionId = session('selected_session');
         $pending_message = session('pending_message');
 
+
+
+        $query = Patient::query();
+
+        // Filter by company_id if provided
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+
+        // Filter by platoon if provided
+        if ($request->filled('platoon')) {
+            $query->where('platoon', $request->platoon);
+        }
+
+        $today = Carbon::today();
+        $thisWeek = Carbon::now()->startOfWeek();
+        $thisMonth = Carbon::now()->startOfMonth();
+        $thisYear = Carbon::now()->startOfYear();
+
+        // Count statistics based on the selected filters
+        $dailyCount = (clone $query)->whereDate('created_at', $today)->count();
+        $weeklyCount = (clone $query)->whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
+        $monthlyCount = (clone $query)->whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
+
+        // Fetch list of companies
+        $companies = Company::all();
+
+        // Patient distribution for the selected year (used in Pie Chart)
+        $patientDistribution = (clone $query)
+            ->whereBetween('created_at', [$thisYear, Carbon::now()])
+            ->selectRaw('platoon, COUNT(*) as count')
+            ->groupBy('platoon')
+            ->pluck('count', 'platoon');
+
+
+
+
+
         if (auth()->user()->hasRole('Student')) {
             return view('dashboard.student_dashboard', compact('pending_message', 'selectedSessionId'));
-        } else {
+        } else if (auth()->user()->hasRole('Receptionist|Doctor')){
+            return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies'));
+        }else {
             $denttotalCount = Student::where('session_programme_id', $selectedSessionId)->count();
             $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)->where('beat_status', 1)->count();
             $beats = Beat::where('date', Carbon::today()->toDateString())->get();

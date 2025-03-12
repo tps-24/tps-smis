@@ -75,7 +75,9 @@
                                 @method('POST')
 
                                 <div id="mess">
-                                    <h4>Mess Students</h4>
+                                    <div class="mb-4">
+                                        <h4>Mess Students</h4>
+                                    </div>
                                     @foreach ($mess_students as $student)
                                         <div class="form-check">
                                             <input id="item-child" class="form-check-input" name="student_ids[]" type="checkbox"
@@ -87,7 +89,9 @@
                                 </div>
 
                                 <div id="sentry" class="mt-4">
-                                    <h4>Sentry Students</h4>
+                                    <div class="mb-4">
+                                        <h4>Sentry Students</h4>
+                                    </div>
                                     @foreach ($sentry_students as $student)
                                         <div class="form-check">
                                             <input id="item-child" class="form-check-input" name="student_ids[]" type="checkbox"
@@ -99,7 +103,9 @@
                                 </div>
 
                                 <div id="off" class="mt-4">
-                                    <h4>Off Students</h4>
+                                    <div class="mb-4">
+                                        <h4>Off Students</h4>
+                                    </div>
                                     @foreach ($off_students as $student)
                                         <div class="form-check">
                                             <input id="item-child" class="form-check-input" name="student_ids[]" type="checkbox"
@@ -133,8 +139,8 @@
 
 
             <!-- <div class="d-flex gap-2 justify-content-end">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div> -->
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div> -->
         </form>
         <script>
 
