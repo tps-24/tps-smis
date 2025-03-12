@@ -10,21 +10,28 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-4">
-                    <h6>Daily Count</h6>
-                    <p>{{ $dailyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', 'daily') }}" class="btn btn-info">View Daily Patients</a>
-                </div>
-                <div class="col-md-4">
-                    <h6>Weekly Count</h6>
-                    <p>{{ $weeklyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', 'weekly') }}" class="btn btn-info">View Weekly Patients</a>
-                </div>
-                <div class="col-md-4">
-                    <h6>Monthly Count</h6>
-                    <p>{{ $monthlyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', 'monthly') }}" class="btn btn-info">View Monthly Patients</a>
-                </div>
+            <div class="col-md-4">
+         <h6>Daily Count</h6>
+       <p>{{ $dailyCount }} Patients</p>
+         <a href="{{ route('hospital.viewDetails', ['timeframe' => 'daily', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}" class="btn btn-info">
+        View Daily Patients
+      </a>
+    </div>
+      <div class="col-md-4">
+      <h6>Weekly Count</h6>
+       <p>{{ $weeklyCount }} Patients</p>
+      <a href="{{ route('hospital.viewDetails', ['timeframe' => 'weekly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}" class="btn btn-info">
+        View Weekly Patients
+       </a>
+    </div>
+      <div class="col-md-4">
+    <h6>Monthly Count</h6>
+    <p>{{ $monthlyCount }} Patients</p>
+    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'monthly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}" class="btn btn-info">
+        View Monthly Patients
+    </a>
+</div>
+
             </div>
         </div>
     </div>
@@ -45,7 +52,7 @@
     @if(auth()->user()->hasRole('Sir Major'))
         <option value="{{ $assignedCompany->id ?? '' }}">{{ $assignedCompany->name ?? 'N/A' }}</option>
     @else
-        <option value="">Select Company</option>
+        <option value="" disabled>Select Company</option>
         @foreach($companies as $company)
             <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
                 {{ $company->name }}
@@ -95,10 +102,8 @@
                     <td>{{ $student->platoon ?? 'N/A' }}</td>
                     <td>{{ $student->company->name ?? 'N/A' }}</td>
                     <td>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal{{ $student->id }}">
-                            Send Student Details
-                        </button>
-                        <div class="modal fade" id="approvalModal{{ $student->id }}" tabindex="-1" aria-hidden="true">
+                        
+                        <!-- <div class="modal fade" id="approvalModal{{ $student->id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -114,7 +119,51 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
+
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<button class="btn btn-primary" onclick="sendForApproval({{ $student->id }}, '{{ $student->first_name }}', '{{ $student->last_name }}')">
+    Send for Approval
+</button>
+
+<script>
+function sendForApproval(studentId, firstName,lastName) {
+    Swal.fire({
+        title: `Send for Approval: ${firstName}${lastName}`,
+        text: "Are you sure you want to send this student for Receptionist approval?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, send it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Create and submit a hidden form
+            let form = document.createElement("form");
+            form.method = "POST";
+            form.action = "{{ route('students.sendToReceptionist') }}";
+            form.style.display = "none";
+
+            let csrfInput = document.createElement("input");
+            csrfInput.type = "hidden";
+            csrfInput.name = "_token";
+            csrfInput.value = "{{ csrf_token() }}";
+
+            let studentInput = document.createElement("input");
+            studentInput.type = "hidden";
+            studentInput.name = "student_id";
+            studentInput.value = studentId;
+
+            form.appendChild(csrfInput);
+            form.appendChild(studentInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+</script>
+
                     </td>
                 </tr>
                 @endforeach

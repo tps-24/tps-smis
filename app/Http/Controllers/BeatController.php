@@ -78,9 +78,9 @@ class BeatController extends Controller
     public function createExchange(Beat $beat)
     {
         if ($beat->guardArea) {
-            $beatsToExchange = $beat->guardArea->company->beats()->where('date', $beat->date)->get();
+            $beatsToExchange = $beat->guardArea->company->guardBeats()->where('date', $beat->date)->get();
         } else if ($beat->patrolArea) {
-            $beatsToExchange = $beat->patrolArea->company->beats()->where('date', $beat->date)->get();
+            $beatsToExchange = $beat->patrolArea->company->patrolBeats()->where('date', $beat->date)->get();
         }
         $beat_students = Student::whereIn('id', json_decode($beat->student_ids))->orderBy('platoon')->get();
         //$beatsToExchange = Beat::where('date', $beat->created_at->format('Y-m-d'))->get();

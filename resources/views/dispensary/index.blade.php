@@ -58,14 +58,12 @@
     
     <!-- Pie Chart Section -->
     <div class="card">
-        <div class="card-header">
-            <h5 class="card-title">Patient Distribution for {{ now()->year }}</h5>
-        </div>
-        <div class="card-body">
-            <canvas id="patientChart"></canvas>
-        </div>
+    <div class="card-header">
+        <h5 class="card-title">Patient Distribution for {{ now()->year }}</h5>
     </div>
-
+    <div class="card-body d-flex justify-content-center">
+        <canvas id="patientChart" style="max-width: 300px; max-height: 300px;"></canvas>
+    </div>
 </div>
 
 <!-- Include Chart.js -->
@@ -93,6 +91,19 @@
                             '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#D35400'
                         ]
                     }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allows control of size
+                    plugins: {
+                        legend: {
+                            position: 'bottom', // Moves legend below
+                            labels: {
+                                boxWidth: 10, // Reduces legend size
+                                font: { size: 10 } // Smaller font
+                            }
+                        }
+                    }
                 }
             });
         } else {
@@ -101,6 +112,7 @@
         }
     });
 </script>
+
 @endsection
 
 

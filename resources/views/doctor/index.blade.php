@@ -65,20 +65,18 @@
                                                             @csrf
                                                             <input type="hidden" name="student_id" value="{{ $patient->id }}">
                                                             <div class="mb-3">
-    <label for="excuse_type_id" class="form-label">E.D Type</label>
-    <select name="excuse_type_id" id="excuse_type_id" class="form-select" required>
-        <option value="">Select E.D Type</option>
+    <label for="excuse_type_id" class="form-label" >Excuse Type</label>
+    <select name="excuse_type_id" id="excuse_type_id" class="form-select" required >
+        <option value="" disabled >Select E.D Type</option>
         @foreach ($excuseTypes as $id => $excuseName)
             <option value="{{ $id }}">{{ $excuseName }}</option>
         @endforeach
     </select>
 </div>
 
-
-
                                                             <div class="mb-3">
                                                                 <label class="form-label">Days of Rest</label>
-                                                                <input type="number" class="form-control" name="rest_days" min="1" required>
+                                                                <input type="number" class="form-control" name="rest_days" min="0" required>
                                                             </div>
 
                                                             <div class="mb-3">
