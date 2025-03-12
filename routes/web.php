@@ -159,6 +159,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/beats/approve-reserve/{studentId}', [BeatController::class, 'approveReserve'])->name('beats.approve-reserve');
     Route::get('/beats/reserve-replacement/{reserveId}/{date}/{beatReserveId}', [BeatController::class, 'beatReplacementStudent'])->name('beats.reserve-replacement');
     Route::post('/beats/replace-reserve/{reserveId}/{studentId}/{date}/{beatReserveId}', [BeatController::class, 'beatReserveReplace'])->name('beats.replace-reserve');
+    Route::get('/beats/create-exchange/{beat}',[BeatController::class, 'createExchange'])->name(name: 'beats.create-exchange');
+    Route::post('/beats/exchange/{beat}',[BeatController::class, 'exchange'])->name(name: 'beats.exchange');
+
     
     Route::get('/students/downloadSample', [StudentController::class, 'downloadSample'])->name('studentDownloadSample');
     Route::get('/staff/downloadSample', [StaffController::class, 'downloadSample'])->name('staffDownloadSample');
@@ -278,6 +281,22 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
     Route::resource('announcements', AnnouncementController::class);
     Route::resource('visitors', MPSVisitorController::class);
     Route::resource('timesheets', TimeSheetController::class);
+    Route::resource('guard-areas', GuardAreaController::class);
+    Route::resource('patrol-areas', PatrolAreaController::class);
+
+
+    
+    // Define the custom route first
+
+    // routes/web.php
+    Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
+    Route::get('campanies/{campusId}', [GuardAreaController::class,'get_companies']);
+    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
+
+
+
     Route::resource('grading_systems', GradingSystemController::class); 
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);
@@ -336,6 +355,8 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
         Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
         Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
         Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
+
+        Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
