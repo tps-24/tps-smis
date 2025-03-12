@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 
+
 class PatientController extends Controller
 {
     public function __construct()
@@ -31,7 +32,7 @@ class PatientController extends Controller
             'approvePatient'
         ]);
 
-        $this->middleware('permission:hospital-update')->only([
+        $this->middleware('permission:hospital-edit')->only([
             'saveDetails',
             'doctorPage'
         ]);
@@ -220,22 +221,6 @@ public function receptionistPage()
 }
 
 
-// public function doctorPage()
-// {
-//     if (!auth()->user()->hasRole('Doctor')) {
-//         abort(403, 'You do not have access to this page.');
-//     }
-
-//     // Fetch approved patients and include related student details
-//     $patients = Patient::where('status', 'approved')
-//                 ->with('student:id,first_name,last_name') // Load only required fields
-//                 ->get();
-
-//     $excuseTypes = ExcuseType::all(); // ✅ Fix: Fetch excuse types for the dropdown
-
-//     return view('doctor.index', compact('patients', 'excuseTypes'));
-// }
-
 public function doctorPage()
 {
     if (!auth()->user()->hasRole('Doctor')) {
@@ -277,19 +262,6 @@ public function saveDetails(Request $request)
 }
 
 
-
-public function sirMajorStatistics()
-{
-    $company_id = auth()->user()->company_id; // Ensure Sir Major only sees their company's data
-
-    $patients = Patient::where('company_id', $company_id)
-        ->whereNotNull('excuse_type') // Ensure only patients with doctor inputs are retrieved
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return view('sirmajor.statistics', compact('patients'));
-}
-
 public function viewDetails(Request $request, $timeframe)
 {
     $sirMajor = Auth::user();
@@ -302,7 +274,11 @@ public function viewDetails(Request $request, $timeframe)
         abort(404, 'Invalid timeframe');
     }
 
-    $query = Patient::where('company_id', $sirMajor->company_id)
+    // Fetch filters from the request
+    $company_id = $request->input('company_id', $sirMajor->company_id);
+    $platoon = $request->input('platoon');
+
+    $query = Patient::where('company_id', $company_id)
                     ->whereYear('created_at', now()->year); // Ensure only current year data is fetched
 
     switch ($timeframe) {
@@ -317,9 +293,14 @@ public function viewDetails(Request $request, $timeframe)
             break;
     }
 
+    // Apply platoon filter if provided
+    if ($platoon) {
+        $query->where('platoon', $platoon);
+    }
+
     $patients = $query->get();
 
-    return view('hospital.viewDetails', compact('patients', 'timeframe'));
+    return view('hospital.viewDetails', compact('patients', 'timeframe', 'company_id', 'platoon'));
 }
 
 public function dispensaryPage(Request $request)
@@ -360,29 +341,43 @@ public function dispensaryPage(Request $request)
 }
 
 
-// public function store(Request $request)
-// {
-//     $request->validate([
-//         'student_id' => 'required|exists:students,id',
-//         'excuse_type_id' => 'required|exists:excuse_types,id', // Validate excuse type
-//         'status' => 'required|in:pending,approved,rejected,treated',
-//         'staff_id' => 'required|exists:staff,id',
-//         'rest_days' => 'required|integer',
-//         'doctor_comment' => 'nullable|string',
-//     ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'student_id' => 'required|exists:students,id',
+        'status' => 'required|in:Admitted,Excuse Duty,Light Duty',
+        'rest_days' => 'required|integer|min:1',
+    ]);
 
-//     Patient::create([
-//         'student_id' => $request->student_id,
-//         'excuse_type_id' => $request->excuse_type_id,
-//         'status' => $request->status,
-//         'staff_id' => $request->staff_id,
-//         'rest_days' => $request->rest_days,
-//         'doctor_comment' => $request->doctor_comment,
-//         'company_id' => auth()->user()->staff->company_id ?? null, // Get company_id from staff
-//         'platoon' => $request->platoon ?? null, // Ensure platoon is set
-//     ]);
+    $patient = new Patient();
+    $patient->student_id = $request->student_id;
+    $patient->company_id = $request->company_id;
+    $patient->platoon = $request->platoon;
+    $patient->status = $request->status;
+    $patient->rest_days = $request->rest_days;
+    $patient->save();
 
-//     return redirect()->route('patients.index')->with('success', 'Patient record added successfully.');
-// }
+    // Update the student's beat_status to 0 if they are sick
+    Student::where('id', $request->student_id)->update(['beat_status' => 0]);
+
+    return back()->with('success', 'Patient record added successfully.');
+}
+
+
+public function updateSickReport(Request $request, $student_id)
+{
+    $student = Student::findOrFail($student_id);
+
+    // Check if the student is a patient
+    if (in_array($request->status, ['Light Duty', 'Excuse Duty', 'Admitted'])) {
+        // Set beat_status to 0 and define sick period
+        $student->beat_status = 0;
+        $student->rest_days = $request->rest_days;
+        $student->sick_until = Carbon::now()->addDays($request->rest_days);
+    }
+
+    $student->save();
+}
 
 }
+

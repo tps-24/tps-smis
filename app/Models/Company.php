@@ -38,4 +38,13 @@ class Company extends Model
     public function beatRound(){
         return $this->hasMany(BeatRound::class);
     } 
+
+        public function areas() {
+            
+
+            return $this->hasMany(Area::class); // Ensure this relationship exists
+        
+
+            }
+    
 }

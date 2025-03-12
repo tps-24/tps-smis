@@ -262,7 +262,7 @@
       @endcan()
 
 
-          @can('hospital-update')
+          @can('hospital-edit')
         <li>
         <a href="{{ route('doctor.page') }}">
           <i class="bi bi-stethoscope"></i>
