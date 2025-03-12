@@ -106,7 +106,7 @@
                                         <th>Date</th>
                                         <th>Start Time</th>
                                         <th>End Time</th>
-                                        <th>Actions</th>
+                                        <th >Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,8 +135,10 @@
                                                                                 <td>{{ $beat->date }}</td>
                                                                                 <td>{{ $beat->start_at }}</td>
                                                                                 <td>{{ $beat->end_at }}</td>
-                                                                                <td>
-                                                                                    <a href="{{route('beats.edit', $beat->id)}}"><button
+                                                                                <td class="d-flex gap-2">
+                                                                                    <a href="{{route('beats.create-exchange', $beat)}}"><button
+                                                                                            class="btn btn-secondary btn-sm">Exchange</button></a>
+                                                                                            <a href="{{route('beats.edit', $beat->id)}}"><button
                                                                                             class="btn btn-primary btn-sm">Edit</button></a>
                                                                                     <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
                                                                                                         @csrf @method('DELETE')

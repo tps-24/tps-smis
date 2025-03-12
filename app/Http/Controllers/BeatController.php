@@ -66,13 +66,45 @@ class BeatController extends Controller
         return view('beats.beat_create', compact('beats'));
     }
 
-public function edit($beat_id){
-    $beat  = Beat::find($beat_id);
-    $beats  = Beat::where('id', $beat_id)->get();
-    $stud =     Student::whereIn('id', json_decode($beat->student_ids))->get();
-    $eligible_students = Student::where('company_id',2)->whereIn('platoon',[8,9,10,11,12,13,14])->where('beat_round',3)->where('beat_status',1)->get();
-    return  view('beats.edit', compact('beat','beats', 'eligible_students', 'stud'));
-}
+    public function edit($beat_id)
+    {
+        $beat = Beat::find($beat_id);
+        $beats = Beat::where('id', $beat_id)->get();
+        $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8, 9, 10, 11, 12, 13, 14])->where('beat_round', 3)->where('beat_status', 1)->get();
+        return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
+    }
+
+    public function createExchange(Beat $beat)
+    {
+        if ($beat->guardArea) {
+            $beatsToExchange = $beat->guardArea->company->beats()->where('date', $beat->date)->get();
+        } else if ($beat->patrolArea) {
+            $beatsToExchange = $beat->patrolArea->company->beats()->where('date', $beat->date)->get();
+        }
+        $beat_students = Student::whereIn('id', json_decode($beat->student_ids))->orderBy('platoon')->get();
+        //$beatsToExchange = Beat::where('date', $beat->created_at->format('Y-m-d'))->get();
+        $beatsToExchange = $beatsToExchange->map(function ($_beat) use ($beat) {
+            // Decode the JSON-encoded student_ids to an array
+            $studentIds = json_decode($_beat->student_ids);
+            // Fetch the students associated with these IDs (assuming you have a Student model)
+            $students = Student::whereIn('id', $studentIds)
+                        ->whereNotIn('id',json_decode($beat->student_ids))->get();
+
+            // Return an array with students and the specific beat they belong to
+            return $students->map(function ($student) use ($_beat) {
+                return [
+                    'student' => $student,
+                    'beat' => $_beat,
+                ];
+            });
+        })->flatten(1) // Flatten the array so each entry is a single student-beat pair
+        ->sortBy(function ($item) {
+            // Sort by the 'platoon' of each student in ascending order
+            return $item['student']->platoon;
+        });
+        return view('beats.exchange', compact('beat', 'beatsToExchange', 'beat_students'));
+    }
 
     public function update(Request $request, $beat_id)
     {
@@ -111,6 +143,100 @@ public function edit($beat_id){
 
         return redirect()->route('beats.byDate')->with('success', 'Beat updated successfully.');
     }
+    public function exchange(Request $request, Beat $beat)
+    {
+        // Retrieve current and exchange student IDs from the request
+        $exchange_students = $request->input('exchange_students'); // Array of exchange student objects
+        $current_students = $request->input('current_students'); // Array of current student IDs to replace
+
+        // Ensure the current_students and exchange_students have the same length
+        if (count($current_students) !== count($exchange_students)) {
+            return response()->json(['error' => 'The number of current students must match the number of exchange students.'], 400);
+        }
+
+        // Get the current student_ids on the beat (assuming this is a JSON string and needs to be decoded)
+        $student_ids = json_decode($beat->student_ids); // Assuming this is an array or collection
+
+        // Loop through the current students and swap their values with the exchange students at the same index
+        foreach ($current_students as $index => $current_student_id) {
+            // Find the index of the current student ID in the student_ids array
+            $key = array_search($current_student_id, $student_ids);
+
+            // If the current student ID is found, replace it with the corresponding exchange student ID
+            if ($key !== false) {
+                // Decode the exchange student object to get the student's ID and the Beat ID
+                $exchange_student = json_decode($exchange_students[$index]);
+
+                // Retrieve the old exchange student ID
+                $old_exchange_student = $exchange_student->student->id;
+
+                // Find the Beat object for the exchange student (the "exchange_beat")
+                $exchange_beat = Beat::find($exchange_student->beat->id);
+
+
+
+                // Update the exchange_students array with the current student ID at the corresponding index
+                $exchange_students[$index] = $student_ids[$key];
+
+                // Now replace the current student ID in student_ids with the old exchange student ID
+                $student_ids[$key] = $old_exchange_student;
+
+                // If the exchange_beat exists, update its student_ids
+                if ($exchange_beat) {
+                    // Decode the current student_ids of the exchange_beat
+                    $exchange_student_ids = json_decode($exchange_beat->student_ids);
+
+                    // Find and replace the student ID in the exchange_beat with the current student ID
+                    $exchange_key = array_search($old_exchange_student, $exchange_student_ids);
+
+                    if ($exchange_key !== false) {
+                        // Replace the old exchange student ID with the current student ID
+                        $exchange_student_ids[$exchange_key] = json_decode($current_student_id);
+
+                        // Update the exchange_beat's student_ids field with the modified list (encoded as JSON)
+                        $exchange_beat->student_ids = json_encode($exchange_student_ids);
+                        $exchange_beat->save();  // Save the changes to the exchange_beat
+                    }
+                }
+            }
+        }
+
+
+        // Update the original Beat's student_ids with the new student_ids array (encoded as JSON)
+        $beat->student_ids = json_encode($student_ids);
+
+        // Save the updated Beat model
+        $beat_saved = $beat->save();  // Save the changes to the original beat
+
+        return redirect()->route('beats.byDate', ['date' => $beat->date])->with('success', 'Students beat exchanged successfully.');
+    }
+
+
+
+
+
+
+    public function exchange1(Request $request, Beat $beat)
+    {
+        $exchange_students = $request->input('exchange_students');
+        $current_students = $request->input('current_students');
+        //change current student
+        foreach ($beat->students as $student) {
+            for ($i = 0; $i < count($exchange_students); ++$i) {
+                $exchange_student = json_decode($exchange_students[$i])->student;
+                //return $exchange_student->id;
+
+            }
+            for ($i = 0; $i < count($current_students); ++$i) {
+                if ($student->id == $current_students[$i]) {
+                    $student->id = $current_students[$i];
+                }
+            }
+
+        }
+
+        return json_decode($exchange_students[0])->student->id;
+    }
 
     public function generatePDF(Request $request, $companyId)
     {
@@ -126,13 +252,13 @@ public function edit($beat_id){
                     });
             })
             ->with([
-                'guardAreas.beats' => function ($query) use ($date) {
-                    $query->where('date', $date);
-                },
-                'patrolAreas.beats' => function ($query) use ($date) {
-                    $query->where('date', $date);
-                }
-            ])
+                    'guardAreas.beats' => function ($query) use ($date) {
+                        $query->where('date', $date);
+                    },
+                    'patrolAreas.beats' => function ($query) use ($date) {
+                        $query->where('date', $date);
+                    }
+                ])
             ->firstOrFail();
 
         $summary = [];
@@ -238,8 +364,8 @@ public function edit($beat_id){
             // $EligibleFemalesPercentage =  $EligibleFemales/($EligibleFemales+$EligibleMales);
             // $platoonNoFemales = ceil((137 *$EligibleFemalesPercentage)/7);
             // $platoonNoMales = floor((137 *(1-$EligibleFemalesPercentage))/7);
-            
-            
+
+
             // $total =($platoonNoFemales+ $platoonNoMales) *7;
             // foreach ($currentGroup as $platoon) {
             //     $platoonStudents = $companyStudents->where('platoon', $platoon);
@@ -248,7 +374,7 @@ public function edit($beat_id){
 
             //     $selectedStudents = $selectedStudents->merge($females)->merge($males);
             // }
- 
+
 
             // Apply Gender Restrictions
             if (!empty($area->beat_exception_ids)) {
@@ -283,7 +409,7 @@ public function edit($beat_id){
                     $preferredStudents = $companyStudents->where('gender', 'M');
                 }
 
-                
+
                 // Prioritize muislims who fasted ... during morning and mid night
                 if ($startAt === '06:00' || $startAt === '00:00') {
                     $preferredStudents = $companyStudents->where('fast_status', 1);
@@ -735,7 +861,8 @@ public function edit($beat_id){
         $attained_current_round = count($students->whereIn('beat_status', [1, 2, 3])->where('beat_round', $current_round)->values());
         $NotAttained_current_round = count($students->whereIn('beat_status', [1])->where('beat_round', '<', $current_round)->values());
         $exceededAttained_current_round = count($students->whereIn('beat_status', [1])->where('beat_round', '>', $current_round)->values());
-
+        $fastingStudentCount = count($students->where('fast_status', 1)->values());
+        //dd($current_round);
         $ICTStudents = $students->where('beat_exclusion_vitengo_id', 1)->values();
         $ujenziStudents = $students->where('beat_exclusion_vitengo_id', 2)->values();
         $hospitalStudents = $students->where('beat_exclusion_vitengo_id', 3)->values();
@@ -765,37 +892,38 @@ public function edit($beat_id){
             'company_id' => $company->id,
             'company_name' => $company->name,
             'data' => [
-                'totalStudents' => $totalStudents,
-                'totalIneligibleStudents' => $totalIneligibleStudents,
-                'totalEligibleStudents' => $totalEligibleStudents,
-                'eligibleStudentsPercent' => $eligibleStudentsPercent,
-                'InEligibleStudentsPercent' => $InEligibleStudentsPercent,
-                'reserveStudents' => $reserveStudents,
-                'guardAreas' => $guardAreas,
-                'patrolAreas' => $patrolAreas,
-                'current_round' => $current_round,
-                'attained_current_round' => $attained_current_round,
-                'NotAttained_current_round' => $NotAttained_current_round,
-                'exceededAttained_current_round' => $exceededAttained_current_round,
-                'number_of_guards' => $number_of_guards,
-                'days_per_round' => $days_per_round,
-                'vitengo' => [
-                    [
-                        'name' => 'ICT',
-                        'students' => $ICTStudents
-                    ],
-                    [
-                        'name' => 'UJENZI',
-                        'students' => $ujenziStudents
-                    ],
-                    [
-                        'name' => 'HOSPITAL',
-                        'students' => $hospitalStudents
-                    ],
+                    'totalStudents' => $totalStudents,
+                    'totalIneligibleStudents' => $totalIneligibleStudents,
+                    'totalEligibleStudents' => $totalEligibleStudents,
+                    'eligibleStudentsPercent' => $eligibleStudentsPercent,
+                    'InEligibleStudentsPercent' => $InEligibleStudentsPercent,
+                    'reserveStudents' => $reserveStudents,
+                    'guardAreas' => $guardAreas,
+                    'patrolAreas' => $patrolAreas,
+                    'current_round' => $current_round,
+                    'attained_current_round' => $attained_current_round,
+                    'NotAttained_current_round' => $NotAttained_current_round,
+                    'exceededAttained_current_round' => $exceededAttained_current_round,
+                    'fastingStudentCount' => $fastingStudentCount,
+                    'number_of_guards' => $number_of_guards,
+                    'days_per_round' => $days_per_round,
+                    'vitengo' => [
+                            [
+                                'name' => 'ICT',
+                                'students' => $ICTStudents
+                            ],
+                            [
+                                'name' => 'UJENZI',
+                                'students' => $ujenziStudents
+                            ],
+                            [
+                                'name' => 'HOSPITAL',
+                                'students' => $hospitalStudents
+                            ],
 
-                ],
-                'emergencyStudents' => $emergencyStudents
-            ]
+                        ],
+                    'emergencyStudents' => $emergencyStudents
+                ]
         ];
         //array_push($report, $company);
         //}

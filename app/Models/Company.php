@@ -38,4 +38,8 @@ class Company extends Model
     public function beatRound(){
         return $this->hasMany(BeatRound::class);
     } 
+    public function beats()
+    {
+        return $this->hasManyThrough(Beat::class, GuardArea::class, 'company_id', 'guardArea_id', 'id', 'id');
+    }
 }
