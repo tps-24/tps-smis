@@ -26,10 +26,11 @@
             </div>
         </div>
     </div>
+    
     <div class="col-xxl-3 col-sm-12 col-12">
         <div class="card mb-4 card-height-420">
             <div class="card-header">
-                <h5 class="card-title">Recent Announcements</h5>
+                <h2 class="card-title">Recent Announcements</h2>
             </div>
             <div class="card-body">
                 <div class="d-flex flex-column justify-content-between h-100">
@@ -40,7 +41,7 @@
                                 <i class="bi bi-twittr fs-3 text-primary"></i>
                             </div>
                             <div class="d-flex flex-column">
-                                <p class="mb-1 opacity-50">Blaah Blaah</p>
+                                <p class="mb-1 opacity-50">To all recruits</p>
                                 <h3 class="m-0 lh-1 fw-semibold">159</h3>
                             </div>
                         </div>
@@ -66,17 +67,6 @@
                     <!-- Transactions ends -->
                     <a href="javascript:void(0)" class="btn btn-dark">View All <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Row ends -->
-
-<!-- Row starts -->
-<div class="row gx-4" style="margin-top:10px">
-    <div class="col-xxl-12">
-        <div class="card" style="height: 150px !important">
-            <div class="card-body">
             </div>
         </div>
     </div>
@@ -132,9 +122,9 @@
     const dailyData = {
         labels: dailyLabels,
         datasets: [
-            { label: 'Absents', data: [12, 9, 15, 11, 18, 14, 10], backgroundColor: 'rgba(255, 99, 132, 0.5)' },
-            { label: 'Sick', data: [5, 6, 4, 7, 5, 6, 7], backgroundColor: 'rgba(54, 162, 235, 0.5)' },
-            { label: 'Locked up', data: [2, 3, 1, 4, 3, 2, 1], backgroundColor: 'rgba(75, 192, 192, 0.5)' },
+            { label: 'Absents', data: [12, 9, 15, 11, 18, 14, 10], backgroundColor: 'rgba(255, 0, 0, 0.7)' }, // Bright Red
+            { label: 'Sick', data: [5, 6, 4, 7, 5, 6, 7], backgroundColor: 'rgba(0, 123, 255, 0.7)' }, // Bright Blue
+            { label: 'Locked up', data: [2, 3, 1, 4, 3, 2, 1], backgroundColor: 'rgba(255, 165, 0, 0.7)' }, // Bright Orange
             { label: 'Trend Line', data: [8, 7, 10, 8, 12, 9, 8], type: 'line', fill: false, borderColor: 'rgba(0,0,0,0.7)', tension: 0.1 }
         ]
     };
@@ -142,9 +132,9 @@
     const weeklyData = {
         labels: weeklyLabels,
         datasets: [
-            { label: 'Absents', data: [10, 20, 14, 18, 15], backgroundColor: 'rgba(255, 99, 132, 0.5)' },
-            { label: 'Sick', data: [6, 7, 5, 6, 7], backgroundColor: 'rgba(54, 162, 235, 0.5)' },
-            { label: 'Locked up', data: [2, 4, 3, 3, 4], backgroundColor: 'rgba(75, 192, 192, 0.5)' },
+            { label: 'Absents', data: [10, 20, 14, 18, 15], backgroundColor: 'rgba(255, 0, 0, 0.7)' }, // Bright Red
+            { label: 'Sick', data: [6, 7, 5, 6, 7], backgroundColor: 'rgba(0, 123, 255, 0.7)' }, // Bright Blue
+            { label: 'Locked up', data: [2, 4, 3, 3, 4], backgroundColor: 'rgba(255, 165, 0, 0.7)' }, // Bright Orange
             { label: 'Trend Line', data: [8, 10, 8, 9, 9], type: 'line', fill: false, borderColor: 'rgba(0,0,0,0.7)', tension: 0.1 }
         ]
     };
@@ -152,42 +142,41 @@
     const monthlyData = {
         labels: monthlyLabels,
         datasets: [
-            { label: 'Absents', data: [22, 25, 20], backgroundColor: 'rgba(255, 99, 132, 0.5)' },
-            { label: 'Sick', data: [8, 7, 6], backgroundColor: 'rgba(54, 162, 235, 0.5)' },
-            { label: 'Locked up', data: [5, 4, 5], backgroundColor: 'rgba(75, 192, 192, 0.5)' },
+            { label: 'Absents', data: [22, 25, 20], backgroundColor: 'rgba(255, 0, 0, 0.7)' }, // Bright Red
+            { label: 'Sick', data: [8, 7, 6], backgroundColor: 'rgba(0, 123, 255, 0.7)' }, // Bright Blue
+            { label: 'Locked up', data: [5, 4, 5], backgroundColor: 'rgba(255, 165, 0, 0.7)' }, // Bright Orange
             { label: 'Trend Line', data: [21, 23, 20], type: 'line', fill: false, borderColor: 'rgba(0,0,0,0.7)', tension: 0.1 }
         ]
     };
 
-
-        // Initialize Chart
-        const ctx = document.getElementById('groupedBarChart').getContext('2d');
-        let chart = new Chart(ctx, {
-            type: 'bar',
-            data: dailyData, // Default to daily data
-            options: {
-                responsive: true,
-                scales: {
-                    x: { stacked: false },
-                    y: { stacked: false }
-                }
+    // Initialize Chart
+    const ctx = document.getElementById('groupedBarChart').getContext('2d');
+    let chart = new Chart(ctx, {
+        type: 'bar',
+        data: dailyData, // Default to daily data
+        options: {
+            responsive: true,
+            scales: {
+                x: { stacked: false },
+                y: { stacked: false }
             }
-        });
-
-        function showDaily() {
-            chart.data = dailyData;
-            chart.update();
         }
+    });
 
-        function showWeekly() {
-            chart.data = weeklyData;
-            chart.update();
-        }
+    function showDaily() {
+        chart.data = dailyData;
+        chart.update();
+    }
 
-        function showMonthly() {
-            chart.data = monthlyData;
-            chart.update();
-        }
-    </script>
+    function showWeekly() {
+        chart.data = weeklyData;
+        chart.update();
+    }
+
+    function showMonthly() {
+        chart.data = monthlyData;
+        chart.update();
+    }
+</script>
 
 @endsection
