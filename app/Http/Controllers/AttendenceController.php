@@ -158,9 +158,11 @@ class AttendenceController extends Controller
 
 
         }
+
+        // dd($attendences);
         return view('attendences.attended', compact('attendences', 'page', 'company', 'date'));
     }
-    protected function statistics($attendence, $company)
+    protected function statistics($attendence, $company_id)
     {
         //return count($attendence[0]);
         $data = new \Illuminate\Database\Eloquent\Collection();
@@ -187,7 +189,7 @@ class AttendenceController extends Controller
             }
         }
 
-        $mps = $this->getMPSdata($company);
+        $mps = $this->getMPSdata($company_id);
         $data->put('present', $present);
         $data->put('absent', $absent);
         $data->put('total', $total - $mps);
@@ -197,7 +199,7 @@ class AttendenceController extends Controller
         return $data;
     }
 
-    protected function setZero($company)
+    protected function setZero($company_id)
     {
         return [
             'present' => 0,
@@ -205,7 +207,7 @@ class AttendenceController extends Controller
             'total' => 0,
             'sick' => 0,
             'safari' => 0,
-            'mps' => $this->getMPSdata($company),
+            'mps' => $this->getMPSdata($company_id),
         ];
     }
 
@@ -237,7 +239,7 @@ class AttendenceController extends Controller
             }
         }
         foreach ($companies as $company) {
-            $statistics->put($company->name, $this->statistics($attendences[$company->name], $company->name));
+            $statistics->put($company->name, $this->statistics($attendences[$company->id], $company->name));
         }
         return view('attendences/index', compact('statistics', 'companies', 'page'));
     }
@@ -284,7 +286,7 @@ class AttendenceController extends Controller
             }
             array_push($statistics, [
                 'company_name' => $company->name,
-                'statistics' => count($company_stats) > 0 ? $this->statistics($company_stats, $company->name) : $this->setZero($company->name)
+                'statistics' => count($company_stats) > 0 ? $this->statistics($company_stats, $company->id) : $this->setZero($company->id)
             ]);
         }
         $companies = $this->companies;
@@ -292,12 +294,12 @@ class AttendenceController extends Controller
 
     }
 
-    public function getMPSdata($company)
+    public function getMPSdata($company_id)
     {
         $mpsStudents = MPS::whereDate('created_at', Carbon::today())->orWhereNotNull('released_at')->get();
         $count = 0;
         foreach ($mpsStudents as $mpsStudent) {
-            if ($mpsStudent->student->company == $company) {
+            if ($mpsStudent->student->company_id == $company_id) {
                 ++$count;
             }
         }
@@ -409,10 +411,11 @@ class AttendenceController extends Controller
                 }
         }
         $page = AttendenceType::find($type);
+        $lockUp = $this->getLockUpStudentsIds($platoon);
         Attendence::create([
             'attendenceType_id' => $type,
             'platoon_id' => $platoon_id,
-            'present' => $present,
+            'present' => $present - count($lockUp),
             'sentry' => 0,
             'absent' => count($absent_ids),
             'adm' => 0,
@@ -421,11 +424,13 @@ class AttendenceController extends Controller
             'mess' => 0,
             'female' => $female,
             'male' => $male,
-            'absent_student_ids' => json_encode($absent_ids),
+            'lockUp' => count($lockUp),
+            'lockUp_students_ids' => json_encode($lockUp),
+            'absent_student_ids' => implode(',', $absent_ids),
             'total' => $total
         ]);
+        
         return redirect()->route('attendences.index')->with('page', $page);
-        ;
 
     }
 
@@ -600,5 +605,10 @@ class AttendenceController extends Controller
         $attendence->save();
 
         return redirect()->to('attendences/type/'.$attendence->attendenceType_id)->with('success', "Attendance updated successfully.");
+    }
+
+    private function getLockUpStudentsIds($platoon){
+        $lockUpStudentsIds = $platoon->lockUp()->pluck('students.id');
+        return $lockUpStudentsIds;
     }
 }

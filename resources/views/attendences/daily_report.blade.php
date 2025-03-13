@@ -75,6 +75,7 @@
                             <th>Off</th>
                             <th>Messy</th>
                             <th>Sick</th>
+                            <th width="120%">Lock Up</th>
                             <th>ME</th>
                             <th>KE</th>
                             <th>Jumla</th>
@@ -92,6 +93,7 @@
                             $total_sentry = 0;
                             $total_safari = 0;
                             $total_off = 0;
+                            $total_lockUp = 0;
                             $total_messy = 0;
                             $total_sick = 0;
                             $total_male = 0;
@@ -106,6 +108,7 @@
                                                         $total_absent += $attendance[0]->absent;
                                                         $total_sentry += $attendance[0]->sentry;
                                                         $total_messy += $attendance[0]->messy;
+                                                        $total_lockUp += $attendance[0]->lockUp;
                                                         $total_off += $attendance[0]->off;
                                                         $total_sick += $attendance[0]->sick;
                                                         $total_male += $attendance[0]->male;
@@ -158,6 +161,7 @@
                                                     <td>{{ $attendance[0]->off ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->mess ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->sick ?? '-' }}</td>
+                                                    <td>{{ $attendance[0]->lockUp ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->male ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->female ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->total ?? '-' }}</td>
@@ -175,6 +179,7 @@
                             <td>{{ $total_off }}</td>
                             <td>{{ $total_messy }}</td>
                             <td>{{ $total_sick }}</td>
+                            <td>{{ $total_lockUp }}</td>
                             <td>{{ $total_male }}</td>
                             <td>{{ $total_female }}</td>
                             <td>{{ $grand_total }}</td>

@@ -22,7 +22,7 @@ class PatrolAreaController extends Controller
               $patrolArea->beat_exceptions = BeatException::whereIn('id', json_decode($patrolArea->beat_exception_ids, true))->get(); 
             }
             if($patrolArea->beat_time_exception_ids != NULL){
-                $patrolArea->beat_time_exceptions = BeatException::whereIn('id', json_decode($patrolArea->beat_time_exception_ids, true))->get(); 
+                $patrolArea->beat_time_exceptions = BeatTimeException::whereIn('id', json_decode($patrolArea->beat_time_exception_ids, true))->get(); 
               }
             return $patrolArea;
         });

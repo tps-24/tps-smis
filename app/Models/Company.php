@@ -47,12 +47,15 @@ class Company extends Model
     {
         return $this->hasManyThrough(Beat::class, PatrolArea::class, 'company_id', 'patrolArea_id', 'id', 'id');
     }
-        public function areas() {
-            
 
-            return $this->hasMany(Area::class); // Ensure this relationship exists
-        
+    public function lockUp(){
+        return $this->hasManyThrough(MPS::class, Student::class, 'company_id', 'student_id', 'id', 'id');
+ 
+    }
 
-            }
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
+    }
     
 }
