@@ -41,12 +41,12 @@
         <table class="table table-striped truncate m-0">
         <thead>
           <tr>
-          <th>ID</th>
+          <th>S/No</th>
           <th>Name</th>
-          <th>Company ID</th>
-          <th>Campus ID</th>
+          <th>Company </th>
+          <th>Campus </th>
           <th>Added By</th>
-          <th>Number of Guards</th>
+          <th>Guards</th>
           <th>Actions</th>
           </tr>
         </thead>
@@ -58,9 +58,9 @@
         <tr>
         <td>{{ ++$i }}.</td>
         <td>{{ $guardArea->name }}</td>
-        <td>{{ $guardArea->company_id }}</td>
-        <td>{{ $guardArea->campus_id }}</td>
-        <td>{{ $guardArea->added_by }}</td>
+        <td>{{ $guardArea->company->name }}</td>
+        <td>{{ $guardArea->company->campus->campusName }}</td>
+        <td>{{ $guardArea->addedBy->name }}</td>
         <td>{{ $guardArea->number_of_guards }}</td>
         <td>
         <button class="btn btn-info btn-sm" data-bs-toggle="modal"

@@ -39,7 +39,7 @@
         <table class="table table-striped truncate m-0">
         <thead>
           <tr>
-          <th></th>
+          <th>S/No</th>
           <th>Start Area</th>
           <th>End Area</th>
           <th>Company </th>

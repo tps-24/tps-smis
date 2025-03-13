@@ -22,5 +22,10 @@ class Platoon extends Model
     public function students(){
         return $this->hasMany(Student::class,'platoon', 'name');
     }
+
+    public function lockUp(){
+        return $this->hasManyThrough(MPS::class, Student::class, 'platoon', 'student_id', 'name', 'id');
+ 
+    }
     
 }

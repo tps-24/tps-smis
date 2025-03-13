@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class MPSController extends Controller
 {
-
+    private  $selectedSessionId;
     public function __construct()
     {
 
@@ -20,6 +20,9 @@ class MPSController extends Controller
         $this->middleware('permission:mps-create', ['only' => ['create', 'store',]]);
         $this->middleware('permission:mps-edit', ['only' => ['edit', 'update','release']]);
         $this->middleware('permission:mps-delete', ['only' => ['destroy']]);
+        $this->selectedSessionId = session('selected_session');
+        if (!$this->selectedSessionId)
+            $this->selectedSessionId = 1;
     }
     /**
      * Display a listing of the resource.
@@ -134,7 +137,7 @@ class MPSController extends Controller
     public function search(Request $request)
     {
         $companies = Company::all();
-        $students = Student::where('platoon', $request->platoon)->where('company_id', $request->company_id);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        $students = Student::where('platoon', $request->platoon)->where('company_id', $request->company_id)->where('session_programme_id', $this->selectedSessionId);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
         if ($request->name) {
             $students = $students->where(function ($query) use ($request) {
                 $query->where('first_name', 'like', '%' . $request->name . '%')
@@ -148,7 +151,7 @@ class MPSController extends Controller
     }
 
     private function searchStudent($company_id, $platoon, $name = null){
-        $students = Student::where('platoon', $platoon)->where('company_id', $company_id);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        $students = Student::where('platoon', $platoon)->where('company_id', $company_id)->where('session_programme_id', $this->selectedSessionId);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
         if ($name) {
             $students = $students->where(function ($query) use ($name) {
                 $query->where('first_name', 'like', '%' . $name . '%')
@@ -176,8 +179,9 @@ class MPSController extends Controller
     public function company($companyId)
     {
         $company = Company::find($companyId);
-        $mpsStudents = MPS::join('students', 'm_p_s.student_id', 'students.id')->join('companies', 'students.company_id', 'companies.name')
-                        ->where('students.company_id', $companyId)->get();
+        $mpsStudents = $company->lockUp;
+        // $mpsStudents = MPS::join('students', 'm_p_s.student_id', 'students.id')->join('companies', 'students.company_id', 'companies.name')
+        //                 ->where('students.company_id', $companyId)->get();
                         $scrumbName = $company->name;
         return view('mps.index', compact('mpsStudents', 'scrumbName'));
 
