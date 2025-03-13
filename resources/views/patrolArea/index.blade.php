@@ -7,8 +7,8 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-      <li class="breadcrumb-item"><a href="#">Course</a></li>
-      <li class="breadcrumb-item active" aria-current="page"><a href="#">Course Lists</a></li>
+      <li class="breadcrumb-item"><a href="#">Patrol</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="#">Patrol Areas</a></li>
       </ol>
     </nav>
     </div>
@@ -71,27 +71,9 @@
         method="POST" style="display:inline;">
         @csrf
         @method('DELETE')
-        <button class="btn btn-sm btn-danger" onclick="confirmDelete()" type="button">Delete</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmDelete('deleteForm{{ $patrolArea->id }}','Patrol Area')" type="button">Delete</button>
         </form>
-        <script>
-        function confirmDelete() {
-          // SweetAlert confirmation
-          Swal.fire({
-          title: 'Delete Patrol Area?',
-          text: "This action cannot be undone.",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, delete it!',
-          cancelButtonText: 'No, cancel!',
-          reverseButtons: true
-          }).then((result) => {
-          if (result.isConfirmed) {
-          // If confirmed, submit the form
-          document.getElementById('deleteForm{{ $patrolArea->id }}').submit();
-          }
-          });
-        }
-        </script>
+        @include('layouts.sweet_alerts.confirm_delete')
         </td>
 
         <div class="modal fade" id="statusModal{{  $patrolArea->id ?? '' }}" tabindex="-1"
@@ -159,6 +141,4 @@
   <!-- Row ends -->
 
   <!-- Include SweetAlert2 CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 @endsection

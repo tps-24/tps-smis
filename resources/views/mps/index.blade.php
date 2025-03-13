@@ -20,11 +20,8 @@
 @endsection
 
 @section('content')
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
+@include('layouts.sweet_alerts.index')
+
 <div style="display: flex; justify-content: flex-end; margin-right: 2px;">
     <a href="{{url('/mps/create')}}"><button class="btn btn-sm btn-success">Add Student</button></a>
 </div>

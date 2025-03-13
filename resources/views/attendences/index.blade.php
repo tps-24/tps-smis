@@ -16,11 +16,7 @@
 
 @endsection
 @section('content')
-@session('success')
-    <div class="alert alert-success" role="alert">
-        {{ $value }}
-    </div>
-@endsession
+@include('layouts.sweet_alerts.index')
 <div class="row ">
     <div class="col-6">
             <form action="{{ route('attendances.summary',['type_id' => $page->id]) }}" method="GET" class="form-inline d-flex gap-2">

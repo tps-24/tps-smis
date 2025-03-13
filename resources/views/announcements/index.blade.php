@@ -17,11 +17,7 @@
 
 @endsection
 @section('content')
-    @session('success')
-        <div class="alert alert-success" role="alert">
-            {{ $value }}
-        </div>
-    @endsession  
+@include('layouts.sweet_alerts.index')
 
 
     @can('announcement-create')  

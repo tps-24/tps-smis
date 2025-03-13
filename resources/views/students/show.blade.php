@@ -59,7 +59,7 @@
                         @can('beat-edit')  
                         <a class="btn btn-{{ $student->fast_status == 0 ? 'secondary' : 'primary' }}"
                             href="{{ route('updateFastingStatus', ['studentId' => $student->id, 'fastingStatus' => $student->fast_status == 0 ? 1 : 0]) }}">
-                            {{ $student->fast_status == 0 ? 'Fasting' : 'Not Fasting' }}</a>
+                            {{ $student->fast_status == 0 ? 'Not Fasting' : 'Fasting' }}</a>
                         @endcan()
                     @if ($student->status === 'pending')
                     <form action="{{ route('students.approve', $student->id) }}" method="POST" style="display:inline">

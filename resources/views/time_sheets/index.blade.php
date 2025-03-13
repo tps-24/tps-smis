@@ -15,11 +15,8 @@
 
 @endsection
 @section('content')
-    @session('success')
-        <div class="alert alert-success alert-dismissible " role="alert">
-            {{ $value }}
-        </div>
-    @endsession
+@include('layouts.sweet_alerts.index')
+
 
     @php
         $i = 0;

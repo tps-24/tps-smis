@@ -88,6 +88,13 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-body">
+                                @session('success')
+                                <script>
+                                var successMessage = <?php  echo json_encode(session('success')); ?>;
+                                window.onload = function () {
+                                success(successMessage);
+                                }
+                                </script>
                                 @yield('content')
                             </div>
                         </div>
@@ -97,5 +104,6 @@
         </main>
         
     </div>
+    @include('layouts.sweet_alerts.success')
 </body>
 </html>

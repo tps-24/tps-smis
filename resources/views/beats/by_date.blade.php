@@ -37,9 +37,7 @@
 
 @section('content')
     <div class="container">
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+    @include('layouts.sweet_alerts.index')
         @php
             $i = 1;
             $j = 1;
