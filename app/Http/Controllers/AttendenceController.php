@@ -608,7 +608,11 @@ class AttendenceController extends Controller
     }
 
     private function getLockUpStudentsIds($platoon){
-        $lockUpStudentsIds = $platoon->lockUp()->pluck('students.id');
+        $lockUpStudentsIds = $platoon->lockUp()->whereNull('released_at')->pluck('students.id');
         return $lockUpStudentsIds;
+    }
+
+    private function getKaziniStudentsIds($platoon){
+        dd($platoon);
     }
 }

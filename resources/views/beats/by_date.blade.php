@@ -20,19 +20,19 @@
 @endsection
 
 @section('scrumb')
-<!-- Scrumb starts -->
-<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
-    <div class="container-fluid">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-smis/beats">Beats</a></li>
-                <li class="breadcrumb-item active"><a href="#">Guards by Specific Date</a></li>
-            </ol>
-        </nav>
-    </div>
-</nav>
-<!-- Scrumb ends -->
+    <!-- Scrumb starts -->
+    <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+        <div class="container-fluid">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/tps-smis/beats">Beats</a></li>
+                    <li class="breadcrumb-item active"><a href="#">Guards by Specific Date</a></li>
+                </ol>
+            </nav>
+        </div>
+    </nav>
+    <!-- Scrumb ends -->
 @endsection
 
 @section('content')
@@ -90,8 +90,8 @@
                                         <button type="submit" class="btn btn-secondary">Download PDF</button>
                                     </form>
                                 </div>
-                                <a href="{{ route('beats.reserves',['companyId'=>$company->id, 'date' =>$date]) }}"><button style="height: 30px;"
-                                    class="btn btn-sm btn-success">Reserves</button></a>
+                                <a href="{{ route('beats.reserves', ['companyId' => $company->id, 'date' => $date]) }}"><button
+                                        style="height: 30px;" class="btn btn-sm btn-success">Reserves</button></a>
                             </div>
 
                         </div>
@@ -106,7 +106,7 @@
                                         <th>Date</th>
                                         <th>Start Time</th>
                                         <th>End Time</th>
-                                        <th >Actions</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -138,12 +138,12 @@
                                                                                 <td class="d-flex gap-2">
                                                                                     <a href="{{route('beats.create-exchange', $beat)}}"><button
                                                                                             class="btn btn-secondary btn-sm">Exchange</button></a>
-                                                                                            <a href="{{route('beats.edit', $beat->id)}}"><button
+                                                                                    <a href="{{route('beats.edit', $beat->id)}}"><button
                                                                                             class="btn btn-primary btn-sm">Edit</button></a>
                                                                                     <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
-                                                                                                        @csrf @method('DELETE')
-                                                                                                        <button class="btn btn-danger btn-sm">Delete</button>
-                                                                                                    </form> -->
+                                                                                                                                                        @csrf @method('DELETE')
+                                                                                                                                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                                                                                                                                    </form> -->
                                                                                 </td>
                                                                             </tr>
                                                         @endforeach
@@ -197,13 +197,15 @@
                                                                                 <td>{{ $beat->date }}</td>
                                                                                 <td>{{ $beat->start_at }}</td>
                                                                                 <td>{{ $beat->end_at }}</td>
-                                                                                <td>
+                                                                                <td class="d-flex gap-2">
+                                                                                    <a href="{{route('beats.create-exchange', $beat)}}"><button
+                                                                                            class="btn btn-secondary btn-sm">Exchange</button></a>
                                                                                     <a href="{{route('beats.edit', $beat->id)}}"><button
                                                                                             class="btn btn-primary btn-sm">Edit</button></a>
                                                                                     <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
-                                                                                                        @csrf @method('DELETE')
-                                                                                                        <button class="btn btn-danger btn-sm">Delete</button>
-                                                                                                    </form> -->
+                                                                                                                                                        @csrf @method('DELETE')
+                                                                                                                                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                                                                                                                                    </form> -->
                                                                                 </td>
                                                                             </tr>
                                                         @endforeach
