@@ -25,7 +25,5 @@ class Platoon extends Model
 
     public function lockUp(){
         return $this->hasManyThrough(MPS::class, Student::class, 'platoon', 'student_id', 'name', 'id');
- 
     }
-    
 }

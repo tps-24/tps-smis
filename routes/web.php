@@ -123,7 +123,7 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::post('/coursework/upload/{courseId}', [CourseworkResultController::class, 'import'])->name('coursework.upload');
     Route::get('/update-fasting-status/{studentId}/{fastingStatus}', [StudentController::class, 'updateFastStatus'])->name('updateFastingStatus');
     Route::get('/update-beat-status-to-safari/{studentId}', [StudentController::class, 'toSafari'])->name('students.toSafari');
-    Route::resource('students', StudentController::class);  
+    //Route::resource('students', StudentController::class);  
     
 });
 

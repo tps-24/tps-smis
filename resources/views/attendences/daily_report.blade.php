@@ -75,7 +75,7 @@
                             <th>Off</th>
                             <th>Messy</th>
                             <th>Sick</th>
-                            <th width="120%">Lock Up</th>
+                            <th>L/Up</th>
                             <th>ME</th>
                             <th>KE</th>
                             <th>Jumla</th>
@@ -171,7 +171,7 @@
 
                         @endphp
                         <tr style="font-weight: bold;">
-                            <td>TOTAL</td>
+                            <td>JUMLA</td>
                             <td>{{ $total_present }}</td>
                             <td>{{ $total_absent }}</td>
                             <td>{{ $total_sentry }}</td>
@@ -183,7 +183,6 @@
                             <td>{{ $total_male }}</td>
                             <td>{{ $total_female }}</td>
                             <td>{{ $grand_total }}</td>
-
                         </tr>
                     </tbody>
                 </table>
