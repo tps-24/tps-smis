@@ -662,7 +662,6 @@ class StudentController extends Controller
 
         $student -> beat_status = 1;
         $student->save();
-         
         return redirect()->back()->with('success','Beat activated successfully.');
     }
 
@@ -706,13 +705,22 @@ class StudentController extends Controller
     public function toSafari($studentId){
         $student = Student::findOrFail($studentId);
         if(!$student){
-            return redirect()->back()->with('success', 'Student with the '.$studentId.' Id is not found.');
+            return redirect()->back()->with('error', 'Student with the '.$studentId.' Id is not found.');
         }
 
             $student->beat_status = 4;
         $student->save();   
-
-
         return redirect()->route('students.index')->with('success','Beat status to Safari updated successfully.');
+    }
+
+    public function BackFromsafari($studentId){
+        $student = Student::findOrFail($studentId);
+        if(!$student){
+            return redirect()->back()->with('error', 'Student is not found.');
+        }
+
+            $student->beat_status = 1;
+        $student->save();   
+        return redirect()->route('students.index')->with('success','Beat status back from Safari updated successfully.');
     }
 }

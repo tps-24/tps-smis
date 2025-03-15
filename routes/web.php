@@ -123,6 +123,7 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::post('/coursework/upload/{courseId}', [CourseworkResultController::class, 'import'])->name('coursework.upload');
     Route::get('/update-fasting-status/{studentId}/{fastingStatus}', [StudentController::class, 'updateFastStatus'])->name('updateFastingStatus');
     Route::get('/update-beat-status-to-safari/{studentId}', [StudentController::class, 'toSafari'])->name('students.toSafari');
+    Route::get('/update-beat-status-back-from-safari/{studentId}', [StudentController::class, 'BackFromsafari'])->name('students.BackFromsafari');
     //Route::resource('students', StudentController::class);  
     
 });
@@ -180,8 +181,8 @@ Route::group(['middleware' => ['auth']], function () {
 
    
     Route::controller(StudentController::class)->prefix('students')->group(function () {
-        Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
-        Route::post('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
+        Route::get('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
+        Route::get('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
         /**
          * 
          *  Wizard route for student registration
@@ -330,7 +331,7 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
         /**
          * End of wizard for student registration
          */
-        Route::post('students/search', 'search')->name('students.search');
+        Route::get('students/search', 'search')->name('students.search');
         Route::get('dashboard', 'dashboard');
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
