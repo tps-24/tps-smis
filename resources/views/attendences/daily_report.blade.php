@@ -38,7 +38,7 @@
         }
 
         body {
-            padding: 20px;
+            /* padding: 20px; */
             /* You can adjust the padding value as needed */
         }
     </style>
@@ -74,6 +74,7 @@
                             <th>Safari</th>
                             <th>Off</th>
                             <th>Messy</th>
+                            <th>Kazini</th>
                             <th>Sick</th>
                             <th>L/Up</th>
                             <th>ME</th>
@@ -94,6 +95,7 @@
                             $total_safari = 0;
                             $total_off = 0;
                             $total_lockUp = 0;
+                            $total_kazini = 0;
                             $total_messy = 0;
                             $total_sick = 0;
                             $total_male = 0;
@@ -109,6 +111,7 @@
                                                         $total_sentry += $attendance[0]->sentry;
                                                         $total_messy += $attendance[0]->messy;
                                                         $total_lockUp += $attendance[0]->lockUp;
+                                                        $total_kazini += $attendance[0]->kazini;
                                                         $total_off += $attendance[0]->off;
                                                         $total_sick += $attendance[0]->sick;
                                                         $total_male += $attendance[0]->male;
@@ -160,6 +163,7 @@
                                                     <td>{{ $attendance[0]->safari ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->off ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->mess ?? '-' }}</td>
+                                                    <td>{{ $attendance[0]->kazini ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->sick ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->lockUp ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->male ?? '-' }}</td>
@@ -178,8 +182,9 @@
                             <td>{{ $total_safari }}</td>
                             <td>{{ $total_off }}</td>
                             <td>{{ $total_messy }}</td>
+                            <td>{{ $total_kazini }}</td>
                             <td>{{ $total_sick }}</td>
-                            <td>{{ $total_lockUp }}</td>
+                            <td>{{ $total_lockUp }}</td> 
                             <td>{{ $total_male }}</td>
                             <td>{{ $total_female }}</td>
                             <td>{{ $grand_total }}</td>

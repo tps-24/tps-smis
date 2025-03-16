@@ -192,7 +192,7 @@ class CourseworkResultController extends Controller
             return redirect()->route('coursework_results.index')->with('success', 'Coursework results Uploaded  successfully.');
         } catch (Exception $e) {
             // If an error occurs during import, catch the exception and return the error message
-            return redirect()->back()->with('success', 'Import failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
         }
         //Excel::import(new CourseworkResultImport($semesterId, $courseId, $courseworkId), filePath: $request->file('import_file'));
         //return redirect()->route('coursework_results.index')->with('success', 'Coursework results Uploaded  successfully.');

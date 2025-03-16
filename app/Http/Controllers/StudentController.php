@@ -20,6 +20,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\RedirectResponse;
 use DB;
 use Hash;
+use Exception;
 use Illuminate\Support\Facades\Log; // Namespace for the Log facade
 
 
@@ -519,8 +520,14 @@ class StudentController extends Controller
         if ($validator->fails()) {
             return back()->with('error', $validator->errors()->first());
         }
+        try{
         Excel::import(new BulkImportStudents, filePath: $request->file('import_file'));
-        return back()->with('success', 'Students Uploaded  successfully.');
+        }catch (Exception $e) {
+            // If an error occurs during import, catch the exception and return the error message
+            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+        }
+        return redirect()->route('students.index')->with('success', 'Students Uploaded  successfully.');
+        // return back()
     }
 
     // public function createStepOne()
