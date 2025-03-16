@@ -317,7 +317,7 @@
         </li>
         @endcan()
         <li>
-        <a href="{{url('/report/generate')}}">Beat History</a>
+        <a href="{{url('/report/generate')}}">Beat Report</a>
         </li>
       </ul>
       </li>

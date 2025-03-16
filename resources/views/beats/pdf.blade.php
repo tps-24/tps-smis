@@ -7,7 +7,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            /* color:green !important; */
+            color:#008AD8 !important;
         }
         .container {
             width: 100%;
@@ -30,7 +30,7 @@
             font-size: 12px; /* Reduce font size */
         }
         .table th, .table td {
-            border: 1px solid #000;
+            border: 1px solid #008AD8;
             padding: 2px 5px; /* Reduce padding */
             text-align: left;
             white-space: nowrap; /* Prevent text wrapping */

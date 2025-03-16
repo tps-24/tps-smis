@@ -71,7 +71,7 @@ class BeatController extends Controller
         $beat = Beat::find($beat_id);
         $beats = Beat::where('id', $beat_id)->get();
         $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
-        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8,9,10,11,12,13,14])->where('beat_round', 3)->where('beat_status', 1)->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8,9,10,11,12,13,14])->where('beat_round', 4)->where('beat_status', 1)->get();
         return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
     }
 
@@ -415,11 +415,11 @@ class BeatController extends Controller
 
 
                 // Prioritize muislims who fasted ... during morning and mid night
-                if ($startAt === '06:00' || $startAt === '00:00') {
-                    $preferredStudents = $companyStudents->where('fast_status', 1);
-                } else {
-                    $preferredStudents = $companyStudents->where('fast_status', 0);
-                }
+                // if ($startAt === '06:00' || $startAt === '00:00') {
+                //     $preferredStudents = $companyStudents->where('fast_status', 1);
+                // } else {
+                //     $preferredStudents = $companyStudents->where('fast_status', 0);
+                // }
 
                 if ($preferredStudents->isNotEmpty()) {
                     $companyStudents = $preferredStudents->values();
