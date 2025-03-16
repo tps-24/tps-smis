@@ -52,7 +52,7 @@
                   @if(!($student->beat_status == 0  || $student->beat_status == 2  || $student->beat_status == 3) )
                         @can('beat-edit')  
                         <a class="btn btn-{{ $student->beat_status == 4 ? 'primary' : 'warning'}}"
-                        href="{{ route('students.toSafari', ['studentId' => $student->id ]) }}">
+                        @if ($student->beat_status == 4)  href="{{ route('students.BackFromsafari', ['studentId' => $student->id ]) }}"  @else href="{{ route('students.toSafari', ['studentId' => $student->id ]) }}"@endif>
                         {{ $student->beat_status == 4 ? 'Return' : 'Safari' }}</a>    
                         @endcan()
                     @endif

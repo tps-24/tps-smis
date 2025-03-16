@@ -28,10 +28,6 @@ $i = 0;
 <!-- Row starts -->
 <div class="row gx-4">
     <div class="col-sm-12">
-        <div class="card mb-3">
-            <div class="card-header">
-
-            </div>
             <div class="row">
                 @can('student-create')
                 <div class="col-3">
@@ -41,7 +37,7 @@ $i = 0;
                 @if (Auth::user()->hasPermissionTo('student-create'))
                 <div class="col-6 d-flex justify-content-center">
                     @else
-                    <div class="col-12 d-flex justify-content-center">
+                    <div class="d-flex justify-content-center">
                         @endif
                         <form class="d-flex" action="{{route('staff.search')}}" method="POST">
                             @csrf
@@ -67,7 +63,7 @@ $i = 0;
                     </div>
                 </div>
                 @can('student-create')
-                <div class="pull-right col" style="margin-right: 0px;">
+                <div class="col" >
                     <a class="btn btn-success mb-2 btn-sm" href="{{ route('staffs.create') }}"
                         style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Staff</a>
                 </div>
@@ -128,7 +124,6 @@ $i = 0;
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 </div>
 <!-- Row ends -->

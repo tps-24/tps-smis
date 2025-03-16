@@ -25,7 +25,7 @@
     </div>
   @endcan
     <div class="col-6 " style="float: right;">
-      <form class="d-flex" action="{{route('students.search')}}" method="POST">
+      <form class="d-flex" action="{{route('students.search')}}" method="GET">
       @csrf
       @method("POST")
       <div class="d-flex">
@@ -119,7 +119,7 @@
       @can('beat-edit')
       <td>
       @if($student->beat_status == '1')
-      <form action="{{ route('students.deactivate_beat_status', $student->id) }}" method="POST"
+      <form action="{{ route('students.deactivate_beat_status', $student->id) }}" method="GET"
       id="toggleForm{{ $student->id }}">
       @csrf
       <div class="form-check form-switch">
@@ -130,7 +130,7 @@
       </form>
 
     @else
-      <form action="{{ route('students.activate_beat_status', $student->id) }}" method="POST"
+      <form action="{{ route('students.activate_beat_status', $student->id) }}" method="GET"
       id="toggleForm{{ $student->id }}" class="d-flex gap-2">
       @csrf
       <div class="form-check form-switch">
