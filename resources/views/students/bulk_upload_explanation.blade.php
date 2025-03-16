@@ -16,11 +16,7 @@
 
 @endsection
 @section('content')
-    @session('success')
-        <div class="alert alert-success alert-dismissible " role="alert">
-            {{ $value }}
-        </div>
-    @endsession
+@include('layouts.sweet_alerts.index')
     <div class="d-flex justify-content-between">
         <a href="{{ route('studentDownloadSample') }}"><button style="height: 30px;" class="btn btn-sm btn-success"><i
                     class="bi bi-download"></i>Download sample</button></a>

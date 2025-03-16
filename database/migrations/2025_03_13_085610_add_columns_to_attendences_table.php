@@ -15,6 +15,7 @@ return new class extends Migration
             $table->integer('lockUp')->after(column: 'off')->nullable();
             $table->json('lockUp_students_ids')->after(column: 'lockUp')->nullable();
             $table->integer('kazini')->after(column: 'off')->nullable();
+            $table->integer('sick')->after(column: 'kazini')->nullable();
         });
     }
 
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->dropColumn('lockUp');
             $table->dropColumn('lockUp_students_ids');
             $table->dropColumn('kazini');
+            $table->dropColumn('sick');
         });
     }
 };

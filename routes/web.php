@@ -449,7 +449,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file'); // Download file
 });
 
-Route::get('test', [BeatController::class,'beatReplacementStudent']);
+
 Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index');
 Route::get('/downloads/upload', [DownloadController::class, 'showUploadPage'])->name('downloads.upload.page');
 Route::post('/downloads/upload', [DownloadController::class, 'upload'])->name('downloads.upload');
@@ -468,3 +468,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/leave-requests/{id}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
     Route::post('/leave-requests/{id}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
 });
+
+
+Route::get('test', [AttendenceController::class,'getKaziniStudentsIds']);
