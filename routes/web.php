@@ -19,7 +19,6 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\BeatController;
 use App\Http\Controllers\TimetableController;
-
 use App\Http\Controllers\GradingSystemController;
 use App\Http\Controllers\GradeMappingController;
 use App\Http\Controllers\SemesterController;
@@ -40,6 +39,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\MPSVisitorController;
 use App\Http\Controllers\StaffProgrammeCourseController;
 use App\Http\Controllers\TimeSheetController;
+use App\Http\Controllers\SafariStudentController;
 use Carbon\Carbon;
 use App\Http\Controllers\LeaveController;
 
@@ -264,6 +264,10 @@ Route::put('timesheets/{timesheetId}/reject', [TimeSheetController::class, 'reje
 Route::put('timesheets/{timesheetId}/approve', [TimeSheetController::class, 'approve'])->name('timesheets.approve');
 Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('timesheets.filter');
 
+Route::post('students/{student}/safari/', [SafariStudentController::class, 'store'])->name('storeSafariStudent');
+Route::put('students/return-safari/{safariStudent}', [SafariStudentController::class, 'updateSafari'])->name('returnSafariStudent');
+
+
 
     
     Route::resource('roles', RoleController::class);
@@ -284,7 +288,7 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
     Route::resource('timesheets', TimeSheetController::class);
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
-
+    Route::resource('safari-students', SafariStudentController::class);
 
     
     // Define the custom route first

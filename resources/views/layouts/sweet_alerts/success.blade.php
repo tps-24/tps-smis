@@ -7,7 +7,7 @@
                 title: "{{ session('success') }}",  // Use the session success message
                 icon: "success",                    // Set icon to 'success'
                 draggable: true,                    // Enable dragging
-                timer: 4000,                        // Close the alert after 2 seconds
+                timer: 1500,                        // Close the alert after 2 seconds
             });
         </script>
     @endif

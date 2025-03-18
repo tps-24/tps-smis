@@ -427,8 +427,8 @@ class AttendenceController extends Controller
             'male' => $male,
             'lockUp' => count($lockUp),
             'kazini' => $kazini,
-            'lockUp_students_ids' => json_encode($lockUp),
-            'absent_student_ids' => implode(',', $absent_ids),
+            'lockUp_students_ids' =>count($lockUp) > 0?  json_encode($lockUp): NULL,
+            'absent_student_ids' =>count($absent_ids) > 0? implode(',', $absent_ids): NULL,
             'total' => $total
         ]);
         
