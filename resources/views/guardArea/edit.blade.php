@@ -22,7 +22,7 @@
                     <div class="row">
                         <div class="col-lg-12 margin-tb">
                             <div class="pull-left">
-                                <h2>Add New Guard Area</h2>
+                                <h2>Edit Guard Area</h2>
                             </div>
                             <div class="pull-right">
                                 <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('guard-areas.index') }}"><i
@@ -124,17 +124,31 @@
                                 <div class="card mb-2">
                                     <div class="card-body">
                                         <div class="m-0">
-                                            <label class="form-label" for="abc">Beat Exceptions </label>
+                                            <label class="form-label" for="beat_exception_ids">Beat Exceptions</label>
                                             <select class="form-control" name="beat_exception_ids[]" id="beat_exception_ids"
                                                 multiple>
-
                                                 @foreach ($beatExceptions as $beatException)
                                                     <option value="{{ $beatException->id }}" @if(in_array($beatException->id, json_decode($guardArea->beat_exception_ids, true) ?? [])) selected
                                                     @endif>
                                                         {{ $beatException->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
+                                            
+                                        <!-- Link to unselect all options -->
+                                        <a style="text-decoration:underline;" href="javascript:void(0);" id="unselectBeatException" class="text-info"><i>Clear</i></a>
                                         </div>
+                                        <script>
+                                            document.getElementById('unselectBeatException').addEventListener('click', function () {
+                                                const selectElement = document.getElementById('beat_exception_ids');
+
+                                                // Unselect all options
+                                                for (let option of selectElement.options) {
+                                                    option.selected = false;
+                                                }
+                                            });
+                                        </script>
+
                                         @error('beat_exception_ids')
                                             <div class="error">{{ $message }}</div>
                                         @enderror
@@ -158,7 +172,20 @@
 
                                                 @endforeach
                                             </select>
+                                            
+                                        <!-- Link to unselect all options -->
+                                        <a style="text-decoration:underline;" href="javascript:void(0);" id="unselectBeatTimeException" class="text-info"><i>Clear</i></a>
                                         </div>
+                                        <script>
+                                            document.getElementById('unselectBeatTimeException').addEventListener('click', function () {
+                                                const selectElement = document.getElementById('beat_time_exception_ids');
+
+                                                // Unselect all options
+                                                for (let option of selectElement.options) {
+                                                    option.selected = false;
+                                                }
+                                            });
+                                        </script>
                                         @error('beat_time_exception_ids[]')
                                             <div class="error">{{ $message }}</div>
                                         @enderror
@@ -178,24 +205,24 @@
         </div>
     </div>
     <script>
-    document.getElementById('campuses').addEventListener('change', function () {
-        var campusId = this.value;
-        var companiesSelect = document.getElementById('companies');
-        companiesSelect.innerHTML = '<option value="">Select a company</option>'; // Clear previous options
-        var link = '/tps-smis/campanies/' + campusId;
-        if (campusId) {
-            fetch(link)
-                .then(response => response.json())
-                .then(companies => {
-                    companies.forEach(company => {
-                        var option = document.createElement('option');
-                        option.value = company.id;
-                        option.text = company.name;
-                        companiesSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error fetching platoons:', error));
-        }
-    });
-</script>
+        document.getElementById('campuses').addEventListener('change', function () {
+            var campusId = this.value;
+            var companiesSelect = document.getElementById('companies');
+            companiesSelect.innerHTML = '<option value="">Select a company</option>'; // Clear previous options
+            var link = '/tps-smis/campanies/' + campusId;
+            if (campusId) {
+                fetch(link)
+                    .then(response => response.json())
+                    .then(companies => {
+                        companies.forEach(company => {
+                            var option = document.createElement('option');
+                            option.value = company.id;
+                            option.text = company.name;
+                            companiesSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching platoons:', error));
+            }
+        });
+    </script>
 @endsection

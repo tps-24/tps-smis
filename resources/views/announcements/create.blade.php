@@ -46,7 +46,7 @@
                         <div class="m-0">
                             <label for="expires_at">Expires At </label>
                             <input class="form-control" value="{{old('expires_at')}}" type="datetime-local"
-                                name="expires_at" id="expires_at">
+                              min="{{ \Carbon\Carbon::today() }}"  name="expires_at" id="expires_at">
                         </div>
                         @error('expires_at')
                             <div class="error">{{ $message }}</div>
@@ -87,6 +87,7 @@
                                 @foreach (Auth::user()->roles as $role)
                                     @if (!($role->name == "Teacher" || $role->name == "Sir Major"))
                                         <option value="all">All</option>
+                                        <option value="staff">Staff</option>
                                         @break
                                     @endif
                                 @endforeach

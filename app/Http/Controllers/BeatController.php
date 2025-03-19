@@ -504,9 +504,9 @@ class BeatController extends Controller
     public function fillBeats(Request $request)
     {
         $date = $request->input('date', Carbon::today()->toDateString());
-
         if (Beat::where('date', $date)->exists()) {
-            return response()->json(['message' => 'Beats already generated for ' . $date], 200);
+            return redirect()->back()->with('info', 'Beats already generated for ' . $date);
+            //return response()->json(['message' => 'Beats already generated for ' . $date], 200);
         }
 
         // Fetch active students (only those eligible for beats)
@@ -564,8 +564,8 @@ class BeatController extends Controller
                 BeatLeaderOnDuty::create($leader);
             }
         });
-
-        return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
+        return redirect()->route('beats')->with('success','Beats generated successfully for ' . $date);
+        //return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
     }
 
 
