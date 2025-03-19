@@ -114,6 +114,7 @@
                                                         $total_kazini += $attendance[0]->kazini;
                                                         $total_off += $attendance[0]->off;
                                                         $total_sick += $attendance[0]->sick;
+                                                        $total_safari += $attendance[0]->safari;
                                                         $total_male += $attendance[0]->male;
                                                         $total_female += $attendance[0]->female;
                                                         $grand_total += $attendance[0]->total;
