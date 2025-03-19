@@ -114,16 +114,10 @@ Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
 Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
 Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
 
-Route::middleware(['auth', 'check.student.status'])->group(function () {
+Route::middleware(['auth', 'check.student.status', 'student'])->group(function () {
     Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
     Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
     Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
-    Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
-    Route::get('/coursework/upload_explanation/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
-    Route::post('/coursework/upload/{courseId}', [CourseworkResultController::class, 'import'])->name('coursework.upload');
-    Route::get('/update-fasting-status/{studentId}/{fastingStatus}', [StudentController::class, 'updateFastStatus'])->name('updateFastingStatus');
-    Route::get('/update-beat-status-to-safari/{studentId}', [StudentController::class, 'toSafari'])->name('students.toSafari');
-    Route::get('/update-beat-status-back-from-safari/{studentId}', [StudentController::class, 'BackFromsafari'])->name('students.BackFromsafari');
     //Route::resource('students', StudentController::class);  
     
 });
@@ -135,6 +129,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
     Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
     Route::get('students/search_certificate/{companyId}', [FinalResultController::class, 'search'])->name('students.search_certificate');
+
+
+    
+    Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
+    Route::get('/coursework/upload_explanation/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
+    Route::post('/coursework/upload/{courseId}', [CourseworkResultController::class, 'import'])->name('coursework.upload');
+    Route::get('/update-fasting-status/{studentId}/{fastingStatus}', [StudentController::class, 'updateFastStatus'])->name('updateFastingStatus');
+    Route::get('/update-beat-status-to-safari/{studentId}', [StudentController::class, 'toSafari'])->name('students.toSafari');
+    Route::get('/update-beat-status-back-from-safari/{studentId}', [StudentController::class, 'BackFromsafari'])->name('students.BackFromsafari');
 
 
 

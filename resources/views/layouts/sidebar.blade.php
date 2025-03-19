@@ -1,3 +1,56 @@
+<style>
+ /* General Sidebar Styles */
+.sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  color: #343a40; /* Default text color */
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-menu a:hover {
+  background-color: #f1f1f1; /* Hover state */
+  color: #007bff; /* Text color on hover */
+}
+
+/* Active Menu Item Styles */
+a.active {
+  background-color: #007bff; /* Active menu background */
+  color: #ffffff; /* Text color for active menu */
+  font-weight: bold; /* Emphasize active menu */
+  border-left: 4px solid #0056b3; /* Left border for active indicator */
+}
+
+/* Treeview Styling */
+.treeview.menu-open > .treeview-menu {
+  display: block;
+}
+
+.treeview-menu {
+  display: none;
+  padding-left: 20px; /* Indentation for sub-menu items */
+}
+
+.treeview-menu a {
+  padding: 8px 20px;
+  font-size: 0.95rem; /* Slightly smaller font size for sub-menu */
+  color: #6c757d; /* Sub-menu default text color */
+}
+
+.treeview-menu a.active {
+  background-color: #0056b3; /* Darker blue for active sub-menu */
+  color: #ffffff;
+}
+
+</style>
+
 <!-- Sidebar wrapper starts -->
 <nav id="sidebar" class="sidebar-wrapper">
 
@@ -164,20 +217,20 @@
         <li>
         <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a> <!-- For Teacher-->
         </li>
-        <li>
+        <!-- <li>
             <a href="#!">
             Coursework 2
               <i class="bi bi-caret-right-fill"></i>
             </a>
             <ul class="treeview-menu">
               <li>
-              <a href="{{ route('course_works.index') }}">CA Configurations</a> <!-- Add to academic tab -->
+              <a href="{{ route('course_works.index') }}">CA Configurations</a> 
               </li>
               <li>
                 <a href="#!">Nested 2.1</a>
               </li>
             </ul>
-        </li>
+        </li> -->
         <li>
         <a href="#">Semester Exam (SE)</a> <!-- For Teacher-->
         </li>
@@ -197,7 +250,7 @@
       </a>
       </li>
     @endcan()
-      @can('student-coursework-list')
+    @can('student-coursework-list')
       <li>
       <a href="{{ route('students.coursework') }}">
         <i class="bi bi-printer"></i>
@@ -206,17 +259,17 @@
       </li>
     @endcan()
       @can('coursework-config')
-      <li class="treeview">
+      <!-- <li class="treeview">
       <a href="#!">
         <i class="bi bi-stickies"></i>
         <span class="menu-text">Coursework</span>
       </a>
       <ul class="treeview-menu">
         <li>
-        <a href="{{ route('course_works.index') }}">CA Configurations</a> <!-- Add to academic tab -->
+        <a href="{{ route('course_works.index') }}">CA Configurations</a>
         </li>
       </ul>
-      </li>
+      </li> -->
     @endcan()
 
       @can('semester-exam-list')
@@ -248,7 +301,7 @@
         <i class="bi bi-printer"></i>
         <span class="menu-text">Print Certificate(s)</span>
       </a>
-      </li>
+    </li>
     @endcan()
 
       <li>
@@ -257,13 +310,6 @@
           <span class="menu-text">Announcements</span>
         </a>
       </li>
-      <!-- <li>
-      
-    <a href="{{ route('downloads.index') }}">
-              <i class="bi bi-download"></i>
-        <span class="menu-text">Download Center</span>
-      </a>
-    </li> -->
       <li>
         <a href="{{ route('downloads.index') }}">
           <i class="bi bi-download"></i>
@@ -407,3 +453,43 @@
 
 </nav>
 <!-- Sidebar wrapper ends -->
+
+<!-- JavaScript for interactivity -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const menuItems = document.querySelectorAll('.sidebar-menu a');
+      const currentUrl = window.location.pathname;
+
+      // Mark the current menu item as active
+      menuItems.forEach(item => {
+        if (item.href === window.location.origin + currentUrl) {
+          item.classList.add('active');
+          const parentTreeview = item.closest('.treeview');
+          if (parentTreeview) {
+            parentTreeview.classList.add('menu-open');
+          }
+        }
+      });
+
+      // Handle menu clicks to dynamically manage active state and open menus
+      menuItems.forEach(item => {
+        item.addEventListener('click', function () {
+          // Remove "active" from all menu items
+          menuItems.forEach(i => i.classList.remove('active'));
+
+          // Add "active" to clicked item
+          this.classList.add('active');
+
+          // Collapse all treeviews
+          const allTreeviews = document.querySelectorAll('.treeview');
+          allTreeviews.forEach(tree => tree.classList.remove('menu-open'));
+
+          // Expand treeview of the clicked item if it exists
+          const clickedTreeview = this.closest('.treeview');
+          if (clickedTreeview) {
+            clickedTreeview.classList.add('menu-open');
+          }
+        });
+      });
+    });
+</script>

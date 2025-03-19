@@ -127,7 +127,7 @@
                                             <label class="form-label" for="abc">Beat Exceptions </label>
                                             <select class="form-control" name="beat_exception_ids[]" id="beat_exception_ids"
                                                 multiple>
-
+                                                <option  value=NULL>-- Choose the required exception</option>
                                                 @foreach ($beatExceptions as $beatException)
                                                     <option value="{{ $beatException->id }}" @if(in_array($beatException->id, json_decode($guardArea->beat_exception_ids, true) ?? [])) selected
                                                     @endif>

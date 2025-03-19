@@ -59,8 +59,6 @@
             }
         }
 
-
-        
         .watermark {
             position: fixed;
             top: 45%;
@@ -71,13 +69,12 @@
             transform: translate(-50%, -50%);
             z-index: -1;
         }
+
         .content {
             position: relative;
             z-index: 1;
         }
         
-
-
         body {
             text-align: center;
         }
