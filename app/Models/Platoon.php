@@ -26,4 +26,8 @@ class Platoon extends Model
     public function lockUp(){
         return $this->hasManyThrough(MPS::class, Student::class, 'platoon', 'student_id', 'name', 'id');
     }
+
+    public function today_attendence(){
+        return $this->attendences()->whereDate('created_at', now()->toDateString());
+    }
 }

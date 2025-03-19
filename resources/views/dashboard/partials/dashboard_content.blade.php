@@ -33,17 +33,17 @@
                         <div id="radial1"></div>
                     </div>
                     <div class="d-flex flex-column">
-                        <h2 class="lh-1">{{ $denttotalCount }}</h2>
+                        <h2 class="lh-1">{{ $todayStudentReport['present'] }}</h2>
                         <p class="m-0 opacity-50">Students Present</p>
                     </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-between mt-1">
-                    <a class="text-primary" href="/tps-smis/students">
+                    <a class="text-primary" href="{{route('attendences.index')}}">
                         <span>View All</span>
                         <i class="bi bi-arrow-right ms-2"></i>
                     </a>
                     <div class="text-end">
-                        <p class="mb-0 text-primary">96%</p>
+                        <p class="mb-0 text-primary">{{ $todayStudentReport['presentPercent'] }}</p>
                         <span class="badge bg-primary-subtle text-primary small">Today</span>
                     </div>
                 </div>

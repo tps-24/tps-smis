@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             // AttendenceSeeder::class,
             // GradingSystemsTableSeeder::class,
             // PatientsTableSeeder::class,
+            SafariTypeSeeder::class
         ]);
 
         // User::factory(10)->create();

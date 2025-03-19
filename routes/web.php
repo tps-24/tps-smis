@@ -19,7 +19,6 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\BeatController;
 use App\Http\Controllers\TimetableController;
-
 use App\Http\Controllers\GradingSystemController;
 use App\Http\Controllers\GradeMappingController;
 use App\Http\Controllers\SemesterController;
@@ -40,6 +39,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\MPSVisitorController;
 use App\Http\Controllers\StaffProgrammeCourseController;
 use App\Http\Controllers\TimeSheetController;
+use App\Http\Controllers\SafariStudentController;
 use Carbon\Carbon;
 use App\Http\Controllers\LeaveController;
 
@@ -261,6 +261,10 @@ Route::put('timesheets/{timesheetId}/reject', [TimeSheetController::class, 'reje
 Route::put('timesheets/{timesheetId}/approve', [TimeSheetController::class, 'approve'])->name('timesheets.approve');
 Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('timesheets.filter');
 
+Route::post('students/{student}/safari/', [SafariStudentController::class, 'store'])->name('storeSafariStudent');
+Route::put('students/return-safari/{safariStudent}', [SafariStudentController::class, 'updateSafari'])->name('returnSafariStudent');
+
+
 
     
     Route::resource('roles', RoleController::class);
@@ -281,7 +285,7 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
     Route::resource('timesheets', TimeSheetController::class);
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
-
+    Route::resource('safari-students', SafariStudentController::class);
 
     
     // Define the custom route first
@@ -292,7 +296,24 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
     Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
+    Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+        Route::get('type-test/{type_id}', 'attendence');
+        Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
+        Route::post('create/{attendenceType}', 'create')->name('attendences.create');
+        Route::get('edit/{id}', 'edit');
+        Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
+        Route::post('{id}/update', 'update');
+        Route::get('list-absent_students/{list_type}/{attendence_id}/{date}', action: 'list');
+        Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
+        Route::post('store-absents/{attendence_id}/{date}', action: 'storeAbsent');
+        Route::post('store-safari/{attendence_id}', action: 'storeSafari');
+        Route::get('today/{company_id}/{type}','today');
+        Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
+        Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
+        Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
 
+        Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
+    });
 
 
     Route::resource('grading_systems', GradingSystemController::class); 
@@ -307,7 +328,7 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
-
+    Route::resource('attendences', AttendenceController::class);
 
     
     // Route::resource('beats', BeatController::class);
@@ -338,24 +359,7 @@ Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('
 
     });
 
-    Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
-        Route::get('type-test/{type_id}', 'attendence');
-        Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
-        Route::post('create/{type_id}', 'create');
-        Route::get('edit/{id}', 'edit');
-        Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
-        Route::post('{id}/update', 'update');
-        Route::get('list-absent_students/{list_type}/{attendence_id}/{date}', action: 'list');
-        Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
-        Route::post('store-absents/{attendence_id}/{date}', action: 'storeAbsent');
-        Route::post('store-safari/{attendence_id}', action: 'storeSafari');
-        Route::get('today/{company_id}/{type}','today');
-        Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
-        Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
-        Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
-
-        Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
-    });
+    
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
     Route::get('notifications/showNotifications/{notificationIds}',[NotificationController::class,'showNotifications'])->name('notifications.showNotifications'); 

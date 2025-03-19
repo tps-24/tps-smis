@@ -148,7 +148,18 @@
                                                         {{ $beatException->name }}
                                                 @endforeach
                                             </select>
+                                            <a style="text-decoration:underline;" href="javascript:void(0);" id="unselectBeatException" class="text-info"><i>Clear</i></a>
                                         </div>
+                                        <script>
+                                            document.getElementById('unselectBeatException').addEventListener('click', function () {
+                                                const selectElement = document.getElementById('beat_exception_ids');
+
+                                                // Unselect all options
+                                                for (let option of selectElement.options) {
+                                                    option.selected = false;
+                                                }
+                                            });
+                                        </script>
                                         @error('beat_exception_ids')
                                             <div class="error">{{ $message }}</div>
                                         @enderror
@@ -172,7 +183,18 @@
 
                                                 @endforeach
                                             </select>
+                                        <a style="text-decoration:underline;" href="javascript:void(0);" id="unselectBeatTimeException" class="text-info"><i>Clear</i></a>
                                         </div>
+                                        <script>
+                                            document.getElementById('unselectBeatTimeException').addEventListener('click', function () {
+                                                const selectElement = document.getElementById('beat_time_exception_ids');
+
+                                                // Unselect all options
+                                                for (let option of selectElement.options) {
+                                                    option.selected = false;
+                                                }
+                                            });
+                                        </script>
                                         @error('beat_time_exception_ids[]')
                                             <div class="error">{{ $message }}</div>
                                         @enderror

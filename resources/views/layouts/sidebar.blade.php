@@ -335,7 +335,6 @@ a.active {
         </a>
       </li>
 
-
       @can('beat-list')
       <li class="treeview">
       <a href="!#">

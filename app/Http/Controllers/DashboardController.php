@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\SessionProgramme;
 use App\Models\Company;
 use App\Models\Student; 
-use App\Models\Course;
+use App\Models\Platoon;
 use App\Models\Attendence;
 use App\Models\Beat;
 use App\Models\Patient;
@@ -17,8 +17,12 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    private $selectedSessionId;
     public function __construct()
     {
+        $this->selectedSessionId = session('selected_session');
+        if (!$this->selectedSessionId)
+            $this->selectedSessionId = 1;
         $this->middleware(['auth', 'verified', 'check_active_session']);
     }
 
@@ -83,7 +87,9 @@ class DashboardController extends Controller
         } else if (auth()->user()->hasRole('Receptionist|Doctor')){
             return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies'));
         }else {
-            $denttotalCount = Student::where('session_programme_id', $selectedSessionId)->count();
+            $todayStudentReport = $this->todayStudentReport();
+
+            $denttotalCount = $todayStudentReport['present'];
             $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)->where('beat_status', 1)->count();
             $beats = Beat::where('date', Carbon::today()->toDateString())->get();
             $filteredBeats = $beats->filter(function ($beat) use ($selectedSessionId) {
@@ -97,7 +103,7 @@ class DashboardController extends Controller
             $staffsCount = Staff::count('forceNumber');
             $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
 
-            return view('dashboard.dashboard', compact('selectedSessionId', 'denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage', 'recentAnnouncements'));
+            return view('dashboard.dashboard', compact('selectedSessionId', 'denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage', 'recentAnnouncements','todayStudentReport'));
         }
     }
 
@@ -210,5 +216,33 @@ class DashboardController extends Controller
 
         
         return view('dashboard.default_dashboard', compact('currentProgramsCount', 'inactiveProgramsCount', 'programmes', 'weeklyAttendance', 'weeklyComparison')); 
+    }
+
+    private function todayStudentReport(){
+        $present = 0;
+        $absent = 0;
+        $sick = 0;
+        $lockUp = 0;
+        
+        $platoons = Platoon::all();
+
+        foreach($platoons as $platoon){
+        
+            if(count($platoon->today_attendence) > 0){
+                $present += $platoon->today_attendence->get(0)->present;
+                $absent += $platoon->today_attendence->get(0)->absent;
+                $sick += $platoon->today_attendence->get(0)->sick;
+                $lockUp += $platoon->today_attendence->get(0)->lockUp;
+            }
+        }
+        $total = Student::where('session_programme_id', $this->selectedSessionId)->count();
+        $presentPercent = round(($present/($total)*100),1);
+        return [
+            'present' => $present,
+            'absent' => $absent,
+            'sick' => $sick,
+            'lockUp' => $lockUp,
+            'presentPercent' => $presentPercent.'%'
+        ];
     }
 }

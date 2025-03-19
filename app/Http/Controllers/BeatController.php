@@ -71,7 +71,7 @@ class BeatController extends Controller
         $beat = Beat::find($beat_id);
         $beats = Beat::where('id', $beat_id)->get();
         $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
-        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [1,2,3,4,5,6,7])->where('beat_round', 4)->where('beat_status', 1)->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8,9,10,11,12,13,14])->where('beat_round', 3)->where('beat_status', 1)->get();
         return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
     }
 
@@ -504,9 +504,9 @@ class BeatController extends Controller
     public function fillBeats(Request $request)
     {
         $date = $request->input('date', Carbon::today()->toDateString());
-
         if (Beat::where('date', $date)->exists()) {
-            return response()->json(['message' => 'Beats already generated for ' . $date], 200);
+            return redirect()->back()->with('info', 'Beats already generated for ' . $date);
+            //return response()->json(['message' => 'Beats already generated for ' . $date], 200);
         }
 
         // Fetch active students (only those eligible for beats)
@@ -564,8 +564,8 @@ class BeatController extends Controller
                 BeatLeaderOnDuty::create($leader);
             }
         });
-
-        return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
+        return redirect()->route('beats')->with('success','Beats generated successfully for ' . $date);
+        //return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
     }
 
 
