@@ -56,8 +56,8 @@
         <a href="" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> Add Course Results</a>
         </button>
         
-        <button disabled id="add_btn" class="btn btn-success mb-2" style="float:right !important; margin-right:1%;">
-        <a href="{{ route('coursework_results.index') }}" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> CA Configurations</a>
+        <button disabled id="ca_configuration_btn" class="btn btn-success mb-2" style="float:right !important; margin-right:1%;">
+        <a href="" id="ca_configuration_link" style="color:white;"> <i class="fa fa-plus"></i> CA Configurations</a>
         </button>
       </div>
       </div>
@@ -101,6 +101,13 @@
       const newHref = uploadExplanationRoute.replace('COURSE_ID_PLACEHOLDER', courseId);
       add_link.setAttribute('href', newHref);
       add_btn.disabled = false;
+
+      ca_configuration_link = document.getElementById('ca_configuration_link');
+      ca_configuration_btn = document.getElementById('ca_configuration_btn');
+      var ca_configuration_route = @json(route('coursework_results.index'));
+      //const newHrefCAConfiguration = ca_configuration_link.replace('COURSE_ID_PLACEHOLDER', courseId);
+      ca_configuration_link.setAttribute('href', ca_configuration_route);
+      ca_configuration_btn.disabled = false;
       console.log(`Course ID clicked: ${courseId}`); // Log the course ID to the console
       fetchCourseworkResults(courseId);
       });

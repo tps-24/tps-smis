@@ -302,7 +302,24 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
     Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
+    Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+        Route::get('type-test/{type_id}', 'attendence');
+        Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
+        Route::post('create/{attendenceType}', 'create')->name('attendences.create');
+        Route::get('edit/{id}', 'edit');
+        Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
+        Route::post('{id}/update', 'update');
+        Route::get('list-absent_students/{list_type}/{attendence_id}/{date}', action: 'list');
+        Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
+        Route::post('store-absents/{attendence_id}/{date}', action: 'storeAbsent');
+        Route::post('store-safari/{attendence_id}', action: 'storeSafari');
+        Route::get('today/{company_id}/{type}','today');
+        Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
+        Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
+        Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
 
+        Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
+    });
 
 
     Route::resource('grading_systems', GradingSystemController::class); 
@@ -317,7 +334,7 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
-
+    Route::resource('attendences', AttendenceController::class);
 
     
     // Route::resource('beats', BeatController::class);
@@ -348,24 +365,7 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
 
     });
 
-    Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
-        Route::get('type-test/{type_id}', 'attendence');
-        Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
-        Route::post('create/{type_id}', 'create');
-        Route::get('edit/{id}', 'edit');
-        Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
-        Route::post('{id}/update', 'update');
-        Route::get('list-absent_students/{list_type}/{attendence_id}/{date}', action: 'list');
-        Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
-        Route::post('store-absents/{attendence_id}/{date}', action: 'storeAbsent');
-        Route::post('store-safari/{attendence_id}', action: 'storeSafari');
-        Route::get('today/{company_id}/{type}','today');
-        Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
-        Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
-        Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
-
-        Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
-    });
+    
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
     Route::get('notifications/showNotifications/{notificationIds}',[NotificationController::class,'showNotifications'])->name('notifications.showNotifications'); 

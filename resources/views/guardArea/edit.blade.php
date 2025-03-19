@@ -221,7 +221,7 @@
                             companiesSelect.appendChild(option);
                         });
                     })
-                    .catch(error => console.error('Error fetching platoons:', error));
+                    .catch(error => console.error('Error fetching companies:', error));
             }
         });
     </script>

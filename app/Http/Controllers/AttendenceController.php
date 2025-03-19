@@ -46,13 +46,16 @@ class AttendenceController extends Controller
     {
         $attendenceType = AttendenceType::find($attendenceType_id);
         $platoon = Platoon::find($request->platoon);
-
-        $students = Student::where('company_id', $platoon->company_id)
-                    ->where('session_programme_id',$this->selectedSessionId)
-                    ->where('platoon', $platoon->name)
-                    ->whereNotIn('id',$this->getKaziniStudentsIds($platoon))
-                    ->get();
-                   
+        $students = $platoon->students()->where('session_programme_id',$this->selectedSessionId)
+                                    ->where('company_id', $platoon->company_id)
+                                    ->whereNotIn('id',$this->getKaziniStudentsIds($platoon))->get();
+        //return count($students);
+        // $students = Student::where('company_id', $platoon->company_id)
+        //             ->where('session_programme_id',$this->selectedSessionId)
+        //             ->where('platoon', $platoon->name)
+        //             ->whereNotIn('id',$this->getKaziniStudentsIds($platoon))
+        //             ->get();
+               
         return view(
             'attendences/create',
             compact('students', 'attendenceType', 'platoon')
@@ -219,7 +222,6 @@ class AttendenceController extends Controller
     public function testAttendence($type)
     {
         $attendenceType = AttendenceType::find($type);
-        $page = $attendenceType;
         $attendences = new \Illuminate\Database\Eloquent\Collection();
         $data = [];
         $statistics = new \Illuminate\Database\Eloquent\Collection();
@@ -246,7 +248,7 @@ class AttendenceController extends Controller
         foreach ($companies as $company) {
             $statistics->put($company->name, $this->statistics($attendences[$company->id], $company->name));
         }
-        return view('attendences/index', compact('statistics', 'companies', 'page'));
+        return view('attendences/index', compact('statistics', 'companies', 'attendenceType'));
     }
 
     public function attendence(Request $request, $type)
@@ -259,7 +261,6 @@ class AttendenceController extends Controller
         }
         $date = Carbon::parse($date)->format('Y-m-d');
         $attendenceType = AttendenceType::find($type);
-        $page = $attendenceType;
         $roles = Auth::user()->roles;
         foreach ($roles as $role) {
             if (
@@ -275,7 +276,7 @@ class AttendenceController extends Controller
                 $this->companies = [Auth::user()->staff->company];
                 if (count($this->companies) != 0)
                     if ($this->companies[0] == null) {
-                        return view('attendences/index', compact('page', 'date'));
+                        return view('attendences/index', compact('attendenceType', 'date'));
                     }
             } else {
                 abort(403);
@@ -290,12 +291,12 @@ class AttendenceController extends Controller
                 }
             }
             array_push($statistics, [
-                'company_name' => $company->name,
+                'company' => $company,
                 'statistics' => count($company_stats) > 0 ? $this->statistics($company_stats, $company->id) : $this->setZero($company->id)
             ]);
         }
         $companies = $this->companies;
-        return view('attendences/index', compact('statistics', 'companies', 'page', 'date'));
+        return view('attendences/index', compact('statistics', 'companies', 'attendenceType', 'date'));
 
     }
 
