@@ -23,11 +23,11 @@ class StaffController extends Controller
 {
     function __construct()
     {
-         $this->middleware('permission:staff-list|staff-create|staff-edit|staff-delete', ['only' => ['index','view']]);
+         $this->middleware('permission:staff-list|staff-create|staff-edit|staff-delete', ['only' => ['index']]);
          $this->middleware('permission:staff-create', ['only' => ['create','store','import']]);
          $this->middleware('permission:staff-edit', ['only' => ['edit','update','updateProfile']]);
          $this->middleware('permission:staff-delete', ['only' => ['destroy']]);
-         $this->middleware('permission:staff-profile', ['only' => ['profile']]);
+         $this->middleware('permission:staff-view', ['only' => ['profile','view']]);
     }
 
     /**
@@ -143,6 +143,21 @@ class StaffController extends Controller
     public function show(Staff $staff)
     {
         return view('staffs.show', compact('staff'));
+    }
+
+    /**
+     * Display the CV for a specific staff member.
+     */
+    public function resume()
+    {
+        $id=1;
+            $staff = Staff::with('department')->find(1);
+        
+            if (!$staff) {
+                return abort(404, 'Staff member not found.');
+            }
+        
+            return view('staffs.resume', compact('staff'));        
     }
 
     /**

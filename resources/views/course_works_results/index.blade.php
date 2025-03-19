@@ -57,7 +57,7 @@
         </button>
         
         <button disabled id="add_btn" class="btn btn-success mb-2" style="float:right !important; margin-right:1%;">
-        <a href="{{ route('coursework_results.index') }}" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> CA Configurations</a>
+        <a href="{{ route('course_works.index') }}" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> CA Configurations</a>
         </button>
       </div>
       </div>
