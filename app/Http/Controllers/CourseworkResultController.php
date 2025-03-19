@@ -157,9 +157,8 @@ class CourseworkResultController extends Controller
 
     public function create_import($courseId)
     {
-        $semesters = Semester::all();
-        $courseworks = CourseWork::all();
-        return view('course_works_results.upload_explanation', compact('semesters', 'courseworks', 'courseId'));
+        $course = Course::findOrFail($courseId);
+        return view('course_works_results.upload_explanation', compact(  'course'));
     }
     public function import(Request $request, $courseId)
     {

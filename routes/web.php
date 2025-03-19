@@ -321,7 +321,9 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
         Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
     });
 
-
+    Route::get('course/courseworks/create/{courseId}',[CourseWorkController::class,'create'])->name('course.coursework.create');
+    Route::get('course/courseworks/{courseId}',[CourseWorkController::class,'getCourse'])->name('course.coursework');
+    Route::post('course/courseworks/store/{courseId}',[CourseWorkController::class,'store'])->name('course.coursework.store');
     Route::resource('grading_systems', GradingSystemController::class); 
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);

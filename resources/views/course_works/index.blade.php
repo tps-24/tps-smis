@@ -22,7 +22,7 @@
 <div class="container">
     
       <div class="pull-right" >
-          <a class="btn btn-success mb-2" href="{{ route('course_works.create') }}" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New course</a>
+          <a class="btn btn-success mb-2" href="{{ route('course.coursework.create',['courseId'=>$course->id]) }}" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New course</a>
       </div>
       <div class="card-body">
         <div class="table-outer">
@@ -30,29 +30,23 @@
               <table class="table table-striped truncate m-0">
                   <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Programme ID</th>
-                    <th>Course ID</th>
-                    <th>Semester ID</th>
+                    <th></th>
                     <th>Assessment Type</th>
                     <th>Coursework Title</th>
                     <th>Max Score</th>
                     <th>Due Date</th>
-                    <th>Session Programme ID</th>
                     <th scope="col" width="280px">Actions</th>
                   </tr>
-                  </thead>
-                    @foreach ($courseWorks as $courseWork)
+                  @php
+                    $i = 0;
+                  @endphp
+                    @foreach ($course->courseWorks as $courseWork)
                     <tr>
-                        <td>{{ $courseWork->id }}</td>
-                        <td>{{ $courseWork->programme_id }}</td>
-                        <td>{{ $courseWork->course_id }}</td>
-                        <td>{{ $courseWork->semester_id }}</td>
+                      <td>{{ ++$i }}.</td>
                         <td>{{ $courseWork->AssessmentType->type_name }}</td>
                         <td>{{ $courseWork->coursework_title }}</td>
                         <td>{{ $courseWork->max_score }}</td>
                         <td>{{ $courseWork->due_date }}</td>
-                        <td>{{ $courseWork->session_programme_id }}</td>
                         <td>
                             <a class="btn btn-info btn-sm" href="{{ route('course_works.show',$courseWork->id) }}"><i class="fa-solid fa-list"></i> Show</a>
                             <a class="btn btn-primary btn-sm" href="{{ route('course_works.edit',$courseWork->id) }}"><i class="fa-solid fa-pen-to-square"></i> Edit</a>

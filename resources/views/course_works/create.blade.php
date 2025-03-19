@@ -39,27 +39,10 @@
                     </ul>
                     </div>
                 @endif
-            <form method="POST" action="{{ route('course_works.store') }}">
+            <form method="POST" action="{{ route('course.coursework.store',['courseId' => $course->id]) }}">
                 @csrf
                 <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Prog Id:</strong>
-                            <input type="number" name="programme_id" placeholder="Enter prog id" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Course Id:</strong>
-                            <input type="number" name="course_id" placeholder="Enter Course id" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Semester Id:</strong>
-                            <input type="number" name="semester_id" placeholder="Enter Semester id" class="form-control">
-                        </div>
-                    </div>
+                    
                     <div class="col-xs-6 col-sm-6 col-md-12">
                         <div class="form-group">
                             <strong>Assessment Type:</strong>
@@ -87,12 +70,6 @@
                         <div class="form-group">
                             <strong>Due Date:</strong>
                             <input type="date" name="due_date" placeholder="Enter Due Date" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Session Programme ID:</strong>
-                            <input type="number" name="session_programme_id" placeholder="Enter Course id" class="form-control">
                         </div>
                     </div>
                     <input type="number" name="created_by" value="{{ Auth::user()->id }}" class="form-control" hidden>

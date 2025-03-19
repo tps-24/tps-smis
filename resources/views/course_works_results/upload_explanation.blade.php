@@ -20,11 +20,17 @@
     <div class="col-sm-12 col-12">
         <div class="card mb-4">
             <div class="card-header">
-                <a href="{{ route('courseworkResultDownloadSample') }}">
+                <div class="mb-4">
+                   <h3>Upload Coursework for {{ $course->courseName }} Course</h3> 
+                </div>
+                <div>
+                 <a href="{{ route('courseworkResultDownloadSample') }}">
                     <button  class="btn btn-s btn-success">
                         <i class="bi bi-download"></i> &nbspSample For Uploading Coursework
                     </button>
-                </a>
+                </a> 
+                </div>
+
                 <div class="mt-3">
                 <p>&nbspPlease download the sample uploading excel file and review your coursework before submitting. If you encounter any issues, feel free to contact support.</p>
                 </div>
@@ -42,14 +48,14 @@
                 @endif
 
                 <div class="d-flex gap-2 float-end">
-                    <form method="POST"  action="{{ route('coursework.upload', $courseId) }}" enctype="multipart/form-data">
+                    <form method="POST"  action="{{ route('coursework.upload', $course->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('POST')
                         <div class="d-flex gap-2 justify-content-end">
                             <!-- Semester Select -->
                             <select style="width: 30%; height: 40px; text-align: left; padding-bottom:5px;" name="semesterId" id="semesters" class="form-control" required>
                                 <option value="" selected disabled>-- Select Semester</option>
-                                @foreach ($semesters as $semester)
+                                @foreach ($course->semesters as $semester)
                                     <option value="{{ $semester->id }}">{{ $semester->semester_name }}</option>
                                 @endforeach
                             </select>

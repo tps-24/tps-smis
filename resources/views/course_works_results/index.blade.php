@@ -104,9 +104,9 @@
 
       ca_configuration_link = document.getElementById('ca_configuration_link');
       ca_configuration_btn = document.getElementById('ca_configuration_btn');
-      var ca_configuration_route = @json(route('coursework_results.index'));
-      //const newHrefCAConfiguration = ca_configuration_link.replace('COURSE_ID_PLACEHOLDER', courseId);
-      ca_configuration_link.setAttribute('href', ca_configuration_route);
+      var ca_configuration_route = @json(route('course.coursework', ['courseId' => 'COURSE_ID_PLACEHOLDER']));
+      const newHrefCAConfiguration = ca_configuration_route.replace('COURSE_ID_PLACEHOLDER', courseId);
+      ca_configuration_link.setAttribute('href', newHrefCAConfiguration);
       ca_configuration_btn.disabled = false;
       console.log(`Course ID clicked: ${courseId}`); // Log the course ID to the console
       fetchCourseworkResults(courseId);
