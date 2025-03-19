@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             // CreateAdminUserSeeder::class,
             // BeatTypeSeeder::class,
             // AreaSeeder::class,
-            // VitengoSeeder::class,
+           // VitengoSeeder::class,
             // CompanySeeder::class,
             // PlatoonSeeder::class,
             // AttendenceTypeSeeder::class,
