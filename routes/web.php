@@ -87,7 +87,7 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
 Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
 });
 
-    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    // Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     
     Route::resource('coursework_results', CourseworkResultController::class);
 
@@ -124,8 +124,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/staff/cv', [StaffController::class, 'resume'])->name('staff.resume');
 
 
-
+    Route::get('/semesters/{semesterId}/courses', [CourseworkResultController::class, 'index'])->name('semesters.index');
     
+    
+    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+
     Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
     Route::get('/coursework/upload_cw/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
     Route::post('/coursework/upload/{courseId}', [CourseworkResultController::class, 'import'])->name('coursework.upload');
@@ -215,8 +219,6 @@ Route::group(['middleware' => ['auth']], function () {
 Route::group(['middleware' => ['auth']], function () {    
     // Define the custom route first
     Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
-    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
-    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
     // Define the custom route first
@@ -293,8 +295,6 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     // routes/web.php
     Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
     Route::get('campanies/{campusId}', [GuardAreaController::class,'get_companies']);
-    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
-    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
         Route::get('type-test/{type_id}', 'attendence');
@@ -315,7 +315,9 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
         Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
     });
 
-
+    Route::get('course/courseworks/create/{courseId}',[CourseWorkController::class,'create'])->name('course.coursework.create');
+    Route::get('course/courseworks/{courseId}',[CourseWorkController::class,'getCourse'])->name('course.coursework');
+    Route::post('course/courseworks/store/{courseId}',[CourseWorkController::class,'store'])->name('course.coursework.store');
     Route::resource('grading_systems', GradingSystemController::class); 
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);

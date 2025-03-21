@@ -13,7 +13,6 @@ use App\Imports\CourseworkResultImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
 use Exception;
-use Illuminate\Support\Facades\DB;
 
 class CourseworkResultController extends Controller
 {
@@ -31,8 +30,24 @@ class CourseworkResultController extends Controller
         // dd($courseworkResults);
         return view('course_works_results.index', compact('programme','semesters','selectedSemester'));
     }
+    
+    public function getResultsByCoursez($courseId)
+    {
+        try {
+            \Log::info('getResultsByCourse method called with courseId: ' . $courseId); // Log for debugging
 
-    public function getResultsByCoursey($courseId)
+            $results = CourseworkResult::where('course_id', $courseId)
+                ->with(['student', 'course', 'coursework', 'semester'])
+                ->paginate(10); // Paginate the results, 10 per page
+
+            return response()->json($results);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching coursework results: ' . $e->getMessage()); // Log the error
+            return response()->json(['message' => 'Internal Server Error'], 500);
+        }
+    }
+
+    public function getResultsByCourse($courseId)
     {
         try {
             \Log::info('Fetching results for course ID: ' . $courseId); // Log for debugging
@@ -45,7 +60,6 @@ class CourseworkResultController extends Controller
                 ->with(['student', 'course', 'coursework', 'semester'])
                 ->paginate(10); // Paginate the results, 10 per page
 
-                dd($results);
             return response()->json([
                 'courseworks' => $courseworks, // For dynamic table headings
                 'results' => $results, // For dynamic table rows
@@ -56,66 +70,27 @@ class CourseworkResultController extends Controller
         }
     }
 
-    public function getResultsByCourse($courseId)
+
+    public function getCourseworkConfiguration($courseId)
     {
         try {
-            // Fetch all coursework configurations for the given course
-            $courseworks = DB::table('course_works')
-                ->where('course_id', $courseId)
-                ->select('id', 'coursework_title')
+            // Fetch coursework configuration for the specific course
+            $courseworks = CourseWork::where('course_id', $courseId)->get(['coursework_title', 'id']);
+
+            // Fetch coursework results for the specific course
+            $results = CourseworkResult::where('course_id', $courseId)
+                ->with(['student'])
                 ->get();
 
-            // Log the fetched courseworks for debugging
-            \Log::info('Courseworks fetched:', ['data' => $courseworks]);
-
-            // Fetch coursework results grouped by student
-            $results = DB::table('coursework_results')
-                ->join('students', 'coursework_results.student_id', '=', 'students.id')
-                ->where('coursework_results.course_id', $courseId)
-                ->select(
-                    'coursework_results.student_id',
-                    'coursework_results.coursework_id',
-                    'coursework_results.score',
-                    'students.force_number',
-                    'students.first_name',
-                    'students.last_name'
-                )
-                ->get();
-
-            // Log the fetched results for debugging
-            \Log::info('Raw results fetched:', ['data' => $results]);
-
-            // Group results by student ID
-            $groupedResults = $results->groupBy('student_id')->map(function ($studentResults) use ($courseworks) {
-                $studentData = $studentResults->first(); // Basic student details
-                $scores = $studentResults->pluck('score', 'coursework_id'); // Map scores by coursework ID
-                $totalCW = $scores->sum(); // Calculate total coursework score
-
-                return [
-                    'student' => [
-                        'force_number' => $studentData->force_number,
-                        'first_name' => $studentData->first_name,
-                        'last_name' => $studentData->last_name,
-                    ],
-                    'scores' => $scores, // Individual coursework scores
-                    'total_cw' => $totalCW, // Total CW score
-                ];
-            });
-
-            \Log::info('Grouped results processed:', ['data' => $groupedResults]);
-
-            // Ensure valid structure even if results are empty
             return response()->json([
-                'courseworks' => $courseworks ?? [],
-                'results' => $groupedResults ?? [],
+                'courseworks' => $courseworks,
+                'results' => $results,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error fetching coursework results:', ['message' => $e->getMessage()]);
+            \Log::error('Error fetching coursework configuration and results: ' . $e->getMessage());
             return response()->json(['message' => 'Internal Server Error'], 500);
         }
     }
-
-
 
 
 

@@ -89,7 +89,7 @@ class DashboardController extends Controller
         }else {
             $todayStudentReport = $this->todayStudentReport();
 
-            $denttotalCount = $todayStudentReport['present'];
+            $denttotalCount = Student::where('session_programme_id', $selectedSessionId)->count();// $todayStudentReport['present'];
             $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)->where('beat_status', 1)->count();
             $beats = Beat::where('date', Carbon::today()->toDateString())->get();
             $filteredBeats = $beats->filter(function ($beat) use ($selectedSessionId) {
@@ -229,7 +229,7 @@ class DashboardController extends Controller
         foreach($platoons as $platoon){
         
             if(count($platoon->today_attendence) > 0){
-                $present += $platoon->today_attendence->get(0)->present;
+                $present += $platoon->today_attendence->get(0)->present + $platoon->today_attendence->get(0)->kazini + $platoon->today_attendence->get(0)->sentry + $platoon->today_attendence->get(0)->messy;
                 $absent += $platoon->today_attendence->get(0)->absent;
                 $sick += $platoon->today_attendence->get(0)->sick;
                 $lockUp += $platoon->today_attendence->get(0)->lockUp;

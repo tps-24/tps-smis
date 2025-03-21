@@ -20,6 +20,7 @@ class Attendence extends Model
       'male',
       'lockUp',
       'kazini',
+      'sick',
       'lockUp_students_ids',
       'total',
       'absent_student_ids',

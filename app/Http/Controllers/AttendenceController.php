@@ -48,8 +48,10 @@ class AttendenceController extends Controller
         $platoon = Platoon::find($request->platoon);
         $students = $platoon->students()->where('session_programme_id',$this->selectedSessionId)
                                     ->where('company_id', $platoon->company_id)
+                                    ->whereNotIn('id',$this->getSafariStudentIds($platoon))
+                                    ->whereNotIn('id',$this->getSickStudentIds($platoon))
                                     ->whereNotIn('id',$this->getKaziniStudentsIds($platoon))->get();
-        //return count($students);
+                                    //return count($students);
         // $students = Student::where('company_id', $platoon->company_id)
         //             ->where('session_programme_id',$this->selectedSessionId)
         //             ->where('platoon', $platoon->name)
@@ -374,7 +376,7 @@ class AttendenceController extends Controller
     {
         $ids = $request->input('student_ids');
         if ($ids == NULL) {
-            return redirect()->route('attendences.index')->with('success', "Attendences for this platoon already recorded.");
+            return redirect()->to('attendences/type/1')->with('error', "Students must be selected.");
         }
         // $female = $students->where('gender', 'F')->count();
         // $male = $students->where('gender', 'M')->count();
@@ -393,7 +395,7 @@ class AttendenceController extends Controller
                         ->where('platoon', $platoon->name)  
                         ->where('gender', 'M')->count();
         
-        $absent_ids = array_values(array_diff($students, $ids, $this->getKaziniStudentsIds($platoon)));
+        $absent_ids = array_values(array_diff($students, $ids, $this->getKaziniStudentsIds($platoon),$this->getSickStudentIds($platoon), $this->getSafariStudentIds($platoon)));
         $total = count($students);
         
         
@@ -401,7 +403,7 @@ class AttendenceController extends Controller
             ->where('attendences.platoon_id', $platoon_id)
             ->whereDate('attendences.created_at', Carbon::today())->get();
         if (!$todayRecords->isEmpty()) {
-            return redirect()->route('attendences.index')->with('success', "Attendences for this platoon already recorded.");
+            return redirect()->to('attendences/type/1')->with('success', "Attendences for this platoon already recorded.");
         }
         for($i = 0; $i<count($absent_ids); $i++){
             $student = Student::find($absent_ids[$i]);
@@ -414,6 +416,8 @@ class AttendenceController extends Controller
         $page = AttendenceType::find($type);
         $lockUp = $this->getLockUpStudentsIds($platoon);
         $kazini = $this->kaziniPlatoonStudents($platoon);
+        $sick_ids = $this->getSickStudentIds($platoon);
+        $safari_ids = $this->getSafariStudentIds($platoon);
         Attendence::create([
             'attendenceType_id' => $type,
             'platoon_id' => $platoon_id,
@@ -421,19 +425,21 @@ class AttendenceController extends Controller
             'sentry' => 0,
             'absent' => count($absent_ids),
             'adm' => 0,
-            'safari' => 0,
+            'safari' => count($safari_ids),
             'off' => 0,
             'mess' => 0,
             'female' => $female,
             'male' => $male,
             'lockUp' => count($lockUp),
             'kazini' => $kazini,
+            'sick' => count($sick_ids),
+            'session_programme_id ' => $this->selectedSessionId,
             'lockUp_students_ids' =>count($lockUp) > 0?  json_encode($lockUp): NULL,
             'absent_student_ids' =>count($absent_ids) > 0? implode(',', $absent_ids): NULL,
             'total' => $total
         ]);
         
-        return redirect()->route('attendences.index')->with('success','Attendances saved successfully.');
+        return redirect()->to('attendences/type/1')->with('success','Attendances saved successfully.');
 
     }
 
@@ -655,5 +661,22 @@ class AttendenceController extends Controller
 
     $studentIds = $students->pluck('id')->toArray();
     return $studentIds;
+    }
+
+    private function getSickStudentIds($platoon){
+        $sick_ids = [];
+        $sick_students = $platoon->today_sick;       
+        foreach($sick_students as $sick_student){            
+            if ($sick_student->created_at->copy()->addDays($sick_student->rest_days)>=(Carbon::now())) {
+                if($sick_student->excuse_type_id == 1 || $sick_student->excuse_type_id == 3){
+                    $sick_ids = array_merge($sick_ids, [$sick_student->student->id]);
+                }
+            }
+        }        
+        return $sick_ids;
+    }
+
+    private function getSafariStudentIds($platoon){
+        return  $platoon->safari->pluck('student_id')->toArray();   
     }
 }

@@ -24,7 +24,7 @@
 @endsession
 
 <div class="row gx-4">
-    <div class="col-sm-3">
+    <div class="col-sm-4">
         <div class="card mb-3">
             <div class="card-header">
                 <!-- Semester Tabs -->
@@ -73,7 +73,7 @@
 
 
     <!-- Right section starts-->
-    <div class="col-sm-9">
+    <div class="col-sm-8">
         <div class="card mb-3">
             <div class="card-header">
                 <div class="pull-right">
@@ -179,17 +179,6 @@
             return response.json();
         })
         .then(data => {
-            console.log('Fetched Data:', data);
-
-            // Handle missing or empty data
-            if (!data.courseworks || !Array.isArray(data.courseworks) || data.courseworks.length === 0) {
-                throw new Error('No coursework data found.');
-            }
-
-            if (!data.results || Object.keys(data.results).length === 0) {
-                throw new Error('No result data found.');
-            }
-
             // Clear previous content
             headingsContainer.innerHTML = `
                 <th>#</th>
@@ -206,25 +195,28 @@
                 headingsContainer.appendChild(heading);
             });
 
-            // Add "Total CW" and "Actions" headings
+            // Add "Total CW" heading
             const totalHeading = document.createElement('th');
             totalHeading.style.textAlign = 'center';
             totalHeading.innerText = 'Total CW';
             headingsContainer.appendChild(totalHeading);
 
+            // **Add Actions heading**
             const actionsHeading = document.createElement('th');
             actionsHeading.style.textAlign = 'center';
             actionsHeading.innerText = 'Actions';
             headingsContainer.appendChild(actionsHeading);
 
-            // Populate table rows
+            // Populate table rows with results
             let rowIndex = 1;
             Object.entries(data.results).forEach(([studentId, studentResult]) => {
                 const row = document.createElement('tr');
+
+                // Add initial columns (student details)
                 row.innerHTML = `
                     <td style="text-align: center;">${rowIndex++}</td>
-                    <td style="text-align: center;">${studentResult.student.force_number}</td>
-                    <td>${studentResult.student.first_name} ${studentResult.student.last_name}</td>
+                    <td style="text-align: center;">${result.student.force_number}</td>
+                    <td>${result.student.first_name} ${result.student.middle_name ?? ''} ${result.student.last_name}</td>
                 `;
 
                 // Add scores for each coursework heading
@@ -233,46 +225,46 @@
                     row.innerHTML += `<td style="text-align: center;">${score}</td>`;
                 });
 
-                // Add "Total CW" and "Actions" columns
+                // Add "Total CW" column
+                row.innerHTML += `<td style="text-align: center;">${studentResult.total_cw}</td>`;
+
+                // **Add Actions column**
                 row.innerHTML += `
-                    <td style="text-align: center;">${studentResult.total_cw}</td>
                     <td style="text-align: center;">
                         <button class="btn btn-info btn-sm">View</button>
                         <button class="btn btn-primary btn-sm">Edit</button>
                     </td>
                 `;
+
                 resultsContainer.appendChild(row);
             });
 
-            // Add pagination links
-            paginationContainer.innerHTML = '';
-            if (data.results.links && Array.isArray(data.results.links)) {
-                paginationContainer.innerHTML = `
-                    <ul class="pagination justify-content-end">
-                        ${data.results.links.map(link => `
-                            <li class="page-item ${link.active ? 'active' : ''}">
-                                <a class="page-link" href="#" data-page="${new URL(link.url).searchParams.get('page')}">
-                                    ${link.label}
-                                </a>
-                            </li>
-                        `).join('')}
-                    </ul>
-                `;
+            // Add pagination links dynamically
+            paginationContainer.innerHTML = `
+                <ul class="pagination justify-content-end">
+                    ${data.results.links.map(link => `
+                        <li class="page-item ${link.active ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${new URL(link.url).searchParams.get('page')}">
+                                ${link.label}
+                            </a>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
 
-                // Attach event listeners for pagination links
-                document.querySelectorAll('.page-link').forEach(link => {
-                    link.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const page = this.getAttribute('data-page');
-                        if (page) fetchCourseworkResults(courseId, page);
-                    });
+            // Attach event listeners for pagination links
+            document.querySelectorAll('.page-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    if (page) fetchCourseworkResults(courseId, page);
                 });
-            }
+            });
         })
         .catch(error => {
             console.error('Error fetching results:', error);
 
-            // Display fallback message in case of failure
+            // Display fallback message in the table
             resultsContainer.innerHTML = `
                 <tr>
                     <td colspan="7" class="text-danger text-center">Failed to load results. Please try again later.</td>

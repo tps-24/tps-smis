@@ -110,10 +110,9 @@ class ExcuseTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ExcuseType $excuseType): RedirectResponse
+    public function destroy(ExcuseType $excuseType)
     {
-        $course->delete();
-    
+        $excuseType->delete();
         return redirect()->route('excuse_types.index')
                         ->with('success','Excuse type deleted successfully');
     }

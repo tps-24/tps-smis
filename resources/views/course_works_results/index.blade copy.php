@@ -24,7 +24,7 @@
 @endsession
 
 <div class="row gx-4">
-    <div class="col-sm-3">
+    <div class="col-sm-4">
         <div class="card mb-3">
             <div class="card-header">
                 <!-- Semester Tabs -->
@@ -73,7 +73,7 @@
 
 
     <!-- Right section starts-->
-    <div class="col-sm-9">
+    <div class="col-sm-8">
         <div class="card mb-3">
             <div class="card-header">
                 <div class="pull-right">
@@ -108,13 +108,11 @@
     </table>
 </div>
 
+
 <!-- Pagination -->
 <div class="d-flex justify-content-end mt-3" id="pagination-container">
     <!-- Pagination links will dynamically load here -->
 </div>
-
-
-
 
 
 
@@ -129,6 +127,7 @@
 
 @section('scripts')
 <script>
+  
   document.addEventListener('DOMContentLoaded', function () {
     // Attach event listeners for all course links
     document.querySelectorAll('.course-link').forEach(function (link) {
@@ -153,111 +152,99 @@
 
             console.log(`Selected Course ID: ${courseId}`);
 
-            // Fetch and display results for the selected course
+            // Fetch results for the selected course
             fetchCourseworkResults(courseId);
         });
     });
 
-    // Function to fetch and render coursework results
+    // Function to fetch and display coursework results
     function fetchCourseworkResults(courseId, page = 1) {
-    const apiUrl = `/tps-smis/coursework_results/course/${courseId}?page=${page}`;
-    const headingsContainer = document.getElementById('coursework-headings');
-    const resultsContainer = document.getElementById('coursework-results');
-    const paginationContainer = document.getElementById('pagination-container');
+        const headingsContainer = document.getElementById('coursework-headings');
+        const resultsContainer = document.getElementById('coursework-results');
+        const paginationContainer = document.getElementById('pagination-container');
+        const loader = document.getElementById('loading-indicator'); // Optional loader for UX
+        const basePath = '/tps-smis'; // Adjust base path if necessary
 
-    // Check if necessary elements exist
-    if (!headingsContainer || !resultsContainer || !paginationContainer) {
-        console.error('Error: Necessary DOM elements are missing');
-        return;
-    }
+        console.log(`Fetching results for Course ID: ${courseId} (Page: ${page})`);
 
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Fetched Data:', data);
+        // Show loader while fetching data
+        if (loader) loader.style.display = 'block';
 
-            // Handle missing or empty data
-            if (!data.courseworks || !Array.isArray(data.courseworks) || data.courseworks.length === 0) {
-                throw new Error('No coursework data found.');
-            }
-
-            if (!data.results || Object.keys(data.results).length === 0) {
-                throw new Error('No result data found.');
-            }
-
-            // Clear previous content
-            headingsContainer.innerHTML = `
-                <th>#</th>
-                <th>Force Number</th>
-                <th>Student Name</th>
-            `;
-            resultsContainer.innerHTML = '';
-
-            // Add dynamic coursework headings
-            data.courseworks.forEach(coursework => {
-                const heading = document.createElement('th');
-                heading.style.textAlign = 'center';
-                heading.innerText = coursework.coursework_title;
-                headingsContainer.appendChild(heading);
-            });
-
-            // Add "Total CW" and "Actions" headings
-            const totalHeading = document.createElement('th');
-            totalHeading.style.textAlign = 'center';
-            totalHeading.innerText = 'Total CW';
-            headingsContainer.appendChild(totalHeading);
-
-            const actionsHeading = document.createElement('th');
-            actionsHeading.style.textAlign = 'center';
-            actionsHeading.innerText = 'Actions';
-            headingsContainer.appendChild(actionsHeading);
-
-            // Populate table rows
-            let rowIndex = 1;
-            Object.entries(data.results).forEach(([studentId, studentResult]) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="text-align: center;">${rowIndex++}</td>
-                    <td style="text-align: center;">${studentResult.student.force_number}</td>
-                    <td>${studentResult.student.first_name} ${studentResult.student.last_name}</td>
+        fetch(`${basePath}/coursework_results/course/${courseId}?page=${page}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Clear previous headings, results, and pagination
+                headingsContainer.innerHTML = `
+                    <th style="width: 5%; text-align: center;">#</th>
+                    <th style="width: 25%; text-align: center;">Force Number</th>
+                    <th style="width: 25%; text-align: center;">Student Name</th>
                 `;
+                resultsContainer.innerHTML = '';
+                paginationContainer.innerHTML = '';
 
-                // Add scores for each coursework heading
+                // Add dynamic coursework headings
                 data.courseworks.forEach(coursework => {
-                    const score = studentResult.scores[coursework.id] || '-';
-                    row.innerHTML += `<td style="text-align: center;">${score}</td>`;
+                    const heading = document.createElement('th');
+                    heading.style.textAlign = 'center';
+                    heading.innerText = coursework.coursework_title;
+                    headingsContainer.appendChild(heading);
                 });
 
-                // Add "Total CW" and "Actions" columns
-                row.innerHTML += `
-                    <td style="text-align: center;">${studentResult.total_cw}</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-info btn-sm">View</button>
-                        <button class="btn btn-primary btn-sm">Edit</button>
-                    </td>
-                `;
-                resultsContainer.appendChild(row);
-            });
+                // Add Actions column
+                const actionsHeading = document.createElement('th');
+                actionsHeading.style.textAlign = 'center';
+                actionsHeading.style.width = '30%';
+                actionsHeading.innerText = 'Actions';
+                headingsContainer.appendChild(actionsHeading);
 
-            // Add pagination links
-            paginationContainer.innerHTML = '';
-            if (data.results.links && Array.isArray(data.results.links)) {
-                paginationContainer.innerHTML = `
+                // Populate table rows with results
+                let i = 1;
+                data.results.data.forEach(result => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="text-align: center;">${i++}</td>
+                        <td style="text-align: left;">${result.student.force_number ?? 'N/A'}</td>
+                        <td>${result.student.first_name} ${result.student.middle_name ?? ''} ${result.student.last_name}</td>
+                        ${data.courseworks.map(coursework => {
+                            // Map coursework title to result fields
+                            const fieldName = coursework.coursework_title.toLowerCase().replace(/ /g, '_');
+                            return `
+                                <td style="text-align: center;">
+                                    ${result[fieldName] ?? '-'}
+                                </td>`;
+                        }).join('')}
+                        <td style="text-align: center;">
+                            <div class="btn-group">
+                                <a class="btn btn-info btn-sm" href="${basePath}/coursework_results/${result.id}"><i class="fa fa-eye"></i> Show</a>
+                                <a class="btn btn-primary btn-sm" href="${basePath}/coursework_results/${result.id}/edit"><i class="fa fa-edit"></i> Edit</a>
+                                <form method="POST" action="${basePath}/coursework_results/${result.id}" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</button>
+                                </form>
+                            </div>
+                        </td>`;
+                    resultsContainer.appendChild(row);
+                });
+
+                // Build and display pagination links
+                const pagination = document.createElement('nav');
+                pagination.innerHTML = `
                     <ul class="pagination justify-content-end">
                         ${data.results.links.map(link => `
                             <li class="page-item ${link.active ? 'active' : ''}">
-                                <a class="page-link" href="#" data-page="${new URL(link.url).searchParams.get('page')}">
+                                <a class="page-link" href="#" data-page="${link.url ? new URL(link.url).searchParams.get('page') : ''}">
                                     ${link.label}
                                 </a>
                             </li>
                         `).join('')}
-                    </ul>
-                `;
+                    </ul>`;
+                paginationContainer.appendChild(pagination);
 
                 // Attach event listeners for pagination links
                 document.querySelectorAll('.page-link').forEach(link => {
@@ -267,22 +254,19 @@
                         if (page) fetchCourseworkResults(courseId, page);
                     });
                 });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching results:', error);
-
-            // Display fallback message in case of failure
-            resultsContainer.innerHTML = `
-                <tr>
-                    <td colspan="7" class="text-danger text-center">Failed to load results. Please try again later.</td>
-                </tr>
-            `;
-        });
-}
-
+            })
+            .catch(error => {
+                console.error('Error fetching results:', error);
+                resultsContainer.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-danger">Failed to load results. Please try again later.</td>
+                    </tr>`;
+            })
+            .finally(() => {
+                if (loader) loader.style.display = 'none'; // Hide loader
+            });
+    }
 });
-
 
 </script>
 @endsection
