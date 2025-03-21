@@ -55,4 +55,7 @@ class Company extends Model
         return $this->belongsTo(Campus::class);
     }
     
+    public function sickStudents(){
+        return $this->hasMany(Patient::class);
+    }
 }

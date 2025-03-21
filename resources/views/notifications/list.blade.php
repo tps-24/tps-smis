@@ -1,10 +1,10 @@
  <!-- Notification script starts -->
  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+            <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
             <script>
                 let notification_ids =  "[";
                 // Enable pusher logging - don't include this in production
-                Pusher.logToConsole = true;
+                //Pusher.logToConsole = true;
 
 
                 var pusher = new Pusher('3a9b85e8ad0fb87a0a56', {
@@ -56,11 +56,11 @@
                 });
 
                 pusher.connection.bind('state_change', function (states) {
-                    console.log('State changed from ' + states.previous + ' to ' + states.current);
+                    //console.log('State changed from ' + states.previous + ' to ' + states.current);
                     if (states.current === 'connected') {
-                        console.log('Successfully connected to Pusher!');
+                        //console.log('Successfully connected to Pusher!');
                     } else if (states.current === 'disconnected') {
-                        console.log('Disconnected. Attempting to reconnect...');
+                        // console.log('Disconnected. Attempting to reconnect...');
                         pusher.connect();
                     }
                 });

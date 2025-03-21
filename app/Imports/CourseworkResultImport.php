@@ -39,17 +39,19 @@ class CourseworkResultImport implements ToCollection, ToModel
     {
         $this->num++;
         if ($this->num > 5) {
+            
             if (empty($row[1])) {
                 return;  // or you can use continue; depending on where the loop is
             }
             $student = Student::where('force_number', $row[1])->first();
-
+            
             if (!$student) {
                 // If no student found, throw an exception with a detailed message
                 throw new Exception('Student with force number ' . $row[1] . ' not found.');
             }
-
+            dd($this->courseId);
             $coursework = CourseWork::findOrFail($this->courseId);
+            
             if (!$coursework) {
                 // If no coursework found, throw an exception with a detailed message
                 throw new Exception('coursework with Id ' . $this->courseId . ' not found.');
@@ -70,7 +72,7 @@ class CourseworkResultImport implements ToCollection, ToModel
             $courseworkResult->course_id = $this->courseId;
             $courseworkResult->coursework_id = $this->courseworkId;
             $courseworkResult->semester_id = $this->semesterId;
-            $courseworkResult->score = $row[2];
+            $courseworkResult->score = $row[3];
             $courseworkResult->created_by = Auth::user()->id;
             $courseworkResult->save();
             return $courseworkResult;

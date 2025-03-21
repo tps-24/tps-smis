@@ -50,7 +50,8 @@
 
                     <div class="d-flex justify-content-end mt-3 gap-2">
                         @can('beat-edit')
-                            @if ($student->beat_status == 4 && $student->pendingSafari()->exists())
+                        @if($student->beat_status != 6)
+                            @if ($student->beat_status == 4 && $student->pendingSafari()->exists()  )
                                 <form action="{{ route('returnSafariStudent', $student->pendingSafari()->first()->id) }}"
                                     method="POST">
                                     @csrf
@@ -61,6 +62,7 @@
                             @else
                                 <button class="btn  btn-warning" data-bs-toggle="modal"
                                     data-bs-target="#SafariDetails">Safari</button>
+                            @endif
                             @endif
                         @endcan
 

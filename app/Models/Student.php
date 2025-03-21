@@ -125,4 +125,8 @@ class Student extends Model
     public function pendingSafari(){
         return $this->safari()->where('status','safari');
     }
+
+    public function sick(){
+        return $this->hasMany(Patient::class);
+    }
 }
