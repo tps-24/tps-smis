@@ -109,43 +109,47 @@
         // Initialize Chart
         const ctx = document.getElementById('groupedBarChart').getContext('2d');
         let chart = new Chart(ctx, {
-    type: 'bar',
-    data: dailyData, // Default to daily data
-    options: {
-        responsive: true,
-        scales: {
-            x: {
-                stacked: false,
-                title: {
-                    display: true,
-                    text: 'Dates'  // Default label for the X-axis
+            type: 'bar',
+            data: dailyData, // Default to daily data
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: false,
+                        title: {
+                            display: true,
+                            text: 'Dates'  // Default label for the X-axis
+                        }
+                    },
+                    y: {
+                        stacked: false,
+                        title: {
+                            display: true,
+                            text: 'Counts'  // Default label for the Y-axis
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            padding: 20, // Add padding to the top of the bars
+                            // Use callback to remove decimal points
+                            callback: function (value) {
+                                return value.toFixed(0);  // Rounds the value to the nearest integer
+                            }
+                        },
+                        // Dynamically set the max value of the y-axis to be higher than the highest bar
+                        suggestedMax: Math.max(...daily.absents, ...daily.sick, ...daily.lockUps) * 1.5, // 20% more than the highest value
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 30, // Adds space at the top of the chart area
+                        bottom: 10,
+                        left: 10,
+                        right: 10
+                    }
                 }
-            },
-            y: {
-                stacked: false,
-                title: {
-                    display: true,
-                    text: 'Counts'  // Default label for the Y-axis
-                },
-                ticks: {
-                    beginAtZero: true,
-                    padding: 20, // Add padding to the top of the bars
-                    // This ensures we start from 0 and leave space at the top
-                },
-                // Dynamically set the max value of the y-axis to be higher than the highest bar
-                suggestedMax: Math.max(...daily.absents, ...daily.sick, ...daily.lockUps) * 1.2, // 20% more than the highest value
             }
-        },
-        layout: {
-            padding: {
-                top: 30, // Adds space at the top of the chart area
-                bottom: 10,
-                left: 10,
-                right: 10
-            }
-        }
-    }
-});
+        });
+
 
         function updateAxisLabels(dataType) {
             switch (dataType) {

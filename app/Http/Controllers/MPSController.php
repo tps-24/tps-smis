@@ -187,7 +187,7 @@ class MPSController extends Controller
         $mpsStudents = $company->lockUp;
         // $mpsStudents = MPS::join('students', 'm_p_s.student_id', 'students.id')->join('companies', 'students.company_id', 'companies.name')
         //                 ->where('students.company_id', $companyId)->get();
-                        $scrumbName = $company->name;
+                        $scrumbName = $company->description;
         return view('mps.index', compact('mpsStudents', 'scrumbName'));
 
     }
