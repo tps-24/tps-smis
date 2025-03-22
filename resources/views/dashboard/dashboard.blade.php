@@ -38,14 +38,15 @@
                         <!-- Announcements start -->
                         <div class="d-flex flex-column gap-3">
                             @foreach ($recentAnnouncements as $announcement)
-                                <div class="d-flex pb-3 border-bottom w-100">
-                                    <div class=" me-3">
+                                <div class="pb-3 border-bottom w-100">
+                                    <div class=" d-flex me-3">
                                         <!-- <i class="bi bi-icon fs-3 text-{{ $announcement->type }}"></i> -->
                                         <img style="width: 50px;" src="{{ asset('resources/assets/images/new_blinking.gif') }}"
                                             alt="new gif">
+                                            <h3 class="m-0 lh-1 fw-semibold">{{ $announcement->title }}</h3>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <h3 class="m-0 lh-1 fw-semibold">{{ $announcement->title }}</h3>
+                                        
                                         <p class="m-0 lh-1 fw-semibold">{{ $announcement->message }}</p>
                                     </div>
                                 </div>
