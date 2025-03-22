@@ -51,6 +51,7 @@ class MPSController extends Controller
         if (!$student) {
             abort(404);
         }
+
         $mpsStudentData = $student->mps;
         if ($mpsStudentData) {
             foreach ($mpsStudentData as $data) {
@@ -61,20 +62,23 @@ class MPSController extends Controller
         }
         $validator = Validator::make($request->all(), [
             'description' => 'required',
-            'days' => 'required|numeric'
+            'arrested_at' => 'required||date'
+            //'days' => 'required|numeric'
         ]);
 
         if ($validator->errors()->any()) {
             return redirect()->back()->withErrors($validator->errors());
         }
-        $student = MPS::create([
+         MPS::create([
             'added_by' => Auth::user()->id,
             'student_id' => $student->id,
             'description' => $request->description,
-            'days' => $request->days,
+            'previous_beat_status' => $student->beat_status,
             'arrested_at' => $request->arrested_at
         ]);
 
+        $student->beat_status = 6;
+        $student->save();
         return redirect()->route('mps.index')->with('success', 'Student recorded successfully.');
     }
 
@@ -97,25 +101,22 @@ class MPSController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $mPS)
+    public function update(Request $request, $mPSStudentId)
     {
-        $mPSstudent = MPS::find($mPS);
+        $mPSstudent = MPS::find($mPSStudentId);
         if (!$mPSstudent) {
             abort(404);
         }
         $validator = Validator::make($request->all(), [
             'description' => 'required|alpha',
-            'days' => 'required|numeric'
+            'arrested_at' => 'required||date'
         ]);
         if ($validator->errors()->any()) {
             return redirect()->back()->withErrors($validator->errors());
         }
-        MPS::create([
-            'added_by' => Auth::user()->id,
-            'student_id' => $mPSstudent->id,
-            'days' => $request->days,
-            'arrested_at' => $request->arrested_at
-        ]);
+        $mPSstudent->arrested_at = $request->arrested_at;
+        $mPSstudent->description = $request->description;
+        $mPSstudent->save();
 
         return redirect()->back()->with('success', 'MPS student record updated succesfully.');
     }
@@ -172,6 +173,10 @@ class MPSController extends Controller
             abort(404);
         }
         $mPSstudent->released_at = Carbon::now();
+        $mPSstudent->days = Carbon::parse($mPSstudent->arrested_at)->diffInDays(Carbon::now());
+        $student = $mPSstudent->student;
+        $student->beat_status = $mPSstudent->previous_beat_status;
+        $student->save();
         $mPSstudent->save();
         return redirect()->back()->with('success', 'Student released successfuly.');
     }

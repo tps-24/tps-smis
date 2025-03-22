@@ -38,11 +38,7 @@
             </div>
             <div class="card-body">
 
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible" role="alert">
-                        {{ session('success') }}
-                    </div>
-                @endif
+            @include('layouts.sweet_alerts.index')
 
                 <div class="d-flex gap-2 float-end">
                     <form method="POST"  action="{{ route('coursework.upload', $course->id) }}" enctype="multipart/form-data">

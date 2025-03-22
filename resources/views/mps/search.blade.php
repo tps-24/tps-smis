@@ -17,11 +17,7 @@
 @endsection
 @section('content')
 <!-- Success Message -->
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
+@include('layouts.sweet_alerts.index')
 <div class="card-body">
     <form action="{{url('/mps/search')}}" method="POST" class="d-flex justify-content-between mb-3">
         @csrf
@@ -98,14 +94,7 @@
                                                                 <div class="error">{{ $message }}</div>
                                                             @enderror
 
-                                                            <div class="mb-3">
-                                                                <label for="excuseType" class="form-label">Days</label>
-                                                                <input class="form-control" value="1" min="1" type="number" required
-                                                                    name="days">
-                                                            </div>
-                                                            @error('days')
-                                                                <div class="error">{{ $message }}</div>
-                                                            @enderror
+                                                            
 
                                                             <div class="mb-3">
                                                                 <label for="description" class="form-label">Description</label>

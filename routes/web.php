@@ -288,7 +288,7 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('safari-students', SafariStudentController::class);
-
+    Route::resource('mps', MPSController::class);
     
     // Define the custom route first
 

@@ -61,7 +61,8 @@
                     use App\Models\Student;
                     $date = Carbon\Carbon::parse("$date")
                 @endphp
-                <h4> {{ strtoupper($company->name) }} STATE {{ $date->format('d/m/Y')}}</h4>
+                <h4>DAILY STATE {{ strtoupper($company->name) }}  DATE {{ $date->format('d/m/Y')}}</h4>
+                <h4>BASIC RECRUIT COURSE No 1. 2024/2025</h4>
             </div>
             <div class="table-container">
                 <table class="page-break">
@@ -335,6 +336,37 @@
         </table>
     </div
     @endif
+
+    @if ($sick_students -> isNotEmpty())
+    <div class="table-container" style="width: 50%;">
+        <center>
+            <h4>Sick Students</h4>
+        </center>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Names</th>
+                    <th>Rest days</th>
+                    <th>Platoon</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for ($i = 0; $i < count($sick_students); $i++)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ $sick_students[$i]->first_name }} {{ $sick_students[$i]->middle_name }}
+                            {{ $sick_students[$i]->last_name }}</td>
+                            <td>{{ $sick_students[$i]->sick->last()->rest_days }}</td>
+                        <td>{{ $sick_students[$i]->platoon }}</td>
+                    </tr>
+                @endfor
+            </tbody>
+        </table>
+    </div>
+    @endif
+
+    
 </body>
 
 </html>

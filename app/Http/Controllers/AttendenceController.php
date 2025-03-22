@@ -304,7 +304,7 @@ class AttendenceController extends Controller
 
     public function getMPSdata($company_id)
     {
-        $mpsStudents = MPS::whereDate('created_at', Carbon::today())->orWhereNotNull('released_at')->get();
+        $mpsStudents = MPS::WhereNull('released_at')->get();
         $count = 0;
         foreach ($mpsStudents as $mpsStudent) {
             if ($mpsStudent->student->company_id == $company_id) {
@@ -546,8 +546,13 @@ class AttendenceController extends Controller
     public function generatePdf($companyId, $date)
     {
         $company = Company::find($companyId);
-        //return view('attendences.daily_report', compact('company', 'date'));
-        $pdf = Pdf::loadView('attendences.daily_report', compact('company', 'date'));
+        $sick_ids = [];
+        foreach($company->platoons as $platoon){
+            $sick_ids = array_merge($sick_ids, $this->getSickStudentIds($platoon));
+        }
+        $sick_students = Student::whereIn('id', $sick_ids)->get();
+        //return view('attendences.daily_report', compact('company', 'date', 'sick_students'));
+        $pdf = Pdf::loadView('attendences.daily_report', compact('company', 'date', 'sick_students'));
         return $pdf->download($date . "-" . $company->name . "-attendance.pdf");
     }
 
