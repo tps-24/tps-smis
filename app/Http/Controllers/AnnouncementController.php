@@ -65,6 +65,7 @@ class AnnouncementController extends Controller
             $filePath = $file->store('uploads', 'public');
             $announcement->document_path = $filePath;
         }
+        //return $request->audience;
         if ($request->audience == "all") {
             $announcement->audience = $request->audience;
         } else if($request->audience == "staff"){

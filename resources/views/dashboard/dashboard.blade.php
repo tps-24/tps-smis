@@ -38,10 +38,9 @@
                 <div class="d-flex flex-column gap-3">
                     @foreach ($recentAnnouncements as $announcement)
                         <div class="d-flex pb-3 border-bottom w-100">
-                            <div class=" me-3">
+                            <div class=" me-3" >
                                 <!-- <i class="bi bi-icon fs-3 text-{{ $announcement->type }}"></i> -->
-                                <img style="width: 100px;" src="{{ asset('resources/assets/images/new_blinking.gif') }}" alt="new gif">                                    
-
+                                <img style="width: 50px;" src="{{ asset('resources/assets/images/new_blinking.gif') }}" alt="new gif">                                    
                             </div>
                             <div class="d-flex flex-column">
                                 <h3 class="m-0 lh-1 fw-semibold">{{ $announcement->title }}</h3>
@@ -63,76 +62,44 @@
 <!-- Chart.js -->
 <script src="/tps-smis/resources/assets/js/chart.js"></script>
 <script>
-    function getDateRange(days) {
-        const today = new Date();
-        let dates = [];
-        for (let i = 0; i < days; i++) {
-            const date = new Date();
-            date.setDate(today.getDate() - i);
-            dates.push(date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }));
-        }
-        return dates.reverse();
-    }
-
-    function getWeekRange(weeks) {
-        const today = new Date();
-        let weeksArray = [];
-        for (let i = 0; i < weeks; i++) {
-            const weekStart = new Date(today);
-            weekStart.setDate(today.getDate() - (7 * i));
-            weeksArray.push(`Week ${weekStart.getWeek()}`);
-        }
-        return weeksArray.reverse();
-    }
-
-    function getMonthRange(months) {
-        const today = new Date();
-        let monthsArray = [];
-        for (let i = 0; i < months; i++) {
-            const month = new Date(today);
-            month.setMonth(today.getMonth() - i);
-            monthsArray.push(month.toLocaleString('default', { month: 'long', year: 'numeric' }));
-        }
-        return monthsArray.reverse();
-    }
-
-    Date.prototype.getWeek = function () {
-        const firstDayOfYear = new Date(this.getFullYear(), 0, 1);
-        const pastDaysOfYear = (this - firstDayOfYear) / 86400000;
-        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-    };
-
-    const dailyLabels = getDateRange(7);
-    const weeklyLabels = getWeekRange(5);
-    const monthlyLabels = getMonthRange(3);
+    var data = @json($graphData);
+    daily = data.dailyData;
+    weekly = data.weeklyData;
+    monthly = data.monthlyData;
 
     const dailyData = {
-        labels: dailyLabels,
+        labels: daily.dates,
         datasets: [
-            { label: 'Absents', data: [12, 9, 15, 11, 18, 14, 10], backgroundColor: '#1E4093' },
-            { label: 'Sick', data: [5, 6, 4, 7, 5, 6, 7], backgroundColor: 'rgba(255, 0, 0, 0.7)' },
-            { label: 'Locked up', data: [2, 3, 1, 4, 3, 2, 1], backgroundColor: 'orange' },
-            { label: 'Trend Line', data: [8, 7, 10, 8, 12, 9, 8], type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 }
+            { label: 'Absents', data: daily.absents, backgroundColor: '#1E4093' },
+            { label: 'Sick', data: daily.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+            { label: 'Locked up', data: daily.lockUps, backgroundColor: 'orange' },
+            { label: 'Absents Trends', data: daily.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+            { label: 'Sick Trends', data: daily.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden:true },
+            { label: 'Lock Up Trends', data: daily.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden:true  }
         ]
     };
 
     const weeklyData = {
-        labels: weeklyLabels,
+        labels: weekly.weeks,
         datasets: [
-            { label: 'Absents', data: [10, 20, 14, 18, 15], backgroundColor: '#1E4093' },
-            { label: 'Sick', data: [6, 7, 5, 6, 7], backgroundColor:  'rgba(255, 0, 0, 0.7)' },
-            { label: 'Locked up', data: [2, 4, 3, 3, 4], backgroundColor: 'rgba(255, 165, 0, 0.7)' }, // Bright Orange
-            { label: 'Trend Line', data: [8, 10, 8, 9, 9], type: 'line', fill: false, borderColor: 'rgba(0,0,0,0.7)', tension: 0.1 }
+            { label: 'Absents', data: weekly.absents, backgroundColor: '#1E4093' },
+            { label: 'Sick', data: weekly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+            { label: 'Locked up', data: weekly.lockUps, backgroundColor: 'orange' },
+            { label: 'Absents Trends', data: weekly.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+            { label: 'Sick Trends', data: weekly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden:true },
+            { label: 'Lock Up Trends', data: weekly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden:true  }
         ]
     };
 
     const monthlyData = {
-        labels: monthlyLabels,
+        labels: monthly.months,
         datasets: [
-            { label: 'Absents', data: [22, 25, 20], backgroundColor: '#1E4093' },
-            { label: 'Sick', data: [8, 7, 6], backgroundColor: 'rgba(255, 0, 0, 0.7)' },
-            { label: 'Locked up', data: [5, 4, 5], backgroundColor: 'rgba(255, 165, 0, 0.7)' }, // Bright Orange
-            { label: 'Trend Line', data: [21, 23, 20], type: 'line', fill: false, borderColor: 'rgba(0,0,0,0.7)', tension: 0.1 }
+            { label: 'Absents', data: monthly.absents, backgroundColor: '#1E4093' },
+            { label: 'Sick', data: monthly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+            { label: 'Locked up', data: monthly.lockUps, backgroundColor: 'orange' },
+            { label: 'Absents Trends', data: monthly.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+            { label: 'Sick Trends', data: monthly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden:true },
+            { label: 'Lock Up Trends', data: monthly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden:true  }
         ]
     };
 
@@ -144,25 +111,60 @@
         options: {
             responsive: true,
             scales: {
-                x: { stacked: false },
-                y: { stacked: false }
+                x: { 
+                    stacked: false,
+                    title: {
+                    display: true,
+                    text: 'Dates'  // Default label for the X-axis
+                }
+                },
+                y: { 
+                    stacked: false,
+                    title: {
+                    display: true,
+                    text: 'Counts'  // Default label for the Y-axis
+                }
+                }
             }
         }
     });
+    function updateAxisLabels(dataType) {
+    switch (dataType) {
+        case 'daily':
+            chart.data = dailyData;
+            chart.options.scales.x.title.text = 'Dates';  // X-axis label for daily data
+            chart.options.scales.y.title.text = 'Counts';  // Y-axis label for daily data
+            break;
+        case 'weekly':
+            chart.data = weeklyData;
+            chart.options.scales.x.title.text = 'Weeks';  // X-axis label for weekly data
+            chart.options.scales.y.title.text = 'Counts';  // Y-axis label for weekly data
+            break;
+        case 'monthly':
+            chart.data = monthlyData;
+            chart.options.scales.x.title.text = 'Months';  // X-axis label for monthly data
+            chart.options.scales.y.title.text = 'Counts';  // Y-axis label for monthly data
+            break;
+        default:
+            break;
+    }
+
+    chart.update();  // Update the chart to reflect the new labels and data
+}
 
     function showDaily() {
         chart.data = dailyData;
-        chart.update();
+        updateAxisLabels('daily');
     }
 
     function showWeekly() {
         chart.data = weeklyData;
-        chart.update();
+        updateAxisLabels('weekly');
     }
 
     function showMonthly() {
         chart.data = monthlyData;
-        chart.update();
+        updateAxisLabels('monthly');
     }
 </script>
 
