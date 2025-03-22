@@ -128,6 +128,7 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'hospital-approve', 'description' => 'Approve sick students'],        
             ['name' => 'student-courses', 'description' => 'View Courses as Student'],        
             ['name' => 'student-coursework-list', 'description' => 'View Courseworks as Student'],        
+            ['name' => 'staff-view', 'description' => 'View staff profile'],        
             // Add other permissions here with descriptions 
             ]; 
 

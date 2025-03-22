@@ -63,15 +63,6 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
     // Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
 });
 
-
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
-
-
-
 // Route::controller(BeatController::class)->prefix('beats')->group(function () {
 //     Route::get('/', 'index');
 //     Route::get('companies/{beatType}','companies');
@@ -96,7 +87,7 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
 Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
 });
 
-    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    // Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     
     Route::resource('coursework_results', CourseworkResultController::class);
 
@@ -130,10 +121,17 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
     Route::get('students/search_certificate/{companyId}', [FinalResultController::class, 'search'])->name('students.search_certificate');
 
+    Route::get('/staff/cv', [StaffController::class, 'resume'])->name('staff.resume');
 
+
+    Route::get('/semesters/{semesterId}/courses', [CourseworkResultController::class, 'index'])->name('semesters.index');
     
+    
+    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
+    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+
     Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
-    Route::get('/coursework/upload_explanation/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
+    Route::get('/coursework/upload_cw/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
     Route::post('/coursework/upload/{courseId}', [CourseworkResultController::class, 'import'])->name('coursework.upload');
     Route::get('/update-fasting-status/{studentId}/{fastingStatus}', [StudentController::class, 'updateFastStatus'])->name('updateFastingStatus');
     Route::get('/update-beat-status-to-safari/{studentId}', [StudentController::class, 'toSafari'])->name('students.toSafari');
@@ -221,8 +219,6 @@ Route::group(['middleware' => ['auth']], function () {
 Route::group(['middleware' => ['auth']], function () {    
     // Define the custom route first
     Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
-    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
-    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
     // Define the custom route first
@@ -299,8 +295,6 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     // routes/web.php
     Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
     Route::get('campanies/{campusId}', [GuardAreaController::class,'get_companies']);
-    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
-    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
         Route::get('type-test/{type_id}', 'attendence');
@@ -466,17 +460,5 @@ Route::get('/downloads/{file}', [DownloadController::class, 'download'])->name('
 Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
     ->name('downloads.delete')
     ->middleware('auth'); // Requires login to delete
-
-   
-//Leaves Routes
-
-
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leaves.index');
-    Route::post('/leave-requests/{id}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
-    Route::post('/leave-requests/{id}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
-});
-
 
 Route::get('test', [AttendenceController::class,'getKaziniStudentsIds']);

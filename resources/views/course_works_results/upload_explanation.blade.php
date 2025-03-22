@@ -7,7 +7,7 @@
       <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
             <li class="breadcrumb-item"><a href="#">Course Work Results</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><a href="#">Upload Coursework Results</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="#">Upload Coursework Results for  {{  $course->courseName }}</a></li>
       </ol>
     </nav>
   </div>
@@ -20,9 +20,6 @@
     <div class="col-sm-12 col-12">
         <div class="card mb-4">
             <div class="card-header">
-                <div class="mb-4">
-                   <h3>Upload Coursework for {{ $course->courseName }} Course</h3> 
-                </div>
                 <div>
                  <a href="{{ route('courseworkResultDownloadSample') }}">
                     <button  class="btn btn-s btn-success">
@@ -61,7 +58,6 @@
                                 <option value="" selected disabled>-- Select Coursework Type</option>
                             </select>
 
-                            
                             <div class="d-flex gap-2" style="width:550px">
                                 <!-- File Upload -->
                                 <input type="file" name="import_file" class="form-control mb-2" required 
