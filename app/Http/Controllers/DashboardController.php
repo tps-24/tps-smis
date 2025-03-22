@@ -12,6 +12,7 @@ use App\Models\Attendence;
 use App\Models\Beat;
 use App\Models\Patient;
 use App\Models\Staff;
+use App\Models\MPS;
 use App\Models\Announcement;
 use Carbon\Carbon;
 
@@ -215,7 +216,7 @@ class DashboardController extends Controller
         $programmes = SessionProgramme::where('is_current', 1)->get();
         // Additional data for graphs here
 
-        
+
         return view('dashboard.default_dashboard', compact('currentProgramsCount', 'inactiveProgramsCount', 'programmes', 'weeklyAttendance', 'weeklyComparison'));
     }
 
@@ -297,7 +298,7 @@ class DashboardController extends Controller
 
             $lastFiveWeeks->push($weekKey);
             $weekKeys[$startOfWeek] = $i - 1;  // Use start of week as the key
-            $weeklyData['weeks'] =[];
+            $weeklyData['weeks'] = [];
             $weeklyData['absents'][] = 0;
             $weeklyData['sick'][] = 0;
             $weeklyData['lockUps'][] = 0;
@@ -340,7 +341,9 @@ class DashboardController extends Controller
                         $index = $dateKeys[$attendanceDate];
                         $attendanceData['absents'][$index] += (int) $attendance->absent;
                         $attendanceData['sick'][$index] += (int) $attendance->sick;
-                        $attendanceData['lockUps'][$index] += (int) $attendance->lockUp;
+                        if($attendanceData['lockUps'][$index] == 0){
+                        $attendanceData['lockUps'][$index] = (int) MPS::whereDate('arrested_at', $attendanceDate)->count();
+                        }
                     }
 
                     // For weekly data, check which week the attendance falls into
@@ -349,10 +352,14 @@ class DashboardController extends Controller
                         $weekIndex = $weekKeys[$attendanceWeek];
                         $weeklyData['absents'][$weekIndex] += (int) $attendance->absent;
                         $weeklyData['sick'][$weekIndex] += (int) $attendance->sick;
-                        $weeklyData['lockUps'][$weekIndex] += (int) $attendance->lockUp;
+                        if ($weeklyData['lockUps'][$weekIndex] == 0) {
+                            $startOfWeek = Carbon::parse(Carbon::now()->startOfWeek())->toDateString();  // Set a start time
+                            $endOfWeek = Carbon::parse(Carbon::now()->endOfWeek())->toDateString();  // Set a start time 
+                            $weeklyData['lockUps'][$weekIndex] = (int) MPS::whereBetween('arrested_at', [$startOfWeek, $endOfWeek])->count();
+                        }
                     }
 
-                    for($i = 0;  $i < count($attendanceData['dates']); $i++){
+                    for ($i = 0; $i < count($attendanceData['dates']); $i++) {
                         $attendanceData['dates'][$i] = Carbon::parse($attendanceData['dates'][$i])->format('d-m-Y');
                     }
                     // For monthly data, check which month the attendance falls into
@@ -361,7 +368,13 @@ class DashboardController extends Controller
                         $monthIndex = $monthKeys[$attendanceMonth];
                         $monthlyData['absents'][$monthIndex] += (int) $attendance->absent;
                         $monthlyData['sick'][$monthIndex] += (int) $attendance->sick;
-                        $monthlyData['lockUps'][$monthIndex] += (int) $attendance->lockUp;
+                        if ($monthlyData['lockUps'][$monthIndex] == 0) {
+                            $carbonDate = Carbon::parse($attendanceMonth);
+                            $month = $carbonDate->month;
+                            $year = $carbonDate->year;
+                            $monthlyData['lockUps'][$monthIndex] = (int) MPS::whereMonth('arrested_at', $month)->whereYear('arrested_at', $year)->count();
+                        }
+
                     }
                 }
             }
@@ -381,9 +394,9 @@ class DashboardController extends Controller
         $weekKeys = array_flip($weekKeys);
         for ($i = count($weekKeys) - 1; $i >= 0; $i--) {
             // Use the getWeekNumber function to get the week number and push it to the 'weeks' array
-            array_push($weeklyData['weeks'], "Week ".$this->getWeekNumber($weekKeys[$i]));
+            array_push($weeklyData['weeks'], "Week " . $this->getWeekNumber($weekKeys[$i]));
         }
-        
+
         // Reverse the monthly data arrays to ensure the most recent data comes last
         $monthlyData['absents'] = array_reverse($monthlyData['absents']);
         $monthlyData['sick'] = array_reverse($monthlyData['sick']);
@@ -398,18 +411,19 @@ class DashboardController extends Controller
         ];
     }
 
-    private function getWeekNumber($date){
+    private function getWeekNumber($date)
+    {
         $sessionProgramme = SessionProgramme::find($this->selectedSessionId);
         // Define the specified start date (September 30, 2024)
         $startDate = Carbon::createFromFormat('d-m-Y', Carbon::parse($sessionProgramme->startDate)->format('d-m-Y'));
         //dd($date);
         // Define the target date for which you want to calculate the week number
         $date = Carbon::parse($date); // This could be the current date, or any specific date
-        
+
         // Calculate the difference in weeks between the start date and the target date
         $weekNumber = $startDate->diffInWeeks($date) + 1;  // Adding 1 to make it 1-based (Week 1, Week 2, ...)
         return (int) $weekNumber;
-        }
+    }
 
 
 }
