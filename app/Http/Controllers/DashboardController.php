@@ -340,7 +340,10 @@ class DashboardController extends Controller
                     if (isset($dateKeys[$attendanceDate])) {
                         $index = $dateKeys[$attendanceDate];
                         $attendanceData['absents'][$index] += (int) $attendance->absent;
-                        $attendanceData['sick'][$index] += (int) $attendance->sick;
+                        if($attendanceData['sick'][$index] == 0){
+                            $attendanceData['sick'][$index] = (int) Patient::whereDate('created_at',$attendanceDate)->whereNotNull('excuse_type_id')->count();
+                        }
+                        
                         if($attendanceData['lockUps'][$index] == 0){
                         $attendanceData['lockUps'][$index] = (int) MPS::whereDate('arrested_at', $attendanceDate)->count();
                         }
@@ -351,10 +354,12 @@ class DashboardController extends Controller
                     if (isset($weekKeys[$attendanceWeek])) {
                         $weekIndex = $weekKeys[$attendanceWeek];
                         $weeklyData['absents'][$weekIndex] += (int) $attendance->absent;
-                        $weeklyData['sick'][$weekIndex] += (int) $attendance->sick;
+                        $startOfWeek = Carbon::parse(Carbon::now()->startOfWeek())->toDateString();  // Set a start time
+                        $endOfWeek = Carbon::parse(Carbon::now()->endOfWeek())->toDateString();  // Set a start time 
+                        if($weeklyData['sick'][$weekIndex] == 0){
+                            $weeklyData['sick'][$weekIndex] = (int) Patient::whereBetween('created_at', [$startOfWeek, $endOfWeek])->whereNotNull('excuse_type_id')->count();
+                        }
                         if ($weeklyData['lockUps'][$weekIndex] == 0) {
-                            $startOfWeek = Carbon::parse(Carbon::now()->startOfWeek())->toDateString();  // Set a start time
-                            $endOfWeek = Carbon::parse(Carbon::now()->endOfWeek())->toDateString();  // Set a start time 
                             $weeklyData['lockUps'][$weekIndex] = (int) MPS::whereBetween('arrested_at', [$startOfWeek, $endOfWeek])->count();
                         }
                     }
@@ -367,11 +372,14 @@ class DashboardController extends Controller
                     if (isset($monthKeys[$attendanceMonth])) {
                         $monthIndex = $monthKeys[$attendanceMonth];
                         $monthlyData['absents'][$monthIndex] += (int) $attendance->absent;
-                        $monthlyData['sick'][$monthIndex] += (int) $attendance->sick;
+                        $carbonDate = Carbon::parse($attendanceMonth);
+                        $month = $carbonDate->month;
+                        $year = $carbonDate->year;
+                        if($monthlyData['sick'][$monthIndex] == 0){
+                           $monthlyData['sick'][$monthIndex] = (int) Patient::whereMonth('created_at', $month)->whereYear('created_at', $year)->count(); 
+                        }
+                        
                         if ($monthlyData['lockUps'][$monthIndex] == 0) {
-                            $carbonDate = Carbon::parse($attendanceMonth);
-                            $month = $carbonDate->month;
-                            $year = $carbonDate->year;
                             $monthlyData['lockUps'][$monthIndex] = (int) MPS::whereMonth('arrested_at', $month)->whereYear('arrested_at', $year)->count();
                         }
 
