@@ -257,13 +257,7 @@
           <span class="menu-text">Announcements</span>
         </a>
       </li>
-      <!-- <li>
       
-    <a href="{{ route('downloads.index') }}">
-              <i class="bi bi-download"></i>
-        <span class="menu-text">Download Center</span>
-      </a>
-    </li> -->
       <li>
         <a href="{{ route('downloads.index') }}">
           <i class="bi bi-download"></i>
@@ -296,11 +290,40 @@
       </ul>
       </li>
     @endcan()
-      <li>
-        <a href="{{route('leaves.index')}}">
+  
+<li class="treeview">
+<a href="">
           <i class="bi bi-mouse3"></i>
           <span class="menu-text">Leave(s)</span>
         </a>
+        <ul class="treeview-menu">
+        <li>
+      <a href="{{ route('leave-requests.create') }}">
+          <i class="bi bi-mouse3"></i>
+          <span class="menu-text">Leave Application</span>
+        </a>
+      </li>
+        <li>
+    <a href="{{ route('leave-requests.sir-major') }}">
+        <i class="bi bi-person-vcard"></i>
+        <span class="menu-text">Received Requests</span>
+    </a>
+</li>
+<li>
+    <a href="{{ route('leave-requests.inspector') }}">
+        <i class="bi bi-person-vcard"></i>
+        <span class="menu-text">Inspector Panel</span>
+    </a>
+</li>
+
+
+<li>
+    <a href="{{ route('leave-requests.chief-instructor') }}">
+        <i class="bi bi-person-vcard"></i>
+        <span class="menu-text">Chief Panel</span>
+    </a>
+</li>
+        </ul>
       </li>
 
 

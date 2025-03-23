@@ -41,7 +41,9 @@ use App\Http\Controllers\MPSVisitorController;
 use App\Http\Controllers\StaffProgrammeCourseController;
 use App\Http\Controllers\TimeSheetController;
 use Carbon\Carbon;
-use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\LeaveRequestController;
+
+
 
 require __DIR__ . '/auth.php';
 
@@ -458,9 +460,22 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
 //Leaves Routes
 
 
+Route::prefix('leave-requests')->group(function () {
+    Route::get('/', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
+    Route::get('/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leaves.index');
-    Route::post('/leave-requests/{id}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
-    Route::post('/leave-requests/{id}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+    Route::post('/store', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+    
+    Route::put('/forward-inspector/{id}', [LeaveRequestController::class, 'forwardToInspector'])->name('leave-requests.forward-inspector');
+    Route::put('/forward-chief/{id}', [LeaveRequestController::class, 'forwardToChief'])->name('leave-requests.forward-chief');
+    
+    Route::put('/approve/{id}', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
+    Route::put('/reject/{id}', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+
+    // Views for roles
+    Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+    Route::get('/sir-major', [LeaveRequestController::class, 'sirMajorView'])->name('leave-requests.sir-major');
+    Route::get('/inspector', [LeaveRequestController::class, 'inspectorView'])->name('leave-requests.inspector');
+    Route::get('/chief-instructor', [LeaveRequestController::class, 'chiefInstructorView'])->name('leave-requests.chief-instructor');
 });
+

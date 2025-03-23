@@ -1,25 +1,17 @@
 <?php
+
 namespace App\Notifications;
+
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\BroadcastMessage;
-
-
-// app/Notifications/LeaveRequestNotification.php
-namespace App\Notifications;
-
+use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\LeaveRequest;
-use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;
 
-class LeaveRequestNotification extends Notification
+class LeaveRequestSubmitted extends Notification
 {
     use Queueable;
 
-    public $leaveRequest;
+    protected $leaveRequest;
 
     public function __construct(LeaveRequest $leaveRequest)
     {
@@ -28,24 +20,17 @@ class LeaveRequestNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['mail', 'database'];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-                    ->line('A leave request has been processed.')
-                    ->action('View Leave Request', url('/leave/requests/'.$this->leaveRequest->id))
-                    ->line('Status: ' . $this->leaveRequest->status)
-                    ->line($this->leaveRequest->rejection_reason ? 'Rejection Reason: ' . $this->leaveRequest->rejection_reason : '');
+        return ['database'];
     }
 
     public function toDatabase($notifiable)
     {
         return [
             'leave_request_id' => $this->leaveRequest->id,
-            'status' => $this->leaveRequest->status,
-            'rejection_reason' => $this->leaveRequest->rejection_reason,
+            'student_name' => $this->leaveRequest->student->user->name,
+            'start_date' => $this->leaveRequest->start_date,
+            'end_date' => $this->leaveRequest->end_date,
+            'reason' => $this->leaveRequest->reason,
         ];
     }
 }

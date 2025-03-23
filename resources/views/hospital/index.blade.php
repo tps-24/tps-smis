@@ -31,7 +31,6 @@
         View Monthly Patients
     </a>
 </div>
-
             </div>
         </div>
     </div>
@@ -44,7 +43,6 @@
 
          <!-- Search Form -->
     <div class="card mb-3">
-        
         <div class="card-body">
         <form action="{{ route('hospital.index') }}" method="GET" class="d-flex justify-content-between mb-3">
     <div class="d-flex">
@@ -60,12 +58,9 @@
         @endforeach
     @endif
 </select>
-
-
-
         <select class="form-select me-2" name="platoon">
             <option value="">Select Platoon</option>
-            @for ($i = 1; $i <= 15; $i++)
+            @for ($i = 1; $i <= 14; $i++)
                 <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>{{ $i }}</option>
             @endfor
         </select>
@@ -163,7 +158,6 @@ function sendForApproval(studentId, firstName,lastName) {
     });
 }
 </script>
-
                     </td>
                 </tr>
                 @endforeach

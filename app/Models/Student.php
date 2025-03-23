@@ -118,4 +118,10 @@ class Student extends Model
     //     return Storage::url($this->photo);
     // }
 
+    public function leaveRequests()
+{
+    return $this->hasMany(LeaveRequest::class);
+}
+
+
 }
