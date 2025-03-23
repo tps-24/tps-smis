@@ -418,7 +418,14 @@ class AttendenceController extends Controller
         $kazini = $this->kaziniPlatoonStudents($platoon);
         $sick_ids = $this->getSickStudentIds($platoon);
         $safari_ids = $this->getSafariStudentIds($platoon);
-        Attendence::create([
+        $specificDate = Carbon::create(2025, 3, 19, 0, 0, 0); 
+        Attendence::updateOrCreate(
+            [
+                'attendenceType_id' => $type,    // Unique key or combination of keys for matching
+                'platoon_id' => $platoon_id,     // Another unique key for matching
+                'created_at' => $specificDate,   // Match the specific created_at date
+            ],
+            [
             'attendenceType_id' => $type,
             'platoon_id' => $platoon_id,
             'present' => $present - count($lockUp),
@@ -436,7 +443,9 @@ class AttendenceController extends Controller
             'session_programme_id ' => $this->selectedSessionId,
             'lockUp_students_ids' =>count($lockUp) > 0?  json_encode($lockUp): NULL,
             'absent_student_ids' =>count($absent_ids) > 0? json_encode($absent_ids): NULL,
-            'total' => $total
+            'total' => $total,
+            'created_at' => $specificDate,  // Set created_at to a specific date
+            'updated_at' => $specificDate,  // You can also set updated_at if needed
         ]);
         
         return redirect()->to('attendences/type/1')->with('success','Attendances saved successfully.');
