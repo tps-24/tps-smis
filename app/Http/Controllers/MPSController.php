@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class MPSController extends Controller
 {
-
+    private  $selectedSessionId;
     public function __construct()
     {
 
@@ -20,6 +20,9 @@ class MPSController extends Controller
         $this->middleware('permission:mps-create', ['only' => ['create', 'store',]]);
         $this->middleware('permission:mps-edit', ['only' => ['edit', 'update','release']]);
         $this->middleware('permission:mps-delete', ['only' => ['destroy']]);
+        $this->selectedSessionId = session('selected_session');
+        if (!$this->selectedSessionId)
+            $this->selectedSessionId = 1;
     }
     /**
      * Display a listing of the resource.
@@ -48,6 +51,7 @@ class MPSController extends Controller
         if (!$student) {
             abort(404);
         }
+
         $mpsStudentData = $student->mps;
         if ($mpsStudentData) {
             foreach ($mpsStudentData as $data) {
@@ -58,20 +62,23 @@ class MPSController extends Controller
         }
         $validator = Validator::make($request->all(), [
             'description' => 'required',
-            'days' => 'required|numeric'
+            'arrested_at' => 'required||date'
+            //'days' => 'required|numeric'
         ]);
 
         if ($validator->errors()->any()) {
             return redirect()->back()->withErrors($validator->errors());
         }
-        $student = MPS::create([
+         MPS::create([
             'added_by' => Auth::user()->id,
             'student_id' => $student->id,
             'description' => $request->description,
-            'days' => $request->days,
+            'previous_beat_status' => $student->beat_status,
             'arrested_at' => $request->arrested_at
         ]);
 
+        $student->beat_status = 6;
+        $student->save();
         return redirect()->route('mps.index')->with('success', 'Student recorded successfully.');
     }
 
@@ -94,25 +101,22 @@ class MPSController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $mPS)
+    public function update(Request $request, $mPSStudentId)
     {
-        $mPSstudent = MPS::find($mPS);
+        $mPSstudent = MPS::find($mPSStudentId);
         if (!$mPSstudent) {
             abort(404);
         }
         $validator = Validator::make($request->all(), [
             'description' => 'required|alpha',
-            'days' => 'required|numeric'
+            'arrested_at' => 'required||date'
         ]);
         if ($validator->errors()->any()) {
             return redirect()->back()->withErrors($validator->errors());
         }
-        MPS::create([
-            'added_by' => Auth::user()->id,
-            'student_id' => $mPSstudent->id,
-            'days' => $request->days,
-            'arrested_at' => $request->arrested_at
-        ]);
+        $mPSstudent->arrested_at = $request->arrested_at;
+        $mPSstudent->description = $request->description;
+        $mPSstudent->save();
 
         return redirect()->back()->with('success', 'MPS student record updated succesfully.');
     }
@@ -134,7 +138,7 @@ class MPSController extends Controller
     public function search(Request $request)
     {
         $companies = Company::all();
-        $students = Student::where('platoon', $request->platoon)->where('company_id', $request->company_id);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        $students = Student::where('platoon', $request->platoon)->where('company_id', $request->company_id)->where('session_programme_id', $this->selectedSessionId);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
         if ($request->name) {
             $students = $students->where(function ($query) use ($request) {
                 $query->where('first_name', 'like', '%' . $request->name . '%')
@@ -148,7 +152,7 @@ class MPSController extends Controller
     }
 
     private function searchStudent($company_id, $platoon, $name = null){
-        $students = Student::where('platoon', $platoon)->where('company_id', $company_id);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+        $students = Student::where('platoon', $platoon)->where('company_id', $company_id)->where('session_programme_id', $this->selectedSessionId);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
         if ($name) {
             $students = $students->where(function ($query) use ($name) {
                 $query->where('first_name', 'like', '%' . $name . '%')
@@ -169,6 +173,10 @@ class MPSController extends Controller
             abort(404);
         }
         $mPSstudent->released_at = Carbon::now();
+        $mPSstudent->days = Carbon::parse($mPSstudent->arrested_at)->diffInDays(Carbon::now());
+        $student = $mPSstudent->student;
+        $student->beat_status = $mPSstudent->previous_beat_status;
+        $student->save();
         $mPSstudent->save();
         return redirect()->back()->with('success', 'Student released successfuly.');
     }
@@ -176,9 +184,10 @@ class MPSController extends Controller
     public function company($companyId)
     {
         $company = Company::find($companyId);
-        $mpsStudents = MPS::join('students', 'm_p_s.student_id', 'students.id')->join('companies', 'students.company_id', 'companies.name')
-                        ->where('students.company_id', $companyId)->get();
-                        $scrumbName = $company->name;
+        $mpsStudents = $company->lockUp;
+        // $mpsStudents = MPS::join('students', 'm_p_s.student_id', 'students.id')->join('companies', 'students.company_id', 'companies.name')
+        //                 ->where('students.company_id', $companyId)->get();
+                        $scrumbName = $company->description;
         return view('mps.index', compact('mpsStudents', 'scrumbName'));
 
     }

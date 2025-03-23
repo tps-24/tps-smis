@@ -7,7 +7,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            /* color:green !important; */
+            color:#008AD8 !important;
         }
         .container {
             width: 100%;
@@ -30,7 +30,7 @@
             font-size: 12px; /* Reduce font size */
         }
         .table th, .table td {
-            border: 1px solid #000;
+            border: 1px solid #008AD8;
             padding: 2px 5px; /* Reduce padding */
             text-align: left;
             white-space: nowrap; /* Prevent text wrapping */
@@ -59,8 +59,6 @@
             }
         }
 
-
-        
         .watermark {
             position: fixed;
             top: 45%;
@@ -71,13 +69,12 @@
             transform: translate(-50%, -50%);
             z-index: -1;
         }
+
         .content {
             position: relative;
             z-index: 1;
         }
         
-
-
         body {
             text-align: center;
         }
@@ -121,7 +118,7 @@
             @endphp
             <!-- <h1><b>TANZANIA POLICE SCHOOL-MOSHI</b></h1> -->
             <h1 style="margin-top:-5px;">RATIBA YA MALINDO {{ strtoupper($company->description) }}</h1>
-            <h2 style="margin-top:-5px;">TAREHE {{ $date->format('d/m/Y')}} - ROUND FOUR (4)</h2>
+            <h2 style="margin-top:-5px;">TAREHE {{ $date->format('d/m/Y')}} - ROUND FIVE (5)</h2>
             
         </div>
 

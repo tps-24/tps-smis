@@ -15,9 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'check_active_session' => \App\Http\Middleware\CheckActiveSessionProgramme::class,
+            'student' => \App\Http\Middleware\RestrictToStudents::class,
             'check.student.status' => \App\Http\Middleware\CheckStudentStatus::class,
             'checkCourseInstructor' => \App\Http\Middleware\CheckCourseInstructor::class,
-            'check_active_session' => \App\Http\Middleware\CheckActiveSessionProgramme::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

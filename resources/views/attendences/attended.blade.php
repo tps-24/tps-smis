@@ -37,7 +37,10 @@
                     <th>Sentry</th>
                     <th>Mess</th>
                     <th>Off</th>
+                    <th>Sick</th>
                     <th>Safari</th>
+                    <th>Lock Up</th>
+                    <th>Kazini</th>
                     <th>ME</th>
                     <th>KE</th>
                     <th>Total</th>
@@ -54,7 +57,10 @@
                         <td>{{$attendence->sentry}}</td>
                         <td>{{$attendence->mess}}</td>
                         <td>{{$attendence->off}}</td>
+                        <td>{{$attendence->sick}}</td>
                         <td>{{$attendence->safari}}</td>
+                        <td>{{$attendence->lockUp?? ''}}</td>
+                        <td>{{$attendence->kazini?? ''}}</td>
                         <td>{{$attendence->male}}</td>
                         <td>{{$attendence->female}}</td>
                         <td>{{$attendence->total}}</td>

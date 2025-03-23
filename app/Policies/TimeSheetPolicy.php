@@ -23,6 +23,7 @@ class TimeSheetPolicy
      */
     public function view(User $user, TimeSheet $timeSheet): bool
     {
+        //Check if user if has a permission to view any timesheet
         if($user->hasRole('Super Administrator') ||
         $user->hasRole('Chief Instructor') || 
         $user->hasRole('Academic Coordinator')) return true;

@@ -17,11 +17,7 @@
 
 @endsection
 @section('content')
-    @session('success')
-        <div class="alert alert-success" role="alert">
-            {{ $value }}
-        </div>
-    @endsession  
+@include('layouts.sweet_alerts.index')
 
 
     @can('announcement-create')  
@@ -39,7 +35,10 @@
                     @foreach ($announcements as $announcement)
                         <li class="list-group-item d-flex justify-content-between align-items-center mt-2">
                             <div>
-                                <div class="mb-4">
+                                <div class="mb-4 d-flex">
+                                    @if ($announcement->expires_at > \Carbon\Carbon::now())
+                                    <img style="width: 50px; margin-top: -10px;" src="{{ asset('resources/assets/images/new_blinking.gif') }}" alt="new gif">                                    
+                                    @endif
                                     <h4 class="text-{{ $announcement->type }}">{{ $announcement->title }}</h4>
                                 </div>
                                 <p> &nbsp &nbsp &nbsp{{ $announcement->message }}</p>
@@ -51,21 +50,25 @@
                                 <p><small>Announced by: <i>{{ $announcement->poster->name }}</i></small></p>
                                 <small>Posted At:
                                     {{ $announcement->created_at ? $announcement->created_at->format('d-m-Y H:i') : 'N/A' }}</small><br>
-                                <small>Expires At:
-                                    {{ $announcement->expires_at ? $announcement->expires_at->format('d-m-Y H:i') : 'N/A' }}</small>
-
+                                
+                                @if ($announcement->expires_at < \Carbon\Carbon::now())
+                                   <small> Expired At: {{ $announcement->expires_at ? $announcement->expires_at->format('d-m-Y H:i') : 'N/A' }}</small>
+                                @else
+                                  <small>Expires At: {{ $announcement->expires_at ? $announcement->expires_at->format('d-m-Y H:i') : 'N/A' }}</small>
+                                @endif
                             </div>
                             @if($announcement->created_at->gt(\Carbon\Carbon::now()->subHours(2)))
                                 <div class="btn-group">
                                     <a style="margin-right: 10px;" href="{{ route('announcements.edit', $announcement->id) }}"><button
                                             class="btn btn-sm btn-primary">Edit</button></a>
-                                    <form action="{{ route('announcements.destroy', $announcement->id) }}" method="POST"
+                                    <form id="deleteForm{{ $announcement->id }}" action="{{ route('announcements.destroy', $announcement->id) }}" method="POST"
                                         style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        <button onclick="confirmDelete('deleteForm{{ $announcement->id }}','Announcement')" type="button" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
                                 </div>
+                                @include('layouts.sweet_alerts.confirm_delete')
                             @endif
                         </li>
                     @endforeach

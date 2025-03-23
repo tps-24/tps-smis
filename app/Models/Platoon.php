@@ -22,5 +22,22 @@ class Platoon extends Model
     public function students(){
         return $this->hasMany(Student::class,'platoon', 'name');
     }
-    
+
+    public function lockUp(){
+        return $this->hasManyThrough(MPS::class, Student::class, 'platoon', 'student_id', 'name', 'id');
+    }
+
+    private function sick(){
+        return $this->hasManyThrough(Patient::class, Student::class, 'platoon', 'student_id', 'name', 'id');
+    }
+    public function safari(){
+        return $this->hasManyThrough(SafariStudent::class, Student::class, 'platoon', 'student_id', 'name', 'id');
+    }
+    public function today_attendence(){
+        return $this->attendences()->whereDate('created_at', now()->toDateString());
+    }
+
+    public function today_sick(){
+        return $this->sick();
+    }
 }

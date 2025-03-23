@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Company;
+use App\Models\SafariType;
 use App\Models\Programme;
 use App\Models\CourseworkResult;
 use App\Imports\BulkImportStudents;
@@ -20,6 +21,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\RedirectResponse;
 use DB;
 use Hash;
+use Exception;
 use Illuminate\Support\Facades\Log; // Namespace for the Log facade
 
 
@@ -44,7 +46,9 @@ class StudentController extends Controller
         if (!$selectedSessionId)
             $selectedSessionId = 1;
         $students = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
-        $companies = Company::all();
+        $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+            $query->where('session_programme_id', $selectedSessionId); // Filter students by session
+        })->get();
         return view('students.index', compact('students', 'companies'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
     }
@@ -166,11 +170,6 @@ class StudentController extends Controller
         $input = $request->all();
         $password = Hash::make($input['password']);
         $fullName = $request->first_name. ' ' . $request->middle_name. ' ' . $request->last_name;
-    
-
-        $input = $request->all();
-        $password = Hash::make($input['password']);
-        $fullName = $request->first_name . ' ' . $request->middle_name . ' ' . $request->last_name;
 
 
         //Create User First
@@ -266,8 +265,8 @@ class StudentController extends Controller
     public function show($id)
     {
         $student = Student::find($id);
-        $page_name = "More Student Details";
-        return view('students.show', compact('student', 'page_name'));
+        $safari_types = SafariType::all();
+        return view('students.show', compact('student', 'safari_types'));
     }
     /**
      * Show the form for editing the specified resource.
@@ -519,8 +518,13 @@ class StudentController extends Controller
         if ($validator->fails()) {
             return back()->with('error', $validator->errors()->first());
         }
+        try{
         Excel::import(new BulkImportStudents, filePath: $request->file('import_file'));
-        return back()->with('success', 'Students Uploaded  successfully.');
+        }catch (Exception $e) {
+            // If an error occurs during import, catch the exception and return the error message
+            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+        }
+        return redirect()->route('students.index')->with('success', 'Students Uploaded  successfully.');
     }
 
     // public function createStepOne()
@@ -662,7 +666,6 @@ class StudentController extends Controller
 
         $student -> beat_status = 1;
         $student->save();
-         
         return redirect()->back()->with('success','Beat activated successfully.');
     }
 
@@ -706,13 +709,22 @@ class StudentController extends Controller
     public function toSafari($studentId){
         $student = Student::findOrFail($studentId);
         if(!$student){
-            return redirect()->back()->with('success', 'Student with the '.$studentId.' Id is not found.');
+            return redirect()->back()->with('error', 'Student with the '.$studentId.' Id is not found.');
         }
 
             $student->beat_status = 4;
         $student->save();   
-
-
         return redirect()->route('students.index')->with('success','Beat status to Safari updated successfully.');
+    }
+
+    public function BackFromsafari($studentId){
+        $student = Student::findOrFail($studentId);
+        if(!$student){
+            return redirect()->back()->with('error', 'Student is not found.');
+        }
+
+            $student->beat_status = 1;
+        $student->save();   
+        return redirect()->route('students.index')->with('success','Beat status back from Safari updated successfully.');
     }
 }

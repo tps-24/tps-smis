@@ -131,6 +131,7 @@
                         <th>Attained Current Round</th>
                         <th>Exceeded Current Round</th>
                         <th>Not Attained Current Round</th>
+                        <th>Fasting Student</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -140,6 +141,7 @@
                         <td>{{$data['attained_current_round']}}</td>
                         <td>{{$data['exceededAttained_current_round']}}</td>
                         <td>{{$data['NotAttained_current_round']}}</td>
+                        <td>{{$data['fastingStudentCount']}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -149,7 +151,9 @@
                 @foreach ($data['vitengo'] as $kitengo)
                 @if(count($kitengo['students']) > 0)
                 <br>
-                <h4>{{ $kitengo['name'] }}</h4>
+                <div class="mb-3">
+                    <h4>{{ $kitengo['name'] }}</h4>
+                    </div>
                 <table style="width: 100%" class="table table-striped truncate m-0">
                     <thead>
                         <tr>
@@ -172,7 +176,9 @@
                 @endif
                 @endforeach
                 <br>
-                <h4>EMERGENCE</h4>
+                <div class="mb-3">
+                  <h4>EMERGENCE</h4>  
+                </div>
                 <table style="width: 100%" class="table table-striped truncate m-0">
                     <thead>
                         <tr>
@@ -194,8 +200,9 @@
                         @endforeach
                     </tbody>
                 </table>
-
-                <h4>RESERVED AND REPLACED STUDENTS</h4>
+                <div class="mb-3">
+                    <h4>RESERVED AND REPLACED STUDENTS</h4>
+                    </div>
                 <table style="width: 100%" class="table table-striped truncate m-0">
                     <thead>
                         <tr>

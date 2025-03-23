@@ -20,11 +20,8 @@
 @endsection
 
 @section('content')
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
+@include('layouts.sweet_alerts.index')
+
 <div style="display: flex; justify-content: flex-end; margin-right: 2px;">
     <a href="{{url('/mps/create')}}"><button class="btn btn-sm btn-success">Add Student</button></a>
 </div>
@@ -52,7 +49,7 @@
                             <tr>
                                 <td>{{++$i}}</td>
                                 <td>{{$student->student->first_name ?? ''}} {{$student->student->last_name ?? ''}}</td>
-                                <td>{{$student->days}}</td>
+                                <td>{{$student->days?? '-'}}</td>
                                 <td>{{$student->arrested_at}}</td>
                                 <td>
                                     @if (!$student->released_at)
@@ -61,51 +58,26 @@
                                         {{$student->released_at}}
                                     @endif
                                 </td>
-                                <td>{{$student->staff->name ?? ''}}</td>
-                                <td>
+                                <td>{{$student->staff->name ?? '-'}}</td>
+                                <td class="d-flex gap-2">
                                     <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#statusModal{{ $student->id ?? ''}}">
                                         More
                                     </button>
+                                    @if(!$student->released_at)
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#statusModalEdit{{ $student->id }}">
+                                            Edit
+                                        </button>
+                                    <form id="releaseForm{{ $student->id }}" action="{{url('mps/release/' . $student->id)}}" method="POST">
+                                                        @csrf
+                                                        <button onclick="confirmAction('releaseForm{{ $student->id }}','Release Student', '{{ $student->student->first_name }} {{ $student->student->last_name }}', 'Release')" type="button" class="btn btn-sm btn-warning">Release</button>
+                                                    </form>
+                                    
+                                    @endif
                                 </td>
                                 <td>
 
-                                    @if(!$student->released_at)
-                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#statusModalRelease">
-                                            Edit
-                                        </button>
-                                        <button class="btn  btn-warning btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#Release">Release</button>
-                                    @endif
-                                    <div class="modal fade" id="Release" tabindex="-1" aria-labelledby="statusModalLabelRelease"
-                                        aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="statusModalLabelRelease">
-                                                        Release Confirmation
-                                                    </h5>
-
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-
-                                                    <p>You are about to release {{$student->student->first_name ?? ''}}
-                                                        {{$student->student->last_name ?? ''}}
-                                                    </p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <form action="{{url('mps/release/' . $student->id)}}" method="POST">
-                                                        @csrf
-                                                        <button class="btn btn-sm btn-primary">Release</button>
-                                                    </form>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <div class="modal fade" id="statusModal{{  $student->id ?? '' }}" tabindex="-1"
                                         aria-labelledby="statusModalLabel{{  $student->id ?? '' }}" aria-hidden="true">
                                         <div class="modal-dialog">
@@ -126,12 +98,12 @@
                                         </div>
                                     </div>
                                     <!-- Edit MPS information -->
-                                    <div class="modal fade" id="statusModalRelease" tabindex="-1"
-                                        aria-labelledby="statusModalLabelRelease" aria-hidden="true">
+                                    <div class="modal fade" id="statusModalEdit{{ $student->id }}" tabindex="-1"
+                                        aria-labelledby="statusModalEdit{{ $student->id }}" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="statusModalLabelRelease">Edit
+                                                    <h5 class="modal-title" id="statusModalEdit{{ $student->id }}">Edit
                                                         Student Details for {{ $student->student->first_name }}
                                                         {{ $student->student->last_name }}
                                                     </h5>
@@ -140,10 +112,10 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <!-- Form to update patient status -->
-                                                    <form action="{{url('/mps/store/' . $student->id)}}" method="POST">
-                                                        @csrf
-                                                        @method('POST')
+                                                    <form action="{{route('mps.update' , $student->id)}}" method="POST">
 
+                                                        @csrf
+                                                        @method('PUT')
                                                         <div class="mb-3">
                                                             <label for="excuseType" class="form-label">Arrested At</label>
                                                             <input value="{{$student->arrested_at}}" class="form-control"
@@ -152,12 +124,6 @@
                                                         @error('arrested_at')
                                                             <div class="error">{{ $message }}</div>
                                                         @enderror
-
-                                                        <div class="mb-3">
-                                                            <label for="excuseType" class="form-label">Days</label>
-                                                            <input value="{{$student->days}}" class="form-control" value="1" min="1"
-                                                                type="number" required name="days">
-                                                        </div>
                                                         @error('days')
                                                             <div class="error">{{ $message }}</div>
                                                         @enderror
@@ -170,8 +136,10 @@
                                                         @error('description')
                                                             <div class="error">{{ $message }}</div>
                                                         @enderror
-
-                                                        <button type="submit" class="btn btn-primary">Save</button>
+                                                        <div class="d-flex justify-content-end">
+                                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                        </div>
+                                                        
                                                     </form>
                                                 </div>
                                             </div>
@@ -188,4 +156,5 @@
      No records founds.
     @endif
 @endif
+@include('layouts.sweet_alerts.confirm_action')
 @endsection

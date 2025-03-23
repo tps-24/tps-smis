@@ -13,9 +13,6 @@ class Company extends Model
         'name'
     ];
 
-    // public function platoons(){
-    //     return $this->hasMany(Platoon::class,'company_id','id');
-    // }
 
     public function students(){
         return $this->hasMany(Student::class);
@@ -38,13 +35,27 @@ class Company extends Model
     public function beatRound(){
         return $this->hasMany(BeatRound::class);
     } 
+    public function guardBeats()
+    {
+        return $this->hasManyThrough(Beat::class, GuardArea::class, 'company_id', 'guardArea_id', 'id', 'id');
+    }
 
-        public function areas() {
-            
+    public function patrolBeats()
+    {
+        return $this->hasManyThrough(Beat::class, PatrolArea::class, 'company_id', 'patrolArea_id', 'id', 'id');
+    }
 
-            return $this->hasMany(Area::class); // Ensure this relationship exists
-        
+    public function lockUp(){
+        return $this->hasManyThrough(MPS::class, Student::class, 'company_id', 'student_id', 'id', 'id');
+ 
+    }
 
-            }
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
+    }
     
+    public function sickStudents(){
+        return $this->hasMany(Patient::class);
+    }
 }

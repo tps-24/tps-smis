@@ -25,7 +25,8 @@ class AnnouncementController extends Controller
     }
     public function index()
     {
-        $announcements = Announcement::where('expires_at', '>', Carbon::now())->orderBy('created_at', 'desc')->get();
+        //$announcements = Announcement::where('expires_at', '>', Carbon::now())->orderBy('created_at', 'desc')->get();
+        $announcements = Announcement::orderBy('created_at', 'desc')->get();
         return view('announcements.index', compact('announcements'));
     }
 
@@ -64,11 +65,14 @@ class AnnouncementController extends Controller
             $filePath = $file->store('uploads', 'public');
             $announcement->document_path = $filePath;
         }
-
+        //return $request->audience;
         if ($request->audience == "all") {
             $announcement->audience = $request->audience;
-        } else {
-            $announcement->company_id = Auth::user()->staff->company_id?? $request->audience;
+        } else if($request->audience == "staff"){
+            $announcement->company_id = $request->audience;
+            
+        }else{
+            //$announcement->company_id = Auth::user()->staff->company_id?? $request->audience;
         }
         $announcement->save();
         broadcast(new NotificationEvent($announcement->title, $announcement->type, 'announcement', $announcement, $announcement->id));

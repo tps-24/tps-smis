@@ -13,15 +13,19 @@ class CompanySeeder extends Seeder
     public function run(): void
     {
         Company::create([
+            'campus_id' => 1,
             'name'=>'HQ'
         ]);
         Company::create([
+            'campus_id' => 1,
             'name'=>'A'
         ]);
         Company::create([
+            'campus_id' => 1,
             'name'=>'B'
         ]);
         Company::create([
+            'campus_id' => 1,
             'name'=>'C'
         ]);
     }

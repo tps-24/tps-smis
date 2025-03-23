@@ -39,13 +39,8 @@
       @foreach ($patrol_areas as $patrol_area)
       <tr>
       <td>{{++$i}}</td>
-<<<<<<< HEAD
       <td>{{$patrol_area->start_area}}</td>
       <td>{{$patrol_area->end_area}}</td>
-=======
-      <td>{{$patrol_area->start->name}}</td>
-      <td>{{$patrol_area->end->name}}</td>
->>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
       <td>
         <button class="btn  btn-primary btn-sm" data-bs-toggle="modal"
         data-bs-target="#MoreAbsent{{$patrol_area->id}}">Edit</button>
@@ -62,11 +57,7 @@
           <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="statusModalLabelMore">
-<<<<<<< HEAD
             From {{$patrol_area->start_area}} to {{$patrol_area->end_area}}
-=======
-            From {{$patrol_area->start->name}} to {{$patrol_area->end->name}}
->>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
             </h5>
 
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -83,11 +74,7 @@
             <select class="form-select" id="abc4" name="start_area" required aria-label="Default select example">
             <option selected disabled value="">start area</option>
               @foreach ($company->areas as $area)
-<<<<<<< HEAD
               <option @if ($patrol_area->id == $patrol_area->id) selected @endif value="{{$patrol_area->id}}">{{$patrol_area->start_area}}</option>
-=======
-              <option @if ($area->id == $patrol_area->start->id) selected @endif value="{{$area->id}}">{{$area->name}}</option>
->>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
               @endforeach
             </select>
             </div>
@@ -100,11 +87,7 @@
             <select class="form-select" id="abc4" name="end_area" required aria-label="Default select example">
             <option selected disabled value="">end area</option>
               @foreach ($company->areas as $area)
-<<<<<<< HEAD
               <option @if ($patrol_area->id == $patrol_area->id) selected @endif value="{{$patrol_area->id}}">{{$patrol_area->end_area}}</option>
-=======
-              <option @if ($area->id == $patrol_area->end->id) selected @endif value="{{$area->id}}">{{$area->name}}</option>
->>>>>>> 7d61e4df868b37df109c9a8e92bdee3250c6fbd9
               @endforeach
             </select>
             </div>

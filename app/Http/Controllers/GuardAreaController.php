@@ -23,7 +23,7 @@ class GuardAreaController extends Controller
               $guardArea->beat_exceptions = BeatException::whereIn('id', json_decode($guardArea->beat_exception_ids, true))->get(); 
             }
             if($guardArea->beat_time_exception_ids != NULL){
-                $guardArea->beat_time_exceptions = BeatException::whereIn('id', json_decode($guardArea->beat_time_exception_ids, true))->get(); 
+                $guardArea->beat_time_exceptions = BeatTimeException::whereIn('id', json_decode($guardArea->beat_time_exception_ids, true))->get(); 
               }
             return $guardArea;
         });

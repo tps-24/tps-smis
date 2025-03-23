@@ -17,13 +17,7 @@
 @endsection
 
 @section('content')
-
-  <div class="row">
-    @session('success')
-    <div class="alert alert-success" role="alert">
-    {{ $value }}
-    </div>
-  @endsession
+@include('layouts.sweet_alerts.index')
     <div class="row">
     @can('student-create')
     <div class="col-3">
@@ -31,7 +25,7 @@
     </div>
   @endcan
     <div class="col-6 " style="float: right;">
-      <form class="d-flex" action="{{route('students.search')}}" method="POST">
+      <form class="d-flex" action="{{route('students.search')}}" method="GET">
       @csrf
       @method("POST")
       <div class="d-flex">
@@ -97,96 +91,97 @@
     <?php  $i = 0;?>
     @foreach ($students as $key => $student)
 
-    <tr>
-    <td>{{++$i}}</td>
-    <td>{{$student->force_number ?? ''}}</td>
-    <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
-    <td>{{$student->company->name ?? ''}}</td>
-    <td>{{$student->platoon}}</td>
-    <td>{{$student->phone}}</td>
-    <td>{{$student->home_region}}</td>
+      <tr>
+      <td>{{++$i}}</td>
+      <td>{{$student->force_number ?? ''}}</td>
+      <td>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
+      <td>{{$student->company->name ?? ''}}</td>
+      <td>{{$student->platoon}}</td>
+      <td>{{$student->phone}}</td>
+      <td>{{$student->home_region}}</td>
 
-    <td>
-      @can('student-list')
+      <td>
+        @can('student-list')
       <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">
       Show</a>
     @endcan
-      @can('student-edit')
+        @can('student-edit')
       <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
     @endcan
 
-      @can('student-delete')
-      <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-    data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
+        @can('student-delete')
+        <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+        data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
     @endcan
-    
-    </td>
-    
-    @can('beat-edit') 
-    <td>
-    @if($student->beat_status == '1')
-      <form action="{{ route('students.deactivate_beat_status', $student->id) }}" method="POST"
+
+      </td>
+
+      @can('beat-edit')
+      <td>
+      @if($student->beat_status == '1')
+      <form action="{{ route('students.deactivate_beat_status', $student->id) }}" method="GET"
       id="toggleForm{{ $student->id }}">
       @csrf
       <div class="form-check form-switch">
-      <input  class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}" name="status{{ $student->id }}"
-      @if($student->beat_status == '1') checked @endif>
+      <input class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}"
+      name="status{{ $student->id }}" @if($student->beat_status == '1') checked @endif>
       </div>
       <button type="submit" style="display: none;">Submit</button>
       </form>
 
     @else
-      <form action="{{ route('students.activate_beat_status', $student->id) }}" method="POST" id="toggleForm{{ $student->id }}"
-      class="d-flex gap-2">
+      <form action="{{ route('students.activate_beat_status', $student->id) }}" method="GET"
+      id="toggleForm{{ $student->id }}" class="d-flex gap-2">
       @csrf
       <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}" name="status{{ $student->id }}">
+      <input class="form-check-input" type="checkbox" id="statusToggle{{ $student->id }}"
+      name="status{{ $student->id }}">
       </div>
       <button type="submit" style="display: none;">Submit</button>
       </form>
-    @endif  
-    </td>
+    @endif
+      </td>
     @endcan()
-    <script>
-      // Listen for changes to the toggle
-      document.getElementById('statusToggle{{ $student->id }}').addEventListener('change', function () {
-      // Automatically submit the form when toggle is changed
-      document.getElementById('toggleForm{{ $student->id }}').submit();
-      });
-    </script>
-    
+      <script>
+        // Listen for changes to the toggle
+        document.getElementById('statusToggle{{ $student->id }}').addEventListener('change', function () {
+        // Automatically submit the form when toggle is changed
+        document.getElementById('toggleForm{{ $student->id }}').submit();
+        });
+      </script>
 
-    <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
-      aria-labelledby="createNewContactLabel" aria-hidden="true">
-      <div class="modal-dialog">
-      <div class="modal-content">
-      <div class="modal-header flex-column">
-      <div class="text-center">
-      <h4 class="text-danger">Delete Student</h4>
-      </div>
-      </div>
-      <div class="modal-body">
-      <h5>You are about to delete {{$student->first_name}} {{$student->middle_name}}
-      {{$student->last_name}}.
-      </h5>
-      <p>Please confirm to delete.</p>
-      </div>
-      <div class="modal-footer">
-      <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">
-      Cancel
-      </button>
-      <form method="POST" action="{{url('students/' . $student->id . '/delete')}}" style="display:inline">
-      @csrf
-      @method('POST')
-      <button type="submit" class="btn btn-danger btn-sm">Confirm</i></button>
-      </form>
-      </div>
-      </div>
-      </div>
-    </div>
-    </td>
 
-    </tr>
+      <div class="modal fade" id="createNewContact{{$student->id}}" tabindex="-1"
+        aria-labelledby="createNewContactLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header flex-column">
+        <div class="text-center">
+        <h4 class="text-danger">Delete Student</h4>
+        </div>
+        </div>
+        <div class="modal-body">
+        <h5>You are about to delete {{$student->first_name}} {{$student->middle_name}}
+        {{$student->last_name}}.
+        </h5>
+        <p>Please confirm to delete.</p>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">
+        Cancel
+        </button>
+        <form method="POST" action="{{url('students/' . $student->id . '/delete')}}" style="display:inline">
+        @csrf
+        @method('POST')
+        <button type="submit" class="btn btn-danger btn-sm">Confirm</i></button>
+        </form>
+        </div>
+        </div>
+        </div>
+      </div>
+      </td>
+
+      </tr>
   @endforeach
     </tbody>
     </table>

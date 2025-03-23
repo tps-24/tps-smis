@@ -16,50 +16,15 @@
 
 @endsection
 @section('content')
-@session('success')
-    <div class="alert alert-success" role="alert">
-        {{ $value }}
-    </div>
-@endsession
+@include('layouts.sweet_alerts.index')
 <div class="row ">
     <div class="col-6">
-            <form action="{{ route('attendances.summary',['type_id' => $page->id]) }}" method="GET" class="form-inline d-flex gap-2">
+            <form action="{{ route('attendances.summary',['type_id' => $attendenceType->id]) }}" method="GET" class="form-inline d-flex gap-2">
                 <input style="width:40%" type="date" name="date" max="{{ Carbon\Carbon::today()->format('Y-m-d') }}" class="form-control" value="{{ $date }}">
                 <button type="submit" class="btn btn-primary">Filter</button>
             </form>        
     </div>
-    @if(Carbon\Carbon::parse("$date") == \Carbon\Carbon::today())
-     <div class="col-6 justify-content-end">
-            <form action="{{url('attendences/create/' . $page->id)}}" method="POST">
-                @csrf
-                @method('POST')
-                <div class=" d-flex gap-2 justify-content-end">
-                    <div class="">
-                        <label for="">Company </label>
-                        <select style="height:60%" class="form-select" name="company_id" id="companies" required
-                            aria-label="Default select example">
-                            <option value="">company</option>
-                            @foreach ($companies as $company)
-                                <option value="{{$company->id}}">{{$company->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class=""> <label class="form-label" for="abc4">Platoon</label>
-                        <select style="height:60%" class="form-select" name="platoon" required id="platoons"
-                            aria-label="Default select example">
-                            <option value="" disabled selected>Select a platoon</option>
-                        </select>
-                    </div>
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-success ">New
-                        </button>
-                    </div>
-                </div>
-                <!-- </div> -->
-            </form>
-    </div>
-    @endif
+    
 </div>
 <script>
     document.getElementById('companies').addEventListener('change', function () {
@@ -108,8 +73,34 @@
                     <!-- Tab content start -->
                     <div class="tab-content h-300">
                         @for ($j = 0; $j < count($statistics); ++$j)
-                        <div id="one{{$statistics[$j]['company_name']}}" @if ($j == 0) class="tab-pane fade show active"
+                        <div id="one{{$statistics[$j]['company']->name}}" @if ($j == 0) class="tab-pane fade show active"
                             @else class="tab-pane fade" @endif role="tabpanel">
+                            @if(Carbon\Carbon::parse("$date") == \Carbon\Carbon::today())
+                                <div class="justify-content-end">
+                                        <form action="{{ route('attendences.create',['attendenceType' => $attendenceType->id]) }}" method="POST">
+                                        @csrf
+                                        @method('POST')
+                                            <div class=" d-flex gap-2 justify-content-end">
+                                                <div class=""> <label class="form-label" for="abc4">Platoon</label>
+                                                    <select style="height:60%" class="form-select" name="platoon" required id="platoons"
+                                                        aria-label="Default select example">
+                                                        <option value="" disabled selected>Select a platoon</option>
+                                                        @foreach($statistics[$j]['company']->platoons as $platoon)
+                                                            @if(count($platoon->today_attendence) < 1)
+                                                                <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
+                                                            @endif
+                                                            @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <button type="submit" class="btn btn-success ">New
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!-- </div> -->
+                                        </form>
+                                </div>
+                            @endif
                             <!-- Row starts -->
                             <div class="row gx-4">
                                 <div class="col-sm-12 col-12">
@@ -136,7 +127,7 @@
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-between mt-1">
                                                                     <a class="text-primary ms-4"
-                                                                    href="{{ route('today',['company_id'=> $companies[$j]->id, 'type' => $page->id, 'date' => $date]) }}"
+                                                                    href="{{ route('today',['company_id'=> $companies[$j]->id, 'type' => $attendenceType->id, 'date' => $date]) }}"
 >                                                                        <span>View</span>
                                                                     </a>
                                                                 </div>

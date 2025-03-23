@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('style')
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"> -->
 <style>
 .back{
   border-radius: 30% !important;
@@ -50,9 +50,6 @@
             <div class="d-flex justify-content-end mt-3">
               <button class="btn btn-danger me-2">Edit Profile</button>
               <button class="btn btn-success">Active</button> 
-              <div class="pull-right" style="margin-left:5px">
-                  <a class="btn btn-primary" href="{{ route('staffs.index') }}"> Back</a>
-              </div>
             </div>
           </div>
         </div>
@@ -70,22 +67,22 @@
                       <ul class="nav nav-tabs" id="customTab2" role="tablist">
                         <li class="nav-item" role="presentation">
                           <a class="nav-link active" id="tab-oneA" data-bs-toggle="tab" href="#oneA" role="tab"
-                            aria-controls="oneA" aria-selected="true"><i class="bi bi-person me-2"></i> Personal
+                            aria-controls="oneA" aria-selected="true"><i class="bi bi-person me-2"></i> My Personal
                             Details</a>
                         </li>
                         <li class="nav-item" role="presentation">
                           <a class="nav-link" id="tab-twoA" data-bs-toggle="tab" href="#twoA" role="tab"
                             aria-controls="twoA" aria-selected="false"><i
-                              class="bi bi-info-circle me-2"></i>Attendances</a>
+                              class="bi bi-info-circle me-2"></i>My Attendances</a>
                         </li>
                         <li class="nav-item" role="presentation">
                           <a class="nav-link" id="tab-threeA" data-bs-toggle="tab" href="#threeA" role="tab"
                             aria-controls="threeA" aria-selected="false"><i
-                              class="bi bi-credit-card-2-front me-2"></i>Leaves</a>
+                              class="bi bi-credit-card-2-front me-2"></i>My Leave(s)</a>
                         </li>
                         <li class="nav-item" role="presentation">
                           <a class="nav-link" id="tab-fourA" data-bs-toggle="tab" href="#fourA" role="tab"
-                            aria-controls="fourA" aria-selected="false"><i class="bi bi-eye-slash me-2"></i>Reset
+                            aria-controls="fourA" aria-selected="false"><i class="bi bi-eye-slash me-2"></i>Change
                             Password</a>
                         </li>
                       </ul>
@@ -112,7 +109,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-person"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="forceNumber" value="K.2120" Disabled>
+                                          <input type="text" class="form-control" id="forceNumber" value="{{$staff->forceNumber ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -128,7 +125,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-person"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="fullName" value="{{ $staff->firstName }} {{ $staff->middleName }} {{ $staff->lastName }}" Disabled>
+                                          <input type="text" class="form-control" id="fullName" value="{{$staff->firstName ?? ''}} {{$staff->middleName ?? ''}} {{$staff->lastName ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -144,7 +141,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-envelope"></i>
                                           </span>
-                                          <input type="email" class="form-control" id="yourEmail" value="{{ $staff->email }}" Disabled>
+                                          <input type="email" class="form-control" id="yourEmail" value="{{$staff->email}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -159,7 +156,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-phone"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="contactNumber" value="+255655527782" Disabled>
+                                          <input type="text" class="form-control" id="contactNumber" value="{{$staff->phoneNumber ?? ''}}" Disabled>
                                         </div>
 
                                       </div>
@@ -175,7 +172,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-calendar4"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="birthDay"  value="14/08/1968" Disabled>
+                                          <input type="text" class="form-control" id="birthDay"  value="{{$staff->DoB ?? ''}}" Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -249,7 +246,7 @@
                           <div class="row align-items-end">
                             <div class="col-xl-4 col-sm-6 col-12">
                               <div class="p-3">
-                                <img src="/tps-smis/resources/assets/images/login.svg" alt="Contact Us" class="img-fluid" width="350" height="320">
+                                <img src="/tps-smis/resources/assets/images/login.svg" alt="Contact Us" class="img-fluid" width="300" height="320">
                               </div>
                             </div>
                             <div class="col-sm-4 col-12">

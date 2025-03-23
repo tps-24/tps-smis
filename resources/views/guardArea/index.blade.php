@@ -17,11 +17,7 @@
 
 @endsection
 @section('content')
-  @session('success')
-    <div class="alert alert-success alert-dismissible " role="alert">
-    {{ $value }}
-    </div>
-  @endsession
+@include('layouts.sweet_alerts.index')
 
   <!-- Row starts -->
   <div class="row gx-4">
@@ -41,12 +37,12 @@
         <table class="table table-striped truncate m-0">
         <thead>
           <tr>
-          <th>ID</th>
+          <th>S/No</th>
           <th>Name</th>
-          <th>Company ID</th>
-          <th>Campus ID</th>
+          <th>Company </th>
+          <th>Campus </th>
           <th>Added By</th>
-          <th>Number of Guards</th>
+          <th>Guards</th>
           <th>Actions</th>
           </tr>
         </thead>
@@ -58,9 +54,9 @@
         <tr>
         <td>{{ ++$i }}.</td>
         <td>{{ $guardArea->name }}</td>
-        <td>{{ $guardArea->company_id }}</td>
-        <td>{{ $guardArea->campus_id }}</td>
-        <td>{{ $guardArea->added_by }}</td>
+        <td>{{ $guardArea->company->name }}</td>
+        <td>{{ $guardArea->company->campus->campusName }}</td>
+        <td>{{ $guardArea->addedBy->name }}</td>
         <td>{{ $guardArea->number_of_guards }}</td>
         <td>
         <button class="btn btn-info btn-sm" data-bs-toggle="modal"
@@ -71,27 +67,9 @@
         method="POST" style="display:inline;">
         @csrf
         @method('DELETE')
-        <button class="btn btn-sm btn-danger" onclick="confirmDelete()" type="button">Delete</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmDelete('deleteForm{{ $guardArea->id }}', 'Guard Area')" type="button">Delete</button>
         </form>
-        <script>
-        function confirmDelete() {
-          // SweetAlert confirmation
-          Swal.fire({
-          title: 'Delete Guard Area?',
-          text: "This action cannot be undone.",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, delete it!',
-          cancelButtonText: 'No, cancel!',
-          reverseButtons: true
-          }).then((result) => {
-          if (result.isConfirmed) {
-          // If confirmed, submit the form
-          document.getElementById('deleteForm{{ $guardArea->id }}').submit();
-          }
-          });
-        }
-        </script>
+        @include('layouts.sweet_alerts.confirm_delete')
         </td>
         <div class="modal fade" id="statusModal{{  $guardArea->id ?? '' }}" tabindex="-1"
         aria-labelledby="statusModalLabel{{  $guardArea->id ?? '' }}" aria-hidden="true">
@@ -155,5 +133,4 @@
     </div>
   </div>
   <!-- Row ends -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection

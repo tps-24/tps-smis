@@ -10,8 +10,8 @@ class MPS extends Model
         'added_by',
         'student_id',
         'arrested_at',
-        'days',
-        'description'
+        'description',
+        'previous_beat_status'
     ];
     protected $casts = [
         "arrested_at" => "datetime",

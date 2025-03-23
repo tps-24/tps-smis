@@ -38,7 +38,7 @@
         }
 
         body {
-            padding: 20px;
+            /* padding: 20px; */
             /* You can adjust the padding value as needed */
         }
     </style>
@@ -61,7 +61,8 @@
                     use App\Models\Student;
                     $date = Carbon\Carbon::parse("$date")
                 @endphp
-                <h4> {{ strtoupper($company->name) }} STATE {{ $date->format('d/m/Y')}}</h4>
+                <h4>DAILY STATE {{ strtoupper($company->name) }}  DATE {{ $date->format('d/m/Y')}}</h4>
+                <h4>BASIC RECRUIT COURSE No 1. 2024/2025</h4>
             </div>
             <div class="table-container">
                 <table class="page-break">
@@ -74,7 +75,9 @@
                             <th>Safari</th>
                             <th>Off</th>
                             <th>Messy</th>
+                            <th>Kazini</th>
                             <th>Sick</th>
+                            <th>L/Up</th>
                             <th>ME</th>
                             <th>KE</th>
                             <th>Jumla</th>
@@ -92,6 +95,8 @@
                             $total_sentry = 0;
                             $total_safari = 0;
                             $total_off = 0;
+                            $total_lockUp = 0;
+                            $total_kazini = 0;
                             $total_messy = 0;
                             $total_sick = 0;
                             $total_male = 0;
@@ -106,8 +111,11 @@
                                                         $total_absent += $attendance[0]->absent;
                                                         $total_sentry += $attendance[0]->sentry;
                                                         $total_messy += $attendance[0]->messy;
+                                                        $total_lockUp += $attendance[0]->lockUp;
+                                                        $total_kazini += $attendance[0]->kazini;
                                                         $total_off += $attendance[0]->off;
                                                         $total_sick += $attendance[0]->sick;
+                                                        $total_safari += $attendance[0]->safari;
                                                         $total_male += $attendance[0]->male;
                                                         $total_female += $attendance[0]->female;
                                                         $grand_total += $attendance[0]->total;
@@ -157,7 +165,9 @@
                                                     <td>{{ $attendance[0]->safari ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->off ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->mess ?? '-' }}</td>
+                                                    <td>{{ $attendance[0]->kazini ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->sick ?? '-' }}</td>
+                                                    <td>{{ $attendance[0]->lockUp ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->male ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->female ?? '-' }}</td>
                                                     <td>{{ $attendance[0]->total ?? '-' }}</td>
@@ -167,18 +177,19 @@
 
                         @endphp
                         <tr style="font-weight: bold;">
-                            <td>TOTAL</td>
+                            <td>JUMLA</td>
                             <td>{{ $total_present }}</td>
                             <td>{{ $total_absent }}</td>
                             <td>{{ $total_sentry }}</td>
                             <td>{{ $total_safari }}</td>
                             <td>{{ $total_off }}</td>
                             <td>{{ $total_messy }}</td>
+                            <td>{{ $total_kazini }}</td>
                             <td>{{ $total_sick }}</td>
+                            <td>{{ $total_lockUp }}</td> 
                             <td>{{ $total_male }}</td>
                             <td>{{ $total_female }}</td>
                             <td>{{ $grand_total }}</td>
-
                         </tr>
                     </tbody>
                 </table>
@@ -325,6 +336,37 @@
         </table>
     </div
     @endif
+
+    @if ($sick_students -> isNotEmpty())
+    <div class="table-container" style="width: 50%;">
+        <center>
+            <h4>Sick Students</h4>
+        </center>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Names</th>
+                    <th>Rest days</th>
+                    <th>Platoon</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for ($i = 0; $i < count($sick_students); $i++)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ $sick_students[$i]->first_name }} {{ $sick_students[$i]->middle_name }}
+                            {{ $sick_students[$i]->last_name }}</td>
+                            <td>{{ $sick_students[$i]->sick->last()->rest_days }}</td>
+                        <td>{{ $sick_students[$i]->platoon }}</td>
+                    </tr>
+                @endfor
+            </tbody>
+        </table>
+    </div>
+    @endif
+
+    
 </body>
 
 </html>

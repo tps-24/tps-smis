@@ -118,10 +118,15 @@ class Student extends Model
     //     return Storage::url($this->photo);
     // }
 
-    public function leaveRequests()
-{
-    return $this->hasMany(LeaveRequest::class);
-}
+    public function safari(){
+        return $this->hasMany(SafariStudent::class);
+    }
 
+    public function pendingSafari(){
+        return $this->safari()->where('status','safari');
+    }
 
+    public function sick(){
+        return $this->hasMany(Patient::class);
+    }
 }
