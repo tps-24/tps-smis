@@ -296,6 +296,7 @@ a.active {
           <span class="menu-text">Announcements</span>
         </a>
       </li>
+      
       <li>
         <a href="{{ route('downloads.index') }}">
           <i class="bi bi-download"></i>
@@ -328,12 +329,14 @@ a.active {
       </ul>
       </li>
     @endcan()
-      <li>
-        <a href="">
+  
+<li class="treeview">
+<a href="">
           <i class="bi bi-mouse3"></i>
           <span class="menu-text">Leave(s)</span>
         </a>
       </li>
+
 
       @can('beat-list')
       <li class="treeview">
