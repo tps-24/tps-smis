@@ -582,7 +582,7 @@ class AttendenceController extends Controller
             $sick_ids = array_merge($sick_ids, $this->getSickStudentIds($platoon));
         }
         $sick_students = Student::whereIn('id', $sick_ids)->get();
-        return view('attendences.daily_report', compact('company', 'date', 'sick_students'));
+        //return view('attendences.daily_report', compact('company', 'date', 'sick_students'));
         $pdf = Pdf::loadView('attendences.daily_report', compact('company', 'date', 'sick_students'));
         return $pdf->download($date . "-" . $company->name . "-attendance.pdf");
     }
