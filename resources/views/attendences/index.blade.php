@@ -17,6 +17,7 @@
 @endsection
 @section('content')
 @include('layouts.sweet_alerts.index')
+@if($companies->isNotEmpty())
 <div class="row ">
     <div class="col-6">
             <form action="{{ route('attendances.summary',['type_id' => $attendenceType->id]) }}" method="GET" class="form-inline d-flex gap-2">
@@ -245,4 +246,7 @@
         </div>
     </div>
 </div>
+@else
+<h1>No students for the selected session.</h1>
+@endif
 @endsection
