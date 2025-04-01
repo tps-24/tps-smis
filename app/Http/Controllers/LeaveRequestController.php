@@ -134,4 +134,39 @@ class LeaveRequestController extends Controller
         $leaveRequests = LeaveRequest::where('status', 'pending_chief')->get();
         return view('leave-requests.chief_instructor', compact('leaveRequests'));
     }
+
+
+
+    public function staffPanel()
+{
+    $staff = Auth::user(); // Logged-in staff
+
+    if (!$staff instanceof \App\Models\Staff) {
+        return redirect()->route('login')->with('error', 'Unauthorized access.');
+    }
+
+    $role = strtolower($staff->role); // Using 'role' instead of 'designation'
+
+    switch ($role) {
+        case 'sir major':
+            $leaves = LeaveRequest::where('sir_major_id', $staff->id)->get();
+            break;
+
+        case 'inspector':
+            $leaves = LeaveRequest::where('status', 'forwarded_to_inspector')->get();
+            break;
+
+        case 'chief instructor':
+            $leaves = LeaveRequest::where('status', 'pending_chief')->get();
+            break;
+
+        default:
+            return redirect()->route('login')->with('error', 'Invalid role.');
+    }
+
+    return view('leave-requests.staff_panel', compact('staff', 'role', 'leaves'));
+}
+
+
+
 }

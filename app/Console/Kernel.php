@@ -7,6 +7,8 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+
+
     protected $commands = [
         \App\Console\Commands\DailyBeats::class,
     ];
@@ -15,8 +17,8 @@ class Kernel extends ConsoleKernel
         // Add your scheduled tasks here.
         $schedule->command('inspire')->everyTwentySeconds();
         $schedule->command('app:daily-beats')->daily();	;
+        $schedule->command('students:restore-beat')->daily();
         
-        $schedule->command('update:beat_status')->daily();
     }
 
     protected function commands(): void
@@ -25,5 +27,6 @@ class Kernel extends ConsoleKernel
         require base_path('routes/console.php');
     }
     
+
 
 }

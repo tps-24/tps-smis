@@ -412,6 +412,7 @@ Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name(
 Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
 Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
 Route::get('/dispensary', [PatientController::class, 'dispensaryPage'])->name('dispensary.page');
+Route::get('/statistics/download/{timeframe}', [PatientController::class, 'downloadStatisticsReport'])->name('statistics.download');
 
 
 // 🚀 Routes for Sending to Receptionist
@@ -427,6 +428,9 @@ Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->nam
 // 🩺 Doctor Routes
 Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.page');
 Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
+Route::post('/patients/save-details', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
+Route::put('/patients/discharge/{id}', [PatientController::class, 'discharge'])->name('patients.discharge');
+Route::put('/patients/{id}/discharge', [PatientController::class, 'discharge'])->name('patients.discharge');
 
 // 📅 Timetable Routes
 Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');
@@ -458,23 +462,20 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
 
    
 //Leaves Routes
-
 Route::prefix('leave-requests')->group(function () {
     Route::get('/', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
     Route::get('/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
-
     Route::post('/store', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
-    
     Route::put('/forward-inspector/{id}', [LeaveRequestController::class, 'forwardToInspector'])->name('leave-requests.forward-inspector');
     Route::put('/forward-chief/{id}', [LeaveRequestController::class, 'forwardToChief'])->name('leave-requests.forward-chief');
-    
     Route::put('/approve/{id}', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
     Route::put('/reject/{id}', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+    
+    // Route for staff panel
+    Route::middleware(['auth'])->get('/staff-panel', [LeaveRequestController::class, 'staffPanel'])->name('staff.panel');
 
     // Views for roles
-    Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
     Route::get('/sir-major', [LeaveRequestController::class, 'sirMajorView'])->name('leave-requests.sir-major');
     Route::get('/inspector', [LeaveRequestController::class, 'inspectorView'])->name('leave-requests.inspector');
     Route::get('/chief-instructor', [LeaveRequestController::class, 'chiefInstructorView'])->name('leave-requests.chief-instructor');
 });
-

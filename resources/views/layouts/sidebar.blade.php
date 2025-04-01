@@ -1,3 +1,4 @@
+
 <!-- Sidebar wrapper starts -->
 <nav id="sidebar" class="sidebar-wrapper">
 
@@ -290,41 +291,46 @@
       </ul>
       </li>
     @endcan()
-  
-<li class="treeview">
-<a href="">
-          <i class="bi bi-mouse3"></i>
-          <span class="menu-text">Leave(s)</span>
-        </a>
-        <ul class="treeview-menu">
-        <li>
-      <a href="{{ route('leave-requests.create') }}">
-          <i class="bi bi-mouse3"></i>
-          <span class="menu-text">Leave Application</span>
-        </a>
-      </li>
-        <li>
-    <a href="{{ route('leave-requests.sir-major') }}">
-        <i class="bi bi-person-vcard"></i>
-        <span class="menu-text">Received Requests</span>
+    <li class="treeview">
+    <a href="#">
+        <i class="bi bi-mouse3"></i>
+        <span class="menu-text">Leave(s)</span>
     </a>
-</li>
-<li>
-    <a href="{{ route('leave-requests.inspector') }}">
-        <i class="bi bi-person-vcard"></i>
-        <span class="menu-text">Inspector Panel</span>
-    </a>
+    <ul class="treeview-menu">
+        {{-- Leave Application (for all users) --}}
+        <li>
+            <a href="{{ route('leave-requests.create') }}">
+                <i class="bi bi-mouse3"></i>
+                <span class="menu-text">Leave Application</span>
+            </a>
+        </li>
+
+        {{-- Role-specific panel --}}
+        @if (isset($role) && $role === 'sir major')
+            <li>
+                <a href="{{ route('staff.panel') }}">
+                    <i class="bi bi-person-vcard"></i>
+                    <span class="menu-text">Received Requests</span>
+                </a>
+            </li>
+        @elseif (isset($role) && $role === 'inspector')
+            <li>
+                <a href="{{ route('staff.panel') }}">
+                    <i class="bi bi-person-vcard"></i>
+                    <span class="menu-text">Inspector Panel</span>
+                </a>
+            </li>
+        @elseif (isset($role) && $role === 'chief instructor')
+            <li>
+                <a href="{{ route('staff.panel') }}">
+                    <i class="bi bi-person-vcard"></i>
+                    <span class="menu-text">Chief Panel</span>
+                </a>
+            </li>
+        @endif
+    </ul>
 </li>
 
-
-<li>
-    <a href="{{ route('leave-requests.chief-instructor') }}">
-        <i class="bi bi-person-vcard"></i>
-        <span class="menu-text">Chief Panel</span>
-    </a>
-</li>
-        </ul>
-      </li>
 
 
       @can('beat-list')

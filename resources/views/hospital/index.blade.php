@@ -125,7 +125,7 @@
 <script>
 function sendForApproval(studentId, firstName,lastName) {
     Swal.fire({
-        title: `Send for Approval: ${firstName}${lastName}`,
+        title: `Send for Approval: ${firstName}  ${lastName}`,
         text: "Are you sure you want to send this student for Receptionist approval?",
         icon: "warning",
         showCancelButton: true,
