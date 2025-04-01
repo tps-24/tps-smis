@@ -223,6 +223,9 @@ class DashboardController extends Controller
 
     private function todayStudentReport()
     {
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
         $present = 0;
         $absent = 0;
         $sick = 0;
@@ -239,8 +242,8 @@ class DashboardController extends Controller
                 $lockUp += $platoon->today_attendence->get(0)->lockUp;
             }
         }
-        $total = Student::where('session_programme_id', $this->selectedSessionId)->count();
-        $presentPercent = round(($present / ($total) * 100), 1);
+        $total = Student::where('session_programme_id', $selectedSessionId)->count();
+        $presentPercent = $total == 0? 0: round(($present / ($total) * 100), 1);
         return [
             'present' => $present,
             'absent' => $absent,
@@ -251,6 +254,10 @@ class DashboardController extends Controller
     }
     public function getGraphData()
     {
+
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
         // Initialize arrays to store the data for each period
         $attendanceData = [
             'dates' => [],
@@ -328,12 +335,13 @@ class DashboardController extends Controller
 
         // Loop through each company and its platoons
         foreach ($companies as $company) {
+
+            //dd($selectedSessionId);
             foreach ($company->platoons as $platoon) {
                 // Get attendance records for the last 7 days
-                $attendances = $platoon->attendences()
+                $attendances = $platoon->attendences()->where('session_programme_id', $selectedSessionId)
                     ->where('created_at', '>=', Carbon::now()->subDays(7))
                     ->get();
-
                 // Process attendance data for the last 7 days
                 foreach ($attendances as $attendance) {
                     $attendanceDate = Carbon::parse($attendance->created_at)->format('Y-m-d');

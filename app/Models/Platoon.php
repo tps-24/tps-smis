@@ -34,7 +34,10 @@ class Platoon extends Model
         return $this->hasManyThrough(SafariStudent::class, Student::class, 'platoon', 'student_id', 'name', 'id');
     }
     public function today_attendence(){
-        return $this->attendences()->whereDate('created_at', now()->toDateString());
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
+        return $this->attendences()->where('session_programme_id', $selectedSessionId)->whereDate('created_at', now()->toDateString())->whereNotNull('session_programme_id');
     }
 
     public function today_sick(){

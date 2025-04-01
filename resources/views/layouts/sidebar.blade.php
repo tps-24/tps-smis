@@ -90,9 +90,9 @@
         <!-- <li>
         <a href="/tps-smis/attendences/type/2">Master Parade</a>
       </li> -->
-        <li>
+        <!-- <li>
         <a href="/tps-smis/attendences/type/3">Night</a>
-        </li>
+        </li> -->
         <!-- <li>
         <a href="/tps-smis/attendences/type/4">Flag</a>
       </li> -->

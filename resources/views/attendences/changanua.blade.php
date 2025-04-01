@@ -33,8 +33,8 @@
                 <input class="form-check-input" type="radio" name="type" value="off">
                 <label for="">Off</label>
 
-                <input class="form-check-input" type="radio" name="type" value="safari">
-                <label for="">Safari</label>
+                <!-- <input class="form-check-input" type="radio" name="type" value="safari">
+                <label for="">Safari</label> -->
             </div>
 
             <div class="row d-flex" style="width: 100%; position: relative;">
@@ -116,17 +116,7 @@
                                     @endforeach
                                 </div>
 
-                                <div id="safari" class="mt-4">
-                                    <h4>Safari Students</h4>
-                                    @foreach ($safari_students as $student)
-                                        <div class="form-check">
-                                            <input id="item-child" class="form-check-input" name="student_ids[]" type="checkbox"
-                                                checked value="{{$student->id}}" id="defaultCheck" .{{$student->id}}>
-                                            <label class="form-check-label" for="defaultCheck1">{{$student->first_name}}
-                                                {{$student->middle_name}} {{$student->last_name}}</label>
-                                        </div>
-                                    @endforeach
-                                </div>
+                                
                                 <div class="d-flex gap-2 justify-content-end">
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>

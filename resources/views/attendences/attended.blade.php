@@ -97,12 +97,12 @@
                                             </ol>
 
                                         </div>
-                                        <div class="modal-footer">
+                                        <!-- <div class="modal-footer">
                                             <a
                                                 href="{{url('attendences/list-absent_students/' . $company->id . '/' . $attendence->id.'/'.$date)}}"><button
                                                     class="btn btn-sm btn-primary">Add absents</button></a>
                                         
-                                        </div>
+                                        </div> -->
                                     </div>
                             </div>
                             

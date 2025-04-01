@@ -105,7 +105,10 @@
                         @endphp
                         @foreach ($company->platoons as $platoon)
                                                 @php
-                                                    $attendance = $platoon->attendences()->whereDate('created_at', $date)->get();
+                                                        $selectedSessionId = session('selected_session');
+                                                if (!$selectedSessionId)
+                                                    $selectedSessionId = 1;
+                                                    $attendance = $platoon->attendences()->whereDate('created_at', $date)->where('session_programme_id', $selectedSessionId)->get();
                                                     if (count($attendance) > 0) {
                                                         $total_present += $attendance[0]->present;
                                                         $total_absent += $attendance[0]->absent;
@@ -119,7 +122,7 @@
                                                         $total_male += $attendance[0]->male;
                                                         $total_female += $attendance[0]->female;
                                                         $grand_total += $attendance[0]->total;
-                                                        $absent_ids = $attendance[0]->absent_student_ids !=null? explode(",", $attendance[0]->absent_student_ids):[];
+                                                        $absent_ids = $attendance[0]->absent_student_ids !=null? json_decode( $attendance[0]->absent_student_ids):[];
                                                         $sentry_student_ids = $attendance[0]->mess_student_ids !=null? explode(",", $attendance[0]->sentry_student_ids):[];
                                                         $mess_student_ids = $attendance[0]->mess_student_ids !=null? explode(",", $attendance[0]->mess_student_ids): [];
                                                         $off_student_ids =$attendance[0]->off_student_ids !=null?  explode(",", $attendance[0]->off_student_ids): [];
@@ -324,6 +327,7 @@
                 </tr>
             </thead>
             <tbody>
+
                 @for ($i = 0; $i < count($absent_students); $i++)
                     <tr>
                         <td>{{ $i + 1 }}</td>
