@@ -124,7 +124,6 @@
             <div class="card-header">
                 <div class="pull-right">
                     <span style="font-size:30px !important">Coursework Results</span>
-
                     <!-- <h6>Here display the course choosen</h6> -->
 
                     <button disabled id="add_btn" class="btn btn-success mb-2"
@@ -137,9 +136,6 @@
                         <a href="" id="ca_configuration_link" style="color:white;"> <i class="fa fa-plus"></i> CA Configurations</a>
                     </button>
                 </div>
-                
-                <button id="export-btn" class="btn btn-secondary btn-sm" style="margin-bottom:-20px;">Export to Excel</button>
-                
             </div>
             <div class="card-body">
                 <div class="table-outer">
@@ -208,7 +204,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    function fetchCourseworkResults(courseworkId, page = 1) {
+    // Function to fetch and render coursework results
+function fetchCourseworkResults(courseworkId, page = 1) {
     const apiUrl = `/tps-smis/coursework_results/coursework/${courseworkId}?page=${page}`;
     const headingsContainer = document.getElementById('coursework-headings');
     const resultsContainer = document.getElementById('coursework-results');
@@ -218,9 +215,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Error: Necessary DOM elements are missing');
         return;
     }
-
-    // Show a loading indicator (optional)
-    resultsContainer.innerHTML = `<tr><td colspan="7" class="text-center">Loading...</td></tr>`;
 
     fetch(apiUrl)
         .then(response => {
@@ -243,9 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 paginationContainer.innerHTML = '';
                 return;
             }
-
-            // Check if `per_page` exists and is a valid number
-            const perPage = data.results.per_page && !isNaN(data.results.per_page) ? data.results.per_page : 10;  // Default to 10 if not available
 
             // Clear previous content
             headingsContainer.innerHTML = `
@@ -273,16 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
             actionsHeading.innerText = 'Actions';
             headingsContainer.appendChild(actionsHeading);
 
-            // Ensure the page number is a valid integer
-            page = parseInt(page, 10);
-            if (isNaN(page) || page <= 0) {
-                page = 1;  // Default to page 1 if invalid
-            }
-
-            // Calculate the startIndex for serial numbers
-            const startIndex = (page - 1) * perPage + 1;
-
-            let rowIndex = startIndex;
+            let rowIndex = 1;
             Object.entries(data.results.data).forEach(([studentId, studentResult]) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -315,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                             return `
                                 <li class="page-item ${link.active ? 'active' : ''}">
-                                    <a class="page-link" href="#" data-page="${page}">
+                                    <a class="page-link" href="#" ${page ? `data-page="${page}"` : ''}>
                                         ${link.label}
                                     </a>
                                 </li>
@@ -348,77 +330,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
-
-<script>
-    // Function to export results to Excel
-function exportToExcel(courseworkId) {
-    const tableData = [];
-    
-    // Define table headers based on the specified format
-    tableData.push([
-        'S/N',
-        'Full Name',
-        'Sex',
-        'Examination Number',
-        'Individual Assignment',
-        'Group Assignment',
-        'Test',
-        'Total'
-    ]);
-
-    // Fetch results from the server
-    fetch(`/tps-smis/coursework_results/coursework/${courseworkId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            let rowIndex = 1; // Initialize the serial number
-            data.results.data.forEach(studentResult => {
-                const fullName = `${studentResult.student.first_name} ${studentResult.student.middle_name || ''} ${studentResult.student.last_name}`;
-                const row = [
-                    rowIndex++, // Serial number
-                    fullName.trim(), // Full Name
-                    studentResult.student.sex || '-', // Sex
-                    studentResult.student.force_number, // Examination Number
-                    studentResult.scores['individual_assignment'] || '-', // Individual Assignment
-                    studentResult.scores['group_assignment'] || '-', // Group Assignment
-                    studentResult.scores['test'] || '-', // Test
-                    studentResult.total_cw || '-', // Total
-                ];
-                tableData.push(row); // Add row to table data
-            });
-
-            // Use SheetJS to create and download Excel file
-            const worksheet = XLSX.utils.aoa_to_sheet(tableData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
-            XLSX.writeFile(workbook, 'Coursework_Results.xlsx');
-        })
-        .catch(error => {
-            console.error('Error exporting results:', error);
-            alert('Failed to export results. Please try again later.');
-        });
-}
-
-// Attach event listener to the Export button
-document.getElementById('export-btn').addEventListener('click', function () {
-    // Dynamically fetch the courseworkId from a hidden input or dataset
-    const courseworkId = document.getElementById('export-btn').dataset.courseworkId;
-
-    // If courseworkId is not available, throw an error
-    if (!courseworkId) {
-        console.error('Error: courseworkId is not defined');
-        alert('Coursework ID is missing. Cannot export results.');
-        return;
-    }
-
-    // Call the export function with the courseworkId
-    exportToExcel(courseworkId);
-});
-
-</script>
-
 @endsection

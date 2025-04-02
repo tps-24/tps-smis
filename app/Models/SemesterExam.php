@@ -9,7 +9,10 @@ class SemesterExam extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['course_id', 'semester_id', 'exam_date', 'max_score'];
+    protected $fillable = [
+        'course_id', 'semester_id', 'exam_date', 'max_score', 'session_programme_id', 'created_by', 'updated_by',
+    ];
+    
 
     public function course()
     {

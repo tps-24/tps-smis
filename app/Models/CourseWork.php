@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CourseWork extends Model
 {
     use HasFactory;
+    protected $table = 'courseworks';
 
     protected $fillable = ['programme_id','course_id',  'semester_id', 'assessment_type_id', 'coursework_title',  'max_score', 'due_date', 'session_programme_id','created_by','updated_by'];
 

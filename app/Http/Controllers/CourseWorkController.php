@@ -49,7 +49,7 @@ class CourseWorkController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('course_works')->where(function ($query) use ($request, $courseId) {
+                Rule::unique('courseworks')->where(function ($query) use ($request, $courseId) {
                     return $query->where('course_id', $courseId) // Check within the same course
                                 ->where('assessment_type_id', $request->assessment_type_id); // Check within the same assessment type
                 }),
@@ -59,7 +59,6 @@ class CourseWorkController extends Controller
         ]);
 
         CourseWork::create([
-            'programme_id' => $coursePivot->programme_id,
             'course_id' => $course->id,
             'semester_id' => $coursePivot->semester_id,
             'assessment_type_id' => $request->assessment_type_id,

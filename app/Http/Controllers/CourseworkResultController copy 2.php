@@ -109,38 +109,37 @@ class CourseworkResultController extends Controller
     public function getResultsByCourse($courseId)
 {
     try {
-        \Log::info("Fetching results for course ID: {$courseId}");
         // Fetch all coursework configurations for the given course
         $courseworks = DB::table('courseworks')
             ->where('course_id', $courseId)
             ->select('id', 'coursework_title')
             ->get();
 
-        // Fetch coursework results by linking through the coursework table
+        // Fetch and sort coursework results by total_cw in descending order before pagination
         $results = DB::table('coursework_results')
             ->join('students', 'coursework_results.student_id', '=', 'students.id')
-            ->join('courseworks', 'coursework_results.coursework_id', '=', 'courseworks.id') // Establish the relationship
-            ->where('courseworks.course_id', $courseId) // Filter based on course_id in the coursework table
+            ->where('coursework_results.course_id', $courseId)
             ->select(
                 'coursework_results.student_id',
                 'students.force_number',
                 'students.first_name',
                 'students.middle_name',
                 'students.last_name',
-                DB::raw('SUM(coursework_results.score) as total_cw') // Calculate total CW
+                DB::raw('SUM(coursework_results.score) as total_cw') // Calculate total CW in query
             )
             ->groupBy(
-                'coursework_results.student_id',
-                'students.force_number',
-                'students.first_name',
-                'students.middle_name',
-                'students.last_name'
+                'coursework_results.student_id', // Group by student ID
+                'students.force_number',        // Group by force number
+                'students.first_name',          // Group by first name
+                'students.middle_name',         // Group by middle name
+                'students.last_name'            // Group by last name
             )
-            ->orderByDesc('total_cw') // Sort by total CW
-            ->paginate(10); // Paginate results
+            ->orderByDesc('total_cw') // Sort by total scores
+            ->paginate(10); // Paginate sorted results
 
         // Format results for the frontend
         $groupedResults = collect($results->items())->map(function ($studentResult) use ($courseworks) {
+            // Fetch individual scores for this student's coursework
             $scores = DB::table('coursework_results')
                 ->where('student_id', $studentResult->student_id)
                 ->whereIn('coursework_id', $courseworks->pluck('id'))
@@ -170,21 +169,22 @@ class CourseworkResultController extends Controller
             ]);
         }
 
-        // Return formatted JSON response
+        // Return JSON response with sorted results and pagination links
         return response()->json([
             'courseworks' => $courseworks ?? [],
             'results' => [
                 'data' => $groupedResults,
-                'links' => $results->toArray()['links'], // Include pagination links
+                'links' => $results->toArray()['links'], // Provide pagination links
             ],
         ]);
     } catch (\Exception $e) {
-        // Log and return error
+        // Log error and return a server error response
         \Log::error('Error fetching coursework results:', ['message' => $e->getMessage()]);
         return response()->json(['message' => 'Internal Server Error'], 500);
     }
 }
 
+    
     
 
 

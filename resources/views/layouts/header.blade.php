@@ -1,4 +1,46 @@
 <!-- App header starts -->
+ <style>
+       /* Responsive adjustments */
+       @media (max-width: 468px) {
+      .title-container {
+        max-width: 95%;
+        padding: 10px;
+      }
+      .session-input-group {
+        width: 90%;
+        margin: 15px auto;
+      }
+      .session-input-group form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .session-input-group .input-group {
+        flex-direction: column;
+      }
+      .session-input-group button,
+      .session-input-group select {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      .session-input-group button:last-child,
+      .session-input-group select:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    @media (min-width: 468px) {
+        .outside{
+            font-size:18px; 
+            margin-left: 1%; 
+            height:36px; 
+            width:30%
+        }
+        .outside form{
+            margin-left:10px;
+        }
+        
+    }
+ </style>
 <div class="app-header d-flex align-items-center">
     <!-- Toggle buttons starts -->
     <div class="d-flex">
@@ -39,7 +81,27 @@
     @endphp
 
     @can('programme-session-list')
-    <div class="input-group" style="font-size:18px; margin-left: 1%; height:36px; width:30%">
+    <div class="input-group outside" style="">
+        <form action="{{ url()->current() }}" method="GET" style="display:inline-block;">
+            <div class="input-group inside" style="font-size:18px; height:36px;">
+                <button class="btn btn-outline-secondary" type="button">
+                    Active Session
+                </button>
+                <select name="session_id" class="form-control activeSession" id="sessionProgramme" onchange="this.form.submit()">
+                    <option value="" disabled {{ !$selectedSessionId ? 'selected' : '' }}>Choose the session</option>
+                    @foreach($sessionProgrammes as $sessionProgramme)
+                        <option value="{{ $sessionProgramme->id }}" {{ $sessionProgramme->id == $selectedSessionId ? 'selected' : '' }}>
+                            {{ $sessionProgramme->session_programme_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </form>
+    </div>
+
+
+    
+    <!-- <div class="input-group" style="font-size:18px; margin-left: 1%; height:36px; width:30%">
         <form action="{{ url()->current() }}" method="GET" style="display:inline-block; margin-left:10px;">
             <div class="input-group" style="font-size:18px; height:36px;">
                 <button class="btn btn-outline-secondary" type="button">
@@ -49,13 +111,13 @@
                     <option value="" disabled {{ !$selectedSessionId ? 'selected' : '' }}>Choose the session</option>
                     @foreach($sessionProgrammes as $sessionProgramme)
                         <option value="{{ $sessionProgramme->id }}" {{ $sessionProgramme->id == $selectedSessionId ? 'selected' : '' }}>
-                            {{ $sessionProgramme->programme_name }}
+                            {{ $sessionProgramme->session_programme_name }}
                         </option>
                     @endforeach
                 </select>
             </div>
         </form>
-    </div>
+    </div> -->
     @endcan
     <!-- Session ends -->
 

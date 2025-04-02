@@ -216,12 +216,20 @@ a.active {
             <li>
             <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a> <!-- For Teacher-->
             </li>
+            @can('semester-exam-list')
             <li>
-            <a href="#">Semester Exam (SE)</a> <!-- For Teacher-->
+            <a href="{{ route('semester_exams.index') }}">Semester Exam (SE)</a> <!-- For Teacher-->
             </li>
+            @endcan()
             @can('optional-enrollment-list')
             <li>
             <a href="{{ route('enrollments.index') }}">Optional Courses</a> <!-- For Academic Coord -->
+            </li>
+            @endcan()
+            
+            @can('generate-results')
+            <li>
+              <a href="{{ route('final_results.generate') }}">Generate Final Results</a>
             </li>
             @endcan()
           </ul>
@@ -256,29 +264,6 @@ a.active {
         </li>
       </ul>
       </li> -->
-    @endcan()
-
-      @can('semester-exam-list')
-      <li class="treeview">
-      <a href="#!">
-        <i class="bi bi-stickies"></i>
-        <span class="menu-text">Examination (UE)</span>
-      </a>
-
-      <ul class="treeview-menu">
-        @can('generate-results')
-      <li>
-      <a href="{{ route('final_results.generate') }}">Generate Results</a>
-      </li>
-    @endcan()
-        <li>
-        <a href="{{ route('final_results.index') }}">semester 1</a>
-        </li>
-        <li>
-        <a href="{{ route('final_results.index') }}">semester 2</a>
-        </li>
-      </ul>
-      </li>
     @endcan()
 
     @can('print-certificate')

@@ -44,7 +44,7 @@
                 
 
                 
-<h1>Edit Course Assignment for {{ $programme->programmeName }} in {{ $semester->semester_name }} (Session: {{ $sessionProgramme->programme_name }})</h1>
+<h1>Edit Course Assignment for {{ $programme->programmeName }} in {{ $semester->semester_name }} (Session: {{ $sessionProgramme->session_programme_name }})</h1>
 <form action="{{ route('assignments.update', [$programme->id, $semester->id, $sessionProgramme->id, $course->id]) }}" method="POST">
     @csrf
     @method('PUT')

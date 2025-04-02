@@ -30,7 +30,7 @@
 <div class="container">
 
 
-<h2>Beats for {{ $date }}</h2>
+<h2>Beats for {{ $date ?? ''}}</h2>
     
     <form action="{{ route('beats.byDate') }}" method="GET" class="mb-4">
         <div class="row">

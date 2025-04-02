@@ -14,21 +14,21 @@ class CourseworkResultImport implements ToCollection
 {
     private $num = 0; // Row counter
     private $courseworkId;
-    // private $courseId;
-    // private $semesterId;
+    private $courseId;
+    private $semesterId;
 
     // Constructor to initialize semesterId, courseId, and courseworkId
-    public function __construct($courseworkId)
+    public function __construct($semesterId, $courseId, $courseworkId)
     {
-        // $this->semesterId = $semesterId;
-        // $this->courseId = $courseId;
+        $this->semesterId = $semesterId;
+        $this->courseId = $courseId;
         $this->courseworkId = $courseworkId;
     }
 
     // Main method to process the Excel rows
     public function collection(Collection $rows)
     {
-    // dd('Processing rows...', $this->courseworkId);
+    // dd('Processing rows...', $rows);
 
         $this->num = 0;
 
@@ -36,7 +36,7 @@ class CourseworkResultImport implements ToCollection
             $this->num++;
 
             // Skip the first 4 rows (e.g., headers or meta-info)
-            if ($this->num <= 5) {
+            if ($this->num <= 4) {
                 continue;
             }
 
@@ -67,7 +67,9 @@ class CourseworkResultImport implements ToCollection
                 // Save coursework result
                 CourseworkResult::create([
                     'student_id' => $student->id,
+                    'course_id' => $this->courseId,
                     'coursework_id' => $this->courseworkId,
+                    'semester_id' => $this->semesterId,
                     'score' => $row[3],
                     'created_by' => Auth::user()->id,
                 ]);
@@ -85,7 +87,9 @@ class CourseworkResultImport implements ToCollection
     private function checkStudentDuplication($studentId)
     {
         return CourseworkResult::where('student_id', $studentId)
+            ->where('course_id', $this->courseId)
             ->where('coursework_id', $this->courseworkId)
+            ->where('semester_id', $this->semesterId)
             ->exists();
     }
 }

@@ -1,5 +1,42 @@
 @extends('layouts.main')
 
+@section('style')
+<style>
+    /* Enhance mobile view without affecting large screens */
+    @media (max-width: 768px) {
+        /* Adjust chart container for mobile */
+        .chart-container {
+            padding: 15px;
+            overflow-x: auto; /* Prevent horizontal overflow */
+            height: 400px; /* Set a fixed height for better visibility */
+        }
+
+        canvas {
+            width: 100% !important; /* Ensure the canvas fills the container */
+        }
+
+        /* Resize images for announcements */
+        .card-body img {
+            width: 30px;
+        }
+
+        /* Center-align text and reduce spacing */
+        h2, h3 {
+            text-align: center;
+        }
+
+        /* Buttons stack vertically */
+        .btn-group {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-group .btn {
+            margin-bottom: 10px;
+        }
+    }
+</style>
+@endsection
 @section('content')
     <!-- Row starts -->
     <div class="row gx-4" id="dashboardContent">
@@ -13,7 +50,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="container">
-                        <h2>Grouped Bar Graph of Student Attendances</h2>
+                        <h2 style="color: #002366;">Trends and Analysis of Student Attendance Patterns</h2>
                         <div class="btn-group mb-3" role="group" aria-label="Filter options">
                             <button type="button" class="btn btn-primary" onclick="showDaily()">Daily</button>
                             <button type="button" class="btn btn-secondary" onclick="showWeekly()">Weekly</button>

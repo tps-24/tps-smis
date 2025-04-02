@@ -45,7 +45,7 @@ class SessionProgrammeController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'programme_name' => 'required|unique:session_programmes,programme_name',
+            'session_programme_name' => 'required|unique:session_programmes,session_programme_name',
             'year' => 'required',
         ]);
     
@@ -77,7 +77,7 @@ class SessionProgrammeController extends Controller
     public function update(Request $request, string $id)
     {
         request()->validate([
-            'programme_name' => 'required|unique:session_programmes,programme_name',
+            'session_programme_name' => 'required|unique:session_programmes,session_programme_name',
             'year' => 'required',
        ]);
    

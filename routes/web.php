@@ -87,9 +87,7 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
 Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
 });
 
-    // Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     
-    Route::resource('coursework_results', CourseworkResultController::class);
 
 
 // Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
@@ -128,7 +126,9 @@ Route::group(['middleware' => ['auth']], function () {
     
     
     Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
-    Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    // Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    Route::get('/coursework_results/coursework/{coursework}', [CourseworkResultController::class, 'getResultsByCourse']);
+
 
     Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
     Route::get('/coursework/upload_cw/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
@@ -318,14 +318,19 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::get('course/courseworks/create/{courseId}',[CourseWorkController::class,'create'])->name('course.coursework.create');
     Route::get('course/courseworks/{courseId}',[CourseWorkController::class,'getCourse'])->name('course.coursework');
     Route::post('course/courseworks/store/{courseId}',[CourseWorkController::class,'store'])->name('course.coursework.store');
+
+    // Route::get('course/courseworks/create/{courseId}',[SemesterExamController::class,'create'])->name('course.coursework.create');
+    // Route::get('course/courseworks/{courseId}',[SemesterExamController::class,'getCourse'])->name('course.coursework');
+    // Route::post('course/courseworks/store/{courseId}',[SemesterExamController::class,'store'])->name('course.coursework.store');
     Route::resource('grading_systems', GradingSystemController::class); 
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);
     Route::resource('assign-courses', ProgrammeCourseSemesterController::class);
     Route::resource('enrollments', OptionalCourseEnrollmentController::class);
     Route::resource('course_works', CourseWorkController::class);
-    Route::resource('semester_exams', SemesterExamController::class);
-    Route::resource('semester_exam_results', SemesterExamResultController::class);
+    Route::resource('coursework_results', CourseworkResultController::class);
+    Route::resource('semester_exams_config', SemesterExamController::class);
+    Route::resource('semester_exams', SemesterExamResultController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
     Route::resource('guard-areas', GuardAreaController::class);
