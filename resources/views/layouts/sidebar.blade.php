@@ -306,9 +306,9 @@
         </li>
 
         {{-- Role-specific panel --}}
-        @if (isset($role) && $role === 'sir major')
+        @if (isset($role) && $role === 'Sir Major')
             <li>
-                <a href="{{ route('staff.panel') }}">
+                <a href="{{ route('staff_panel') }}">
                     <i class="bi bi-person-vcard"></i>
                     <span class="menu-text">Received Requests</span>
                 </a>

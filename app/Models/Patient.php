@@ -71,10 +71,10 @@ class Patient extends Model
     }
 
 
-    public function excuse_type()
-{
-    return $this->belongsTo(ExcuseType::class, 'excuse_type_id');
-}
+//     public function excuse_type()
+// {
+//     return $this->belongsTo(ExcuseType::class, 'excuse_type_id');
+// }
 
 
 
@@ -87,6 +87,7 @@ public function getExcuseTypeNameAttribute()
 {
     return $this->excuseType->name ?? null;
 }
+
 
 }
 

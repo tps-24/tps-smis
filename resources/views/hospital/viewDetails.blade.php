@@ -18,7 +18,7 @@
         <h5><strong>Generate Report</strong></h5>
         <p>Download a PDF report for the selected timeframe.</p>
         
-        <!-- Download Button -->
+        <!-- Minimized Button -->
         <div class="d-flex">
         <a href="{{ route('statistics.download', ['timeframe' => $timeframe, 'company_id' => $company_id, 'platoon' => $platoon]) }}"
         class="btn btn-danger btn-sm">
@@ -76,3 +76,5 @@
 </div>
 @endsection
 
+
+<!-- <a href="{{ route('statistics.download', ['timeframe' => $timeframe, 'company_id' => $company_id, 'platoon' => $platoon]) }}" -->

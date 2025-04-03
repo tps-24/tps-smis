@@ -26,47 +26,45 @@ class LeaveRequestController extends Controller
 
     // Store a new leave request
     public function store(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'reason' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'start_date' => 'required|date',
+        'end_date' => 'required|date|after_or_equal:start_date',
+        'reason' => 'required|string|max:500',
+    ]);
 
-        // Get authenticated student
-        $student = Student::where('user_id', Auth::id())->first();
+    // Ensure the logged-in user is a student
+    $student = Student::where('user_id', Auth::id())->first();
 
-        if (!$student) {
-            return redirect()->back()->with('error', 'Student account not found.');
-        }
-
-        // Find the Sir Major (no company_id filter)
-        $sirMajor = Staff::where('designation', 'sir major')->first();
-
-        // Create the leave request
-        $leaveRequest = LeaveRequest::create([
-            'student_id' => $student->id,
-            'sir_major_id' => $sirMajor->id ?? null,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'reason' => $request->reason,
-            'status' => 'pending',
-        ]);
-
-        // Send notification to Sir Major
-        // if ($sirMajor) {
-        //     Notification::send($sirMajor, new LeaveRequestSubmitted($leaveRequest));
-        // }
-
-        return redirect()->back()
-            ->with('success', 'Leave request submitted successfully. Awaiting approval.');
+    if (!$student) {
+        return redirect()->back()->with('error', 'Student account not found.');
     }
+
+    // Assign the request to Sir Major (first available one)
+    $sirMajor = Staff::where('role', 'Sir Major')->first();
+
+    if (!$sirMajor) {
+        return redirect()->back()->with('error', 'No Sir Major found to process the request.');
+    }
+
+    // Create the leave request
+    $leaveRequest = LeaveRequest::create([
+        'student_id' => $student->id,
+        'sir_major_id' => $sirMajor->id,
+        'start_date' => $request->start_date,
+        'end_date' => $request->end_date,
+        'reason' => $request->reason,
+        'status' => 'pending',
+    ]);
+
+    return redirect()->back()->with('success', 'Leave request submitted successfully.');
+}
 
     // Sir Major forwards request to Inspector
     public function forwardToInspector($id)
     {
         $leaveRequest = LeaveRequest::findOrFail($id);
-        $inspector = Staff::where('designation', 'inspector')->first();
+        $inspector = Staff::where('role', 'inspector')->first();
 
         if ($inspector) {
             $leaveRequest->update(['inspector_id' => $inspector->id, 'status' => 'pending_inspector']);
@@ -79,7 +77,7 @@ class LeaveRequestController extends Controller
     public function forwardToChief($id)
     {
         $leaveRequest = LeaveRequest::findOrFail($id);
-        $chiefInstructor = Staff::where('designation', 'chief instructor')->first();
+        $chiefInstructor = Staff::where('role', 'chief instructor')->first();
 
         if ($chiefInstructor) {
             $leaveRequest->update(['chief_instructor_id' => $chiefInstructor->id, 'status' => 'pending_chief']);
@@ -136,35 +134,40 @@ class LeaveRequestController extends Controller
     }
 
 
-
     public function staffPanel()
+    {
+        $staff = Auth::guard('staff')->user(); // Ensure staff authentication
+    
+        if (!$staff) {
+            return redirect()->route('login')->with('error', 'Unauthorized access.');
+        }
+    
+        $role = strtolower($staff->role); // Get the designation
+    
+        switch ($role) {
+            case 'Sir Major':
+                $leaves = LeaveRequest::where('sir_major_id', $staff->id)->get();
+                break;
+            default:
+                return redirect()->route('login')->with('error', 'Unauthorized access.');
+        }
+    
+        return view('leaves.staff_panel', compact('staff', 'role', 'leaves'));
+    }
+    
+
+public function login(Request $request)
 {
-    $staff = Auth::user(); // Logged-in staff
+    $credentials = $request->only('email', 'password');
 
-    if (!$staff instanceof \App\Models\Staff) {
-        return redirect()->route('login')->with('error', 'Unauthorized access.');
+    if (Auth::guard('staff')->attempt($credentials)) {
+        $staff = Auth::guard('staff')->user();
+
+        // Redirect to staff panel
+        return redirect()->route('staff_panel');
     }
 
-    $role = strtolower($staff->role); // Using 'role' instead of 'designation'
-
-    switch ($role) {
-        case 'sir major':
-            $leaves = LeaveRequest::where('sir_major_id', $staff->id)->get();
-            break;
-
-        case 'inspector':
-            $leaves = LeaveRequest::where('status', 'forwarded_to_inspector')->get();
-            break;
-
-        case 'chief instructor':
-            $leaves = LeaveRequest::where('status', 'pending_chief')->get();
-            break;
-
-        default:
-            return redirect()->route('login')->with('error', 'Invalid role.');
-    }
-
-    return view('leave-requests.staff_panel', compact('staff', 'role', 'leaves'));
+    return back()->withErrors(['email' => 'Invalid credentials']);
 }
 
 

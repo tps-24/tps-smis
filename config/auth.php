@@ -70,6 +70,30 @@ return [
         //     'table' => 'users',
         // ],
     ],
+    
+'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
+    ],
+
+    'staff' => [  // Staff authentication guard
+        'driver' => 'session',
+        'provider' => 'staff',
+    ],
+],
+
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+    ],
+
+    'staff' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Staff::class, // Ensure Staff model exists
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------

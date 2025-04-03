@@ -74,33 +74,50 @@
         var ctx = document.getElementById('patientChart').getContext('2d');
 
         var patientData = {!! json_encode($patientDistribution) !!};
+        var isCompanySelected = {!! json_encode($isCompanySelected ?? false) !!}; // Ensure it's always defined
 
         var labels = Object.keys(patientData);
         var data = Object.values(patientData);
+
+        // Colors for companies
+        var companyColors = {
+            "HQ": "green",
+            "A": "red",
+            "B": "white",
+            "C": "yellow"
+        };
+
+        // Assign labels and colors
+        var chartLabels = isCompanySelected 
+            ? labels.map(platoon => `Platoon ${platoon}`)  // Show platoon stats if a company is selected
+            : labels.map(companyId => { 
+                return (companyId == 1 ? "HQ" : (companyId == 2 ? "A" : (companyId == 3 ? "B" : "C")));
+              });
+
+        var backgroundColors = isCompanySelected 
+            ? ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#8E44AD', '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#D35400'] // Random colors for platoons
+            : labels.map(companyId => companyColors[(companyId == 1 ? "HQ" : (companyId == 2 ? "A" : (companyId == 3 ? "B" : "C")))]);
 
         if (labels.length > 0) {
             new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: labels.map(platoon => `Platoon ${platoon}`),
+                    labels: chartLabels,
                     datasets: [{
                         label: 'Patients',
                         data: data,
-                        backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#8E44AD',
-                            '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#D35400'
-                        ]
+                        backgroundColor: backgroundColors
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false, // Allows control of size
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom', // Moves legend below
+                            position: 'bottom',
                             labels: {
-                                boxWidth: 10, // Reduces legend size
-                                font: { size: 10 } // Smaller font
+                                boxWidth: 10,
+                                font: { size: 10 }
                             }
                         }
                     }

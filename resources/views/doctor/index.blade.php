@@ -35,7 +35,7 @@
                                 <th>Last Name</th>
                                 <th>Platoon</th>
                                 <th>Status</th>
-                              
+                                <th>Date Admitted</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -46,6 +46,7 @@
                                     <td>{{ $patient->student->last_name ?? '-' }}</td>
                                     <td>{{ $patient->platoon }}</td>
                                     <td>{{ ucfirst($patient->status) }}</td>
+                                    <td>{{ $patient->created_at ?? '-' }}</td>
                                    
                                     
                                    
