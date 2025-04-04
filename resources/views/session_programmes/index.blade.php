@@ -46,7 +46,7 @@
               @foreach ($session_programmes as $key => $session_p)
                 <tr>
                       <td>{{ ++$i }}</td>
-                      <td>{{ $session_p->programme_name }}</td>
+                      <td>{{ $session_p->session_programme_name }}</td>
                       <td>{{ $session_p->description }}</td>
                       <td>{{ $session_p->year }}</td>
                       <td>{{ $session_p->startDate }}</td>

@@ -1,3 +1,54 @@
+<style>
+ /* General Sidebar Styles */
+.sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  color: #343a40; /* Default text color */
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-menu a:hover {
+  background-color: #f1f1f1; /* Hover state */
+  color:rgb(14, 178, 207); /* Text color on hover */
+}
+
+/* Active Menu Item Styles */
+a.active {
+  background-color:rgb(10, 197, 221); /* Active menu background */
+  color: #ffffff; /* Text color for active menu */
+  font-weight: bold; /* Emphasize active menu */
+  border-left: 4px solidrgb(24, 153, 175); /* Left border for active indicator */
+}
+
+/* Treeview Styling */
+.treeview.menu-open > .treeview-menu {
+  display: block;
+}
+
+.treeview-menu {
+  display: none;
+  padding-left: 20px; /* Indentation for sub-menu items */
+}
+
+.treeview-menu a {
+  padding: 8px 20px;
+  font-size: 0.95rem; /* Slightly smaller font size for sub-menu */
+  color: #6c757d; /* Sub-menu default text color */
+}
+
+.treeview-menu a.active {
+  background-color:rgb(12, 143, 160); /* Darker blue for active sub-menu */
+  color: #ffffff;
+}
+</style>
 
 <!-- Sidebar wrapper starts -->
 <nav id="sidebar" class="sidebar-wrapper">
@@ -14,7 +65,7 @@
   <!-- Sidebar menu starts -->
   <div class="sidebarMenuScroll">
     <ul class="sidebar-menu">
-      @if (auth()->check())
+    @if (auth()->check())
       @if (auth()->user()->hasRole('Student'))
       <li>
       <a href="{{ route('students.dashboard') }}">
@@ -22,14 +73,14 @@
       <span class="menu-text">Dashboard</span>
       </a>
       </li>
-    @else
-      <li>
-      <a href="/tps-smis">
-      <i class="bi bi-bar-chart-line"></i>
-      <span class="menu-text">Dashboard</span>
-      </a>
-      </li>
-    @endif
+      @else
+        <li>
+        <a href="/tps-smis">
+        <i class="bi bi-bar-chart-line"></i>
+        <span class="menu-text">Dashboard</span>
+        </a>
+        </li>
+      @endif
     @else
       <li>
       <a href="/tps-smis">
@@ -38,28 +89,26 @@
       </a>
       </li>
     @endif
-
-
-      @can('student-list')
-      <li class="treeview">
-      <a href="#!">
-        <i class="bi bi-box"></i>
-        <span class="menu-text">Students</span>
-      </a>
-      <ul class="treeview-menu">
-        <li>
-        <a href="/tps-smis/students">Student Details</a>
-        </li>
-        @can('student-create')
+    @can('student-list')
+    <li class="treeview">
+    <a href="#!">
+      <i class="bi bi-box"></i>
+      <span class="menu-text">Students</span>
+    </a>
+    <ul class="treeview-menu">
+      <li>
+      <a href="/tps-smis/students">Student Details</a>
+      </li>
+      @can('student-create')
       <li>
       <a href="/tps-smis/students/create">Student Registration</a>
       </li>
-    @endcan()
-      </ul>
-      </li>
+      @endcan()
+    </ul>
+    </li>
     @endcan()
 
-      @can('staff-list')
+    @can('staff-list')
       <li class="treeview">
       <a href="#!">
         <i class="bi bi-box"></i>
@@ -73,11 +122,14 @@
         <li>
         <a href="{{ route('staffs.create') }}">Staff Registration</a>
         </li>
+        <li>
+        <a href="{{ route('staff.resume') }}">Staff Resume</a>
+        </li>
         @endcan()
       </ul>
       </li>
     @endcan()
-      @can('attendance-list')
+    @can('attendance-list')
       <li class="treeview">
       <a href="#!">
         <i class="bi bi-bar-chart-line"></i>
@@ -121,16 +173,14 @@
         </li>
         @endcan()
 
-          @can('hospital-approve')
+        @can('hospital-approve')
         <li>
         <a href="{{ route('receptionist.index') }}">
           <i class="bi bi-person-lines-fill"></i>
           <span class="menu-text">Receptionist Panel</span>
         </a>
         </li>
-      @endcan()
-
-
+        @endcan()
         @can('hospital-edit')
         <li>
         <a href="{{ route('doctor.page') }}">
@@ -144,53 +194,47 @@
 
       @can('academic-view')
       <li class="treeview">
-      <a href="#!">
-        <i class="bi bi-box"></i>
-        <span class="menu-text">Academics</span>
-      </a>
-      <ul class="treeview-menu">
-        @can('programme-list')
-      <li>
-      <a href="{{ route('programmes.index') }}">Programmes</a> <!-- For Academic Coord-->
+        <a href="#!">
+          <i class="bi bi-box"></i>
+          <span class="menu-text">Academics</span>
+        </a>
+          <ul class="treeview-menu">
+            @can('programme-list')
+            <li>
+            <a href="{{ route('programmes.index') }}">Programmes</a> <!-- For Academic Coord-->
+            </li>
+            @endcan()
+            @can('course-list')
+            <li>
+            <a href="{{ route('courses.index') }}">Courses</a> <!-- For Academic Coord-->
+            </li>
+            @endcan()
+            <li>
+            <a href="#">My Courses</a> <!-- For Teacher-->
+            </li>
+            <li>
+            <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a> <!-- For Teacher-->
+            </li>
+            @can('semester-exam-list')
+            <li>
+            <a href="{{ route('semester_exams.index') }}">Semester Exam (SE)</a> <!-- For Teacher-->
+            </li>
+            @endcan()
+            @can('optional-enrollment-list')
+            <li>
+            <a href="{{ route('enrollments.index') }}">Optional Courses</a> <!-- For Academic Coord -->
+            </li>
+            @endcan()
+            
+            @can('generate-results')
+            <li>
+              <a href="{{ route('final_results.generate') }}">Generate Final Results</a>
+            </li>
+            @endcan()
+          </ul>
       </li>
     @endcan()
-        @can('course-list')
-      <li>
-      <a href="{{ route('courses.index') }}">Courses</a> <!-- For Academic Coord-->
-      </li>
-    @endcan()
-        <li>
-        <a href="#">My Courses</a> <!-- For Teacher-->
-        </li>
-        <li>
-        <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a> <!-- For Teacher-->
-        </li>
-        <li>
-            <a href="#!">
-            Coursework 2
-              <i class="bi bi-caret-right-fill"></i>
-            </a>
-            <ul class="treeview-menu">
-              <li>
-              <a href="{{ route('course_works.index') }}">CA Configurations</a> <!-- Add to academic tab -->
-              </li>
-              <li>
-                <a href="#!">Nested 2.1</a>
-              </li>
-            </ul>
-        </li>
-        <li>
-        <a href="#">Semester Exam (SE)</a> <!-- For Teacher-->
-        </li>
-        @can('optional-enrollment-list')
-      <li>
-      <a href="{{ route('enrollments.index') }}">Optional Courses</a> <!-- For Academic Coord -->
-      </li>
-    @endcan()
-      </ul>
-      </li>
-    @endcan()
-      @can('student-courses')
+    @can('student-courses')
       <li>
       <a href="{{ route('students.myCourses') }}">
         <i class="bi bi-printer"></i>
@@ -206,41 +250,7 @@
       </a>
       </li>
     @endcan()
-      @can('coursework-config')
-      <li class="treeview">
-      <a href="#!">
-        <i class="bi bi-stickies"></i>
-        <span class="menu-text">Coursework</span>
-      </a>
-      <ul class="treeview-menu">
-        <li>
-        <a href="{{ route('course_works.index') }}">CA Configurations</a> <!-- Add to academic tab -->
-        </li>
-      </ul>
-      </li>
-    @endcan()
-
-      @can('semester-exam-list')
-      <li class="treeview">
-      <a href="#!">
-        <i class="bi bi-stickies"></i>
-        <span class="menu-text">Examination (UE)</span>
-      </a>
-
-      <ul class="treeview-menu">
-        @can('generate-results')
-      <li>
-      <a href="{{ route('final_results.generate') }}">Generate Results</a>
-      </li>
-    @endcan()
-        <li>
-        <a href="{{ route('final_results.index') }}">semester 1</a>
-        </li>
-        <li>
-        <a href="{{ route('final_results.index') }}">semester 2</a>
-        </li>
-      </ul>
-      </li>
+    @can('coursework-config')
     @endcan()
 
     @can('print-certificate')
@@ -293,11 +303,11 @@
     @endcan()
 
     <li class="treeview">
-    <a href="#">
-        <i class="bi bi-mouse3"></i>
-        <span class="menu-text">Leave(s)</span>
-    </a>
-    <ul class="treeview-menu">
+      <a href="#">
+          <i class="bi bi-mouse3"></i>
+          <span class="menu-text">Leave(s)</span>
+      </a>
+      <ul class="treeview-menu">
         {{-- Leave Application (for all users) --}}
 
 
@@ -329,12 +339,13 @@
                 </a>
             </li>
         @endif
-    </ul>
-</li>
+      </ul>
+    </li>
 
 
-      @can('beat-list')
-      <li class="treeview">
+
+    @can('beat-list')
+    <li class="treeview">
       <a href="!#">
         <i class="bi bi-pie-chart"></i>
         <span class="menu-text">Guards &amp; Patrols</span>
@@ -346,12 +357,12 @@
         </li>
         @endcan()
         <li>
-        <a href="{{url('/report/generate')}}">Beat History</a>
+        <a href="{{url('/report/generate')}}">Beat Report</a>
         </li>
       </ul>
-      </li>
+    </li>
     @endcan()
-      @can('user-list')
+    @can('user-list')
       <li>
       <a href="{{ route('users.index') }}">
         <i class="bi bi-border-all"></i>
@@ -359,7 +370,7 @@
       </a>
       </li>
     @endcan()
-      @can('role-list')
+    @can('role-list')
       <li>
       <a href="{{ route('roles.index') }}">
         <i class="bi bi-archive"></i>
@@ -373,7 +384,7 @@
         <span class="menu-text">Time Sheet</span>
       </a>
       </li>
-      @can('report-list')
+    @can('report-list')
       <li>
       <a href="#">
         <i class="bi bi-border-all"></i>
@@ -381,8 +392,8 @@
       </a>
       </li>
     @endcan()
-      @can('setting-list')
-      <li class="treeview">
+    @can('setting-list')
+    <li class="treeview">
       <a href="#!">
         <i class="bi bi-gear"></i>
         <span class="menu-text">Settings</span>
@@ -417,12 +428,12 @@
         </li>
 
         @can('create-backup')
-      <li>
-      <a href="#">Backup & Restore</a>
-      </li>
-    @endcan()
+        <li>
+        <a href="#">Backup & Restore</a>
+        </li>
+        @endcan()
       </ul>
-      </li>
+    </li>
     @endcan()
       <li>
         <a href="#">
@@ -436,3 +447,43 @@
 
 </nav>
 <!-- Sidebar wrapper ends -->
+ 
+<!-- JavaScript for interactivity -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const menuItems = document.querySelectorAll('.sidebar-menu a');
+      const currentUrl = window.location.pathname;
+
+      // Mark the current menu item as active
+      menuItems.forEach(item => {
+        if (item.href === window.location.origin + currentUrl) {
+          item.classList.add('active');
+          const parentTreeview = item.closest('.treeview');
+          if (parentTreeview) {
+            parentTreeview.classList.add('menu-open');
+          }
+        }
+      });
+
+      // Handle menu clicks to dynamically manage active state and open menus
+      menuItems.forEach(item => {
+        item.addEventListener('click', function () {
+          // Remove "active" from all menu items
+          menuItems.forEach(i => i.classList.remove('active'));
+
+          // Add "active" to clicked item
+          this.classList.add('active');
+
+          // Collapse all treeviews
+          const allTreeviews = document.querySelectorAll('.treeview');
+          allTreeviews.forEach(tree => tree.classList.remove('menu-open'));
+
+          // Expand treeview of the clicked item if it exists
+          const clickedTreeview = this.closest('.treeview');
+          if (clickedTreeview) {
+            clickedTreeview.classList.add('menu-open');
+          }
+        });
+      });
+    });
+</script>

@@ -50,7 +50,7 @@
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
                                 <strong>Session Name:</strong>
-                                <input type="text" name="programme_name" placeholder="Enter Session Programme" class="form-control" value="{{ $session_programme->programme_name }}">
+                                <input type="text" name="session_programme_name" placeholder="Enter Session Programme" class="form-control" value="{{ $session_programme->session_programme_name }}">
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12">

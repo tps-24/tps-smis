@@ -26,9 +26,38 @@ class SemesterExamController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $courseId)
     {
-        //
+        $course = Course::findOrFail($courseId);
+        $coursePivot =  $course->semesters[0]->pivot;
+        $request->validate([
+            'assessment_type_id' => 'required|exists:assessment_types,id',
+            'coursework_title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('course_works')->where(function ($query) use ($request, $courseId) {
+                    return $query->where('course_id', $courseId) // Check within the same course
+                                ->where('assessment_type_id', $request->assessment_type_id); // Check within the same assessment type
+                }),
+            ],
+            'max_score' => 'required|integer|min:1',
+            'due_date' => 'nullable|date',
+        ]);
+
+        SemesterExam::create([
+            'programme_id' => $coursePivot->programme_id,
+            'course_id' => $course->id,
+            'semester_id' => $coursePivot->semester_id,
+            'assessment_type_id' => $request->assessment_type_id,
+            'coursework_title' => $request->coursework_title,
+            'max_score' => $request->max_score,
+            'due_date' => $request->due_date?? NULL,
+            'session_programme_id' =>$coursePivot->session_programme_id,
+            'created_by' => $request->user()->id
+        ]);
+
+        return redirect()->back()->with('success', 'Assessment type added successfully.');
     }
 
     /**

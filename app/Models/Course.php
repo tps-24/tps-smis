@@ -41,5 +41,10 @@ class Course extends Model
         return $this->hasMany(CourseworkResult::class);
     }
 
+    public function semesterExams()
+    {
+        return $this->hasMany(SemesterExam::class);
+    }
+
 
 }

@@ -54,7 +54,7 @@
                     <option value="" disabled {{ !$selectedSessionId ? 'selected' : '' }}>Choose the session</option>
                     @foreach($sessionProgrammes as $sessionProgramme)
                         <option value="{{ $sessionProgramme->id }}" {{ $sessionProgramme->id == $defaultProgrammeId ? 'selected' : '' }}>
-                            {{ $sessionProgramme->programme_name }}
+                            {{ $sessionProgramme->session_programme_name }}
                         </option>
                     @endforeach
                 </select>

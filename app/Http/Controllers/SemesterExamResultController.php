@@ -4,16 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\SemesterExamResult;
 use Illuminate\Http\Request;
+use App\Models\CourseworkResult;
+use App\Models\Course;
+use App\Models\Student;
+use App\Models\CourseWork;
+use App\Models\Semester;
+use App\Models\Programme;
+use App\Imports\CourseworkResultImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Validator;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class SemesterExamResultController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-    }
+  
+     public function index(Request $request)
+     {
+         $programme = Programme::findOrFail(1);
+ 
+         $semesters = Semester::with('courses')->get();
+         $selectedSemesterId = $request->get('semester_id');
+         $selectedSemester = $selectedSemesterId ? Semester::with('courses')->find($selectedSemesterId) : null;
+ 
+         // dd($courseworkResults);
+         return view('semester_exams.index', compact('programme','semesters','selectedSemester'));
+     }
 
     /**
      * Show the form for creating a new resource.

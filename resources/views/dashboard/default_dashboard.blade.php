@@ -9,7 +9,7 @@
     <div class="card mb-4 bg-primary">
         <div class="card-body">
         <div class="m-0 text-white">
-            <div class="fw-semibold mb-3">{{ $prog->programme_name }}</div>
+            <div class="fw-semibold mb-3">{{ $prog->session_programme_name }}</div>
             <div class="position-relative">
             <span class="badge bg-secondary-subtle text-body small mb-2">
             <h5 class="m-0"><span class="opacity-20">Weekly absents</span>&nbsp;&nbsp;23</h5>

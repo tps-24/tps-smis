@@ -9,14 +9,14 @@ class SemesterExamResult extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'exam_id', 'score', 'semester_id'];
+    protected $fillable = ['student_id', 'semester_exam_id', 'score'];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
 
-    public function exam()
+    public function semesterExam()
     {
         return $this->belongsTo(SemesterExam::class);
     }

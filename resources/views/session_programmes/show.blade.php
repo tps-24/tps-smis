@@ -35,7 +35,7 @@
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
                             <strong>Programme Session Name:</strong>
-                            {{ $session_programme->programme_name }}
+                            {{ $session_programme->session_programme_name }}
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">

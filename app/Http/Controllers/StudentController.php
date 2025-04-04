@@ -10,11 +10,11 @@ use App\Models\SafariType;
 use App\Models\Programme;
 use App\Models\CourseworkResult;
 use App\Imports\BulkImportStudents;
+use App\Imports\UpdateStudentDetails;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
-
 use Spatie\Permission\Models\Role;
 use Illuminate\View\View;
 use Illuminate\Support\Arr;
@@ -23,7 +23,6 @@ use DB;
 use Hash;
 use Exception;
 use Illuminate\Support\Facades\Log; // Namespace for the Log facade
-
 
 
 class StudentController extends Controller
@@ -526,6 +525,33 @@ class StudentController extends Controller
         }
         return redirect()->route('students.index')->with('success', 'Students Uploaded  successfully.');
     }
+
+
+    public function updateStudents(Request $request)
+    {
+        // Check if a session is selected
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId) {
+            return redirect()->back()->withErrors('Please select a session before updating students.');
+        }
+
+        $import = new UpdateStudentDetails();
+
+        try {
+            Excel::import($import, $request->file('students_file'));
+
+            // Return with success, warnings, and errors
+            return redirect()->back()->with([
+                'success' => 'Student details updated successfully!',
+                'warnings' => $import->warnings,
+                'errors' => $import->errors,
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors('An error occurred: ' . $e->getMessage());
+        }
+    }
+
+
 
     // public function createStepOne()
     // {

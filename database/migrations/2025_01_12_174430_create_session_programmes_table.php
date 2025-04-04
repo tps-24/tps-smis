@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('session_programmes', function (Blueprint $table) {
             $table->id();
-            $table->string('programme_name', 100);
-            $table->text('description', 200);
-            $table->text('year', 20);
-            $table->tinyInteger('is_current');
-            $table->tinyInteger('is_active');
+            $table->string('session_programme_name', 200)->unique();
+            $table->text('description');
+            $table->string('year', 20);
+            $table->date('startDate')->nullable();
+            $table->date('endDate')->nullable();
+            $table->foreignId('programme_id')->constrained('programmes');
+            $table->boolean('is_current');
+            $table->boolean('is_active');
             $table->timestamps();
         });
     }

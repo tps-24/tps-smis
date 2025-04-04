@@ -104,7 +104,7 @@
                 <div class="card mb-2">
                     <div class="card-body">
                         <div class="m-0">
-                            <label for="type">Attachment(pdf)</label><br>
+                            <label for="type">Attachment(pdf) - Optional</label><br>
                             <input class="form-control" type="file" accept="application/pdf" name="document" id="">
                         </div>
                         @error('document')

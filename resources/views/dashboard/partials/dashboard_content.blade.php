@@ -59,7 +59,8 @@
                         <div id="radial3"></div>
                     </div>
                     <div class="d-flex flex-column">
-                        <h2 class="lh-1">{{ $todayStudentReport['sick'] }}</h2>
+                        <!-- <h2 class="lh-1">{{ $todayStudentReport['sick'] }}</h2> -->
+                        <h2 class="lh-1">{{ $patientsCount}}</h2>
                         <p class="m-0 opacity-50">Sick Students (ED)</p>
                     </div>
                 </div>

@@ -135,7 +135,7 @@
         <ul>
             @foreach ($programmes as $programme)
                 <li>
-                    <strong>Name:</strong> {{ $programme->programme_name }}<br>
+                    <strong>Name:</strong> {{ $programme->session_programme_name }}<br>
                     <strong>Description:</strong> {{ $programme->description }}<br>
                     <strong>Year:</strong> {{ $programme->year }}<br>
                     <strong>Start Date:</strong> {{ $programme->startDate }}<br>

@@ -1,164 +1,111 @@
 @extends('layouts.main')
 
 @section('content')
-<!-- Row starts -->
-<div class="row gx-4" id="dashboardContent">
-    @include('dashboard.partials.dashboard_content', compact('denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage'))
-</div>
-<!-- Row ends -->
+    <!-- Row starts -->
+    <div class="row gx-4" id="dashboardContent">
+        @include('dashboard.partials.dashboard_content', compact('denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage'))
+    </div>
+    <!-- Row ends -->
 
-<!-- Row starts -->
-<div class="row gx-4">
-    <div class="col-xxl-9 col-sm-12 col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="container">
-                    <h2>Grouped Bar Graph of Student Attendances</h2>
-                    <div class="btn-group mb-3" role="group" aria-label="Filter options">
-                        <button type="button" class="btn btn-primary" onclick="showDaily()">Daily</button>
-                        <button type="button" class="btn btn-secondary" onclick="showWeekly()">Weekly</button>
-                        <button type="button" class="btn btn-success" onclick="showMonthly()">Monthly</button>
-                    </div>
-                    <div class="chart-container" style="margin-top: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 10px;">
-                        <canvas id="groupedBarChart"></canvas>
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-xxl-9 col-sm-12 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="container">
+                        <h2 style="color: #002366;">Trends and Analysis of Student Attendance Patterns</h2>
+                        <div class="btn-group mb-3" role="group" aria-label="Filter options">
+                            <button type="button" class="btn btn-primary" onclick="showDaily()">Daily</button>
+                            <button type="button" class="btn btn-secondary" onclick="showWeekly()">Weekly</button>
+                            <button type="button" class="btn btn-success" onclick="showMonthly()">Monthly</button>
+                        </div>
+                        <div class="chart-container"
+                            style="margin-top: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 10px;">
+                            <canvas id="groupedBarChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-xxl-3 col-sm-12 col-12">
-        <div class="card mb-4 card-height-420">
-            <div class="card-header">
-                <h5 class="card-title">Recent Announcements</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-flex flex-column justify-content-between h-100">
-                    <!-- Transactions starts -->
-                    <div class="d-flex flex-column gap-3">
-                        <div class="d-flex pb-3 border-bottom w-100">
-                            <div class="icon-box lg bg-primary-subtle rounded-5 me-3">
-                                <i class="bi bi-twittr fs-3 text-primary"></i>
-                            </div>
-                            <div class="d-flex flex-column">
-                                <p class="mb-1 opacity-50">Blaah Blaah</p>
-                                <h3 class="m-0 lh-1 fw-semibold">159</h3>
-                            </div>
+
+        <div class="col-xxl-3 col-sm-12 col-12">
+            <div class="card mb-4 card-height-420">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Announcements</h2>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column justify-content-between h-100">
+                        <!-- Announcements start -->
+                        <div class="d-flex flex-column gap-3">
+                            @foreach ($recentAnnouncements as $announcement)
+                                <div class="pb-3 border-bottom w-100">
+                                    <div class=" d-flex me-3">
+                                        <!-- <i class="bi bi-icon fs-3 text-{{ $announcement->type }}"></i> -->
+                                        <img style="width: 50px;" src="{{ asset('resources/assets/images/new_blinking.gif') }}"
+                                            alt="new gif">
+                                            <h3 class="m-0 lh-1 fw-semibold">{{ $announcement->title }}</h3>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        
+                                        <p class="m-0 lh-1 fw-semibold">{{ $announcement->message }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                        <div class="d-flex pb-3 border-bottom w-100">
-                            <div class="icon-box lg bg-info-subtle rounded-5 me-3">
-                                <i class="bi bi-xbx fs-3 text-info"></i>
-                            </div>
-                            <div class="d-flex flex-column">
-                                <p class="mb-1 opacity-50">Blaah Blaah</p>
-                                <h3 class="m-0 lh-1 fw-semibold">36</h3>
-                            </div>
-                        </div>
-                        <div class="d-flex pb-3 border-bottom w-100">
-                            <div class="icon-box lg bg-danger-subtle rounded-5 me-3">
-                                <i class="bi bi-youtbe fs-3 text-danger"></i>
-                            </div>
-                            <div class="d-flex flex-column">
-                                <p class="mb-1 opacity-50">Blaah Blaah</p>
-                                <h3 class="m-0 lh-1 fw-semibold">23</h3>
-                            </div>
-                        </div>
+                        <!-- Announcements end -->
+                        <a href="{{url('/announcements')}}" class="btn btn-dark">View All <i
+                                class="bi bi-arrow-right ms-2"></i></a>
                     </div>
-                    <!-- Transactions ends -->
-                    <a href="javascript:void(0)" class="btn btn-dark">View All <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>
+
     </div>
-</div>
-<!-- Row ends -->
+    <!-- Row ends -->
 
-<!-- Row starts -->
-<div class="row gx-4" style="margin-top:10px">
-    <div class="col-xxl-12">
-        <div class="card" style="height: 150px !important">
-            <div class="card-body">
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Row ends -->
+    <!-- Chart.js -->
+    <script src="/tps-smis/resources/assets/js/chart.js"></script>
+    <script>
+        var data = @json($graphData);
+        daily = data.dailyData;
+        weekly = data.weeklyData;
+        monthly = data.monthlyData;
 
-<!-- Chart.js -->
-<script src="/tps-smis/resources/assets/js/chart.js"></script>
-<script>
-    function getDateRange(days) {
-        const today = new Date();
-        let dates = [];
-        for (let i = 0; i < days; i++) {
-            const date = new Date();
-            date.setDate(today.getDate() - i);
-            dates.push(date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }));
-        }
-        return dates.reverse();
-    }
+        const dailyData = {
+            labels: daily.dates,
+            datasets: [
+                { label: 'Absents', data: daily.absents, backgroundColor: '#1E4093' },
+                { label: 'Sick', data: daily.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+                { label: 'Locked up', data: daily.lockUps, backgroundColor: 'orange' },
+                { label: 'Absents Trends', data: daily.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+                { label: 'Sick Trends', data: daily.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
+                { label: 'Lock Up Trends', data: daily.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
+            ]
+        };
 
-    function getWeekRange(weeks) {
-        const today = new Date();
-        let weeksArray = [];
-        for (let i = 0; i < weeks; i++) {
-            const weekStart = new Date(today);
-            weekStart.setDate(today.getDate() - (7 * i));
-            weeksArray.push(`Week ${weekStart.getWeek()}`);
-        }
-        return weeksArray.reverse();
-    }
+        const weeklyData = {
+            labels: weekly.weeks,
+            datasets: [
+                { label: 'Absents', data: weekly.absents, backgroundColor: '#1E4093' },
+                { label: 'Sick', data: weekly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+                { label: 'Locked up', data: weekly.lockUps, backgroundColor: 'orange' },
+                { label: 'Absents Trends', data: weekly.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+                { label: 'Sick Trends', data: weekly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
+                { label: 'Lock Up Trends', data: weekly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
+            ]
+        };
 
-    function getMonthRange(months) {
-        const today = new Date();
-        let monthsArray = [];
-        for (let i = 0; i < months; i++) {
-            const month = new Date(today);
-            month.setMonth(today.getMonth() - i);
-            monthsArray.push(month.toLocaleString('default', { month: 'long', year: 'numeric' }));
-        }
-        return monthsArray.reverse();
-    }
-
-    Date.prototype.getWeek = function () {
-        const firstDayOfYear = new Date(this.getFullYear(), 0, 1);
-        const pastDaysOfYear = (this - firstDayOfYear) / 86400000;
-        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-    };
-
-    const dailyLabels = getDateRange(7);
-    const weeklyLabels = getWeekRange(5);
-    const monthlyLabels = getMonthRange(3);
-
-    const dailyData = {
-        labels: dailyLabels,
-        datasets: [
-            { label: 'Absents', data: [12, 9, 15, 11, 18, 14, 10], backgroundColor: 'rgba(255, 99, 132, 0.5)' },
-            { label: 'Sick', data: [5, 6, 4, 7, 5, 6, 7], backgroundColor: 'rgba(54, 162, 235, 0.5)' },
-            { label: 'Locked up', data: [2, 3, 1, 4, 3, 2, 1], backgroundColor: 'rgba(75, 192, 192, 0.5)' },
-            { label: 'Trend Line', data: [8, 7, 10, 8, 12, 9, 8], type: 'line', fill: false, borderColor: 'rgba(0,0,0,0.7)', tension: 0.1 }
-        ]
-    };
-
-    const weeklyData = {
-        labels: weeklyLabels,
-        datasets: [
-            { label: 'Absents', data: [10, 20, 14, 18, 15], backgroundColor: 'rgba(255, 99, 132, 0.5)' },
-            { label: 'Sick', data: [6, 7, 5, 6, 7], backgroundColor: 'rgba(54, 162, 235, 0.5)' },
-            { label: 'Locked up', data: [2, 4, 3, 3, 4], backgroundColor: 'rgba(75, 192, 192, 0.5)' },
-            { label: 'Trend Line', data: [8, 10, 8, 9, 9], type: 'line', fill: false, borderColor: 'rgba(0,0,0,0.7)', tension: 0.1 }
-        ]
-    };
-
-    const monthlyData = {
-        labels: monthlyLabels,
-        datasets: [
-            { label: 'Absents', data: [22, 25, 20], backgroundColor: 'rgba(255, 99, 132, 0.5)' },
-            { label: 'Sick', data: [8, 7, 6], backgroundColor: 'rgba(54, 162, 235, 0.5)' },
-            { label: 'Locked up', data: [5, 4, 5], backgroundColor: 'rgba(75, 192, 192, 0.5)' },
-            { label: 'Trend Line', data: [21, 23, 20], type: 'line', fill: false, borderColor: 'rgba(0,0,0,0.7)', tension: 0.1 }
-        ]
-    };
-
+        const monthlyData = {
+            labels: monthly.months,
+            datasets: [
+                { label: 'Absents', data: monthly.absents, backgroundColor: '#1E4093' },
+                { label: 'Sick', data: monthly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+                { label: 'Locked up', data: monthly.lockUps, backgroundColor: 'orange' },
+                { label: 'Absents Trends', data: monthly.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+                { label: 'Sick Trends', data: monthly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
+                { label: 'Lock Up Trends', data: monthly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
+            ]
+        };
 
         // Initialize Chart
         const ctx = document.getElementById('groupedBarChart').getContext('2d');
@@ -168,26 +115,77 @@
             options: {
                 responsive: true,
                 scales: {
-                    x: { stacked: false },
-                    y: { stacked: false }
+                    x: {
+                        stacked: false,
+                        title: {
+                            display: true,
+                            text: 'Dates'  // Default label for the X-axis
+                        }
+                    },
+                    y: {
+                        stacked: false,
+                        title: {
+                            display: true,
+                            text: 'Counts'  // Default label for the Y-axis
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            padding: 20, // Add padding to the top of the bars
+                            // Use callback to remove decimal points
+                            callback: function (value) {
+                                return value.toFixed(0);  // Rounds the value to the nearest integer
+                            }
+                        },
+                        // Dynamically set the max value of the y-axis to be higher than the highest bar
+                        suggestedMax: Math.max(...daily.absents, ...daily.sick, ...daily.lockUps) * 1.5, // 20% more than the highest value
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 30, // Adds space at the top of the chart area
+                        bottom: 10,
+                        left: 10,
+                        right: 10
+                    }
                 }
             }
         });
 
+
+        function updateAxisLabels(dataType) {
+            switch (dataType) {
+                case 'daily':
+                    chart.data = dailyData;
+                    chart.options.scales.x.title.text = 'Dates';  // X-axis label for daily data
+                    chart.options.scales.y.title.text = 'Counts';  // Y-axis label for daily data
+                    break;
+                case 'weekly':
+                    chart.data = weeklyData;
+                    chart.options.scales.x.title.text = 'Weeks';  // X-axis label for weekly data
+                    chart.options.scales.y.title.text = 'Counts';  // Y-axis label for weekly data
+                    break;
+                case 'monthly':
+                    chart.data = monthlyData;
+                    chart.options.scales.x.title.text = 'Months';  // X-axis label for monthly data
+                    chart.options.scales.y.title.text = 'Counts';  // Y-axis label for monthly data
+                    break;
+                default:
+                    break;
+            }
+
+            chart.update();  // Update the chart to reflect the new labels and data
+        }
         function showDaily() {
             chart.data = dailyData;
-            chart.update();
+            updateAxisLabels('daily');
         }
-
         function showWeekly() {
             chart.data = weeklyData;
-            chart.update();
+            updateAxisLabels('weekly');
         }
-
         function showMonthly() {
             chart.data = monthlyData;
-            chart.update();
+            updateAxisLabels('monthly');
         }
     </script>
-
 @endsection

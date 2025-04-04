@@ -7,7 +7,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            color:#008AD8 !important;
+            color:black !important;
         }
         .container {
             width: 100%;
@@ -30,7 +30,7 @@
             font-size: 12px; /* Reduce font size */
         }
         .table th, .table td {
-            border: 1px solid #008AD8;
+            border: 1px solid black;
             padding: 2px 5px; /* Reduce padding */
             text-align: left;
             white-space: nowrap; /* Prevent text wrapping */
@@ -118,7 +118,7 @@
             @endphp
             <!-- <h1><b>TANZANIA POLICE SCHOOL-MOSHI</b></h1> -->
             <h1 style="margin-top:-5px;">RATIBA YA MALINDO {{ strtoupper($company->description) }}</h1>
-            <h2 style="margin-top:-5px;">TAREHE {{ $date->format('d/m/Y')}} - ROUND SIX (6)</h2>
+            <h2 style="margin-top:-5px;">TAREHE {{ $date->format('d/m/Y')}}</h2>
             
         </div>
 
@@ -184,7 +184,7 @@
                                 $platoon = $student ? str_pad($student->platoon, 2, '0', STR_PAD_LEFT) : '-';
                             @endphp
 
-                            <td>{{ $student ? "{$prefix} {$student->first_name} {$student->last_name}" : '-' }}</td>
+                            <td>{{ $student ? "{$student->force_number} {$prefix}  {$student->first_name}" : '-' }}</td>
                             <td class="platoon">{{ $student ? $platoon : '-' }}</td>
                         @endforeach
                     </tr>
@@ -246,7 +246,7 @@
                                 $platoon = $student ? str_pad($student->platoon, 2, '0', STR_PAD_LEFT) : '-';
                             @endphp
 
-                            <td>{{ $student ? "{$prefix} {$student->first_name} {$student->last_name}" : '-' }}</td>
+                            <td>{{ $student ? "{$student->force_number} {$prefix} {$student->first_name}" : '-' }}</td>
                             <td class="platoon">{{ $student ? $platoon : '-' }}</td>
                         @endforeach
                     </tr>
@@ -277,7 +277,7 @@
                 @endif
 
                 <td width="10%" style="text-align:right">{{ $index + 1 }}</td>
-                <td width="40%">{{ $prefix }} {{ $reserve->student->first_name }} {{ $reserve->student->last_name }} - PLT {{ $platoon }}</td>
+                <td width="40%">{{ $reserve->student->force_number }} {{ $prefix }} {{ $reserve->student->first_name }} - PLT {{ $platoon }}</td>
                 
             @endforeach
         </tr>
@@ -293,7 +293,7 @@
             $platoon = str_pad($duty->student->platoon, 2, '0', STR_PAD_LEFT);
         @endphp
     
-        &nbsp;&nbsp;&nbsp;<span style="margin-right:0%">{{ $prefix }} {{ $duty->student->first_name }} {{ $duty->student->middle_name }} {{ $duty->student->last_name }} - PLT {{ $platoon }}</span> <br>
+        &nbsp;&nbsp;&nbsp;<span style="margin-right:0%">{{ $duty->student->force_number }} {{ $prefix }} {{ $duty->student->first_name }} - PLT {{ $platoon }}</span> <br>
     
     @endforeach
 

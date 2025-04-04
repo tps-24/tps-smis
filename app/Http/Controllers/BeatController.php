@@ -71,7 +71,7 @@ class BeatController extends Controller
         $beat = Beat::find($beat_id);
         $beats = Beat::where('id', $beat_id)->get();
         $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
-        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [1,2,3,4,5,6,7])->where('beat_round','<', 5)->where('beat_status', 3)->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8,9,10,11,12,13,14])->where('beat_round','<', 7)->where('beat_status', 1)->where('gender', "F")->get();
         return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
     }
 
@@ -329,7 +329,8 @@ class BeatController extends Controller
         $mid = floor($totalPlatoons->count() / 2);
         $groupA = $totalPlatoons->slice(0, $mid)->values();
         $groupB = $totalPlatoons->slice($mid)->values();
-        $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
+        // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
+        $currentGroup = $groupB;
 
         // Fetch guard and patrol areas with proper time filters
         // $_guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());
@@ -480,6 +481,7 @@ class BeatController extends Controller
 
                 // Increment beat_round for assigned students
                 Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
+                Student::whereIn('id', $assignedStudentIds)->update(['beat_status' => 10]);
             }
 
             if (!empty($assignedStudentIds)) {
@@ -564,7 +566,7 @@ class BeatController extends Controller
                 BeatLeaderOnDuty::create($leader);
             }
         });
-        return redirect()->route('beats')->with('success','Beats generated successfully for ' . $date);
+        return redirect()->back()->with('success','Beats generated successfully for ' . $date);
         //return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
     }
 
@@ -735,7 +737,8 @@ class BeatController extends Controller
         $mid = floor($totalPlatoons->count() / 2);
         $groupA = $totalPlatoons->slice(0, $mid)->values();
         $groupB = $totalPlatoons->slice($mid)->values();
-        $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
+        // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
+        $currentGroup = $groupB;
 
         // Group students by platoon in the current group
         $studentsByPlatoonInGroup = $eligibleStudents->whereIn('platoon', $currentGroup)->groupBy('platoon');
@@ -1154,9 +1157,13 @@ class BeatController extends Controller
         $beat_reserve = BeatReserve::find($beatReserveId);
         $reserve->beat_status = 1;
 
+        // $reserve->increment('beat_round');
+        $reserve->update(['beat_status' => 10]);
         $reserve->increment('beat_round');
+
+        // $reserve->update(['beat_status' => 10])->increment('beat_round');
         $beat_reserve->replaced_student_id = $student->id;
-        $beat_reserve->released = 1;
+        // $beat_reserve->released = 1;
         $beat_reserve->replacement_reason = $request->replacement_reason;
         $student->decrement('beat_round');
         $beat_reserve->save();
