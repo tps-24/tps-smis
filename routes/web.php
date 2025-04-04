@@ -479,6 +479,6 @@ Route::prefix('leave-requests')->group(function () {
     Route::get('/inspector', [LeaveRequestController::class, 'inspectorView'])->name('leave-requests.inspector');
     Route::get('/chief-instructor', [LeaveRequestController::class, 'chiefInstructorView'])->name('leave-requests.chief-instructor');
 });
-Route::middleware(['auth:staff'])->group(function () {
-    Route::get('/staff/panel', [LeaveRequestController::class, 'staffPanel'])->name('staff_panel');
-});
+
+Route::get('/staff-panel', [LeaveRequestController::class, 'staffPanel'])->name('staff_panel');
+

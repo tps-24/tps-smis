@@ -4,11 +4,11 @@
 
 <div class="container">
     <h2 class="mb-4 text-center">
-        @if ($role === 'Sir Major')
-            <i class="bi bi-inbox"></i> Received Leave Requests
+        @if ($role === 'sir major')
+            <i class="bi bi-inbox"></i> Received Leave Requests (Sir Major)
         @elseif ($role === 'inspector')
             <i class="bi bi-check-circle"></i> Inspector Panel - Requests to Review
-        @elseif ($role === 'chief_instructor')
+        @elseif ($role === 'chief instructor')
             <i class="bi bi-award"></i> Chief Instructor Panel - Final Approval
         @endif
     </h2>
@@ -38,7 +38,7 @@
                         <td><span class="badge bg-warning text-dark">{{ ucfirst($leave->status) }}</span></td>
                         <td>{{ $leave->reason }}</td>
                         <td>
-                            @if ($role === 'Sir Major')
+                            @if ($role === 'sir major')
                                 <form action="{{ route('leaves.forwardToInspector', $leave->id) }}" method="POST">
                                     @csrf
                                     <button class="btn btn-warning btn-sm">Forward to Inspector</button>
@@ -48,7 +48,7 @@
                                     @csrf
                                     <button class="btn btn-primary btn-sm">Forward to Chief</button>
                                 </form>
-                            @elseif ($role === 'chief_instructor')
+                            @elseif ($role === 'chief instructor')
                                 <form action="{{ route('leaves.approve', $leave->id) }}" method="POST" style="display:inline-block">
                                     @csrf
                                     <button class="btn btn-success btn-sm">Approve</button>
