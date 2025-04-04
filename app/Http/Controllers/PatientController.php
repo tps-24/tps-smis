@@ -255,11 +255,7 @@ public function saveDetails(Request $request)
     $patient->rest_days = $request->rest_days;
     $patient->status = 'treated'; 
     $patient->admitted_type = $request->admitted_type ?? null;
-<<<<<<< HEAD
     
-=======
-    // $patient->discharge_date = Carbon::now()->addDays((int) $request->rest_days);
->>>>>>> d1c81a7eee54bb7644c5e263128e92c311f3a94e
 
     $patient->save();
 
