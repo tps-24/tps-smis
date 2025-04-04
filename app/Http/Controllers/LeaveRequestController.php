@@ -138,35 +138,36 @@ class LeaveRequestController extends Controller
 
 
     public function staffPanel()
-    {
-        $staff = Auth::guard('staff')->user(); // Ensure staff authentication
-    
-        if (!$staff) {
-            return redirect()->route('login')->with('error', 'Unauthorized access.');
-        }
-    
-        $role = strtolower($staff->role); // Get the role instead of designation
-    
-        // Debugging
-        \Log::info("Auth Debug - Role: " . json_encode($role));
-    
-        switch ($role) {
-            case 'sir major':
-                $leaves = LeaveRequest::where('sir_major_id', $staff->id)->get();
-                break;
-            case 'inspector':
-                $leaves = LeaveRequest::where('status', 'pending_inspector')->get();
-                break;
-            case 'chief instructor':
-                $leaves = LeaveRequest::where('status', 'pending_chief')->get();
-                break;
-            default:
-                return redirect()->route('login')->with('error', 'Unauthorized access.');
-        }
-    
-        return view('leaves.staff_panel', compact('staff', 'role', 'leaves'));
+{
+    $staff = Auth::guard('staff')->user(); // Ensure staff authentication
+
+    if (!$staff) {
+        return redirect()->route('login')->with('error', 'Unauthorized access.');
     }
-    
+
+    \Log::info("Debugging Staff Role: " . json_encode($staff)); // Log entire staff object
+
+    $role = strtolower($staff->role ?? 'Not Set'); // Get role or default to 'Not Set'
+
+    \Log::info("Debug Role: " . $role); // Log role output
+
+    switch ($role) {
+        case 'sir major':
+            $leaves = LeaveRequest::where('sir_major_id', $staff->id)->get();
+            break;
+        case 'inspector':
+            $leaves = LeaveRequest::where('status', 'pending_inspector')->get();
+            break;
+        case 'chief instructor':
+            $leaves = LeaveRequest::where('status', 'pending_chief')->get();
+            break;
+        default:
+            return redirect()->route('login')->with('error', 'Unauthorized access.');
+    }
+
+    return view('leaves.staff_panel', compact('staff', 'role', 'leaves'));
+}
+
     
 
 public function login(Request $request)
