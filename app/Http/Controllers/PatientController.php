@@ -8,7 +8,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class PatientController extends Controller
@@ -238,29 +238,36 @@ public function doctorPage()
     return view('doctor.index', compact('patients', 'excuseTypes'));
 }
 
-
 public function saveDetails(Request $request)
 {
-    $request->validate([
-        'student_id' => 'required|exists:patients,id',
-        'excuse_type_id' => 'required|exists:excuse_types,id', // Fix: Validate against excuse_types table
-        'rest_days' => 'required|integer|min:1',
-        'doctor_comment' => 'required|string'
-    ]);
+    // Log the incoming student_id
+    \Log::info('Incoming student_id:', ['student_id' => $request->student_id]);
 
-    $patient = Patient::findOrFail($request->student_id);
-    
-    // Save doctor's input
-    $patient->update([
-        'excuse_type_id' => $request->excuse_type_id, // Fix: Store excuse_type_id instead of excuse_type
-        'rest_days' => $request->rest_days,
-        'doctor_comment' => $request->doctor_comment,
-        'status' => 'treated', // Mark as treated
-    ]);
+    $patient = Patient::find($request->student_id);
 
-    return redirect()->route('doctor.page')->with('success', 'Patient details saved successfully.');
+    if (!$patient) {
+        return redirect()->back()->with('error', 'Patient record not found.');
+    }
+
+    // Proceed with saving details
+    $patient->excuse_type_id = $request->excuse_type_id;
+    $patient->doctor_comment = $request->doctor_comment;
+    $patient->rest_days = $request->rest_days;
+    $patient->status = 'treated'; 
+    $patient->admitted_type = $request->admitted_type ?? null;
+    // $patient->discharge_date = Carbon::now()->addDays((int) $request->rest_days);
+
+    $patient->save();
+
+    // Update beat_status in students table
+    $student = Student::where('id', $patient->student_id)->first();
+    if ($student) {
+        $student->beat_status = 0;
+        $student->save();
+    }
+
+    return redirect()->back()->with('success', 'Patient details saved successfully.');
 }
-
 
 public function viewDetails(Request $request, $timeframe)
 {
@@ -274,31 +281,48 @@ public function viewDetails(Request $request, $timeframe)
         abort(404, 'Invalid timeframe');
     }
 
-    // Fetch filters from the request
+    // Fetch filters
     $company_id = $request->input('company_id', $sirMajor->company_id);
     $platoon = $request->input('platoon');
 
-    $query = Patient::where('company_id', $company_id)
-                    ->whereYear('created_at', now()->year); // Ensure only current year data is fetched
+    // Start query
+    $query = Patient::query();
 
-    switch ($timeframe) {
-        case 'daily':
-            $query->whereDate('created_at', now());
-            break;
-        case 'weekly':
-            $query->whereBetween('created_at', [now()->startOfWeek(), now()]);
-            break;
-        case 'monthly':
-            $query->whereBetween('created_at', [now()->startOfMonth(), now()]);
-            break;
+    // Apply filters
+    if ($company_id) {
+        $query->where('company_id', $company_id);
     }
 
-    // Apply platoon filter if provided
     if ($platoon) {
         $query->where('platoon', $platoon);
     }
 
+    // Filter by timeframe
+    switch ($timeframe) {
+        case 'daily':
+            $query->whereDate('created_at', Carbon::today());
+            break;
+        case 'weekly':
+            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()]);
+            break;
+        case 'monthly':
+            $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()]);
+            break;
+    }
+
+    // Fetch patients
     $patients = $query->get();
+
+    // Check and return with a message if empty
+    if ($patients->isEmpty()) {
+        return view('hospital.viewDetails', [
+            'patients' => [],
+            'timeframe' => $timeframe,
+            'company_id' => $company_id,
+            'platoon' => $platoon,
+            'message' => 'No patients found for this timeframe.',
+        ]);
+    }
 
     return view('hospital.viewDetails', compact('patients', 'timeframe', 'company_id', 'platoon'));
 }
@@ -377,6 +401,73 @@ public function updateSickReport(Request $request, $student_id)
     }
 
     $student->save();
+}
+
+public function discharge($id)
+{
+    $patient = Patient::findOrFail($id);
+
+    if ($patient->is_discharged) {
+        return response()->json(['success' => false, 'message' => 'Patient already discharged.']);
+    }
+
+    $patient->is_discharged = true;
+    $patient->discharged_date = now();
+    $patient->save();
+
+    // Reset student's beat status
+    if ($patient->student) {
+        $patient->student->beat_status = 1;
+        $patient->student->save();
+    }
+
+    return response()->json(['success' => true, 'message' => 'Patient discharged successfully.']);
+}
+
+
+public function downloadStatisticsReport(Request $request, $timeframe)
+{
+    $company_id = $request->input('company_id');
+    $platoon = $request->input('platoon');
+
+    // Fetch patient details based on the timeframe
+    $query = Patient::query()->whereYear('created_at', now()->year);
+
+    if ($company_id) {
+        $query->where('company_id', $company_id);
+    }
+
+    if ($platoon) {
+        $query->where('platoon', $platoon);
+    }
+
+    switch ($timeframe) {
+        case 'daily':
+            $query->whereDate('created_at', now());
+            break;
+        case 'weekly':
+            $query->whereBetween('created_at', [now()->startOfWeek(), now()]);
+            break;
+        case 'monthly':
+            $query->whereBetween('created_at', [now()->startOfMonth(), now()]);
+            break;
+    }
+
+    $patients = $query->get();
+
+    // Fetch students who have received an excuse type 5+ times
+    $frequentExcuses = Student::select('students.first_name', 'students.last_name', 'patients.platoon')
+        ->join('patients', 'students.id', '=', 'patients.student_id')
+        ->selectRaw('COUNT(patients.excuse_type_id) as excuse_count')
+        ->groupBy('students.id', 'students.first_name', 'students.last_name', 'patients.platoon')
+        ->having('excuse_count', '>=', 5)
+        ->orderByDesc('excuse_count')
+        ->get();
+
+    // Load the PDF view with data
+    $pdf = Pdf::loadView('pdf.statistics', compact('patients', 'frequentExcuses', 'timeframe', 'company_id', 'platoon'));
+
+    return $pdf->download('statistics_report.pdf');
 }
 
 }

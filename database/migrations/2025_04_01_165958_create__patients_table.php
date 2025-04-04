@@ -12,7 +12,8 @@ return new class extends Migration
      */
     public function up()
     {
-       
+      
+        
 
         // Create a new 'patients' table (if this is meant to be a fresh table)
         Schema::create('patients', function (Blueprint $table) {
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('company_id'); 
             $table->string('platoon'); 
             $table->foreignId('excuse_type_id')->constrained('excuse_types');
+            $table->string('admitted_type')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'treated'])->default('pending');
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
             $table->integer('rest_days');

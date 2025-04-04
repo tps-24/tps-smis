@@ -20,12 +20,17 @@
 @include('layouts.sweet_alerts.index')
     <div class="row">
     @can('student-create')
-    <div class="col-3">
+    <div class="col-2">
       <a href="{{ route('uploadStudents') }}" class="btn btn-sm btn-primary">Upload Students</a>
     </div>
-  @endcan
-    <div class="col-6 " style="float: right;">
-      <form class="d-flex" action="{{route('students.search')}}" method="GET">
+    @endcan
+    @can('student-edit')
+    <div class="col-2">
+      <a href="{{ route('updateStudents') }}" class="btn btn-sm btn-secondary">Update Students</a>
+    </div>
+    @endcan
+    <div class="col-5 " style="float: right;">
+      <form class="d-flex" action="{{route('students.search')}}" method="POST">
       @csrf
       @method("POST")
       <div class="d-flex">

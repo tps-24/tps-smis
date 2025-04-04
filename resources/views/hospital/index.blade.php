@@ -31,7 +31,6 @@
         View Monthly Patients
     </a>
 </div>
-
             </div>
         </div>
     </div>
@@ -44,7 +43,6 @@
 
          <!-- Search Form -->
     <div class="card mb-3">
-        
         <div class="card-body">
         <form action="{{ route('hospital.index') }}" method="GET" class="d-flex justify-content-between mb-3">
     <div class="d-flex">
@@ -60,12 +58,9 @@
         @endforeach
     @endif
 </select>
-
-
-
         <select class="form-select me-2" name="platoon">
             <option value="">Select Platoon</option>
-            @for ($i = 1; $i <= 15; $i++)
+            @for ($i = 1; $i <= 14; $i++)
                 <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>{{ $i }}</option>
             @endfor
         </select>
@@ -130,7 +125,7 @@
 <script>
 function sendForApproval(studentId, firstName,lastName) {
     Swal.fire({
-        title: `Send for Approval: ${firstName}${lastName}`,
+        title: `Send for Approval: ${firstName}  ${lastName}`,
         text: "Are you sure you want to send this student for Receptionist approval?",
         icon: "warning",
         showCancelButton: true,
@@ -163,7 +158,6 @@ function sendForApproval(studentId, firstName,lastName) {
     });
 }
 </script>
-
                     </td>
                 </tr>
                 @endforeach

@@ -24,7 +24,9 @@ class Attendence extends Model
       'lockUp_students_ids',
       'total',
       'absent_student_ids',
-      'session_programme_id'
+      'session_programme_id',
+      'created_at',
+      'updated_at'
    ];
    public function platoon()
    {

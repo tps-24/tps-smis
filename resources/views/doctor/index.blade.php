@@ -7,6 +7,7 @@
             <h5 class="card-title">Approved Patients</h5>
         </div>
         <div class="card-body">
+
             @if(session('success'))
                 <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
@@ -14,14 +15,14 @@
                 </div>
 
                 <script>
-                    setTimeout(function() {
-                        let successMessage = document.getElementById('successMessage');
-                        if (successMessage) {
-                            successMessage.style.transition = 'opacity 0.5s';
-                            successMessage.style.opacity = '0';
-                            setTimeout(() => successMessage.style.display = 'none', 500);
+                    setTimeout(() => {
+                        let msg = document.getElementById('successMessage');
+                        if (msg) {
+                            msg.style.transition = 'opacity 0.5s';
+                            msg.style.opacity = '0';
+                            setTimeout(() => msg.style.display = 'none', 500);
                         }
-                    }, 5000); // 5 seconds
+                    }, 5000);
                 </script>
             @endif
 
@@ -34,6 +35,7 @@
                                 <th>Last Name</th>
                                 <th>Platoon</th>
                                 <th>Status</th>
+                              
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -43,10 +45,14 @@
                                     <td>{{ $patient->student->first_name ?? '-' }}</td>
                                     <td>{{ $patient->student->last_name ?? '-' }}</td>
                                     <td>{{ $patient->platoon }}</td>
-                                    <td>{{ $patient->status }}</td>
+                                    <td>{{ ucfirst($patient->status) }}</td>
+                                   
+                                    
+                                   
+
                                     <td>
-                                        <!-- Button to trigger modal -->
-                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#patientModal{{ $patient->id }}">
+                                        <!-- Button to open modal -->
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#patientModal{{ $patient->id }}">
                                             Enter Details
                                         </button>
 
@@ -54,25 +60,37 @@
                                         <div class="modal fade" id="patientModal{{ $patient->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $patient->id }}" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="modalLabel{{ $patient->id }}">
-                                                            Enter Details for {{ $patient->student->first_name ?? '-' }} {{ $patient->student->last_name ?? '-' }}
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form action="{{ route('patients.saveDetails') }}" method="POST">
-                                                            @csrf
-                                                            <input type="hidden" name="student_id" value="{{ $patient->id }}">
+                                                    <form action="{{ route('patients.saveDetails') }}" method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="student_id" value="{{ $patient->id }}">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="modalLabel{{ $patient->id }}">
+                                                                Enter Details for {{ $patient->student->first_name ?? '-' }} {{ $patient->student->last_name ?? '-' }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
                                                             <div class="mb-3">
-    <label for="excuse_type_id" class="form-label" >Excuse Type</label>
-    <select name="excuse_type_id" id="excuse_type_id" class="form-select" required >
-        <option value="" disabled >Select E.D Type</option>
-        @foreach ($excuseTypes as $id => $excuseName)
-            <option value="{{ $id }}">{{ $excuseName }}</option>
-        @endforeach
-    </select>
-</div>
+                                                                <label for="excuse_type_id" class="form-label">Excuse Type</label>
+                                                                <select name="excuse_type_id" class="form-select excuse-select" required data-patient-id="{{ $patient->id }}">
+                                                                    <option value="" disabled selected>Select E.D Type</option>
+                                                                    @foreach ($excuseTypes as $id => $excuseName)
+                                                                        <option value="{{ $id }}">{{ $excuseName }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="mb-3 referral-options d-none" id="referralOption{{ $patient->id }}">
+                                                                <label class="form-label">Admitted Type</label><br>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="admitted_type" value="Internal">
+                                                                    <label class="form-check-label">Internal</label>
+                                                                </div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="admitted_type" value="Referral">
+                                                                    <label class="form-check-label">Referral</label>
+                                                                </div>
+                                                            </div>
 
                                                             <div class="mb-3">
                                                                 <label class="form-label">Days of Rest</label>
@@ -85,8 +103,8 @@
                                                             </div>
 
                                                             <button type="submit" class="btn btn-primary">Save</button>
-                                                        </form>
-                                                    </div>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -102,4 +120,46 @@
         </div>
     </div>
 </div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Toggle Referral/Internal if 'Admitted' is selected
+        document.querySelectorAll('.excuse-select').forEach(select => {
+            select.addEventListener('change', function () {
+                let patientId = this.getAttribute('data-patient-id');
+                let referralDiv = document.getElementById('referralOption' + patientId);
+                let selectedText = this.options[this.selectedIndex].text;
+
+                if (selectedText === 'Admitted') {
+                    referralDiv.classList.remove('d-none');
+                } else {
+                    referralDiv.classList.add('d-none');
+                }
+            });
+        });
+
+        // Discharge confirmation
+        document.querySelectorAll('.discharge-form').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This will discharge the patient!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, discharge'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection

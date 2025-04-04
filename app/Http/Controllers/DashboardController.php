@@ -101,7 +101,15 @@ class DashboardController extends Controller
             $totalStudentsInBeats = $filteredBeats->sum(function ($beat) {
                 return count(json_decode($beat->student_ids, true));
             });
-            $patientsCount = Patient::where('created_at', Carbon::today()->toDateString())->count('student_id');
+            // $patientsCount = Patient::where('created_at', Carbon::today()->toDateString())->count('student_id');
+            // $patientsCount = Patient::whereDate('created_at', Carbon::today())->count();
+            $patientsCount = Patient::whereDate('created_at', Carbon::today())
+                                        ->where(function ($query) {
+                                            $query->where('excuse_type_id', 1)
+                                                ->orWhere('excuse_type_id', 3);
+                                        })
+                                        ->count();
+
             $staffsCount = Staff::count('forceNumber');
             $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
             $graphData = $this->getGraphData();
@@ -162,8 +170,15 @@ class DashboardController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('absent');
 
-        $sick = Patient::whereBetween('created_at', [$startDate, $endDate])
-            ->count();
+        // $sick = Patient::whereBetween('created_at', [$startDate, $endDate])->count();
+        // $sick = Patient::where('created_at', Carbon::today()->toDateString())->count();
+        $sick = Patient::whereDate('created_at', Carbon::today())
+                            ->where(function ($query) {
+                                $query->where('excuse_type_id', 1)
+                                    ->orWhere('excuse_type_id', 3);
+                            })
+                            ->count();
+
 
         $lockedUp = Beat::whereBetween('date', [$startDate, $endDate])
             ->sum('student_count');
@@ -349,11 +364,20 @@ class DashboardController extends Controller
                         $index = $dateKeys[$attendanceDate];
                         $attendanceData['absents'][$index] += (int) $attendance->absent;
                         if($attendanceData['sick'][$index] == 0){
-                            $attendanceData['sick'][$index] = (int) Patient::whereDate('created_at',$attendanceDate)->whereNotNull('excuse_type_id')->count();
+                            // $attendanceData['sick'][$index] = (int) Patient::whereDate('created_at',$attendanceDate)->whereNotNull('excuse_type_id')->count();
+                            $attendanceData['sick'][$index] = (int) Patient::whereDate('created_at', $attendanceDate)
+                            ->where(function ($query) {
+                                $query->where('excuse_type_id', 1)
+                                      ->orWhere('excuse_type_id', 3);
+                            })
+                            ->count();
+                           
+
                         }
                         
                         if($attendanceData['lockUps'][$index] == 0){
-                        $attendanceData['lockUps'][$index] = (int) MPS::whereDate('arrested_at', $attendanceDate)->count();
+                            // $attendanceData['lockUps'][$index] = (int) MPS::whereDate('arrested_at', $attendanceDate)->count();
+                            $attendanceData['lockUps'][$index] = (int) MPS::where('released_at', null)->count();
                         }
                     }
 
@@ -365,7 +389,13 @@ class DashboardController extends Controller
                         $startOfWeek = Carbon::parse(Carbon::now()->startOfWeek())->toDateString();  // Set a start time
                         $endOfWeek = Carbon::parse(Carbon::now()->endOfWeek())->toDateString();  // Set a start time 
                         if($weeklyData['sick'][$weekIndex] == 0){
-                            $weeklyData['sick'][$weekIndex] = (int) Patient::whereBetween('created_at', [$startOfWeek, $endOfWeek])->whereNotNull('excuse_type_id')->count();
+                            // $weeklyData['sick'][$weekIndex] = (int) Patient::whereBetween('created_at', [$startOfWeek, $endOfWeek])->whereNotNull('excuse_type_id')->count();
+                            $weeklyData['sick'][$weekIndex] = (int) Patient::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                            ->where(function ($query) {
+                                $query->where('excuse_type_id', 1)
+                                      ->orWhere('excuse_type_id', 3);
+                            })
+                            ->count();
                         }
                         if ($weeklyData['lockUps'][$weekIndex] == 0) {
                             $weeklyData['lockUps'][$weekIndex] = (int) MPS::whereBetween('arrested_at', [$startOfWeek, $endOfWeek])->count();
@@ -384,7 +414,13 @@ class DashboardController extends Controller
                         $month = $carbonDate->month;
                         $year = $carbonDate->year;
                         if($monthlyData['sick'][$monthIndex] == 0){
-                           $monthlyData['sick'][$monthIndex] = (int) Patient::whereMonth('created_at', $month)->whereYear('created_at', $year)->count(); 
+                        //    $monthlyData['sick'][$monthIndex] = (int) Patient::whereMonth('created_at', $month)->whereYear('created_at', $year)->count(); 
+                           $monthlyData['sick'][$monthIndex] = (int) Patient::whereMonth('created_at', $month)->whereYear('created_at', $year)
+                            ->where(function ($query) {
+                                $query->where('excuse_type_id', 1)
+                                      ->orWhere('excuse_type_id', 3);
+                            })
+                            ->count();
                         }
                         
                         if ($monthlyData['lockUps'][$monthIndex] == 0) {

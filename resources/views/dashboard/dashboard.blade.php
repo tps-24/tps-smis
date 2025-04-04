@@ -35,6 +35,7 @@
             margin-bottom: 10px;
         }
     }
+    
 </style>
 @endsection
 @section('content')
@@ -64,6 +65,7 @@
                 </div>
             </div>
         </div>
+
 
         <div class="col-xxl-3 col-sm-12 col-12">
             <div class="card mb-4 card-height-420">

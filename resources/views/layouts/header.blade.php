@@ -26,6 +26,16 @@
       .session-input-group select:last-child {
         margin-bottom: 0;
       }
+
+      .outside{
+            font-size:18px; 
+            margin-left: -3%; 
+            margin-right: 1%; 
+            height:36px; 
+        }
+      .activesession1{
+            display:none;
+        }
     }
 
     @media (min-width: 468px) {
@@ -84,7 +94,7 @@
     <div class="input-group outside" style="">
         <form action="{{ url()->current() }}" method="GET" style="display:inline-block;">
             <div class="input-group inside" style="font-size:18px; height:36px;">
-                <button class="btn btn-outline-secondary" type="button">
+                <button class="btn btn-outline-secondary activesession1" type="button">
                     Active Session
                 </button>
                 <select name="session_id" class="form-control activeSession" id="sessionProgramme" onchange="this.form.submit()">

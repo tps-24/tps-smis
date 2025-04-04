@@ -41,7 +41,7 @@ use App\Http\Controllers\StaffProgrammeCourseController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\SafariStudentController;
 use Carbon\Carbon;
-use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\LeaveRequestController;
 
 require __DIR__ . '/auth.php';
 
@@ -62,6 +62,15 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
     Route::get('/dashboard/content', [DashboardController::class, 'getContent'])->name('dashboard.content');
     // Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
 });
+
+
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
+
+
 
 // Route::controller(BeatController::class)->prefix('beats')->group(function () {
 //     Route::get('/', 'index');
@@ -103,11 +112,11 @@ Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
 Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
 Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
 
-Route::middleware(['auth', 'check.student.status', 'student'])->group(function () {
+Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
     Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
     Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
-    //Route::resource('students', StudentController::class);  
+   // Route::resource('students', StudentController::class);  
     
 });
 
@@ -137,6 +146,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/update-beat-status-to-safari/{studentId}', [StudentController::class, 'toSafari'])->name('students.toSafari');
     Route::get('/update-beat-status-back-from-safari/{studentId}', [StudentController::class, 'BackFromsafari'])->name('students.BackFromsafari');
 
+    // Route::get('/coursework/upload_explanation/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
+    
 
 
     Route::post('/beats/{id}', [BeatController::class, 'update'])->name('beat.update');
@@ -164,13 +175,16 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/beats/create-exchange/{beat}',[BeatController::class, 'createExchange'])->name(name: 'beats.create-exchange');
     Route::post('/beats/exchange/{beat}',[BeatController::class, 'exchange'])->name(name: 'beats.exchange');
 
-    
     Route::get('/students/downloadSample', [StudentController::class, 'downloadSample'])->name('studentDownloadSample');
     Route::get('/staff/downloadSample', [StaffController::class, 'downloadSample'])->name('staffDownloadSample');
     Route::get('/courseworkResult/downloadSample', [CourseworkResultController::class, 'downloadSample'])->name('courseworkResultDownloadSample');
     Route::get('students/upload-students', function(){
         return view('students.bulk_upload_explanation');
     })->name('uploadStudents');
+
+    Route::get('students/update-students', function(){
+        return view('students.bulk_update_student');
+    })->name('updateStudents');
     
     Route::get('staff/upload-staff', function(){
         return view('staffs.bulk_upload_explanation');
@@ -182,8 +196,8 @@ Route::group(['middleware' => ['auth']], function () {
 
    
     Route::controller(StudentController::class)->prefix('students')->group(function () {
-        Route::get('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
-        Route::get('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
+        Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
+        Route::post('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
         /**
          * 
          *  Wizard route for student registration
@@ -245,6 +259,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
     Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
+    Route::post('/students/bulk-update-students', [StudentController::class, 'updateStudents'])->name('student.updateStudents');
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
@@ -267,7 +282,6 @@ Route::post('students/{student}/safari/', [SafariStudentController::class, 'stor
 Route::put('students/return-safari/{safariStudent}', [SafariStudentController::class, 'updateSafari'])->name('returnSafariStudent');
 
 
-
     
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
@@ -288,7 +302,8 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('safari-students', SafariStudentController::class);
-    Route::resource('mps', MPSController::class);
+
+
     
     // Define the custom route first
 
@@ -299,6 +314,7 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
         Route::get('type-test/{type_id}', 'attendence');
         Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
+        // Route::post('create/{type_id}', 'create');
         Route::post('create/{attendenceType}', 'create')->name('attendences.create');
         Route::get('edit/{id}', 'edit');
         Route::post('{attendenceType_id}/{platoon_id}/store', 'store');
@@ -337,6 +353,7 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('attendences', AttendenceController::class);
 
+
     
     // Route::resource('beats', BeatController::class);
 
@@ -356,17 +373,16 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
         /**
          * End of wizard for student registration
          */
-        Route::get('students/search', 'search')->name('students.search');
+        Route::post('students/search', 'search')->name('students.search');
         Route::get('dashboard', 'dashboard');
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
         Route::post('{id}/delete', 'destroy');
         Route::post('bulkimport', 'import');
 
-
     });
 
-    
+
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
     Route::get('notifications/showNotifications/{notificationIds}',[NotificationController::class,'showNotifications'])->name('notifications.showNotifications'); 
@@ -422,6 +438,7 @@ Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name(
 Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
 Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
 Route::get('/dispensary', [PatientController::class, 'dispensaryPage'])->name('dispensary.page');
+Route::get('/statistics/download/{timeframe}', [PatientController::class, 'downloadStatisticsReport'])->name('statistics.download');
 
 
 // 🚀 Routes for Sending to Receptionist
@@ -436,7 +453,10 @@ Route::get('/receptionist', [PatientController::class, 'receptionistPage'])->nam
 
 // 🩺 Doctor Routes
 Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.page');
-Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
+// Route::post('/patients/saveDetails', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
+Route::post('/patients/save-details', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
+Route::put('/patients/discharge/{id}', [PatientController::class, 'discharge'])->name('patients.discharge');
+Route::put('/patients/{id}/discharge', [PatientController::class, 'discharge'])->name('patients.discharge');
 
 // 📅 Timetable Routes
 Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');
@@ -457,7 +477,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file'); // Download file
 });
 
-
+// Route::get('test', [BeatController::class,'beatReplacementStudent']);
 Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index');
 Route::get('/downloads/upload', [DownloadController::class, 'showUploadPage'])->name('downloads.upload.page');
 Route::post('/downloads/upload', [DownloadController::class, 'upload'])->name('downloads.upload');
@@ -466,4 +486,22 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
     ->name('downloads.delete')
     ->middleware('auth'); // Requires login to delete
 
-Route::get('test', [AttendenceController::class,'getKaziniStudentsIds']);
+   
+//Leaves Routes
+Route::prefix('leave-requests')->group(function () {
+    Route::get('/', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
+    Route::get('/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
+    Route::post('/store', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+    Route::put('/forward-inspector/{id}', [LeaveRequestController::class, 'forwardToInspector'])->name('leave-requests.forward-inspector');
+    Route::put('/forward-chief/{id}', [LeaveRequestController::class, 'forwardToChief'])->name('leave-requests.forward-chief');
+    Route::put('/approve/{id}', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
+    Route::put('/reject/{id}', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+    
+    // Route for staff panel
+    Route::middleware(['auth'])->get('/staff-panel', [LeaveRequestController::class, 'staffPanel'])->name('staff.panel');
+
+    // Views for roles
+    Route::get('/sir-major', [LeaveRequestController::class, 'sirMajorView'])->name('leave-requests.sir-major');
+    Route::get('/inspector', [LeaveRequestController::class, 'inspectorView'])->name('leave-requests.inspector');
+    Route::get('/chief-instructor', [LeaveRequestController::class, 'chiefInstructorView'])->name('leave-requests.chief-instructor');
+});
