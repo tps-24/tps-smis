@@ -8,6 +8,7 @@ use App\Models\Semester;
 use App\Models\AssessmentType;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class CourseWorkController extends Controller
 {
@@ -104,8 +105,33 @@ class CourseWorkController extends Controller
     {
         //
     }
-    public function getCourseworks($semesterId){
+
+    public function getCourseworksxx($semesterId){
+        
+    Log::info("Fetching courseworks for semester ID: {$semesterId}");
         $semester = Semester::findOrFail($semesterId);
         return response()->json($semester->courseWorks);
     }
+
+    public function getCourseworks($semesterId, $courseId)
+    {
+        Log::info("Fetching courseworks for semester ID: {$semesterId}");
+        // Retrieve course_id from the session
+        // $courseId = 1;
+        if (!$courseId) {
+            return response()->json(['error' => 'Course ID not found in session'], 400);
+        }
+    
+        // Find the semester
+        $semester = Semester::findOrFail($semesterId);
+    
+        // Retrieve courseworks filtered by both semester_id and course_id
+        $courseworks = Coursework::where('semester_id', $semesterId)
+            ->where('course_id', $courseId)
+            ->get(['id', 'coursework_title']);
+    
+        return response()->json($courseworks);
+    }
+     
+
 }

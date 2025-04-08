@@ -180,11 +180,12 @@
                             @php
                                 $students = $studentsBySlot[$slot['start_at']] ?? collect();
                                 $student = $students->get($i);
-                                $prefix = $student ? ($student->gender === 'F' ? 'WRC' : 'RC') : '';
+                                $prefix = $student ? ($student->gender === 'F' ? 'RC' : 'RC') : '';
                                 $platoon = $student ? str_pad($student->platoon, 2, '0', STR_PAD_LEFT) : '-';
                             @endphp
 
                             <td>{{ $student ? "{$student->force_number} {$prefix}  {$student->first_name}" : '-' }}</td>
+                            <!-- <td>{{ $student ? "{$prefix}  {$student->first_name} {$student->last_name}" : '-' }}</td> -->
                             <td class="platoon">{{ $student ? $platoon : '-' }}</td>
                         @endforeach
                     </tr>
@@ -247,6 +248,7 @@
                             @endphp
 
                             <td>{{ $student ? "{$student->force_number} {$prefix} {$student->first_name}" : '-' }}</td>
+                            <!-- <td>{{ $student ? "{$prefix} {$student->first_name} {$student->last_name}" : '-' }}</td> -->
                             <td class="platoon">{{ $student ? $platoon : '-' }}</td>
                         @endforeach
                     </tr>
@@ -268,7 +270,7 @@
 
             @foreach($reserves as $index => $reserve)
                 @php
-                    $prefix = $reserve->student->gender === 'F' ? 'WRC' : 'RC';
+                    $prefix = $reserve->student->gender === 'F' ? 'RC' : 'RC';
                     $platoon = str_pad($reserve->student->platoon, 2, '0', STR_PAD_LEFT);
                 @endphp
 

@@ -1,7 +1,7 @@
 <!-- App header starts -->
  <style>
        /* Responsive adjustments */
-       @media (max-width: 468px) {
+       @media (max-width: 600px) {
       .title-container {
         max-width: 95%;
         padding: 10px;

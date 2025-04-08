@@ -398,7 +398,8 @@ class DashboardController extends Controller
                             ->count();
                         }
                         if ($weeklyData['lockUps'][$weekIndex] == 0) {
-                            $weeklyData['lockUps'][$weekIndex] = (int) MPS::whereBetween('arrested_at', [$startOfWeek, $endOfWeek])->count();
+                            // $weeklyData['lockUps'][$weekIndex] = (int) MPS::whereBetween('arrested_at', [$startOfWeek, $endOfWeek])->count();
+                            $weeklyData['lockUps'][$weekIndex] = (int) MPS::where('released_at', null)->count();
                         }
                     }
 

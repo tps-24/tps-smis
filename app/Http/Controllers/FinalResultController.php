@@ -188,6 +188,79 @@ class FinalResultController extends Controller
         
     }
 
+    public function generateCertificate(Request $request)
+    {
+        // dd($request->input());
+        $selectedStudentIds = $request->input('selected_students');
+        if (empty($selectedStudentIds)) {
+            return redirect()->back()->with('error', 'No students selected.');
+        }
+        
+        $students = Student::whereIn('id', $selectedStudentIds)->get();
+
+        // dd($students);
+        
+        // Query data from 'final_results' table and process certificates
+        // Generate and return PDF with selected students' certificates
+        
+        // Example (using a package like Dompdf or another PDF library):
+        // $pdf = PDF::loadView('final_results.certificate', compact('students'))->setPaper('a4', 'potrait');
+   
+
+    // Load the view and set paper with custom margins
+    $pdf = PDF::loadView('final_results.certificate', compact('students'))
+    ->setPaper('a4', 'portrait')
+    ->setOptions([
+        'isHtml5ParserEnabled' => true,
+        'isRemoteEnabled' => true,
+        'defaultPaperMargins' => ['top' => '15mm', 'right' => '15mm', 'bottom' => '15mm', 'left' => '15mm'],
+    ]);
+
+
+
+        
+        // Render the HTML as PDF
+        $pdf->render();
+        // Return the PDF content as a response to be rendered in a new browser window
+        return $pdf->stream('final_results.certificate');
+        
+    }
+
+    public function generateCertificatex()
+    {
+        $data = [
+            'title' => 'Certificate of Achievement',
+            'recipient' => 'G.3332 CPL Erick Eusebo Msilu',
+            'course' => 'Sergeant Course No. 1/2024/2025',
+            'school' => 'Tanzania Police School-Moshi',
+            'dates' => '10 December 2024 to 07 March 2025',
+            'subjects' => [
+                'Police Duties and Administration',
+                'Human Rights and Policing',
+                'Police Leadership',
+                'Communication Skills and Customer Care',
+                'Traffic Control and Management',
+                'Criminal Investigation, Intelligence and Forensic Science',
+                'Criminal Procedure',
+                'Law of Evidence',
+                'Criminal Law',
+                'Gender Issues and Child Protection',
+                'Public Health and Environmental Protection',
+                'Community Policing, Radicalization, Violent Extremism and Terrorism',
+                'Drills and Parade',
+                'Military and Safety Training',
+            ],
+            'signatures' => [
+                'Omary S. Kisalo - ACP, Chief Instructor',
+                'Ramadhani A. Mungi - SACP, Commandant',
+            ],
+        ];
+
+        $pdf = PDF::loadView('certificate', $data);
+
+        return $pdf->download('Certificate.pdf');
+    }
+
     public function search(Request $request, $companyId)
     {
         $selectedSessionId = session('selected_session');

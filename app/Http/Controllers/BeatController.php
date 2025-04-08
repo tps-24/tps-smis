@@ -71,7 +71,7 @@ class BeatController extends Controller
         $beat = Beat::find($beat_id);
         $beats = Beat::where('id', $beat_id)->get();
         $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
-        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8,9,10,11,12,13,14])->where('beat_round','<', 7)->where('beat_status', 1)->where('gender', "F")->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8,9,10,11,12,13,14])->where('beat_round','<', 10)->where('beat_status', 1)->where('gender', "M")->get();
         return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
     }
 
@@ -481,7 +481,7 @@ class BeatController extends Controller
 
                 // Increment beat_round for assigned students
                 Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
-                Student::whereIn('id', $assignedStudentIds)->update(['beat_status' => 10]);
+                Student::whereIn('id', $assignedStudentIds)->update(['beat_status' => 13]);
             }
 
             if (!empty($assignedStudentIds)) {

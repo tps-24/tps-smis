@@ -62,12 +62,26 @@
                         </div>
                     </form>
                 </div>
-                <form action="{{ route('final.generateTranscript') }}" method="POST" class="form-inline mb-4">
+                
+                @php          
+                    $selectedSession = session('selected_session');
+                @endphp
 
+                @if ($selectedSession == 4)
+                <form action="{{ route('final.generateTranscript') }}" method="POST" class="form-inline mb-4">
+                @else
+                <form action="{{ route('final.generateCertificate') }}" method="POST" class="form-inline mb-4">
+                @endif
                     <div class="card-header">
-                        <i>Choose student(s) to print certificate</i>
+                        <i>Choose student(s) to print Certificate or Transcripts</i>
                         @csrf
-                        <button type="submit" class="btn btn-secondary" style="float:right">Print Transcript(s)</button>
+
+
+                            @if ($selectedSession == 4)
+                                    <button type="submit" class="btn btn-secondary" style="float:right">Print Transcript(s)</button>
+                            @else
+                                    <button type="submit" class="btn btn-secondary" style="float:right">Print Certificate(s)</button>
+                            @endif
 
                     </div>
                     <div class="card-body">

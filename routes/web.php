@@ -122,6 +122,8 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
 
 
 Route::group(['middleware' => ['auth']], function () {
+    Route::get('/student/generate-certificate', [StudentController::class, 'generateCertificate']);
+
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/print-certificates', [FinalResultController::class, 'studentList'])->name('studentList');
     Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
@@ -134,7 +136,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/semesters/{semesterId}/courses', [CourseworkResultController::class, 'index'])->name('semesters.index');
     
     
-    Route::get('courseworks/{semesterId}', [CourseworkController::class, 'getCourseworks']);
+    Route::get('courseworks/{semesterId}/{courseId}', [CourseworkController::class, 'getCourseworks']);
+
     // Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('/coursework_results/coursework/{coursework}', [CourseworkResultController::class, 'getResultsByCourse']);
 
@@ -161,6 +164,7 @@ Route::group(['middleware' => ['auth']], function () {
     
     Route::get('/beats/pdf/{company}', [BeatController::class, 'generatePDF'])->name('beats.generatePDF');
     Route::post('/generate-transcript', [FinalResultController::class, 'generateTranscript'])->name('final.generateTranscript');
+    Route::post('/generate-certificate', [FinalResultController::class, 'generateCertificate'])->name('final.generateCertificate');
     
     
     // Route to generate and display the report
