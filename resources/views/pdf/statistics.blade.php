@@ -19,7 +19,7 @@
     <!-- Header -->
     <div class="header">
         <img src="{{ public_path('logo.png') }}" alt="Police Logo">
-        <h2>SHULE YA JESHI LA POLISI TANZANIA -TPS</h2>
+        <h2>SHULE YA  POLISI TANZANIA -TPS MOSHI</h2>
         <h4>Patient Statistics Report</h4>
         <p><strong>Timeframe:</strong> {{ ucfirst($timeframe) }}</p>
         @if($company_id)
@@ -31,9 +31,10 @@
         <hr>
     </div>
 
+
     <!-- Summary: Students with ≥ 5 Excuse Types -->
     @if($frequentExcuses->isNotEmpty())
-        <h3>Summary: Students with ≥ 5 Excuse Types</h3>
+        <h3>Summary: Students with atleast 5 Excuse Types</h3>
         <table>
             <thead>
                 <tr>
@@ -57,8 +58,35 @@
         <hr>
     @endif
 
-    <!-- Patient Details Table -->
-    <h3>Patient Details</h3>
+<!-- ✅ Summary Section -->
+<h2>Summary</h2>
+<h2>Total Patients Present:<strong>{{ $totalPatientsPresent }}</strong></h2>
+
+
+     <!-- ✅ Total Patients Summary -->
+     <h3>Patient Details</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Total Patients</th>
+            <th>Excuse Duty (ED)</th>
+            <th>Light Duty (LD)</th>
+            <th>Admitted (Referral & Internal)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>{{ $totalPatientsPresent }}</strong></td>
+            <td><strong>{{ $excuseDutyCount }}</strong></td>
+            <td><strong>{{ $lightDutyCount }}</strong></td>
+            <td><strong>{{ $admittedCount }}</strong></td>
+        </tr>
+    </tbody>
+</table>
+<hr>
+
+
     @if($patients->isNotEmpty())
         <table>
             <thead>

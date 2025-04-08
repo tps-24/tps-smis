@@ -255,7 +255,7 @@ public function saveDetails(Request $request)
     $patient->rest_days = $request->rest_days;
     $patient->status = 'treated'; 
     $patient->admitted_type = $request->admitted_type ?? null;
-    // $patient->discharge_date = Carbon::now()->addDays((int) $request->rest_days);
+    
 
     $patient->save();
 
@@ -327,42 +327,75 @@ public function viewDetails(Request $request, $timeframe)
     return view('hospital.viewDetails', compact('patients', 'timeframe', 'company_id', 'platoon'));
 }
 
+// public function dispensaryPage(Request $request)
+// {
+//     $query = Patient::query();
+
+//     // Filter by company_id if provided
+//     if ($request->filled('company_id')) {
+//         $query->where('company_id', $request->company_id);
+//     }
+
+//     // Filter by platoon if provided
+//     if ($request->filled('platoon')) {
+//         $query->where('platoon', $request->platoon);
+//     }
+
+//     $today = Carbon::today();
+//     $thisWeek = Carbon::now()->startOfWeek();
+//     $thisMonth = Carbon::now()->startOfMonth();
+//     $thisYear = Carbon::now()->startOfYear();
+
+//     // Count statistics based on the selected filters
+//     $dailyCount = (clone $query)->whereDate('created_at', $today)->count();
+//     $weeklyCount = (clone $query)->whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
+//     $monthlyCount = (clone $query)->whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
+
+//     // Fetch list of companies
+//     $companies = Company::all();
+
+//     // Patient distribution for the selected year (used in Pie Chart)
+//     $patientDistribution = (clone $query)
+//         ->whereBetween('created_at', [$thisYear, Carbon::now()])
+//         ->selectRaw('platoon, COUNT(*) as count')
+//         ->groupBy('platoon')
+//         ->pluck('count', 'platoon');
+
+//     return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies'));
+// }
 public function dispensaryPage(Request $request)
 {
-    $query = Patient::query();
-
-    // Filter by company_id if provided
-    if ($request->filled('company_id')) {
-        $query->where('company_id', $request->company_id);
-    }
-
-    // Filter by platoon if provided
-    if ($request->filled('platoon')) {
-        $query->where('platoon', $request->platoon);
-    }
-
-    $today = Carbon::today();
-    $thisWeek = Carbon::now()->startOfWeek();
-    $thisMonth = Carbon::now()->startOfMonth();
-    $thisYear = Carbon::now()->startOfYear();
-
-    // Count statistics based on the selected filters
-    $dailyCount = (clone $query)->whereDate('created_at', $today)->count();
-    $weeklyCount = (clone $query)->whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
-    $monthlyCount = (clone $query)->whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
-
-    // Fetch list of companies
     $companies = Company::all();
+    $companyId = $request->input('company_id');
+    $platoon = $request->input('platoon');
 
-    // Patient distribution for the selected year (used in Pie Chart)
-    $patientDistribution = (clone $query)
-        ->whereBetween('created_at', [$thisYear, Carbon::now()])
-        ->selectRaw('platoon, COUNT(*) as count')
-        ->groupBy('platoon')
-        ->pluck('count', 'platoon');
+    // Fetch counts
+    $dailyCount = Patient::whereDate('created_at', now())->count();
+    $weeklyCount = Patient::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count();
+    $monthlyCount = Patient::whereMonth('created_at', now()->month)->count();
 
-    return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies'));
+    if ($companyId) {
+        // If a company is selected, show platoon-based statistics
+        $patientDistribution = Patient::where('company_id', $companyId)
+            ->selectRaw('platoon, COUNT(*) as count')
+            ->groupBy('platoon')
+            ->pluck('count', 'platoon');
+
+        $isCompanySelected = true;
+    } else {
+        // Default: Show statistics grouped by company (HQ, A, B, C)
+        $patientDistribution = Patient::selectRaw('company_id, COUNT(*) as count')
+            ->groupBy('company_id')
+            ->pluck('count', 'company_id');
+
+        $isCompanySelected = false;
+    }
+
+    return view('dispensary.index', compact(
+        'companies', 'dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'isCompanySelected'
+    ));
 }
+
 
 
 public function store(Request $request)
@@ -403,34 +436,34 @@ public function updateSickReport(Request $request, $student_id)
     $student->save();
 }
 
-public function discharge($id)
-{
-    $patient = Patient::findOrFail($id);
+// public function discharge($id)
+// {
+//     $patient = Patient::findOrFail($id);
 
-    if ($patient->is_discharged) {
-        return response()->json(['success' => false, 'message' => 'Patient already discharged.']);
-    }
+//     if ($patient->is_discharged) {
+//         return response()->json(['success' => false, 'message' => 'Patient already discharged.']);
+//     }
 
-    $patient->is_discharged = true;
-    $patient->discharged_date = now();
-    $patient->save();
+//     $patient->is_discharged = true;
+//     $patient->discharged_date = now();
+//     $patient->save();
 
-    // Reset student's beat status
-    if ($patient->student) {
-        $patient->student->beat_status = 1;
-        $patient->student->save();
-    }
+//     // Reset student's beat status
+//     if ($patient->student) {
+//         $patient->student->beat_status = 1;
+//         $patient->student->save();
+//     }
 
-    return response()->json(['success' => true, 'message' => 'Patient discharged successfully.']);
-}
+//     return response()->json(['success' => true, 'message' => 'Patient discharged successfully.']);
+// }
 
 
-public function downloadStatisticsReport(Request $request, $timeframe)
+public function downloadStatisticsReport(Request $request, $timeframe) 
 {
     $company_id = $request->input('company_id');
     $platoon = $request->input('platoon');
 
-    // Fetch patient details based on the timeframe
+    // Query for patient details based on timeframe
     $query = Patient::query()->whereYear('created_at', now()->year);
 
     if ($company_id) {
@@ -454,8 +487,16 @@ public function downloadStatisticsReport(Request $request, $timeframe)
     }
 
     $patients = $query->get();
+    
+    // ✅ Fix: Count total patients without modifying the query
+    $totalPatientsPresent = $patients->count();
 
-    // Fetch students who have received an excuse type 5+ times
+    // ✅ Fix: Count excuse types separately without affecting the main query
+    $excuseDutyCount = $patients->where('excuse_type', 'Excuse Duty')->count();
+    $lightDutyCount = $patients->where('excuse_type', 'Light Duty')->count();
+    $admittedCount = $patients->whereIn('excuse_type', ['Referral', 'Internal', 'Admitted'])->count();
+
+    // Fetch students with 5+ excuses
     $frequentExcuses = Student::select('students.first_name', 'students.last_name', 'patients.platoon')
         ->join('patients', 'students.id', '=', 'patients.student_id')
         ->selectRaw('COUNT(patients.excuse_type_id) as excuse_count')
@@ -464,11 +505,22 @@ public function downloadStatisticsReport(Request $request, $timeframe)
         ->orderByDesc('excuse_count')
         ->get();
 
-    // Load the PDF view with data
-    $pdf = Pdf::loadView('pdf.statistics', compact('patients', 'frequentExcuses', 'timeframe', 'company_id', 'platoon'));
+    // Load PDF view with all required data
+    $pdf = Pdf::loadView('pdf.statistics', compact(
+        'patients', 
+        'frequentExcuses', 
+        'totalPatientsPresent',  
+        'excuseDutyCount', 
+        'lightDutyCount', 
+        'admittedCount', 
+        'timeframe', 
+        'company_id', 
+        'platoon'
+    ));
 
     return $pdf->download('statistics_report.pdf');
 }
+
 
 }
 

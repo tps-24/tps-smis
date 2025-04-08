@@ -75,6 +75,7 @@
         </div>
     </div>
     <!-- Display Student Details -->
+    @if(request()->has('company_id') || request()->has('platoon') || request()->has('fullname') || request()->has('student_id'))
     @if($studentDetails->isNotEmpty())
     <div class="table-responsive">
         <table class="table table-striped">
@@ -166,6 +167,7 @@ function sendForApproval(studentId, firstName,lastName) {
     </div>
 @else
     <p class="mt-3 text-danger">{{ $message }}</p>
+@endif
 @endif
 </div>
 @endsection

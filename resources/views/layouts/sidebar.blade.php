@@ -301,6 +301,7 @@ a.active {
       </ul>
       </li>
     @endcan()
+
     <li class="treeview">
       <a href="#">
           <i class="bi bi-mouse3"></i>
@@ -308,6 +309,10 @@ a.active {
       </a>
       <ul class="treeview-menu">
         {{-- Leave Application (for all users) --}}
+
+
+
+        
         <li>
             <a href="{{ route('leave-requests.create') }}">
                 <i class="bi bi-mouse3"></i>
@@ -315,26 +320,22 @@ a.active {
             </a>
         </li>
 
-        {{-- Role-specific panel --}}
-        @if (isset($role) && $role === 'sir major')
+        {{-- Debugging Output --}}
+        <li>
+            <strong>Debug: Role = {{ isset($role) ? $role : 'Not Set' }}</strong>
+        </li>
+
+        {{-- Show "staff_panel" for Sir Major, Inspector, and Chief Instructor --}}
+        @if (isset($role) && in_array($role, ['sir major', 'inspector', 'chief instructor']))
             <li>
-                <a href="{{ route('staff.panel') }}">
+                <a href="{{ route('staff_panel') }}">
                     <i class="bi bi-person-vcard"></i>
-                    <span class="menu-text">Received Requests</span>
-                </a>
-            </li>
-        @elseif (isset($role) && $role === 'inspector')
-            <li>
-                <a href="{{ route('staff.panel') }}">
-                    <i class="bi bi-person-vcard"></i>
-                    <span class="menu-text">Inspector Panel</span>
-                </a>
-            </li>
-        @elseif (isset($role) && $role === 'chief instructor')
-            <li>
-                <a href="{{ route('staff.panel') }}">
-                    <i class="bi bi-person-vcard"></i>
-                    <span class="menu-text">Chief Panel</span>
+                    <span class="menu-text">
+                        @if($role === 'sir major') Received Requests
+                        @elseif($role === 'inspector') Inspector Panel
+                        @elseif($role === 'chief instructor') Chief Panel
+                        @endif
+                    </span>
                 </a>
             </li>
         @endif
