@@ -91,24 +91,30 @@ class DashboardController extends Controller
         } else {
             $todayStudentReport = $this->todayStudentReport();
 
-            $denttotalCount = Student::where('session_programme_id', $selectedSessionId)->count();// $todayStudentReport['present'];
+            $denttotalCount = Student::where('session_programme_id', $selectedSessionId ?? 1)->count();
             $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)->where('beat_status', 1)->count();
             $beats = Beat::where('date', Carbon::today()->toDateString())->get();
             $filteredBeats = $beats->filter(function ($beat) use ($selectedSessionId) {
                 $studentIds = json_decode($beat->student_ids, true);
-                return Student::whereIn('id', $studentIds)->where('session_programme_id', $selectedSessionId)->exists();
+                return Student::whereIn('id', $studentIds)->where('session_programme_id', $selectedSessionId ?? 1)->exists();
             });
             $totalStudentsInBeats = $filteredBeats->sum(function ($beat) {
                 return count(json_decode($beat->student_ids, true));
             });
             // $patientsCount = Patient::where('created_at', Carbon::today()->toDateString())->count('student_id');
+
             // $patientsCount = Patient::whereDate('created_at', Carbon::today())->count();
-            $patientsCount = Patient::whereDate('created_at', Carbon::today())
-                                        ->where(function ($query) {
-                                            $query->where('excuse_type_id', 1)
-                                                ->orWhere('excuse_type_id', 3);
-                                        })
-                                        ->count();
+
+            $patientsCount = Patient::where(function ($query) {
+                                $query->where('excuse_type_id', 1)
+                                    ->whereDate('created_at', Carbon::today()) // Checks for created_at = today when excuse_type_id = 1
+                                    ->orWhere(function ($innerQuery) {
+                                        $innerQuery->where('excuse_type_id', 3)
+                                                ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
+                                    });
+                            })->count();
+
+        
 
             $staffsCount = Staff::count('forceNumber');
             $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;

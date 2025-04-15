@@ -22,7 +22,6 @@
             width: 100%; /* Stretch the image to fill the entire page width */
             height: 100%; /* Stretch the image to fill the entire page height */
             object-fit: cover; /* Ensures the image maintains proportions */
-            loading: lazy; /* Improve loading performance for the image */
         }
 
         .details {
@@ -49,7 +48,7 @@
         }
 
         .details ul li {
-            font-size: 23px;
+            font-size: 18px;
             margin: 2px 0;
             font-weight: bold; /* Make the text bold */
         }
@@ -70,7 +69,7 @@
         <!-- Layered Details -->
         <div class="details">
             <p style="margin-bottom:30px;"><i>This is to certify that</i></p>
-            <p style="font-size:25px; font-weight: bold;">
+            <p style="font-size:20px; font-weight: bold;">
                 {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
             </p>
             <p>
@@ -80,7 +79,7 @@
             <p>
                 From <strong>10 December 2024</strong> to <strong>07 March 2025</strong>.
             </p>
-            <p style="text-align:left; margin-top:30px !important; font-size: 22px;"><i>The following subjects were completed:-</i></p>
+            <p style="text-align:left; margin-top:15px"><i>The following subjects were completed:-</i></p>
             
             <ul>
                 <li>Police Duties and Administration</li>

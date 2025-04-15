@@ -33,7 +33,7 @@
                         <div id="radial1"></div>
                     </div>
                     <div class="d-flex flex-column">
-                        <h2 class="lh-1">{{ $todayStudentReport['present'] }}</h2>
+                        <h2 class="lh-1">{{ $todayStudentReport['present'] }} / {{ $denttotalCount }}</h2>
                         <p class="m-0 opacity-50">Students Present</p>
                     </div>
                 </div>

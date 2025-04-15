@@ -198,6 +198,8 @@
 
 
 <div class="page-break"></div>
+ <br>
+ <br>
 
 <div class="table-container" style="margin-top:-30px;"> 
     <center><h1>RATIBA YA DORIA {{ strtoupper($company->description) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TAREHE {{ $date->format('d/m/Y')}}</h1></center>
@@ -304,7 +306,6 @@
 
 
 <div class="page-break"></div>
-
 
 <h1>Beats Summary for {{ $date->format('d/m/Y')}}</h1>
     <table>

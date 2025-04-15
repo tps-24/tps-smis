@@ -81,7 +81,7 @@
                                     <div class="card-body">
                                         <div class="m-0">
                                             <label class="form-label" for="abc">Number of guards </label>
-                                            <input type="number" min="1" class="form-control" id="number_of_guards"
+                                            <input type="number" min="0" class="form-control" id="number_of_guards"
                                                 name="number_of_guards" required placeholder="2"
                                                 value="{{old('number_of_guards', $patrolArea->number_of_guards)}}">
                                         </div>

@@ -188,7 +188,7 @@ class FinalResultController extends Controller
         
     }
 
-    public function generateCertificate(Request $request)
+    public function generateCertificate_oldNew(Request $request)
     {
         // dd($request->input());
         $selectedStudentIds = $request->input('selected_students');
@@ -198,33 +198,61 @@ class FinalResultController extends Controller
         
         $students = Student::whereIn('id', $selectedStudentIds)->get();
 
-        // dd($students);
-        
-        // Query data from 'final_results' table and process certificates
-        // Generate and return PDF with selected students' certificates
-        
-        // Example (using a package like Dompdf or another PDF library):
-        // $pdf = PDF::loadView('final_results.certificate', compact('students'))->setPaper('a4', 'potrait');
-   
+        // Load the view and set paper with custom margins
+        $pdf = PDF::loadView('final_results.certificate', compact('students'))
+        ->setPaper('a4', 'portrait')
+        ->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultPaperMargins' => ['top' => '15mm', 'right' => '15mm', 'bottom' => '15mm', 'left' => '15mm'],
+        ]);
 
-    // Load the view and set paper with custom margins
-    $pdf = PDF::loadView('final_results.certificate', compact('students'))
-    ->setPaper('a4', 'portrait')
-    ->setOptions([
-        'isHtml5ParserEnabled' => true,
-        'isRemoteEnabled' => true,
-        'defaultPaperMargins' => ['top' => '15mm', 'right' => '15mm', 'bottom' => '15mm', 'left' => '15mm'],
-    ]);
-
-
-
-        
         // Render the HTML as PDF
         $pdf->render();
         // Return the PDF content as a response to be rendered in a new browser window
         return $pdf->stream('final_results.certificate');
         
     }
+
+    public function generateCertificate(Request $request)
+    {
+        // Retrieve selected student IDs from the request
+        $selectedStudentIds = $request->input('selected_students');
+
+        // Validate if any students are selected
+        if (empty($selectedStudentIds)) {
+            return redirect()->back()->with('error', 'No students selected.');
+        }
+
+        // Fetch the student data in batches to improve performance
+        $students = Student::whereIn('id', $selectedStudentIds)->get();
+
+        // Check if students are retrieved successfully
+        if ($students->isEmpty()) {
+            return redirect()->back()->with('error', 'No valid student data found.');
+        }
+
+        // Load the certificate view and configure the PDF
+        try {
+            $pdf = PDF::loadView('final_results.certificate', compact('students'))
+                ->setPaper('a4', 'portrait')
+                ->setOptions([
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                    'dpi' => 120, // Improves rendering efficiency
+                    // 'defaultFont' => 'Arial',
+                    'defaultFont' => 'Edwardian Script ITC',
+                ]);
+
+            // Return the PDF stream
+            return $pdf->stream('final_results.certificate');
+
+        } catch (\Exception $e) {
+            // Handle errors and provide feedback
+            return redirect()->back()->with('error', 'An error occurred while generating the PDF. Please try again.');
+        }
+    }
+
 
     public function generateCertificatex()
     {

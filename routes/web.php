@@ -40,8 +40,10 @@ use App\Http\Controllers\MPSVisitorController;
 use App\Http\Controllers\StaffProgrammeCourseController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\SafariStudentController;
+use App\Http\Controllers\LeaveRequestController; 
+use App\Http\Controllers\CertificateController;
 use Carbon\Carbon;
-use App\Http\Controllers\LeaveRequestController;
+
 
 require __DIR__ . '/auth.php';
 
@@ -306,6 +308,8 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('safari-students', SafariStudentController::class);
+    Route::resource('certificates', CertificateController::class);
+
 
 
     
