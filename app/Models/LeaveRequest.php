@@ -10,28 +10,52 @@ class LeaveRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'student_id', 'sir_major_id', 'inspector_id', 'chief_instructor_id',
-        'start_date', 'end_date', 'reason', 'status', 'rejection_reason'
+        'student_id',
+        'company_id',
+        'platoon',
+        'phone_number',
+        'location',
+        'reason',
+        'status',
+         'start_date',
+        'end_date',
+        'attachments',
     ];
+    
 
-    // public function student() {
-    //     return $this->belongsTo(Students::class, 'student_id');
-    // }
-    public function student()
+    public function student() {
+        return $this->belongsTo(Student::class, 'student_id');
+    }
+
+
+//     public function student()
+// {
+//     return $this->belongsTo(Student::class);
+// }
+
+ public function staff(){
+    return $this->belongsTo(Staff::class, 'staff_id');
+ }
+ 
+public function company()
 {
-    return $this->belongsTo(Student::class);
+    return $this->belongsTo(Company::class, 'company_id');
 }
 
 
-    public function sirMajor() {
-        return $this->belongsTo(Staff::class, 'sir_major_id');
+    /**
+     * Scope for filtering by status.
+     */
+    public function scopeByStatus($query, $status)
+    {
+        return $query->where('status', $status);
     }
 
-    public function inspector() {
-        return $this->belongsTo(Staff::class, 'inspector_id');
-    }
-
-    public function chiefInstructor() {
-        return $this->belongsTo(Staff::class, 'chief_instructor_id');
+    /**
+     * Scope for filtering by company and platoon.
+     */
+    public function scopeByCompanyAndPlatoon($query, $company_id, $platoon)
+    {
+        return $query->where('company_id', $company_id)->where('platoon', $platoon);
     }
 }

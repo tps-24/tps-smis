@@ -13,6 +13,7 @@ class Staff extends Model
     protected $fillable = [
             'forceNumber',
             'rank',
+            'role',
             'nin',
             'firstName',
             'middleName',
@@ -53,5 +54,12 @@ class Staff extends Model
             return $this->belongsTo(User::class);
         }
 
-        
+        // Function to check roles
+    public function hasRole($roles)
+    {
+        if (is_array($roles)) {
+            return in_array(strtolower($this->role), array_map('strtolower', $roles));
+        }
+        return strtolower($this->role) === strtolower($roles);
+    }
 }

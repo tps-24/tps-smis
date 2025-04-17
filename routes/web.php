@@ -487,24 +487,27 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
     ->middleware('auth'); // Requires login to delete
 
    
-//Leaves Routes
-Route::prefix('leave-requests')->group(function () {
-    Route::get('/', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
-    Route::get('/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
-    Route::post('/store', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
-    Route::put('/forward-inspector/{id}', [LeaveRequestController::class, 'forwardToInspector'])->name('leave-requests.forward-inspector');
-    Route::put('/forward-chief/{id}', [LeaveRequestController::class, 'forwardToChief'])->name('leave-requests.forward-chief');
-    Route::put('/approve/{id}', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
-    Route::put('/reject/{id}', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+    Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
+    Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
     
-    // Route for staff panel
-    Route::middleware(['auth'])->get('/staff-panel', [LeaveRequestController::class, 'staffPanel'])->name('staff.panel');
+    Route::get('/leave-request', [LeaveRequestController::class, 'showPanel'])->name('leave-requests.panel');
+    
+    Route::get('/leave-requests/oc-panel', [LeaveRequestController::class, 'ocLeaveRequests'])->name('leave-requests.oc-panel');
+    Route::post('/oc/leave-requests/forward/{id}', [LeaveRequestController::class, 'forwardToChiefInstructor'])->name('oc.leave-requests.forward');
+    
+    Route::get('/chief_instructor/leave-requests', [LeaveRequestController::class, 'approvedLeaveRequestsForChiefInstructor'])->name('chief_instructor.leave-requests');
+    Route::put('/chief-instructor/leave-requests/{id}/approve', [LeaveRequestController::class, 'chiefInstructorApprove'])->name('leave-requests.chief-instructor-approve');
+    Route::get('/leave-requests/chief_instructor', [LeaveRequestController::class, 'chiefInstructorIndex'])->name('leave-requests.chief-instructor');
 
-    // Views for roles
-    Route::get('/sir-major', [LeaveRequestController::class, 'sirMajorView'])->name('leave-requests.sir-major');
-    Route::get('/inspector', [LeaveRequestController::class, 'inspectorView'])->name('leave-requests.inspector');
-    Route::get('/chief-instructor', [LeaveRequestController::class, 'chiefInstructorView'])->name('leave-requests.chief-instructor');
-});
-
-Route::get('/staff-panel', [LeaveRequestController::class, 'staffPanel'])->name('staff_panel');
-
+    Route::put('/leave-requests/{id}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
+    Route::put('/leave-requests/{id}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+    
+    Route::get('/leave-requests/statistics', [LeaveRequestController::class, 'statistics'])->name('leave-requests.statistics');
+    Route::get('/leave-requests/statistics/pdf', [LeaveRequestController::class, 'exportPdf'])->name('leave-requests.statistics.pdf');
+    
+    Route::get('/leave-requests/{id}/download', [LeaveRequestController::class, 'downloadPDF'])->name('leave-requests.download');
+    Route::get('/leave-requests/{id}/pdf', [LeaveRequestController::class, 'exportSinglePdf'])->name('leave-requests.single.pdf');
+    
+    Route::get('/leave-requests/rejected', [LeaveRequestController::class, 'rejected'])->name('leave-requests.rejected');
+    Route::get('/leave-requests/{id}/rejected-pdf', [LeaveRequestController::class, 'downloadRejectedPdf'])->name('leave-requests.rejected.pdf');
+    
