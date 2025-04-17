@@ -142,12 +142,12 @@ a.active {
         <!-- <li>
         <a href="/tps-smis/attendences/type/2">Master Parade</a>
       </li> -->
-        <!-- <li>
+        <li>
+        <a href="/tps-smis/attendences/type/4">Evening</a>
+        </li>
+        <li>
         <a href="/tps-smis/attendences/type/3">Night</a>
-        </li> -->
-        <!-- <li>
-        <a href="/tps-smis/attendences/type/4">Flag</a>
-      </li> -->
+        </li>
       </ul>
       </li>
     @endcan()
@@ -430,6 +430,9 @@ a.active {
         </li>
         <li>
         <a href="{{ route('campuses.index') }}">Campus Settings</a>
+        </li>
+        <li>
+        <a href="{{ route('certificates.index') }}">Certificate Settings</a>
         </li>
         <li>
         <a href="{{ route('guard-areas.index') }}">Guard Areas</a>

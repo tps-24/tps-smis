@@ -6,8 +6,8 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Courses</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">View Course</a></li>
+        <li class="breadcrumb-item"><a href="#">Campuses</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">View Campus</a></li>
       </ol>
     </nav>
   </div>
@@ -17,13 +17,13 @@
 @section('content')
 <!-- Row starts -->
 <div class="row gx-4">
-    <div class="col-sm-8 col-12">
+    <div class="col-sm-6 col-12">
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-12 margin-tb">
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('courses.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" style="margin-left:10px" href="{{ route('campuses.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -31,20 +31,14 @@
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Course Name:</strong>
-                            {{ $course->courseName }}
+                            <strong>Campus Name:</strong>
+                            {{ $campus->campusName }}
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Course Code:</strong>
-                            {{ $course->abbreviation }}
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Department:</strong>
-                            {{ $departmentName }}
+                            <strong>Campus Description:</strong>
+                            {{ $campus->description }}
                         </div>
                     </div>
                 </div>
@@ -52,7 +46,7 @@
         </div>     
     </div>
   
-    <div class="col-sm-4 col-12">
+    <div class="col-sm-6 col-12">
         <div class="card mb-8">
             <div class="card-body">
             </div>

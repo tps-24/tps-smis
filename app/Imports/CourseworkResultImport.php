@@ -65,7 +65,7 @@ class CourseworkResultImport implements ToCollection
                 }
 
                 // Save coursework result
-                CourseworkResult::create([
+                CourseworkResult::updateOrCreate([
                     'student_id' => $student->id,
                     'coursework_id' => $this->courseworkId,
                     'score' => $row[3],

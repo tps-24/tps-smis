@@ -23,7 +23,6 @@
     </div>
   @endsession -->
 @if ($beat->beatType_id == 1)
-<h4>Guard Area : {{$beat->guardArea->name}}</h4>
 @else
 <h4>Patrol Area: {{$beat->patrolArea->start_area}} - {{$beat->patrolArea->end_area}}</h4>
 @endif

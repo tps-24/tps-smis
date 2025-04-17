@@ -14,6 +14,38 @@
 </nav>
 <!-- Scrumb ends --> 
 @endsection
+
+@section('style')
+<style>
+/* Responsive design for smaller devices */
+@media (max-width: 768px) {
+    .card-header {
+        text-align: center;
+    }
+
+    select, input {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .d-flex.gap-2 {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    .backbtn {
+        margin: 10px 0;
+        width: 100%;
+    }
+}
+</style>
+@endsection
+
 @section('content')
 <!-- Row starts -->
 <div class="row gx-4">
@@ -22,7 +54,7 @@
             <div class="card-header">
                 <div>
                  <a href="{{ route('courseworkResultDownloadSample') }}">
-                    <button  class="btn btn-s btn-success">
+                    <button class="btn btn-s btn-success">
                         <i class="bi bi-download"></i> &nbspSample For Uploading Coursework
                     </button>
                 </a> 
@@ -33,7 +65,9 @@
                 </div>
 
                 <div class="pull-right">
-                    <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('coursework_results.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                    <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('coursework_results.index') }}">
+                        <i class="fa fa-arrow-left"></i> Back
+                    </a>
                 </div>
             </div>
             <div class="card-body">
@@ -44,9 +78,10 @@
                     <form method="POST"  action="{{ route('coursework.upload', $course->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('POST')
-                        <div class="d-flex gap-2 justify-content-end">
+                        <input type="hidden" id="course_id" name="course_id" value="$course->id">
+                        <div class="d-flex gap-2 flex-wrap justify-content-end">
                             <!-- Semester Select -->
-                            <select style="width: 30%; height: 40px; text-align: left; padding-bottom:5px;" name="semesterId" id="semesters" class="form-control" required>
+                            <select name="semesterId" id="semesters" class="form-control" required>
                                 <option value="" selected disabled>-- Select Semester</option>
                                 @foreach ($course->semesters as $semester)
                                     <option value="{{ $semester->id }}">{{ $semester->semester_name }}</option>
@@ -54,24 +89,18 @@
                             </select>
 
                             <!-- Coursework Select -->
-                            <select style="width: 30%; height: 40px; text-align: left; vertical-align: middle;" name="courseworkId" id="courseworks" class="form-control" required>
+                            <select name="courseworkId" id="courseworks" class="form-control" required>
                                 <option value="" selected disabled>-- Select Coursework Type</option>
                             </select>
 
-                            <div class="d-flex gap-2" style="width:550px">
-                                <!-- File Upload -->
-                                <input type="file" name="import_file" class="form-control mb-2" required 
-                                    style="width: 80%; height: 40px; text-align: center; line-height: 40px; padding: 0; padding-left: 10px;">
-                                <!-- Button -->
-                                <button 
-                                    style="width: 60%; height: 40px;" 
-                                    type="submit" 
-                                    class="btn btn-success">
+                            <!-- File Upload and Button -->
+                            <div class="d-flex gap-2 flex-wrap">
+                                <input type="file" name="import_file" class="form-control mb-2" required>
+                                <button type="submit" class="btn btn-success">
                                     <i class="bi bi-upload"></i>&nbsp Upload Coursework
                                 </button>
                             </div>
                         </div>
-
                     </form>
                 </div>
             </div>
@@ -84,11 +113,12 @@
     // Fetch courseworks when semester is selected
     document.getElementById('semesters').addEventListener('change', function () {
         var semesterId = this.value;
+        var courseId = document.getElementById('course_id').value;
         var courseworkSelect = document.getElementById('courseworks');
         courseworkSelect.innerHTML = '<option value="">Select coursework</option>'; // Clear previous options
 
         if (semesterId) {
-            fetch(`/tps-smis/courseworks/${semesterId}`)
+            fetch(`/tps-smis/courseworks/${semesterId}/${courseId}`)
                 .then(response => response.json())
                 .then(courseworks => {
                     courseworks.forEach(coursework => {
@@ -102,4 +132,5 @@
         }
     });
 </script>
+
 @endsection

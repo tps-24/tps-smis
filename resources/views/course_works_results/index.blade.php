@@ -129,7 +129,7 @@
 
                     <button disabled id="add_btn" class="btn btn-success mb-2"
                         style="float:right !important; margin-right:1%;">
-                        <a href="" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> Upload Coursework Results</a>
+                        <a href="" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> Upload Coursework</a>
                     </button>
 
                     <button disabled id="ca_configuration_btn" class="btn btn-success mb-2"

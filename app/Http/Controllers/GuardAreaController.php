@@ -105,7 +105,7 @@ class GuardAreaController extends Controller
             'beat_exception_ids.*' => 'nullable|numeric|exists:beat_exceptions,id',
             'beat_time_exception_ids' => 'nullable|array',
             'beat_time_exception_ids.*' => 'nullable|numeric|exists:beat_time_exceptions,id',
-            'number_of_guards' => 'required|numeric|min:1'
+            'number_of_guards' => 'required|numeric|min:0'
         ]);
 
         $guardArea->name = $request->guard_area_name;

@@ -77,6 +77,21 @@
     <!-- Rating -->
     <script src="/tps-smis/resources/assets/vendor/rating/raty.js"></script>
     <script src="/tps-smis/resources/assets/vendor/rating/raty-custom.js"></script> 
+    <script>
+        // Auto-dismiss success and error messages after 5 seconds
+        setTimeout(() => {
+            const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+
+            if (successMessage) {
+                successMessage.style.display = 'none'; // Hide success message
+            }
+
+            if (errorMessage) {
+                errorMessage.style.display = 'none'; // Hide error message
+            }
+        }, 5000); // 5000 milliseconds = 5 seconds
+    </script>
     
     @yield('scripts')
   </body>

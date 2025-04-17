@@ -24,6 +24,10 @@ use Hash;
 use Exception;
 use Illuminate\Support\Facades\Log; // Namespace for the Log facade
 
+use Barryvdh\DomPDF\Facade as PDF;
+
+// use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class StudentController extends Controller
 {

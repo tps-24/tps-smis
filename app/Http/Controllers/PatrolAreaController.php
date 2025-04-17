@@ -56,7 +56,7 @@ class PatrolAreaController extends Controller
             'beat_exception_ids.*' => 'nullable|numeric|exists:beat_exceptions,id',
             'beat_time_exception_ids' => 'nullable|array',
             'beat_time_exception_ids.*' => 'nullable|numeric|exists:beat_time_exceptions,id',
-            'number_of_guards' => 'required|numeric|min:1'
+            'number_of_guards' => 'required|numeric|min:0'
         ]);
 
         PatrolArea::create(
@@ -109,7 +109,7 @@ class PatrolAreaController extends Controller
             'beat_exception_ids.*' => 'nullable|numeric|exists:beat_exceptions,id',
             'beat_time_exception_ids' => 'nullable|array',
             'beat_time_exception_ids.*' => 'nullable|numeric|exists:beat_time_exceptions,id',
-            'number_of_guards' => 'required|numeric|min:1'
+            'number_of_guards' => 'required|numeric|min:0'
         ]);
 
         $patrolArea->start_area = $request->start_area;
