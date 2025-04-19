@@ -81,7 +81,7 @@ public function ocLeaveRequests()
 public function forwardToChiefInstructor($id)
 {
     $leaveRequest = LeaveRequest::findOrFail($id);
-    $leaveRequest->status = 'approved by OC'; // status changed
+    $leaveRequest->status = 'forwarded_to_chief_instructor'; // status changed
     $leaveRequest->save();
 
     return redirect()->back()->with('success', 'Leave request forwarded successfully.');
@@ -92,6 +92,7 @@ public function store(Request $request)
 {
     $validated = $request->validate([
         'student_id' => 'required|exists:students,id',
+        'staff_id' => 'nullable',
         'company_id' => 'required|exists:companies,id',
         'platoon' => 'required|integer',
        
@@ -114,7 +115,7 @@ public function store(Request $request)
 }
 public function chiefInstructorIndex()
 {
-    $leaveRequests = LeaveRequest::where('status', 'approved by OC') 
+    $leaveRequests = LeaveRequest::where('status', 'forwarded_to_chief_instructor') 
                         ->with('student')
                         ->get();
 
@@ -144,7 +145,7 @@ public function approve(Request $request, $id)
     $leaveRequest = LeaveRequest::findOrFail($id);
     $leaveRequest->start_date = $request->start_date;
     $leaveRequest->end_date = $request->end_date;
-    $leaveRequest->status = 'Approved by OC';
+    $leaveRequest->status = 'approved';
     $leaveRequest->save();
 
     return redirect()->back()->with('success', 'Leave request approved successfully.');
@@ -171,7 +172,7 @@ public function reject(Request $request, $id)
 
 public function statistics()
     {
-        $approvedRequests = LeaveRequest::where('status', 'Approved by OC')
+        $approvedRequests = LeaveRequest::where('status', 'approved')
             ->with('student')
             ->latest()
             ->get();

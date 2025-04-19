@@ -20,23 +20,11 @@ return new class extends Migration
             $table->string('location');
             $table->text('reason');
             $table->text('attachments')->nullable(); // optional
-            $table->enum('status', ['pending', 'approved', 'rejected', 'Ready'])->default('pending');
-            $table->dropColumn('status'); // Drop the old ENUM
+            $table->enum('status', ['pending', 'forwarded_to_chief_instructor', 'approved', 'rejected', 'ready'])->default('pending');
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();   
             $table->string('phone_number')->nullable(); 
-            
             $table->timestamps();
-        });
-
-        Schema::table('leave_requests', function (Blueprint $table) {
-            $table->enum('status', [
-                'pending', 
-                'forwarded_to_chief_instructor', 
-                'approved', 
-                'rejected', 
-                'ready'
-            ])->default('pending');
         });
     }
 
@@ -47,8 +35,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('leave_requests');
-        Schema::table('leave_requests', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'approved', 'rejected', 'Ready'])->default('pending');
-        });
     }
 };

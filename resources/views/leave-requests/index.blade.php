@@ -2,12 +2,24 @@
 
 @section('content')
 <div class="col-sm-12">
+    
+@include('layouts.sweet_alerts.index')
 
+    @if (count($errors) > 0)
+        <div class="alert alert-danger">
+            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
    
     <!-- Patient Details Table -->
     <div class="card mb-3">
         <div class="card-header">
-            <h5 class="card-title">Students Details</h5>
+            <h5 class="card-title">Fetch Students Details here ...</h5>
         </div>
 
          <!-- Search Form -->
@@ -84,6 +96,7 @@
 
                 <!-- Hidden Inputs -->
                 <input type="hidden" name="student_id" value="{{ $student->id }}">
+                <input type="hidden" name="staff_id" value="{{ auth()->user()->id }}">
                 <input type="hidden" name="company_id" value="{{ $student->company_id }}">
                 <input type="hidden" name="platoon" value="{{ $student->platoon }}">
                 
@@ -156,4 +169,6 @@
 @endif
 @endif
 </div>
+
+
 @endsection

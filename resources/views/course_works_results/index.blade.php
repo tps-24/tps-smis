@@ -92,6 +92,24 @@
     font-weight: bold; /* Optional: Make it stand out more */
 }
 
+@media (max-width: 768px) {
+    .pull-right {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    span {
+        font-size: 1.5rem; /* Adjust for smaller screens */
+        margin-bottom: 10px;
+    }
+
+    button {
+        width: 100%; /* Full-width buttons on smaller devices */
+        margin: 5px 0;
+    }
+}
+
 </style>
 
 <script>
@@ -122,23 +140,25 @@
     <div class="col-sm-9">
         <div class="card mb-3">
             <div class="card-header">
-                <div class="pull-right">
-                    <span style="font-size:30px !important">Coursework Results</span>
+            <span style="font-size: 1.875rem; text-align: left;">Coursework Results</span> <!-- Equivalent to 30px -->
+            <div class="pull-right d-flex flex-wrap align-items-center justify-content-end" style="gap: 10px;">
+                <!-- Button for Upload Coursework -->
+                <button disabled id="add_btn" class="btn btn-success" style="margin-right: 1%;">
+                    <a href="" id="add_link" style="color: white; text-decoration: none;">
+                        <i class="fa fa-plus"></i> Upload Coursework
+                    </a>
+                </button>
 
-                    <!-- <h6>Here display the course choosen</h6> -->
+                <!-- Button for CA Configurations -->
+                <button disabled id="ca_configuration_btn" class="btn btn-success">
+                    <a href="" id="ca_configuration_link" style="color: white; text-decoration: none;">
+                        <i class="fa fa-plus"></i> CA Configurations
+                    </a>
+                </button>
+            </div>
 
-                    <button disabled id="add_btn" class="btn btn-success mb-2"
-                        style="float:right !important; margin-right:1%;">
-                        <a href="" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> Upload Coursework</a>
-                    </button>
-
-                    <button disabled id="ca_configuration_btn" class="btn btn-success mb-2"
-                        style="float:right !important; margin-right:1%;">
-                        <a href="" id="ca_configuration_link" style="color:white;"> <i class="fa fa-plus"></i> CA Configurations</a>
-                    </button>
-                </div>
                 
-                <button id="export-btn" class="btn btn-secondary btn-sm" style="margin-bottom:-20px;">Export to Excel</button>
+                <button id="export-btn" class="btn btn-secondary btn-sm" style="margin-top:-50px;">Export to Excel</button>
                 
             </div>
             <div class="card-body">

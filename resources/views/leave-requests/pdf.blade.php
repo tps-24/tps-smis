@@ -101,7 +101,7 @@
         <table>
             <tr>
                 <th>Student Name:</th>
-                <td>{{ $leaveRequest->student->first_name }} {{ $leaveRequest->student->last_name }}</td>
+                <td>{{ $leaveRequest->student->first_name }} {{ $leaveRequest->student->middle_name }}  {{ $leaveRequest->student->last_name }}</td>
             </tr>
             <tr>
                 <th>Phone Number:</th>

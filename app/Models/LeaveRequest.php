@@ -11,13 +11,14 @@ class LeaveRequest extends Model
 
     protected $fillable = [
         'student_id',
+        'staff_id',
         'company_id',
         'platoon',
         'phone_number',
         'location',
         'reason',
         'status',
-         'start_date',
+        'start_date',
         'end_date',
         'attachments',
     ];

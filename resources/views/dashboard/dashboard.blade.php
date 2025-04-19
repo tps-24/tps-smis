@@ -116,7 +116,7 @@
                 { label: 'Absents', data: daily.absents, backgroundColor: '#1E4093' },
                 { label: 'Sick', data: daily.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
                 { label: 'Locked up', data: daily.lockUps, backgroundColor: 'orange' },
-                { label: 'Absents Trends', data: daily.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+                { label: 'Absents Trends', data: daily.absents, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
                 { label: 'Sick Trends', data: daily.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
                 { label: 'Lock Up Trends', data: daily.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
             ]
@@ -128,7 +128,7 @@
                 { label: 'Absents', data: weekly.absents, backgroundColor: '#1E4093' },
                 { label: 'Sick', data: weekly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
                 { label: 'Locked up', data: weekly.lockUps, backgroundColor: 'orange' },
-                { label: 'Absents Trends', data: weekly.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+                { label: 'Absents Trends', data: weekly.absents, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
                 { label: 'Sick Trends', data: weekly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
                 { label: 'Lock Up Trends', data: weekly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
             ]
@@ -140,7 +140,7 @@
                 { label: 'Absents', data: monthly.absents, backgroundColor: '#1E4093' },
                 { label: 'Sick', data: monthly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
                 { label: 'Locked up', data: monthly.lockUps, backgroundColor: 'orange' },
-                { label: 'Absents Trends', data: monthly.absents, type: 'line', fill: false, borderColor: 'rgba(49, 48, 48, 0.7)', tension: 0.1 },
+                { label: 'Absents Trends', data: monthly.absents, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
                 { label: 'Sick Trends', data: monthly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
                 { label: 'Lock Up Trends', data: monthly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
             ]

@@ -305,58 +305,52 @@ a.active {
     <a href="#">
         <i class="bi bi-mouse3"></i>
         <span class="menu-text">Leave(s)</span>
-        <i class="bi bi-chevron-down float-end"></i>
     </a>
 
     <ul class="treeview-menu">
-        {{-- Leave Apply Option (For Students using "web" guard) --}}
-        @if (auth('web')->check())
-            <li>
-                <a href="{{ route('leave-requests.index') }}">
-                    <i class="bi bi-pencil-square"></i> Apply for Leave
-                </a>
-            </li>
+        @if (auth()->check())
+          @if (auth()->user()->hasRole('Student'))
+              <li>
+                  <a href="{{ route('leave-requests.index') }}">
+                      Apply for Leave
+                  </a>
+              </li>
+          @elseif (auth()->user()->hasRole('Sir Major'))
+              <li>
+                  <a href="{{ route('leave-requests.index') }}">
+                      <i class="bi bi-inbox"></i> Sir Major Panel
+                  </a>
+              </li>
+          @elseif (auth()->user()->hasRole('OC Coy'))
+              <li>
+                  <a href="{{ route('leave-requests.oc-panel') }}">
+                      <i class="bi bi-person-video3"></i> OC Panel
+                  </a>
+              </li>
+          @elseif (auth()->user()->hasRole('Chief Instructor'))
+              <li>
+                  <a href="{{ route('leave-requests.chief-instructor') }}">
+                      <i class="bi bi-person-badge"></i> Chief Instructor Panel
+                  </a>
+              </li>
+          @else
+              <li>
+                  <a href="{{ route('leave-requests.index') }}">
+                      <i class="bi bi-inbox"></i> Leave Request Panel
+                  </a>
+              </li>
+          @endif
+        @else
+          <li>
+          <a href="/tps-smis">
+            <i class="bi bi-bar-chart-line"></i>
+            <span class="menu-text">Dashboard</span>
+          </a>
+          </li>
         @endif
-
-        {{-- For Staff Roles --}}
-        @if (auth('staff')->check())
-            @php
-                $role = strtolower(auth('staff')->user()->role);
-            @endphp
-
-            {{-- Sir Major --}}
-            @if ($role === 'sir major')
-                <li>
-                    <a href="{{ route('leave-requests.index') }}">
-                        <i class="bi bi-inbox"></i> Sir Major Panel
-                    </a>
-                </li>
-            @endif
-
-            {{-- OC --}}
-            @if ($role === 'oc')
-                <li>
-                    <a href="{{ route('leave-requests.oc-panel') }}">
-                        <i class="bi bi-person-video3"></i> OC Panel
-                    </a>
-                </li>
-            @endif
-
-            {{-- Chief Instructor --}}
-            @if ($role === 'chief instructor')
-                <li>
-                    <a href="{{ route('leave-requests.chief-instructor') }}">
-                        <i class="bi bi-person-badge"></i> Chief Instructor Panel
-                    </a>
-                </li>
-            @endif
-        @endif
+    
     </ul>
-</li>
-
-
-
-
+    </li>
 
     @can('beat-list')
     <li class="treeview">

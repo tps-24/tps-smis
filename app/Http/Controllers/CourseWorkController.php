@@ -115,9 +115,8 @@ class CourseWorkController extends Controller
 
     public function getCourseworks($semesterId, $courseId)
     {
-        Log::info("Fetching courseworks for semester ID: {$semesterId}");
-        // Retrieve course_id from the session
-        // $courseId = 1;
+        Log::info("Fetching courseworks for semester ID: {$semesterId} and course Id: {$courseId} ");
+        
         if (!$courseId) {
             return response()->json(['error' => 'Course ID not found in session'], 400);
         }
