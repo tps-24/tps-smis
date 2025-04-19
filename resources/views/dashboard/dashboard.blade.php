@@ -168,11 +168,10 @@
                             text: 'Counts'  // Default label for the Y-axis
                         },
                         ticks: {
+                            stepSize: 1,
                             beginAtZero: true,
-                            padding: 20, // Add padding to the top of the bars
-                            // Use callback to remove decimal points
                             callback: function (value) {
-                                return value.toFixed(0);  // Rounds the value to the nearest integer
+                                return value.toFixed(0);
                             }
                         },
                         // Dynamically set the max value of the y-axis to be higher than the highest bar
