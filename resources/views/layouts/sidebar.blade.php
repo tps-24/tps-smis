@@ -301,46 +301,60 @@ a.active {
       </ul>
       </li>
     @endcan()
-
     <li class="treeview">
-      <a href="#">
-          <i class="bi bi-mouse3"></i>
-          <span class="menu-text">Leave(s)</span>
-      </a>
-      <ul class="treeview-menu">
-        {{-- Leave Application (for all users) --}}
+    <a href="#">
+        <i class="bi bi-mouse3"></i>
+        <span class="menu-text">Leave(s)</span>
+        <i class="bi bi-chevron-down float-end"></i>
+    </a>
 
-
-
-        
-        <li>
-            <a href="{{ route('leave-requests.create') }}">
-                <i class="bi bi-mouse3"></i>
-                <span class="menu-text">Leave Application</span>
-            </a>
-        </li>
-
-        {{-- Debugging Output --}}
-        <li>
-            <strong>Debug: Role = {{ isset($role) ? $role : 'Not Set' }}</strong>
-        </li>
-
-        {{-- Show "staff_panel" for Sir Major, Inspector, and Chief Instructor --}}
-        @if (isset($role) && in_array($role, ['sir major', 'inspector', 'chief instructor']))
+    <ul class="treeview-menu">
+        {{-- Leave Apply Option (For Students using "web" guard) --}}
+        @if (auth('web')->check())
             <li>
-                <a href="{{ route('staff_panel') }}">
-                    <i class="bi bi-person-vcard"></i>
-                    <span class="menu-text">
-                        @if($role === 'sir major') Received Requests
-                        @elseif($role === 'inspector') Inspector Panel
-                        @elseif($role === 'chief instructor') Chief Panel
-                        @endif
-                    </span>
+                <a href="{{ route('leave-requests.index') }}">
+                    <i class="bi bi-pencil-square"></i> Apply for Leave
                 </a>
             </li>
         @endif
-      </ul>
-    </li>
+
+        {{-- For Staff Roles --}}
+        @if (auth('staff')->check())
+            @php
+                $role = strtolower(auth('staff')->user()->role);
+            @endphp
+
+            {{-- Sir Major --}}
+            @if ($role === 'sir major')
+                <li>
+                    <a href="{{ route('leave-requests.index') }}">
+                        <i class="bi bi-inbox"></i> Sir Major Panel
+                    </a>
+                </li>
+            @endif
+
+            {{-- OC --}}
+            @if ($role === 'oc')
+                <li>
+                    <a href="{{ route('leave-requests.oc-panel') }}">
+                        <i class="bi bi-person-video3"></i> OC Panel
+                    </a>
+                </li>
+            @endif
+
+            {{-- Chief Instructor --}}
+            @if ($role === 'chief instructor')
+                <li>
+                    <a href="{{ route('leave-requests.chief-instructor') }}">
+                        <i class="bi bi-person-badge"></i> Chief Instructor Panel
+                    </a>
+                </li>
+            @endif
+        @endif
+    </ul>
+</li>
+
+
 
 
 

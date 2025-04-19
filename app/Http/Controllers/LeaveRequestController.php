@@ -5,185 +5,222 @@ use Illuminate\Http\Request;
 use App\Models\LeaveRequest;
 use App\Models\Student;
 use App\Models\Staff;
+use App\Models\Company;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\LeaveRequestSubmitted;
 
 class LeaveRequestController extends Controller
 {
-    // Display all leave requests
-    public function index()
+    // Display all Students leave requests
+   
+    public function index(Request $request)
     {
-        $leaveRequests = LeaveRequest::all();
-        return view('leave-requests.index', compact('leaveRequests'));
-    }
+        $user = auth()->user();
 
-    // Show the create leave request form
-    public function create()
-    {
-        return view('leave-requests.create');
-    }
-
-    // Store a new leave request
-    public function store(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'reason' => 'required|string|max:500',
-        ]);
     
-        // Ensure the logged-in user is a student
-        $student = Student::where('user_id', Auth::id())->first();
+        // Fetch staff record for the logged-in user
+        $staff = $user->staff; 
     
-        if (!$student) {
-            return redirect()->back()->with('error', 'Student account not found.');
+        // Get company_id from staff table
+        $assignedCompany = $staff ? Company::find($staff->company_id) : null;
+    
+        // Check if the user has the Sir Major role and ensure they have an assigned company
+        if (!$assignedCompany && $user->hasRole('Sir Major')) {
+            return redirect()->back()->with('error', 'Your assigned company was not found.');
         }
     
-        // Assign the request to the Sir Major of the same company
-        $sirMajor = Staff::where('designation', 'Sir Major')
-            ->where('company_id', $student->company_id)
-            ->first();
-    
-        if (!$sirMajor) {
-            return redirect()->back()->with('error', 'No Sir Major found for your company.');
+        // Super Admin, Admin, Teacher, and MPS Officer can view all companies
+        if ($user->hasRole(['Super Administrator', 'Admin', 'MPS Officer'])) {
+            $companies = Company::all();
+            $query = Student::query();
+        } else {
+            // Sir Major can only see students from their assigned company
+            $companies = collect([$assignedCompany]);
+            $query = Student::where('company_id', $staff->company_id);
         }
     
-        // Create the leave request
-        $leaveRequest = LeaveRequest::create([
-            'student_id' => $student->id,
-            'sir_major_id' => $sirMajor->id,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'reason' => $request->reason,
-            'status' => 'pending',
-        ]);
-    
-        return redirect()->back()->with('success', 'Leave request submitted successfully.');
-    }
-    
-
-    // Sir Major forwards request to Inspector
-    public function forwardToInspector($id)
-    {
-        $leaveRequest = LeaveRequest::findOrFail($id);
-        $inspector = Staff::where('role', 'inspector')->first();
-
-        if ($inspector) {
-            $leaveRequest->update(['inspector_id' => $inspector->id, 'status' => 'pending_inspector']);
+        // Filtering based on selected company
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
         }
-
-        return redirect()->route('leave-requests.sir-major')->with('success', 'Leave request forwarded to inspector');
-    }
-
-    // Inspector forwards request to Chief Instructor
-    public function forwardToChief($id)
-    {
-        $leaveRequest = LeaveRequest::findOrFail($id);
-        $chiefInstructor = Staff::where('role', 'chief instructor')->first();
-
-        if ($chiefInstructor) {
-            $leaveRequest->update(['chief_instructor_id' => $chiefInstructor->id, 'status' => 'pending_chief']);
+    
+        if ($request->filled('platoon')) {
+            $query->where('platoon', $request->platoon);
         }
-
-        return redirect()->route('leave-requests.inspector')->with('success', 'Leave request forwarded to Chief Instructor');
-    }
-
-    // Chief Instructor approves leave request
-    public function approve($id)
-    {
-        $leaveRequest = LeaveRequest::findOrFail($id);
-        $leaveRequest->update(['status' => 'approved']);
-
-        return redirect()->route('leave-requests.chief-instructor')->with('success', 'Leave request approved');
-    }
-
-    // Chief Instructor rejects leave request
-    public function reject(Request $request, $id)
-    {
-        $request->validate(['rejection_reason' => 'required|string']);
-
-        $leaveRequest = LeaveRequest::findOrFail($id);
-        $leaveRequest->update(['status' => 'rejected', 'rejection_reason' => $request->rejection_reason]);
-
-        return redirect()->route('leave-requests.chief-instructor')->with('error', 'Leave request rejected');
-    }
-
-    // View for Sir Major
-    public function sirMajorView()
-    {
-        // $leaveRequests = \App\Models\LeaveRequest::with('student')
-        //     ->where('status', 'pending')
-        //     ->orderBy('created_at', 'desc')
-        //     ->get();
-            $leaveRequests = LeaveRequest::with('student.user')->orderBy('created_at', 'desc')->get();
-
-        return view('leave-requests.sir-major', compact('leaveRequests'));
+    
+        if ($request->filled('fullname')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('first_name', 'LIKE', "%{$request->fullname}%")
+                  ->orWhere('last_name', 'LIKE', "%{$request->fullname}%");
+            });
+        }
+    
+        if ($request->filled('student_id')) {
+            $query->where('id', (int) $request->student_id);
+        }
+    
+        $studentDetails = $query->get();
+        $message = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
+    
+      
+        return view('leave-requests.index', compact('message', 'user', 'assignedCompany', 'companies', 'studentDetails'));
     }
     
+   
 
-    // View for Inspector
-    public function inspectorView()
-    {
-        $leaveRequests = LeaveRequest::where('status', 'pending_inspector')->get();
-        return view('leave-requests.inspector', compact('leaveRequests'));
-    }
-
-    // View for Chief Instructor
-    public function chiefInstructorView()
-    {
-        $leaveRequests = LeaveRequest::where('status', 'pending_chief')->get();
-        return view('leave-requests.chief_instructor', compact('leaveRequests'));
-    }
-
-
-    public function staffPanel()
+// Show all leave requests submitted to OC
+public function ocLeaveRequests()
 {
-    $staff = Auth::guard('staff')->user(); // Ensure staff authentication
-
-    if (!$staff) {
-        return redirect()->route('login')->with('error', 'Unauthorized access.');
-    }
-
-    \Log::info("Debugging Staff Role: " . json_encode($staff)); // Log entire staff object
-
-    $role = strtolower($staff->role ?? 'Not Set'); // Get role or default to 'Not Set'
-
-    \Log::info("Debug Role: " . $role); // Log role output
-
-    switch ($role) {
-        case 'sir major':
-            $leaves = LeaveRequest::where('sir_major_id', $staff->id)->get();
-            break;
-        case 'inspector':
-            $leaves = LeaveRequest::where('status', 'pending_inspector')->get();
-            break;
-        case 'chief instructor':
-            $leaves = LeaveRequest::where('status', 'pending_chief')->get();
-            break;
-        default:
-            return redirect()->route('login')->with('error', 'Unauthorized access.');
-    }
-
-    return view('leaves.staff_panel', compact('staff', 'role', 'leaves'));
+    // OC sees only Pending
+    $leaveRequests = LeaveRequest::where('status', 'Pending')->get();
+    return view('leave-requests.oc-panel', compact('leaveRequests'));
 }
 
-    
-
-public function login(Request $request)
+public function forwardToChiefInstructor($id)
 {
-    $credentials = $request->only('email', 'password');
+    $leaveRequest = LeaveRequest::findOrFail($id);
+    $leaveRequest->status = 'approved by OC'; // status changed
+    $leaveRequest->save();
 
-    if (Auth::guard('staff')->attempt($credentials)) {
-        $staff = Auth::guard('staff')->user();
-
-        // Redirect to staff panel
-        return redirect()->route('staff_panel');
-    }
-
-    return back()->withErrors(['email' => 'Invalid credentials']);
+    return redirect()->back()->with('success', 'Leave request forwarded successfully.');
 }
 
 
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'student_id' => 'required|exists:students,id',
+        'company_id' => 'required|exists:companies,id',
+        'platoon' => 'required|integer',
+       
+        'phone_number' => 'nullable|string|max:20',
+        'location' => 'required|string|max:255',
+        'reason' => 'required|string',
+        'attachments' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+    ]);
+    
+    if ($request->hasFile('attachments')) {
+        $validated['attachments'] = $request->file('attachments')->store('leave_attachments', 'public');
+    }
+
+    // ✅ Set default status when creating the leave request
+    $validated['status'] = 'pending'; // or whatever default status you want ('pending', 'waiting', etc.)
+
+    LeaveRequest::create($validated);
+
+    return redirect()->back()->with('success', 'Leave request submitted successfully.');
+}
+public function chiefInstructorIndex()
+{
+    $leaveRequests = LeaveRequest::where('status', 'approved by OC') 
+                        ->with('student')
+                        ->get();
+
+    return view('leave-requests.chief_instructor', compact('leaveRequests'));
+}
+
+
+public function chiefInstructorApprove(Request $request, $id)
+{
+    $request->validate([
+        'start_date' => 'required|date',
+        'end_date' => 'required|date|after_or_equal:start_date',
+    ]);
+
+    $leaveRequest = LeaveRequest::findOrFail($id);
+    $leaveRequest->start_date = $request->start_date;
+    $leaveRequest->end_date = $request->end_date;
+    $leaveRequest->approved_by_chief_instructor = true;
+    $leaveRequest->save();
+
+    return redirect()->back()->with('success', 'Leave details updated successfully!');
+}
+
+
+public function approve(Request $request, $id)
+{
+    $leaveRequest = LeaveRequest::findOrFail($id);
+    $leaveRequest->start_date = $request->start_date;
+    $leaveRequest->end_date = $request->end_date;
+    $leaveRequest->status = 'Approved by OC';
+    $leaveRequest->save();
+
+    return redirect()->back()->with('success', 'Leave request approved successfully.');
+}
+
+
+
+public function reject(Request $request, $id)
+{
+    $request->validate([
+        'rejection_reason' => 'required|string|max:1000',
+    ]);
+
+    $leaveRequest = LeaveRequest::findOrFail($id);
+    $leaveRequest->status = 'rejected';
+    $leaveRequest->rejection_reason = $request->input('rejection_reason');
+    $leaveRequest->rejected_at = now(); // optional
+    $leaveRequest->save();
+
+    return redirect()->back()->with('success', 'Leave request rejected successfully.');
+}
+
+
+
+public function statistics()
+    {
+        $approvedRequests = LeaveRequest::where('status', 'Approved by OC')
+            ->with('student')
+            ->latest()
+            ->get();
+
+        $totalRequests = $approvedRequests->count();
+        $totalDays = $approvedRequests->sum(function($request) {
+            return \Carbon\Carbon::parse($request->start_date)->diffInDays(\Carbon\Carbon::parse($request->end_date)) + 1;
+        });
+
+        return view('leave-requests.statistics', compact('approvedRequests', 'totalRequests', 'totalDays'));
+    }
+    public function exportPdf()
+    {
+        $approvedRequests = LeaveRequest::where('status', 'Approved by OC')->with('student')->get();
+        
+        $pdf = Pdf::loadView('leave-requests.statistics-pdf', compact('approvedRequests'));
+        return $pdf->download('approved_leave_requests_statistics.pdf');
+    }
+
+
+public function rejected()
+{
+    $leaveRequests = LeaveRequest::with('student')
+        ->where('status', 'rejected')
+        ->orderByDesc('rejected_at')
+        ->get();
+
+    return view('leave-requests.rejected', compact('leaveRequests'));
+}
+
+
+public function downloadRejectedPdf($id)
+{
+    $leaveRequest = LeaveRequest::with('student')->findOrFail($id);
+
+    if ($leaveRequest->status !== 'rejected') {
+        abort(403, 'This request is not rejected.');
+    }
+
+    $pdf = Pdf::loadView('leave-requests.rejected_pdf', compact('leaveRequest'));
+    return $pdf->download('rejected-leave-request-'.$leaveRequest->id.'.pdf');
+}
+public function exportSinglePdf($id)
+{
+    $leaveRequest = LeaveRequest::with('student')->findOrFail($id);
+
+    $pdf = Pdf::loadView('leave-requests.pdf', compact('leaveRequest'));
+    return $pdf->download('leave-request.pdf');
+
+}
 
 }
