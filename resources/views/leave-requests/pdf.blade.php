@@ -1,159 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sw">
 <head>
     <meta charset="UTF-8">
-    <title>Leave Request Form</title>
+    <title>Kibali cha Ruhusa</title>
+
     <style>
-        @page {
-            margin: 50px;
-        }
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #333;
-            position: relative;
-         border: 2px double #000; 
-            padding: 30px;
-            /* background-image: url('{{ public_path('logo.png') }}'); */
-            background-size: 300px 300px;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.95;
+        /* ----- PAGE SIZE & MARGINS ----- */
+        @page   { margin: 50px;  }
+        body    { font-family: DejaVu Sans, sans-serif;
+                  font-size: 14px;  line-height: 1.55;
+                  color:#000;  padding:32px; }
 
+        /* ----- HEADER ----- */
+        .header           { text-align:center; margin-bottom:10px; }
+        .header img       { width:80px; height:80px; }
+        .header h2        { margin:6px 0 4px; font-size:20px; }
+        .header h3        { margin:0; font-size:16px; letter-spacing:.5px; }
 
-            
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .header img {
-            width: 80px;
-            height: 80px;
-        }
-        .header h2 {
-            margin: 10px 0 5px;
-        }
-        .header p {
-            margin: 0;
-            font-size: 13px;
-        }
-        .details table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .details th, .details td {
-            padding: 8px;
-            border-bottom: 1px solid #ccc;
-            text-align: left;
-        }
-        .signatures {
-            margin-top: 50px;
-        }
-        .signatures table {
-            width: 100%;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .signatures img {
-            width: 120px;
-            height: auto;
-        }
-        .stamp {
-            position: absolute;
-            bottom: 100px;
-            right: 100px;
-            opacity: 0.3;
-        }
-        .stamp img {
-            width: 150px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 12px;
-        }
-        .watermark {
-            position: fixed;
-            top: 45%;
-            left: 45%;
-            width: 45%;
-            height: 45%;
-            opacity: 0.1;
-            transform: translate(-50%, -50%);
-            z-index: -1;
+        /* ----- PERMIT TEXT ----- */
+        .permit-content   { margin-top:18px; }
+        .permit-content p { margin:12px 0; text-align:justify; }
+
+        /* ----- SIGNATURES ----- */
+        .signatures       { margin-top:26px; }
+        .signatures table { width:100%; text-align:center; }
+        .signatures td    { padding-top:36px; vertical-align:bottom; }
+        .signatures img   { width:65px; }
+
+        /* ----- FOOTER ----- */
+        .footer           { text-align:center; margin-top:40px; font-size:13px; }
+
+        /* ----- WATERMARK ----- */
+        .watermark{
+            position:fixed;   top:50%; left:50%;
+            width:45%; height:45%;
+            transform:translate(-50%, -50%);
+            opacity:.06; z-index:-1;
         }
     </style>
 </head>
+
 <body>
 
+    {{-- ---------- HEADER ---------- --}}
     <div class="header">
-        <img src="{{ public_path('logo.png') }}" alt="Tanzania Police Logo">
-        <h2>Tanzania Police School - TPS MOSHI</h2>
-        <p><strong>Leave Request Form</strong></p>
-        <p><strong>Generated on:</strong> {{ now()->format('d M Y') }}</p>
+        <img src="{{ public_path('logo.png') }}" alt="Nembo ya Polisi">
+        <h2>SHULE YA POLISI TANZANIA - MOSHI</h2>
+        <h3>KIBALI CHA MWANAFUNZI KUTOKA NJE YA SHULE</h3>
     </div>
 
-    <div class="details">
+    {{-- Watermark --}}
     <img src="{{ public_path('logo.png') }}" class="watermark" alt="Watermark">
+
+    {{-- ---------- PERMIT BODY ---------- --}}
+    <div class="permit-content">
+        <p>
+            Mwanafunzi {{ 
+            $leaveRequest->student->first_name . ' ' .
+            $leaveRequest->student->middle_name . ' ' .
+            $leaveRequest->student->last_name }},
+            kutoka Kombania {{ $leaveRequest->company->name }},
+            Platuni namba {{ $leaveRequest->platoon }},
+            ameruhusiwa kutoka nje ya shule kwenda
+            {{ $leaveRequest->location }}
+            kwa ajili ya {{ $leaveRequest->reason }},
+            kuanzia tarehe {{ \Carbon\Carbon::parse($leaveRequest->start_date)->format('d M Y') }}
+            hadi tarehe {{ \Carbon\Carbon::parse($leaveRequest->end_date)->format('d M Y') }}.
+            Namba ya simu: {{ $leaveRequest->phone_number }}
+        </p>
+
+        <p>
+            <strong>NB:</strong> <strong>Piga timamu katika kituo cha polisi cha karibu kwa msaada.<br>
+            Ripoti MPS unapotoka na unaporudi chuoni. Urudipo, kibali kirudishwe
+            ofisi ya Mkufunzi Mkuu</strong>.
+        </p>
+    </div>
+
+    {{-- ---------- SIGNATURES ---------- --}}
+    <div class="signatures">
         <table>
             <tr>
-                <th>Student Name:</th>
-                <td>{{ $leaveRequest->student->first_name }} {{ $leaveRequest->student->middle_name }}  {{ $leaveRequest->student->last_name }}</td>
-            </tr>
-            <tr>
-                <th>Phone Number:</th>
-                <td>{{ $leaveRequest->phone_number }}</td>
-            </tr>
-            <tr>
-                <th>Company:</th>
-                <td>{{ $leaveRequest->company->name }}  Platoon:{{ $leaveRequest->platoon }}</td>
-            </tr>
-            <!-- <tr>
-                <th>Platoon:</th>
-                <td>{{ $leaveRequest->platoon }}</td>
-            </tr> -->
-            <tr>
-                <th>Location:</th>
-                <td>{{ $leaveRequest->location }}</td>
-            </tr>
-            <tr>
-                <th>Reason for Leave:</th>
-                <td>{{ $leaveRequest->reason }}</td>
-            </tr>
-            <tr>
-                <th>Start Date:</th>
-                <td>{{ $leaveRequest->start_date ?? '-' }} </td>
-            </tr>
-            <tr>
-                <th>End Date:</th>
-                <td>{{ $leaveRequest->end_date ?? '-' }}</td>
-            </tr>
-           
-        </table>
-    </div>
-
-    <!-- Signature Area -->
-    <div class="signature-section">
-
-    <!-- <p>Imetolewa na:</p> -->
-    <img src="{{ public_path('signatures/oc.png') }}" width="150" alt="Signature">
-    <div>Chief Instructor TPS - MOSHI</div>
-    <br>Date: {{ now()->format('d M Y') }}
-</div>
-       
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="S/M Signature"><br>
+                    Sir Major
+                </td>
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="OC Signature"><br>
+                    OC-TPS Moshi
+                </td>
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="C/I Signature"><br>
+                    ChiefInstructor-TPS Moshi
                 </td>
             </tr>
         </table>
     </div>
-
+       
+    {{-- ---------- FOOTER ---------- --}}
     <div class="footer">
-        <p>© {{ date('Y') }} Tanzania Police Force. All rights reserved.</p>
+        © {{ date('Y') }} Jeshi la Polisi Tanzania. Haki zote zimehifadhiwa.
     </div>
 
 </body>
 </html>
-
-

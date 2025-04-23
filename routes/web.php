@@ -465,6 +465,9 @@ Route::get('/doctor', [PatientController::class, 'doctorPage'])->name('doctor.pa
 Route::post('/patients/save-details', [PatientController::class, 'saveDetails'])->name('patients.saveDetails');
 Route::put('/patients/discharge/{id}', [PatientController::class, 'discharge'])->name('patients.discharge');
 Route::put('/patients/{id}/discharge', [PatientController::class, 'discharge'])->name('patients.discharge');
+Route::get('/doctor/admitted', [PatientController::class, 'admitted'])->name('doctor.admitted');
+Route::post('/doctor/discharge/{id}', [PatientController::class, 'discharge'])->name('doctor.discharge');
+//Route::post('/doctor/discharge/{id}', [DoctorController::class, 'discharge'])->name('doctor.discharge');
 
 // 📅 Timetable Routes
 Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');

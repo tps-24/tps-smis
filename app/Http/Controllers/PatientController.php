@@ -521,6 +521,76 @@ public function downloadStatisticsReport(Request $request, $timeframe)
     return $pdf->download('statistics_report.pdf');
 }
 
+public function admitted(Request $request)
+{
+    // Start the query properly
+    $query = Patient::with('student', 'excuseType')
+        ->whereHas('excuseType', function ($q) {
+            $q->where('excuse_type_id', 3);
+        })
+        ->whereIn('admitted_type', ['Referral', 'Internal']);
+
+    // Filter: Search by name
+    if ($request->filled('search')) {
+        $query->whereHas('student', function ($q) use ($request) {
+            $q->where('first_name', 'like', '%' . $request->search . '%')
+              ->orWhere('last_name', 'like', '%' . $request->search . '%');
+
+              
+        });
+    }
+
+    // Filter: Company
+    if ($request->filled('company_id')) {
+        $query->whereHas('student', function ($q) use ($request) {
+            $q->where('company_id', $request->company_id);
+        });
+    }
+
+    // Filter: From Date
+    if ($request->filled('from')) {
+        $query->whereDate('created_at', '>=', $request->from);
+    }
+
+    // Filter: To Date
+    if ($request->filled('to')) {
+        $query->whereDate('created_at', '<=', $request->to);
+    }
+
+    // Final list
+    $admittedPatients = $query->latest()->get();
+
+    // Sort by latest and paginate (10 per page)
+    $admittedPatients = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->all());
+    return view('doctor.admitted', compact('admittedPatients'));
+}
+
+public function discharge($id)
+{
+    $patient = Patient::findOrFail($id);
+
+    if ($patient->is_discharged) {
+        return redirect()->back()->with('error', 'Patient already discharged.');
+    }
+
+    $patient->is_discharged = true;
+    $patient->released_at = now();
+    $patient->save();
+
+
+     // Restore student's beat_status back to active (1)
+    if ($patient->student) {
+        $student = $patient->student;
+
+        // Only update if currently sick (beat_status = 0)
+        if ($student->beat_status == 0) {
+            $student->beat_status = 1; // assuming 1 is the active status (anaweza kuingia lindo)
+            $student->save();
+        }
+    }
+    return redirect()->back()->with('success', 'Patient discharged successfully.');
+}
+
 
 }
 

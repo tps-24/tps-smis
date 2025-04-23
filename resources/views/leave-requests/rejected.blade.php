@@ -5,7 +5,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="mb-0">Rejected Leave Requests</h5>
-        <a href="{{ route('leave-requests.index') }}" class="btn btn-secondary">
+        <a href="{{ route('leave-requests.chief-instructor') }}" class="btn btn-secondary">
             Back to Leave Requests
         </a>
     </div>
@@ -24,7 +24,7 @@
         <th>Reason</th>
         <th>Rejection Reason</th>
         <th>Rejected At</th>
-        <th>Action</th> <!-- New Column -->
+        <th>Action</th> 
     </tr>
 </thead>
 <tbody>
