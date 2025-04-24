@@ -18,8 +18,7 @@ class LeaveRequestController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-
-    
+        
         // Fetch staff record for the logged-in user
         $staff = $user->staff; 
     
@@ -217,11 +216,14 @@ public function downloadRejectedPdf($id)
 }
 public function exportSinglePdf($id)
 {
-    $leaveRequest = LeaveRequest::with('student')->findOrFail($id);
+    $leaveRequest = LeaveRequest::with(['student', 'company'])->findOrFail($id);
 
     $pdf = Pdf::loadView('leave-requests.pdf', compact('leaveRequest'));
-    return $pdf->download('leave-request.pdf');
 
+    return $pdf->download('leave-request.pdf');
 }
+
+
+
 
 }

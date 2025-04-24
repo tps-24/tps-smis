@@ -110,14 +110,18 @@
                         <td>{{ $patient->status ?? '-' }}</td>
                         <td>{{ optional($patient->excuseType)->excuseName ?? '-' }}</td>
                         <td>{{ $patient->rest_days ?? '-' }}</td>
-                        <td>{{ $patient->updated_at ?? '-' }}</td>
-                        <td>
-                            @if (!empty($patient->rest_days) && !empty($patient->created_at))
-                                {{ \Carbon\Carbon::parse($patient->created_at)->addDays($patient->rest_days)->format('Y-m-d') }}
-                            @else
-                                -
-                            @endif
-                        </td>
+                        <td>{{ $patient->created_at ?? '-' }}</td>
+                        <td>   
+                                   @if(optional($patient->excuseType)->excuseName === 'Admitted')
+                                   {{ $patient->released_at ?? 'Not yet discharged' }}
+                                   @elseif (!empty($patient->rest_days) && !empty($patient->created_at))
+                                  {{ \Carbon\Carbon::parse($patient->created_at)->addDays($patient->rest_days)->format('Y-m-d') }}
+                                  @else
+                                    -
+                                   @endif
+
+
+                                </td>
                     </tr>
                 @endforeach
             </tbody>

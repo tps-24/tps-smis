@@ -99,23 +99,7 @@
                     <td>{{ $student->company->name ?? 'N/A' }}</td>
                     <td>
                         
-                        <!-- <div class="modal fade" id="approvalModal{{ $student->id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Send for Approval: {{ $student->first_name }} {{ $student->last_name }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="{{ route('students.sendToReceptionist') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="student_id" value="{{ $student->id }}">
-                                            <button type="submit" class="btn btn-primary">Send to Receptionist</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
+                        
 
                         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

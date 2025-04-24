@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="col-sm-12">
+    <!-- Admitted Patients Button -->
+    <div class="mb-3">
+        <a href="{{ route('doctor.admitted') }}" class="btn btn-success">
+            View Admitted Patients
+        </a>
+    </div>
     <div class="card mb-3">
         <div class="card-header">
             <h5 class="card-title">Approved Patients</h5>
@@ -93,10 +99,14 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="mb-3">
+                                                            <!-- <div class="mb-3">
                                                                 <label class="form-label">Days of Rest</label>
                                                                 <input type="number" class="form-control" name="rest_days" min="0" required>
-                                                            </div>
+                                                            </div> -->
+                                                            <div class="mb-3 rest-days-group" id="restDaysGroup{{ $patient->id }}">
+                                                              <label class="form-label">Days of Rest</label>
+                                                              <input type="number" class="form-control" name="rest_days" min="0">
+                                                             </div>
 
                                                             <div class="mb-3">
                                                                 <label class="form-label">Doctor's Comment</label>
@@ -162,5 +172,25 @@
             });
         });
     });
+
+    document.querySelectorAll('.excuse-select').forEach(select => {
+    select.addEventListener('change', function () {
+        let patientId = this.getAttribute('data-patient-id');
+        let referralDiv = document.getElementById('referralOption' + patientId);
+        let restDaysGroup = document.getElementById('restDaysGroup' + patientId);
+        let selectedText = this.options[this.selectedIndex].text.trim().toLowerCase();
+
+        if (selectedText === 'admitted') {
+            referralDiv.classList.remove('d-none');
+            if (restDaysGroup) restDaysGroup.style.display = 'none';
+        } else {
+            referralDiv.classList.add('d-none');
+            if (restDaysGroup) restDaysGroup.style.display = 'block';
+        }
+    });
+});
+
 </script>
+
+
 @endsection

@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="container mx-auto p-6">
+<div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0">Rejected Leave Requests</h5>
+        <a href="{{ route('leave-requests.chief-instructor') }}" class="btn btn-secondary">
+            Back to Leave Requests
+        </a>
+    </div>
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <center><h2 class="text-3xl font-bold text-gray-800">Approved Leave Requests Details</h2></center>
