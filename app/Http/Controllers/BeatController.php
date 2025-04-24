@@ -71,7 +71,7 @@ class BeatController extends Controller
         $beat = Beat::find($beat_id);
         $beats = Beat::where('id', $beat_id)->get();
         $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
-        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8,9,10,11,12,13,14])->where('beat_round','<', 11)->where('beat_status', 1)->where('gender', "M")->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [8,9,10,11,12,13,14])->where('beat_round','<', 12)->where('beat_status', 1)->where('gender', "M")->get();
         return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
     }
 
@@ -329,8 +329,13 @@ class BeatController extends Controller
         $mid = floor($totalPlatoons->count() / 2);
         $groupA = $totalPlatoons->slice(0, $mid)->values();
         $groupB = $totalPlatoons->slice($mid)->values();
+        
         // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
-        $currentGroup = $groupB;
+        $groupBx = [8,9,10,11,12,13,14];
+
+        // Convert array into a Laravel Collection
+        $currentGroup = collect($groupBx);
+        // dd($currentGroup);
 
         // Fetch guard and patrol areas with proper time filters
         // $_guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());
@@ -738,7 +743,12 @@ class BeatController extends Controller
         $groupA = $totalPlatoons->slice(0, $mid)->values();
         $groupB = $totalPlatoons->slice($mid)->values();
         // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
-        $currentGroup = $groupB;
+        // $currentGroup = $groupB;
+        $groupBx = [8,9,10,11,12,13,14];
+
+        
+        // Convert array into a Laravel Collection
+        $currentGroup = collect($groupBx);
 
         // Group students by platoon in the current group
         $studentsByPlatoonInGroup = $eligibleStudents->whereIn('platoon', $currentGroup)->groupBy('platoon');

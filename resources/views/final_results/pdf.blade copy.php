@@ -4,25 +4,23 @@
     <style>
         
         .container {
-            width: 98%;
             display: flex;
             flex-direction: column;
-            justify-content: center !important;
-            align-items: center !important;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
             text-align: center;
             margin: 0;
-            margin-left:20px;
             font-size: 14px; /* Reduce font size */
         }
         .header, .details, .results-container, .row {
-            width: 98%;
+            width: 100%;
             margin: -20px 0;
         }
         table {
             margin: auto;
             border-collapse: collapse;
-            width: 98%;
+            width: 100%;
         }
         th, td {
             border: 1px solid black;
@@ -51,7 +49,10 @@
             height: 100%;
             box-sizing: border-box;
         } */
-
+        .container {
+            width: 100%;
+        }
+        
         .header {
             text-align: center;
             margin-bottom: 10px;
@@ -89,12 +90,12 @@
         }
         .results-container {
             display: table;
-            width: 98%;
+            width: 100%;
             margin-top:-50px !important;
         }
         .semester-table {
             display: table-cell;
-            width: 48%;
+            width: 49%;
             /* display: inline-block; */
         }
         .sem1{
@@ -106,7 +107,7 @@
         }
 
         .signature {
-            width: 95%;
+            width: 100%;
             display: flex;
             justify-content: space-between;
         }
@@ -129,8 +130,7 @@
         }
 
         .bottom-container {
-            width: 80%;
-            padding-left:9%;
+            width: 100%;
         }
         .col {
             display: inline-block;
@@ -219,74 +219,66 @@
         <h4>EXAMINATION RESULTS</h4>
 
         <div class="results-container">
-        <div class="semester-table sem1" style="float: left; width: 48%; margin-right: 2%;">
-            <h4>Semester I Results</h4>
-            <table style="margin-top: -15px;">
-                <thead>
-                    <tr>
-                        <th width="10%">Module Code</th>
-                        <th width="30%">Module Name</th>
-                        <th width="5%">Units</th>
-                        <th width="5%">Grade</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($student->finalResults as $result)
-                        @if($result->semester_id == 1)
-                            <tr>
-                                <td>{{ $result->course->courseCode ?? ''}}</td>
-                                <td>{{ $result->course->courseName ?? ''}}</td>
-                                <td>{{ $result->course->programmes->first()->pivot->credit_weight ?? '' }}</td>
-                                <td>{{ $result->grade ?? ''}}</td>
-                            </tr>
-                        @endif
-                    @endforeach
-                    <tr>
-                        <td colspan="2"><b>Semester I GPA:</b></td>
-                        <td colspan="2">{{ $student->semesterOneGPA }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="semester-table sem1">
+                <h4>Semester I Results</h4>
+                <table style="margin-top: -15px">
+                    <thead>
+                        <tr>
+                            <th width="10%">Module Code</th>
+                            <th width="30%">Module Name</th>
+                            <th width="5%">Units</th>
+                            <th width="5%">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($student->finalResults as $result)
+                            @if($result->semester_id == 1)
+                                <tr>
+                                    <td>{{ $result->course->courseCode ?? ''}}</td>
+                                    <td>{{ $result->course->courseName ?? ''}}</td>
+                                    <td>{{ $result->course->programmes->first()->pivot->credit_weight ?? '' }}</td>
+                                    <td>{{ $result->grade ?? ''}}</td>
+                                </tr>
+                            @endif
+                        @endforeach
+                        <tr>
+                            <td colspan="2"><b>Semester I GPA:</b></td>
+                            <td colspan="2">{{ $student->semesterOneGPA }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="semester-table sem2">
+                <h4>Semester II Results</h4>
+                <table style="margin-top: -15px">
+                    <thead>
+                        <tr>
+                            <th>Module Code</th>
+                            <th>Module Name</th>
+                            <th>Units</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($student->finalResults as $result)
+                            @if($result->semester_id == 2)
+                                <tr>
+                                    <td>{{ $result->course->courseCode ?? ''}}</td>
+                                    <td>{{ $result->course->courseName ?? ''}}</td>
+                                    <td>{{ $result->course->programmes->first()->pivot->credit_weight ?? '' }}</td>
+                                    <td>{{ $result->grade ?? ''}}</td>
+                                </tr>
+                            @endif
+                        @endforeach
+                        <tr>
+                            <td colspan="2"><b>Semester II GPA:</b></td>
+                            <td colspan="2">{{ $student->semesterTwoGPA }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <div class="semester-table sem2" style="float: right; width: 48%;">
-            <h4>Semester II Results</h4>
-            <table style="margin-top: -15px;">
-                <thead>
-                    <tr>
-                        <th width="10%">Module Code</th>
-                        <th width="30%">Module Name</th>
-                        <th width="5%">Units</th>
-                        <th width="5%">Grade</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($student->finalResults as $result)
-                        @if($result->semester_id == 2)
-                            <tr>
-                                <td>{{ $result->course->courseCode ?? ''}}</td>
-                                <td>{{ $result->course->courseName ?? ''}}</td>
-                                <td>{{ $result->course->programmes->first()->pivot->credit_weight ?? '' }}</td>
-                                <td>{{ $result->grade ?? ''}}</td>
-                            </tr>
-                        @endif
-                    @endforeach
-
-                    <tr>
-                        <td colspan="4" style="padding: 3px 0;"> <!-- Match the padding with other rows -->
-                            &nbsp; <!-- Non-breaking space to ensure consistent height -->
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td colspan="2"><b>Semester II GPA:</b></td>
-                        <td colspan="2">{{ $student->semesterTwoGPA }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
 
     <div class="bottom-container">
         <div class="col text-left signature">
@@ -297,6 +289,9 @@
             <p>{{ now()->toDateString() }}</p>
             <p>Date of Issue</p>
         </div>
+    </div>
+</div>
+
     </div>
 
     <div style="page-break-after: always;"></div>
