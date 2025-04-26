@@ -27,7 +27,7 @@ class BulkImportStudents implements ToCollection, ToModel
     {
         $this->num++;
 
-        if ($this->num > 5) {
+        if ($this->num > 1) {
             if (empty($row[1])) {
                 Log::warning("Skipped row due to missing first name: " . json_encode($row));
                 return;
@@ -62,6 +62,7 @@ class BulkImportStudents implements ToCollection, ToModel
                 $student->next_kin_names = $row[16];
                 $student->next_kin_phone = $row[17];
                 $student->religion = $row[21];
+                $student->beat_status = 0;
 
                 // Save student record first
                 $student->save();

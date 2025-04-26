@@ -16,11 +16,13 @@
         }
 
         .certificate-image img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%; /* Stretch the image to fill the entire page width */
-            height: 100%; /* Stretch the image to fill the entire page height */
+            position: relative; /* Ensure proper positioning */
+            display: flex; /* Enables flexbox layout */
+            justify-content: center; /* Centers horizontally */
+            align-items: center; /* Centers vertically */
+            width: 100%; /* Stretch the image to fill most of the page width */
+            height: 98%; /* Stretch the image to fill most of the page height */
+            margin-top:13px;
             object-fit: cover; /* Ensures the image maintains proportions */
             loading: lazy; /* Improve loading performance for the image */
         }
@@ -78,7 +80,7 @@
                 held at <strong>Tanzania Police School-Moshi</strong>
             </p>
             <p>
-                From <strong>10 December 2024</strong> to <strong>07 March 2025</strong>.
+                From <strong>19 March 2025</strong> to <strong>30 May 2025</strong>.
             </p>
             <p style="text-align:left; margin-top:30px !important; font-size: 22px;"><i>The following subjects were completed:-</i></p>
             
