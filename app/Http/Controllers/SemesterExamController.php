@@ -91,4 +91,24 @@ class SemesterExamController extends Controller
     {
         //
     }
+
+    public function semExams($semesterId, $courseId)
+    {
+        Log::info("Fetching semester exam for semester ID: {$semesterId} and course Id: {$courseId} ");
+        
+        if (!$courseId) {
+            return response()->json(['error' => 'Course ID not found in session'], 400);
+        }
+    
+        // Find the semester
+        $semester = Semester::findOrFail($semesterId);
+    
+        // Retrieve semester exam filtered by both semester_id and course_id
+        $courseworks = SemesterExam::where('semester_id', $semesterId)
+            ->where('course_id', $courseId)
+            ->get(['id', 'coursework_title']);
+    
+        return response()->json($courseworks);
+    }
+
 }
