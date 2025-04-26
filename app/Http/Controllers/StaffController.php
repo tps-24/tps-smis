@@ -15,6 +15,8 @@ use Spatie\Permission\Models\Role;
 use Illuminate\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Http\RedirectResponse;
+use App\Http\Controllers\StaffController;
+
 use DB;
 use Hash;
 use Auth;
@@ -148,17 +150,17 @@ class StaffController extends Controller
     /**
      * Display the CV for a specific staff member.
      */
-    public function resume()
-    {
-        $id=1;
-            $staff = Staff::with('department')->find(1);
+    // public function resume1()
+    // {
+    //     $id=1;
+    //         $staff = Staff::with('department')->find(1);
         
-            if (!$staff) {
-                return abort(404, 'Staff member not found.');
-            }
+    //         if (!$staff) {
+    //             return abort(404, 'Staff member not found.');
+    //         }
         
-            return view('staffs.resume', compact('staff'));        
-    }
+    //         return view('staffs.resume', compact('staff'));        
+    // }
 
     /**
      * Show the form for editing the specified resource.
@@ -293,4 +295,15 @@ class StaffController extends Controller
         ->with('i', ($request->input('page', 1) - 1) * 10);
 
     }
+    public function generateResume($id)
+    {
+        $staff = Staff::findOrFail($id);
+        return view('staffs.resume', compact('staff'));
+    }
+    
+
+    
+    
+    
+
 }

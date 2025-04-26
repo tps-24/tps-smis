@@ -43,6 +43,7 @@ use App\Http\Controllers\SafariStudentController;
 use App\Http\Controllers\LeaveRequestController; 
 use App\Http\Controllers\CertificateController;
 use Carbon\Carbon;
+use App\Http\Controllers\ResumeController;
 
 
 require __DIR__ . '/auth.php';
@@ -522,3 +523,5 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
     Route::get('/leave-requests/rejected', [LeaveRequestController::class, 'rejected'])->name('leave-requests.rejected');
     Route::get('/leave-requests/{id}/rejected-pdf', [LeaveRequestController::class, 'downloadRejectedPdf'])->name('leave-requests.rejected.pdf');
     
+
+Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->name('staffs.resume');
