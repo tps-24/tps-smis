@@ -48,7 +48,8 @@
             </div>
 
             <div class="d-flex justify-content-end mt-3">
-              <button class="btn btn-danger me-2">Edit Profile</button>
+            <a href="{{ route('staffs.resume', $staff->id) }}" class="btn btn-primary me-2">Resume</a>
+            <button class="btn btn-danger me-2">Edit Profile</button>
               <button class="btn btn-success">Active</button> 
             </div>
           </div>

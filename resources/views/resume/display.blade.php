@@ -81,7 +81,6 @@
 @endsection
 
 @section('content')
-<div id="printArea">
 <div class="row gx-4">
     <div class="col-sm-12 col-12">
         <div class="card mb-4 p-4">
@@ -136,30 +135,20 @@
     </div>
 </div>
 <div class="text-end">
-<a href="{{ url()->previous() }}" class="btn btn-secondary me-2">← Back</a>
-
             <button class="btn btn-primary btn-print" onclick="printDiv()">Print / Export to PDF</button>
         </div>
     </div>
 </div>
 
 <!-- Print Script -->
-@section('scripts')
 <script>
     function printDiv() {
         const printContents = document.getElementById('printArea').innerHTML;
         const originalContents = document.body.innerHTML;
-
         document.body.innerHTML = printContents;
         window.print();
-
-        // Use setTimeout to give the print dialog time to finish before resetting
-        setTimeout(() => {
-            document.body.innerHTML = originalContents;
-            location.reload(); 
-        }, 1000);
+        document.body.innerHTML = originalContents;
+        location.reload(); // to reset after printing
     }
 </script>
-@endsection
-
 @endsection
