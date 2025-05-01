@@ -170,8 +170,10 @@ class FinalResultController extends Controller
         
         $students = Student::whereIn('id', $selectedStudentIds)->with('finalResults')->with('admittedStudent')->get();
 
-        // dd($students);
-        
+         //dd($students);
+        // dd($this->finalResultService->calculateFinalResult(
+        //     '513','2','4'
+        // ));
         // Query data from 'final_results' table and process certificates
         // Generate and return PDF with selected students' certificates
         

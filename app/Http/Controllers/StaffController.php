@@ -16,6 +16,9 @@ use Illuminate\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\StaffController;
+use App\Models\EducationLevel;
+use App\Models\School;
+use App\Models\WorkExperience;
 
 use DB;
 use Hash;
@@ -29,7 +32,7 @@ class StaffController extends Controller
          $this->middleware('permission:staff-create', ['only' => ['create','store','import']]);
          $this->middleware('permission:staff-edit', ['only' => ['edit','update','updateProfile']]);
          $this->middleware('permission:staff-delete', ['only' => ['destroy']]);
-         $this->middleware('permission:staff-view', ['only' => ['profile','view']]);
+         $this->middleware('permission:staff-view|profile-list', ['only' => ['profile','view']]);
     }
 
     /**
@@ -295,15 +298,150 @@ class StaffController extends Controller
         ->with('i', ($request->input('page', 1) - 1) * 10);
 
     }
-    public function generateResume($id)
+
+    public function generateResume()
     {
-        $staff = Staff::findOrFail($id);
+        $staff = Staff::findOrFail(1);
         return view('staffs.resume', compact('staff'));
     }
     
+    public function generateResumexx($id)
+    {
+        // Fetch the staff record and its associated user
+        $staff = Staff::with('user')->findOrFail($id);
 
-    
-    
-    
+        // Fetch related data using the user relation
+        $user = $staff->user;
 
+        $workExperiences = $user->workExperiences; // Use user_id to fetch work experiences
+        $computerLiteracies = $user->computerLiteracies; // Fetch computer literacy details
+        $languageProficiencies = $user->languageProficiencies; // Fetch language proficiencies
+        $trainingsAndWorkshops = $user->trainingsAndWorkshops; // Fetch trainings and workshops
+        $referees = $user->referees; // Fetch referees
+
+        // Pass all data to the view
+        return view('staffs.resume', compact(
+            'staff', 
+            'workExperiences', 
+            'computerLiteracies', 
+            'languageProficiencies', 
+            'trainingsAndWorkshops', 
+            'referees'
+        ));
+    }
+
+    public function create_cv($staff_id){
+        $staff = Staff::find($staff_id);
+        $education_levels = EducationLevel::all();
+        return view('staffs.create_cv', compact('staff', 'education_levels'));
+    }
+
+    public function update_cv(Request $request, $staff_id){
+        $staff = Staff::find($staff_id);
+        $education_levels = EducationLevel::all();
+        $request->validate([
+            'father_names' => 'null|string',
+            'father_ward_of_birth' => 'required_if:father_names,!null|string',
+            'father_district_of_birth' => 'required_if:father_names,!null|string',
+            'father_region_of_birth' => 'required_if:father_names,!null|string',
+        ]);
+        $staff-> fatherParticulars = [
+            'names'=> $request-> father_names,
+            'villageOfBirth' => $request-> father_village_of_birth,
+            'wardOfBirth' => $request-> father_ward_of_birth,
+            'districtOfBirth' => $request-> father_district_of_birth,
+            'regionOfBirth' => $request-> father_region_of_birth,
+        ];
+
+        $staff-> motherParticulars = [
+            'names'=> $request-> mother_names,
+            'villageOfBirth' => $request-> mother_village_of_birth,
+            'wardOfBirth' => $request-> mother_ward_of_birth,
+            'districtOfBirth' => $request-> mother_district_of_birth,
+            'regionOfBirth' => $request-> mother_region_of_birth,
+        ];
+        $staff-> parentsAddress = [
+            'village'=> $request-> parentsVillage,
+            'ward' => $request-> parentsWard,
+            'district' => $request-> parentsDistrict,
+            'region' => $request-> parentsRegion,
+        ];
+        $staff->save();
+        return $staff;
+        return view('staffs.create_cv', compact('staff', 'education_levels'));
+    }
+
+    public function update_school_cv(Request $request, $staff_id){
+        //return $request->all();
+        $staff = Staff::find($staff_id);
+        if($request->primary_school_name){
+            $school = School::create([
+                'staff_id' => $staff_id,
+                'name' =>$request->primary_school_name,
+                'education_level_id' =>1,
+                'admission_year' =>$request->primary_school_YoA,
+                'graduation_year' =>$request->primary_school_YoG,
+                'award' =>$request->primary_school_ward,
+                'village' =>$request->primary_school_village,
+                'district' =>$request->primary_school_district,
+                'region' =>$request->primary_school_region
+            ] );            
+        }
+
+        if($request->secondary_school_name){
+            $school = School::create([
+                'staff_id' => $staff_id,
+                'name' =>$request->secondary_school_name,
+                'education_level_id' =>2,
+                'admission_year' =>$request->secondary_school_YoA,
+                'graduation_year' =>$request->secondary_school_YoG,
+                'award' =>$request->secondary_school_ward,
+                'village' =>$request->secondary_school_village,
+                'district' =>$request->secondary_school_district,
+                'region' =>$request->secondary_school_region
+            ] );            
+        }
+
+        if($request->colleges_name){
+            $school = School::create([
+                'staff_id' => $staff_id,
+                'name' =>$request->colleges_name,
+                'education_level_id' =>4,
+                'admission_year' =>$request->colleges_YoA,
+                'graduation_year' =>$request->colleges_YoG,
+                'duration' =>$request->duration,
+                'country' =>$request->colleges_name_region,
+                'award' =>$request->colleges_award,
+                'region' =>$request->colleges_name_region,
+            ] );            
+        }
+
+        if($request->venue){
+            $school = School::create([
+                'staff_id' => $staff_id,
+                'name' =>$request->college,
+                'education_level_id' =>5,
+                'duration' =>$request->duration,
+                'country' =>$request->colleges_name_region,
+                'award' =>$request->award,
+                'venue' =>$request->venue,
+            ] );            
+        }
+        return "Ok";
+    }
+    public function update_work_experience(Request $request, $staff_id){
+        $staff = Staff::find($staff_id);
+        WorkExperience::create([
+            'user_id' =>$staff->id,
+            'institution'=> $request->institution,
+            'address'=> $request->address,
+            'job_title'=> $request->job_title,
+            'position' => $request->position, 
+            'start_date' =>  $request->start_date,
+            'end_date' => $request->end_date,
+            'address' => $request->address,
+            'duties' => json_encode($request->duties),
+        ]);
+        return $request->all();
+    }
 }

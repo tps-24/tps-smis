@@ -21,6 +21,7 @@ class Staff extends Model
             'gender',
             'DoB',
             'maritalStatus',
+            'fatherParticulars',
             'religion',
             'tribe',
             'phoneNumber',
@@ -61,5 +62,14 @@ class Staff extends Model
             return in_array(strtolower($this->role), array_map('strtolower', $roles));
         }
         return strtolower($this->role) === strtolower($roles);
+    }
+
+    public function schools()
+    {
+        return $this->hasMany(School::class);
+    }
+    public function work_experiences()
+    {
+        return $this->hasMany(WorkExperience::class,'user_id');
     }
 }

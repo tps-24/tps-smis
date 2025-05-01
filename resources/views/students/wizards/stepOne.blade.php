@@ -56,7 +56,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc4">Rank</label>
-                        <select class="form-select" id="abc4" name="rank" required
+                        <select class="form-select" id="abc4" name="rank"
                             aria-label="Default select example">
                             <option value="default_value" {{ old('rank', 'default_value') == 'default_value' ? 'selected' : '' }} disabled>Select rank</option>
                             <!-- <option @if(isset($student) && $student->rank == "Recruit") selected @endif value="Recruit" {{ old('rank', 'default_value') == 'Recruit' ? 'selected' : '' }}>Basic Recruit</option> -->
@@ -121,7 +121,7 @@
                 <div class="card-body">
                     <div class="m-0">
                         <label class="form-label" for="abc4">Education Level</label>
-                        <select class="form-select" id="abc4" name="education_level" value="{{old('education_level')}}" required
+                        <select class="form-select" id="abc4" name="education_level" value="{{old('education_level')}}"
                             aria-label="Default select example">
                             <option value = "" selected disabled >select education</option>
                             <option @if(isset($student) && $student->education_level == "Form Four") selected @endif

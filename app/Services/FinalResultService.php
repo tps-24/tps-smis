@@ -12,19 +12,19 @@ class FinalResultService
     {
         // Check if there are any coursework results or exam results
         $hasCourseworkResults = CourseworkResult::where('student_id', $studentId)
-                                                 ->where('semester_id', $semesterId)
+                                                 //->where('semester_id', $semesterId)
                                                  ->whereHas('coursework', function ($query) use ($courseId) {
                                                      $query->where('course_id', $courseId);
                                                  })
                                                  ->exists();
-
         $hasExamResults = SemesterExamResult::where('student_id', $studentId)
-                                            ->where('semester_id', $semesterId)
-                                            ->whereHas('exam', function ($query) use ($courseId) {
+                                            ->where('semester_exam_id', $semesterId)
+                                            ->whereHas('semesterExam', function ($query) use ($courseId) {
                                                 $query->where('course_id', $courseId);
                                             })
                                             ->exists();
 
+        return   $hasCourseworkResults;                                      
         // If there are no coursework results or exam results, mark as Incomplete
         if (!$hasCourseworkResults || !$hasExamResults) {
             return [

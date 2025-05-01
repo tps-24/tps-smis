@@ -2,164 +2,367 @@
 
 @section('style')
 <style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        line-height: 1.6;
-        background-color: #f9f9f9;
-    }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f9f9f9;
+}
 
-    .card {
-        border: none;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
-    }
+.card {
+    border: none;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+}
 
-    .header {
-        text-align: center;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #eee;
-    }
+.header {
+    background-color: rgba(210, 219, 228, 0.45);
+    /* text-align: center; */
+    margin-bottom: 20px;
+    padding: 50px 0 50px 0;
+    border-bottom: 2px solid #eee;
+}
 
-    .header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 5px;
-    }
+.header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
 
-    .header p {
-        color: #7f8c8d;
-        margin-bottom: 2px;
-    }
+.header p {
+    color: #7f8c8d;
+    margin-bottom: 2px;
+}
 
-    .photo img {
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
+.photo img {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
 
-    .section {
-        margin-top: 30px;
-        padding: 15px 20px;
-        border-left: 5px solid #2c3e50;
-        background-color: #fdfdfd;
-        border-radius: 8px;
-    }
+.section {
+    margin-top: 30px;
+    padding: 15px 20px;
+    border-left: 5px solid #2c3e50;
+    background-color: #fdfdfd;
+    border-radius: 8px;
+}
 
-    .section h2 {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #2c3e50;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 5px;
-        margin-bottom: 15px;
-    }
+.section h2 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
 
-    .section p {
-        margin-bottom: 8px;
-        font-size: 0.95rem;
-    }
+.section p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
 
-    .section p strong {
-        color: #34495e;
-    }
+.section p strong {
+    color: #34495e;
+}
 
-    @media only screen and (min-width: 576px) {
-        #pfno {
-            margin-left: 12.5% !important;
-            background-color: red;
-        }
+@media only screen and (min-width: 576px) {
+    #pfno {
+        margin-left: 12.5% !important;
+        background-color: red;
     }
+}
 
-    @media only screen and (max-width: 600px) {
-        .abcd {
-            font-size: 15px !important;
-        }
+@media only screen and (max-width: 600px) {
+    .abcd {
+        font-size: 15px !important;
     }
+}
+
+.bottom-line {
+    border-bottom: 2px solid rgba(61, 91, 122, 0.4);
+    margin: 0 10% 0 10%;
+    width: 80%;
+}
 </style>
 @endsection
 
-@section('content')
-<div id="printArea">
-<div class="row gx-4">
-    <div class="col-sm-12 col-12">
-        <div class="card mb-4 p-4">
-            <div class="card-body">
-                <div class="header">
-                    <h1>{{ $staff->firstName }} {{ $staff->middleName }} {{ $staff->lastName }}</h1>
-                    <p>{{ $staff->email }} | {{ $staff->phoneNumber }}</p>
-                    <p>{{ $staff->currentAddress }}</p>
-                    @if ($staff->photo)
-                        <div class="photo mt-3">
-                            <img src="{{ asset($staff->photo) }}" alt="Photo" height="100">
-                        </div>
-                    @endif
-                </div>
-
-                <div class="section">
-                    <h2>Personal Details</h2>
-                    <p><strong>Force Number:</strong> {{ $staff->forceNumber }}</p>
-                    <p><strong>Date of Birth:</strong> {{ $staff->DoB }}</p>
-                    <p><strong>Gender:</strong> {{ $staff->gender }}</p>
-                    <p><strong>Marital Status:</strong> {{ $staff->maritalStatus }}</p>
-                    <p><strong>Religion:</strong> {{ $staff->religion }}</p>
-                    <p><strong>Tribe:</strong> {{ $staff->tribe }}</p>
-                </div>
-
-                <div class="section">
-                    <h2>Professional Details</h2>
-                    <p><strong>Rank:</strong> {{ $staff->rank }}</p>
-                    <p><strong>Department:</strong> {{ $staff->department->name ?? 'N/A' }}</p>
-                    <p><strong>Designation:</strong> {{ $staff->designation }}</p>
-                    <p><strong>Contract Type:</strong> {{ $staff->contractType }}</p>
-                    <p><strong>Joining Date:</strong> {{ $staff->joiningDate }}</p>
-                    <p><strong>Location:</strong> {{ $staff->location }}</p>
-                </div>
-
-                <div class="section">
-                    <h2>Education</h2>
-                    <p><strong>Level:</strong> {{ $staff->educationLevel }}</p>
-                </div>
-
-                <div class="section">
-                    <h2>Additional Details</h2>
-                    <p><strong>Profile Complete:</strong> {{ $staff->profile_complete ? 'Yes' : 'No' }}</p>
-                </div>
-
-                <div class="section">
-                    <h2>Other Information</h2>
-                    <p>Add any custom details here...</p>
-                </div>
-            </div>
-        </div>
+@section('scrumb')
+<!-- Scrumb starts -->
+<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Staffs</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a href="#">Staff Curriculum Vitae (CV)</a></li>
+            </ol>
+        </nav>
     </div>
-</div>
-<div class="text-end">
-<a href="{{ url()->previous() }}" class="btn btn-secondary me-2">← Back</a>
-
-            <button class="btn btn-primary btn-print" onclick="printDiv()">Print / Export to PDF</button>
-        </div>
-    </div>
-</div>
-
-<!-- Print Script -->
-@section('scripts')
-<script>
-    function printDiv() {
-        const printContents = document.getElementById('printArea').innerHTML;
-        const originalContents = document.body.innerHTML;
-
-        document.body.innerHTML = printContents;
-        window.print();
-
-        // Use setTimeout to give the print dialog time to finish before resetting
-        setTimeout(() => {
-            document.body.innerHTML = originalContents;
-            location.reload(); 
-        }, 1000);
-    }
-</script>
+</nav>
+<!-- Scrumb ends -->
 @endsection
+
+
+@section('content')
+<div class="d-flex justify-content-center">
+    <h2>CURRICULUM VITAE - {{$staff->forceNumber}}</h2>
+</div>
+<div class="" style="padding: 0 15% 0 15%">
+    <h3>(A) PERSONAL PARTICULARS</h3><br><br>
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>Surname</th>
+                <td>{{$staff->lastName}}</td>
+            </tr>
+            <tr>
+                <th>First Name</th>
+                <td>{{$staff->firstName}}</td>
+            </tr>
+            <tr>
+                <th>Middle Name</th>
+                <td>{{$staff->middleName}}</td>
+            </tr>
+            <tr>
+                <th>Sex</th>
+                <td>{{$staff->gender}}</td>
+            </tr>
+            <tr>
+                <th>Date of Birth</th>
+                <td>{{$staff->DoB}}</td>
+            </tr>
+            <tr>
+                <th>Nationality</th>
+                <td>{{$staff->nationality}}</td>
+            </tr>
+            <tr>
+                <th>Marital Status</th>
+                <td>{{$staff->maritalStatus}}</td>
+            </tr>
+            <!-- father's details -->
+            <tr>
+                <th>Father's Names</th>
+                <td>ATHMANI MUNGI KIDANGI</td>
+            </tr>
+            <tr>
+                <th rowspan="4">Father's place of birth</th>
+                <td><strong>Village: </strong>DUTHUMI</td>
+            </tr>
+            <tr>
+                <td><strong>Ward: </strong>BWAKIRA CHINI</td>
+            </tr>
+            <tr>
+                <td><strong>District: </strong>MOROGORO</td>
+            </tr>
+            <tr>
+                <td><strong>Region: </strong>MOROGORO</td>
+            </tr>
+
+            <!-- mother's details -->
+            <tr>
+                <th>Mother's Names</th>
+                <td>ZAINA MOHAMED KIGEDELE</td>
+            </tr>
+            <tr>
+                <th rowspan="4">Mother's place of birth</th>
+                <td><strong>Village: </strong>DAKAWA</td>
+            </tr>
+            <tr>
+                <td><strong>Ward: </strong>BWAKIRA CHINI</td>
+            </tr>
+            <tr>
+                <td><strong>District: </strong>MOROGORO</td>
+            </tr>
+            <tr>
+                <td><strong>Region: </strong>MOROGORO</td>
+            </tr>
+
+            <!-- current parent address -->
+
+            <tr>
+                <th rowspan="4">Parent current address</th>
+                <td><strong>Village: </strong>DUTHUMI</td>
+            </tr>
+            <tr>
+                <td><strong>Ward: </strong>BWAKIRA CHINI</td>
+            </tr>
+            <tr>
+                <td><strong>District: </strong>MOROGORO</td>
+            </tr>
+            <tr>
+                <td><strong>Region: </strong>MOROGORO</td>
+            </tr>
+
+            <tr>
+                <th>Place of domicile(District)</th>
+                <td>MOROGORO</td>
+            </tr>
+
+            <tr>
+                <th>Languages</th>
+                <td>{{$staff->language}}</td>
+            </tr>
+            <tr>
+                <th>Address</th>
+                <td>{{$staff->currentAddress}}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{$staff->email}}</td>
+            </tr>
+            <tr>
+                <th>Mobile</th>
+                <td>{{$staff->phoneNumber}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>(B) EDUCATION AND TRAINING</h3><br><br>
+    <h3>1. Primary Schools</h3><br><br>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name of school</th>
+                <th>Village</th>
+                <th>District</th>
+                <th>Year of Admission</th>
+                <th>Year of graduation</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if ($staff->schools)
+            @foreach ($staff->schools as $school)
+            @if ($school->education_level_id == 1)
+            <tr>
+                <td>{{ $school->name }}</td>
+                <td>{{ $school->village }}</td>
+                <td>{{ $school->district }}</td>
+                <td>{{ $school->admission_year }}</td>
+                <td>{{ $school->graduation_year }}</td>
+            </tr>
+            @endif
+            @endforeach
+            @endif
+        </tbody>
+    </table>
+
+    <h3>2. Secondary Schools</h3><br><br>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name of school</th>
+                <th>Village</th>
+                <th>District</th>
+                <th>Year of Admission</th>
+                <th>Year of graduation</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if ($staff->schools)
+            @foreach ($staff->schools as $school)
+            @if ($school->education_level_id == 2 || $school->education_level_id == 3)
+            <tr>
+                <td>{{$school->education_level->name}}</td>
+                <td>{{ $school->name }}</td>
+                <td>{{ $school->village }}</td>
+                <td>{{ $school->district }}</td>
+                <td>{{ $school->admission_year }}</td>
+                <td>{{ $school->graduation_year }}</td>
+            </tr>
+            @endif
+            @endforeach
+            @endif
+        </tbody>
+    </table>
+
+    <h3>3. Colleges</h3><br><br>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>College/University</th>
+                <th>Duration</th>
+                <th>Region/country</th>
+                <th>Award</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if ($staff->schools)
+            @foreach ($staff->schools as $school)
+            @if ($school->education_level_id == 4)
+            <tr>
+                <td>{{ $school->name }}</td>
+                <td>{{ $school->duration }}</td>
+                <td>{{ $school->country }}</td>
+                <td>{{ $school->award }}</td>
+            </tr>
+            @endif
+            @endforeach
+            @endif
+        </tbody>
+    </table>
+
+    <h3>(C) OTHER COURSES</h3><br><br>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td></td>
+                <td>Duration</td>
+                <td>Theme and Award</td>
+                <td>College/Organization</td>
+                <td>Venue</td>               
+            </tr>
+
+        </thead>
+        <tbody>
+        @if ($staff->schools)
+            @foreach ($staff->schools as $school)
+            @if ($school->education_level_id == 5)
+            <tr>
+                <td></td>
+                <td>{{ $school->duration }}</td>
+                <td>{{ $school->award }}</td>
+                <td>{{ $school->name }}</td>
+                <td>{{ $school->venue }}</td>
+            </tr>
+            @endif
+            @endforeach
+            @endif
+        </tbody>
+    </table>
+
+    <h3>(D) WORK AND EXPERIENCE</h3><br><br>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>S/NO</td>
+                <td>Year</td>
+                <td>Organization</td>
+                <td>Location</td>
+                <td>Position</td>   
+                <td>Duties</td>            
+            </tr>
+
+        </thead>
+        <tbody>
+        @php
+            $i = 0;
+        @endphp
+        @if ($staff->work_experiences)
+            @foreach ($staff->work_experiences as $work_experience)
+            <tr>
+                <td>{{++$i}}</td>
+                <td>{{ substr($work_experience->start_date, 0, 4)}} - {{ substr($work_experience->end_date, 0, 4)}}</td>
+                <td>{{ $work_experience->institution }}</td>
+                <td>{{ $work_experience->address }}</td>
+                <td>{{ $work_experience->position }}</td>
+                <td>{{ $work_experience->duties }}
+            </tr>
+            @endforeach
+            @endif
+        </tbody>
+    </table>
+</div>
 
 @endsection

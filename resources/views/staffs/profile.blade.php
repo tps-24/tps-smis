@@ -48,6 +48,7 @@
             </div>
 
             <div class="d-flex justify-content-end mt-3">
+            <a href="{{route('staff.create-cv', ['staffId'=> $user->staff->id])}}" class="btn btn-secondary me-2">Edit CV</a>
               <button class="btn btn-danger me-2">Edit Profile</button>
               <button class="btn btn-success">Active</button> 
             </div>

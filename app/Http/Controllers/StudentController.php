@@ -579,8 +579,8 @@ class StudentController extends Controller
             'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'middle_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'home_region' => 'nullable|string|min:4',
-            'rank' => 'required',
-            'education_level' => 'required',
+            // 'rank' => 'required',
+            // 'education_level' => 'required',
         ]);
         $companies = Company::all();
         if (empty($request->session()->get('student'))) {
