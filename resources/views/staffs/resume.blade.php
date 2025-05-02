@@ -106,11 +106,16 @@ body {
 
 @section('content')
 <div class="d-flex justify-content-center">
-    <h2>CURRICULUM VITAE - {{$staff->forceNumber}}</h2>
+    <h2>{{$staff->forceNumber}} {{$staff->rank}} {{substr($staff->firstName,0,1)}}.{{substr($staff->middleName,0,1)}}
+        {{$staff->lastName}} - CV</h2>
+</div>
+<div class="d-flex justify-content-between">
+    <a href="{{route('staff.create-cv', ['staffId' => $staff->id])}}" class="btn btn-secondary">Edit</a>
+    <a href="{{route('staff.generateResumeePdf', ['staffId' => $staff->id])}}" class="btn btn-success">Print</a>
 </div>
 <div class="" style="padding: 0 15% 0 15%">
     <h3>(A) PERSONAL PARTICULARS</h3><br><br>
-    <table class="table table-bordered">
+    <table class="table table-sm table-bordered">
         <tbody>
             <tr>
                 <th>Surname</th>
@@ -141,62 +146,73 @@ body {
                 <td>{{$staff->maritalStatus}}</td>
             </tr>
             <!-- father's details -->
+            @php
+                    $fatherParticulars = $staff->fatherParticulars == null? null :
+                    json_decode($staff->fatherParticulars);
+                    @endphp
             <tr>
                 <th>Father's Names</th>
-                <td>ATHMANI MUNGI KIDANGI</td>
+                <td>{{$fatherParticulars[0]?? null}}</td>
             </tr>
             <tr>
                 <th rowspan="4">Father's place of birth</th>
-                <td><strong>Village: </strong>DUTHUMI</td>
+                <td><strong>Village: </strong>{{$fatherParticulars[1]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>Ward: </strong>BWAKIRA CHINI</td>
+                <td><strong>Ward: </strong>{{$fatherParticulars[2]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>District: </strong>MOROGORO</td>
+                <td><strong>District: </strong>{{$fatherParticulars[3]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>Region: </strong>MOROGORO</td>
+                <td><strong>Region: </strong>{{$fatherParticulars[4]?? null}}</td>
             </tr>
 
             <!-- mother's details -->
+            @php    
+                $motherParticulars = $staff->motherParticulars == null? null :
+                json_decode($staff->motherParticulars);//dd($motherParticulars );
+            @endphp
             <tr>
                 <th>Mother's Names</th>
-                <td>ZAINA MOHAMED KIGEDELE</td>
+                <td>{{$motherParticulars[0]?? null}}</td>
             </tr>
             <tr>
                 <th rowspan="4">Mother's place of birth</th>
-                <td><strong>Village: </strong>DAKAWA</td>
+                <td><strong>Village: </strong>{{$motherParticulars[1]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>Ward: </strong>BWAKIRA CHINI</td>
+                <td><strong>Ward: </strong>{{$motherParticulars[2]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>District: </strong>MOROGORO</td>
+                <td><strong>District: </strong>{{$motherParticulars[3]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>Region: </strong>MOROGORO</td>
+                <td><strong>Region: </strong>{{$motherParticulars[4]?? null}}</td>
             </tr>
 
             <!-- current parent address -->
-
+            @php
+                $parentsAddress = $staff->parentsAddress == null? null :
+                json_decode($staff->parentsAddress);
+                @endphp
             <tr>
                 <th rowspan="4">Parent current address</th>
-                <td><strong>Village: </strong>DUTHUMI</td>
+                <td><strong>Village: </strong>{{$parentsAddress[0]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>Ward: </strong>BWAKIRA CHINI</td>
+                <td><strong>Ward: </strong>{{$parentsAddress[1]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>District: </strong>MOROGORO</td>
+                <td><strong>District: </strong>{{$parentsAddress[2]?? null}}</td>
             </tr>
             <tr>
-                <td><strong>Region: </strong>MOROGORO</td>
+                <td><strong>Region: </strong>{{$parentsAddress[3]?? null}}</td>
             </tr>
 
             <tr>
                 <th>Place of domicile(District)</th>
-                <td>MOROGORO</td>
+                <td>{{ $staff->PoD }}</td>
             </tr>
 
             <tr>
@@ -220,7 +236,7 @@ body {
 
     <h3>(B) EDUCATION AND TRAINING</h3><br><br>
     <h3>1. Primary Schools</h3><br><br>
-    <table class="table table-bordered">
+    <table class="table table-sm table-bordered">
         <thead>
             <tr>
                 <th>Name of school</th>
@@ -248,7 +264,7 @@ body {
     </table>
 
     <h3>2. Secondary Schools</h3><br><br>
-    <table class="table table-bordered">
+    <table class="table table-sm table-bordered">
         <thead>
             <tr>
                 <th></th>
@@ -278,7 +294,7 @@ body {
     </table>
 
     <h3>3. Colleges</h3><br><br>
-    <table class="table table-bordered">
+    <table class="table table-sm table-bordered">
         <thead>
             <tr>
                 <th>College/University</th>
@@ -304,19 +320,19 @@ body {
     </table>
 
     <h3>(C) OTHER COURSES</h3><br><br>
-    <table class="table table-bordered">
+    <table class="table table-sm table-bordered">
         <thead>
             <tr>
                 <td></td>
                 <td>Duration</td>
                 <td>Theme and Award</td>
                 <td>College/Organization</td>
-                <td>Venue</td>               
+                <td>Venue</td>
             </tr>
 
         </thead>
         <tbody>
-        @if ($staff->schools)
+            @if ($staff->schools)
             @foreach ($staff->schools as $school)
             @if ($school->education_level_id == 5)
             <tr>
@@ -333,23 +349,23 @@ body {
     </table>
 
     <h3>(D) WORK AND EXPERIENCE</h3><br><br>
-    <table class="table table-bordered">
+    <table class="table table-sm table-bordered">
         <thead>
             <tr>
                 <td>S/NO</td>
                 <td>Year</td>
                 <td>Organization</td>
                 <td>Location</td>
-                <td>Position</td>   
-                <td>Duties</td>            
+                <td>Position</td>
+                <td>Duties</td>
             </tr>
 
         </thead>
         <tbody>
-        @php
+            @php
             $i = 0;
-        @endphp
-        @if ($staff->work_experiences)
+            @endphp
+            @if ($staff->work_experiences)
             @foreach ($staff->work_experiences as $work_experience)
             <tr>
                 <td>{{++$i}}</td>
@@ -357,7 +373,17 @@ body {
                 <td>{{ $work_experience->institution }}</td>
                 <td>{{ $work_experience->address }}</td>
                 <td>{{ $work_experience->position }}</td>
-                <td>{{ $work_experience->duties }}
+                <td>
+                    @php
+                    $duties = $work_experience->duties == null? null :
+                    json_decode($work_experience->duties);
+                    @endphp
+                    <ul>
+                        @foreach ($duties as $duty)
+                        <li>{{ $duty }}</li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
             @endif

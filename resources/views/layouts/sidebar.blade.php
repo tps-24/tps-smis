@@ -123,7 +123,7 @@ a.active {
         <a href="{{ route('staffs.create') }}">Staff Registration</a>
         </li>
         <li>
-        <a href="{{ route('staff.resume') }}">Staff Resume</a>
+        <a href="">Staff Resume</a>
         </li>
         @endcan()
       </ul>

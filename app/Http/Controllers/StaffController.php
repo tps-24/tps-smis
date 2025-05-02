@@ -14,6 +14,7 @@ use App\Models\NextOfKin;
 use Spatie\Permission\Models\Role;
 use Illuminate\View\View;
 use Illuminate\Support\Arr;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\StaffController;
 use App\Models\EducationLevel;
@@ -299,9 +300,9 @@ class StaffController extends Controller
 
     }
 
-    public function generateResume()
+    public function generateResume($staffId)
     {
-        $staff = Staff::findOrFail(1);
+        $staff = Staff::findOrFail($staffId);
         return view('staffs.resume', compact('staff'));
     }
     
@@ -336,35 +337,45 @@ class StaffController extends Controller
         return view('staffs.create_cv', compact('staff', 'education_levels'));
     }
 
+    public function generateResumeePdf($staff_id){
+        $staff = Staff::find($staff_id);
+        $education_levels = EducationLevel::all();
+        $pdf = PDF::loadView('staffs.download_resumeePdf',compact('staff', 'education_levels'));
+        $pdf->set_option('isHtml5ParserEnabled', true);
+        $pdf->set_option('isPhpEnabled', true);
+
+        return $pdf->stream("resumee.pdf");
+        return view('staffs.download_resumeePdf', compact('staff', 'education_levels'));
+    }
     public function update_cv(Request $request, $staff_id){
         $staff = Staff::find($staff_id);
         $education_levels = EducationLevel::all();
-        $request->validate([
-            'father_names' => 'null|string',
-            'father_ward_of_birth' => 'required_if:father_names,!null|string',
-            'father_district_of_birth' => 'required_if:father_names,!null|string',
-            'father_region_of_birth' => 'required_if:father_names,!null|string',
-        ]);
+        // $request->validate([
+        //     'father_names' => 'null|string',
+        //     'father_ward_of_birth' => 'required_if:father_names,!null|string',
+        //     'father_district_of_birth' => 'required_if:father_names,!null|string',
+        //     'father_region_of_birth' => 'required_if:father_names,!null|string',
+        // ]);
         $staff-> fatherParticulars = [
-            'names'=> $request-> father_names,
-            'villageOfBirth' => $request-> father_village_of_birth,
-            'wardOfBirth' => $request-> father_ward_of_birth,
-            'districtOfBirth' => $request-> father_district_of_birth,
-            'regionOfBirth' => $request-> father_region_of_birth,
+             $request-> father_names,
+             $request-> father_village_of_birth,
+            $request-> father_ward_of_birth,
+             $request-> father_district_of_birth,
+             $request-> father_region_of_birth,
         ];
 
         $staff-> motherParticulars = [
-            'names'=> $request-> mother_names,
-            'villageOfBirth' => $request-> mother_village_of_birth,
-            'wardOfBirth' => $request-> mother_ward_of_birth,
-            'districtOfBirth' => $request-> mother_district_of_birth,
-            'regionOfBirth' => $request-> mother_region_of_birth,
+              $request-> mother_names,
+             $request-> mother_village_of_birth,
+             $request-> mother_ward_of_birth,
+             $request-> mother_district_of_birth,
+             $request-> mother_region_of_birth,
         ];
         $staff-> parentsAddress = [
-            'village'=> $request-> parentsVillage,
-            'ward' => $request-> parentsWard,
-            'district' => $request-> parentsDistrict,
-            'region' => $request-> parentsRegion,
+             $request-> parentsVillage,
+             $request-> parentsWard,
+              $request-> parentsDistrict,
+            $request-> parentsRegion,
         ];
         $staff->save();
         return $staff;

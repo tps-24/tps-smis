@@ -133,7 +133,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
     Route::get('students/search_certificate/{companyId}', [FinalResultController::class, 'search'])->name('students.search_certificate');
 
-    Route::get('/staff/cv', [StaffController::class, 'generateResume'])->name('staff.resume');
+    Route::get('/staff/cv/{staffId}', [StaffController::class, 'generateResume'])->name('staff.cv');
 
 
     Route::get('/semesters/{semesterId}/courses', [CourseworkResultController::class, 'index'])->name('semesters.index');
@@ -203,6 +203,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/staff/update-school-cv/{staffId}', [StaffController::class, 'update_school_cv'])->name('staff.update_school-cv');
     Route::post('/staff/update_other_courses-cv/{staffId}', [StaffController::class, 'update_school_cv'])->name('staff.update_other_courses-cv');
     Route::post('/staff/update_work_experiences-cv/{staffId}', [StaffController::class, 'update_work_experience'])->name('staff.update_work_experience-cv');
+    Route::get('/staff/generateResumeePdf/{staffId}', [StaffController::class, 'generateResumeePdf'])->name('staff.generateResumeePdf');
     Route::get('/assign-instructors', [StaffProgrammeCourseController::class, 'showAssignInstructorsForm'])->name('assign.instructors.form');
     Route::post('/assign-instructors', [StaffProgrammeCourseController::class, 'assignInstructors'])->name('assign.instructors');
 

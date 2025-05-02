@@ -16,7 +16,6 @@
 </nav>
 <!-- Scrumb ends -->
 @endsection
-
 @section('content')
 <!-- Custom tabs start -->
 <div class="custom-tabs-container">
@@ -61,7 +60,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Names </label>
-                                    <input type="text" value="{{$fatherParticulars->names?? null}}" class="form-control"
+                                    <input type="text" value="{{$fatherParticulars[0]?? null}}" class="form-control"
                                         id="father_names" name="father_names" placeholder="Enter father's names">
                                 </div>
                             </div>
@@ -72,7 +71,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Village 0f Birth </label>
-                                    <input type="text" value="{{$fatherParticulars->villageOfBirth?? null}}"
+                                    <input type="text" value="{{$fatherParticulars[1]?? null}}"
                                         class="form-control" id="father's_names" name="father_village_of_birth"
                                         placeholder="Enter father's village of birth">
                                 </div>
@@ -85,7 +84,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Ward 0f Birth </label>
-                                    <input type="text" value="{{$fatherParticulars->wardOfBirth?? null}}"
+                                    <input type="text" value="{{$fatherParticulars[2]?? null}}"
                                         class="form-control" id="father's_names" name="father_ward_of_birth"
                                         placeholder="Enter father's Ward of birth">
                                 </div>
@@ -98,7 +97,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">District 0f Birth </label>
-                                    <input type="text" value="{{$fatherParticulars->districtOfBirth?? null}}"
+                                    <input type="text" value="{{$fatherParticulars[3]?? null}}"
                                         class="form-control" id="father's_names" name="father_district_of_birth"
                                         placeholder="Enter father's district of birth">
                                 </div>
@@ -111,7 +110,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Region 0f Birth </label>
-                                    <input type="text" value="{{$fatherParticulars->regionOfBirth?? null}}"
+                                    <input type="text" value="{{$fatherParticulars[4]?? null}}"
                                         class="form-control" id="father's_names" name="father_region_of_birth"
                                         placeholder="Enter father's region of birth">
                                 </div>
@@ -120,8 +119,9 @@
                     </div>
                 </div>
                 @php
+                
                 $motherParticulars = $staff->motherParticulars == null? null :
-                json_decode($staff->motherParticulars);
+                json_decode($staff->motherParticulars);//dd($motherParticulars );
                 @endphp
                 <h3>Mother's particulars</h3><br>
                 <div class="row gx-4">
@@ -130,7 +130,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Names </label>
-                                    <input type="text" value="{{$motherParticulars->names?? null}}" class="form-control"
+                                    <input type="text" value="{{$motherParticulars[0]?? null}}" class="form-control"
                                         id="father_names" name="mother_names" placeholder="Enter father's names">
                                 </div>
                             </div>
@@ -141,7 +141,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Village 0f Birth </label>
-                                    <input type="text" value="{{$motherParticulars->villageOfBirth?? null}}"
+                                    <input type="text" value="{{$motherParticulars[1]?? null}}"
                                         class="form-control" id="father's_names" name="mother_village_of_birth"
                                         placeholder="Enter father's village of birth">
                                 </div>
@@ -154,7 +154,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Ward 0f Birth </label>
-                                    <input type="text" value="{{$motherParticulars->wardOfBirth?? null}}"
+                                    <input type="text" value="{{$motherParticulars[2]?? null}}"
                                         class="form-control" id="father's_names" name="mother_ward_of_birth"
                                         placeholder="Enter father's Ward of birth">
                                 </div>
@@ -167,7 +167,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">District 0f Birth </label>
-                                    <input type="text" value="{{$motherParticulars->districtOfBirth?? null}}"
+                                    <input type="text" value="{{$motherParticulars[3]?? null}}"
                                         class="form-control" id="father's_names" name="mother_district_of_birth"
                                         placeholder="Enter mother's district of birth">
                                 </div>
@@ -180,7 +180,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Region 0f Birth </label>
-                                    <input type="text" value="{{$motherParticulars->regionOfBirth?? null}}"
+                                    <input type="text" value="{{$motherParticulars[4]?? null}}"
                                         class="form-control" id="father's_names" name="mother_region_of_birth"
                                         placeholder="Enter mother's region of birth">
                                 </div>
@@ -199,7 +199,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Village </label>
-                                    <input type="text" value="{{$parentsAddress->parentsVillage?? null}}"
+                                    <input type="text" value="{{$parentsAddress[0]?? null}}"
                                         class="form-control" id="father's_names" name="parentsVillage"
                                         placeholder="Enter current village">
                                 </div>
@@ -212,7 +212,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Ward</label>
-                                    <input type="text" value="{{$parentsAddress->parentsWard?? null}}"
+                                    <input type="text" value="{{$parentsAddress[1]?? null}}"
                                         class="form-control" id="father's_names" name="parentsWard"
                                         placeholder="Enter current ward">
                                 </div>
@@ -225,7 +225,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">District</label>
-                                    <input type="text" value="{{$parentsAddress->parentsDistrict?? null}}"
+                                    <input type="text" value="{{$parentsAddress[2]?? null}}"
                                         class="form-control" id="father's_names" name="parentsDistrict"
                                         placeholder="Enter current district">
                                 </div>
@@ -238,7 +238,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Region</label>
-                                    <input type="text" value="{{$parentsAddress->parentsRegion?? null}}"
+                                    <input type="text" value="{{$parentsAddress[3]?? null}}"
                                         class="form-control" id="father's_names" name="parentsRegion"
                                         placeholder="Enter current region">
                                 </div>
@@ -529,63 +529,119 @@
 
         </div>
         <div class="tab-pane fade" id="threeA" role="tabpanel">
-            <form name="add-blog-post-form" id="add-blog-post-form" method="POST"
-                action="{{route('staff.update_other_courses-cv', ['staffId'=>$staff->id])}}">
-                @csrf
-                @method('POST')
-                <!-- Row starts -->
-                <div class="row gx-4">
-                    <div class="col-sm-6 col-12">
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <div class="m-0">
-                                    <label class="form-label" for="abc">College/Organization </label>
-                                    <input type="text" class="form-control" id="" name="college" placeholder="Name">
-                                </div>
-                            </div>
+            <div class="d-flex justify-content-end mb-2">
+                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#other">Add</button>
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td>S/NO</td>
+                        <th>College/Organization</th>
+                        <th>Duration</th>
+                        <th>Theme and Award</th>
+                        <th>Venue</th>
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                    $i = 0;
+                    @endphp
+                    @if ($staff->schools)
+                    @foreach ($staff->schools as $school)
+                    @if ($school->education_level_id == 4)
+                    <tr>
+                        <td>{{++$i}}</td>
+                        <td>{{ $school->name }}</td>
+                        <td>{{ $school->duration }}</td>
+                        <td>{{ $school->award }}</td>
+                        <td>{{ $school->country }}</td>
+                        <td class="">
+                            <a href="" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    @endif
+                    @endforeach
+                    @endif
+                </tbody>
+
+            </table>
+            <div class="modal fade" id="other" tabindex="-1" aria-labelledby="other" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="newLabel">Add work or Experience</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                    </div>
-                    <div class="col-sm-6 col-12">
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <div class="m-0">
-                                    <label class="form-label" for="abc">Duration </label>
-                                    <input type="number" min="1" class="form-control" id="" name="duration"
-                                        placeholder="1">
-                                </div>
-                            </div>
+                        <div class="modal-body">
+                            <form name="add-blog-post-form" id="add-blog-post-form" method="POST"
+                                action="{{route('staff.update_other_courses-cv', ['staffId'=>$staff->id])}}">
+                                @csrf
+                                @method('POST')
+                                <!-- Row starts -->
+                                <div class="row gx-4">
+                                    <div class="col-sm-6 col-12">
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <div class="m-0">
+                                                    <label class="form-label" for="abc">College/Organization </label>
+                                                    <input type="text" class="form-control" id="" name="college"
+                                                        placeholder="Name">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-12">
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <div class="m-0">
+                                                    <label class="form-label" for="abc">Duration </label>
+                                                    <input type="number" min="1" class="form-control" id=""
+                                                        name="duration" placeholder="1">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-12">
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <div class="m-0">
+                                                    <label class="form-label" for="abc">Theme and Award </label>
+                                                    <input type="text" class="form-control" id="" name="award">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6 col-12">
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <div class="m-0">
+                                                    <label class="form-label" for="abc">Venue </label>
+                                                    <input type="text" class="form-control" id="" name="venue"
+                                                        placeholder="Tanzania">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                    </div>
+                                </div><br>
+                            </form>
                         </div>
-                    </div>
-                    <div class="col-sm-6 col-12">
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <div class="m-0">
-                                    <label class="form-label" for="abc">Theme and Award </label>
-                                    <input type="text" class="form-control" id="" name="award">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col-sm-6 col-12">
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <div class="m-0">
-                                    <label class="form-label" for="abc">Venue </label>
-                                    <input type="text" class="form-control" id="" name="venue" placeholder="Tanzania">
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
 
 
+                </div>
 
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                    </div>
-                </div><br>
-            </form>
+            </div>
+
+
             <!-- Row ends -->
 
         </div>
@@ -607,6 +663,7 @@
                                 <th>POSITION</th>
                                 <th>DUTIES</th>
                                 <th>From-To</th>
+                                <th>Actions</th>
 
                             </tr>
                         </thead>
@@ -621,8 +678,14 @@
                                 <td>{{$work_experience->institution}}</td>
                                 <td>{{$work_experience->address}}</td>
                                 <td>{{$work_experience->position}}</td>
-                                <td>{{$work_experience->duties}}</td>
+                                <td>
+                                    {{$work_experience->duties}}
+                                </td>
                                 <td>{{$work_experience->start_date}} - {{$work_experience->end_date}}</td>
+                                <td class="">
+                            <a href="" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -638,7 +701,9 @@
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="work_experienceForm" action="{{route('staff.update_work_experience-cv', ['staffId' => $staff->id])}}" method="POST">
+                                <form id="work_experienceForm"
+                                    action="{{route('staff.update_work_experience-cv', ['staffId' => $staff->id])}}"
+                                    method="POST">
                                     @csrf
                                     <div class="row gx-4">
                                         <div class="col-sm-6 col-12">
