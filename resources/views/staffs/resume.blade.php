@@ -319,7 +319,7 @@ body {
         </tbody>
     </table>
 
-    <h3>(C) OTHER COURSES</h3><br><br>
+    <h3>(C) OTHER COURSES, PROFESSIONAL EXAMINATION AND WORKSHOP ATTENDED</h3><br><br>
     <table class="table table-sm table-bordered">
         <thead>
             <tr>

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('admission_year')->nullable();
             $table->string('graduation_year')->nullable();
-            $table->integer('duration')->nullable();
+            $table->string('duration')->nullable();
             $table->string('country')->nullable();
             $table->string('award')->nullable();
             $table->string('village')->nullable();

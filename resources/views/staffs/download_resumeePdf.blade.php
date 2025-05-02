@@ -42,6 +42,19 @@
             width: 100%;
             background-color: #f2f2d1;
         }
+        td {
+    vertical-align: top;
+}
+
+td ul {
+    padding-left: 20px; /* Adjust indentation if needed */
+}
+
+td ul li {
+    margin-bottom: 5px; /* Adds space between list items for better readability */
+}
+    
+
         </style>
     </head>
 </head>
@@ -183,7 +196,7 @@
             </tr>
         </tbody>
     </table>
-
+    <div style="page-break-before: always;"></div>
         <h3>(B) EDUCATION AND TRAINING</h3>
         <h3>1. Primary Schools</h3>
         <table class="table table-sm table-bordered">
@@ -269,11 +282,11 @@
             </tbody>
         </table>
 
-        <h3>(C) OTHER COURSES</h3>
+        <h4>(C) OTHER COURSES, PROFESSIONAL EXAMINATION AND WORKSHOP ATTENDED</h4>
         <table class="table table-sm table-bordered">
             <thead>
                 <tr>
-                    <td></td>
+                    <td>S/NO</td>
                     <td>Duration</td>
                     <td>Theme and Award</td>
                     <td>College/Organization</td>
@@ -282,11 +295,14 @@
 
             </thead>
             <tbody>
+                @php
+                    $n=0;
+                @endphp
                 @if ($staff->schools)
                 @foreach ($staff->schools as $school)
                 @if ($school->education_level_id == 5)
                 <tr>
-                    <td></td>
+                    <td>{{++$n}}.</td>
                     <td>{{ $school->duration }}</td>
                     <td>{{ $school->award }}</td>
                     <td>{{ $school->name }}</td>
@@ -318,7 +334,7 @@
                 @if ($staff->work_experiences)
                 @foreach ($staff->work_experiences as $work_experience)
                 <tr>
-                    <td>{{++$i}}</td>
+                    <td>{{++$i}}.</td>
                     <td>{{ substr($work_experience->start_date, 0, 4)}} - {{ substr($work_experience->end_date, 0, 4)}}
                     </td>
                     <td>{{ $work_experience->institution }}</td>

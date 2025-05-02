@@ -33,7 +33,8 @@
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="tab-threeA" data-bs-toggle="tab" href="#threeA" role="tab" aria-controls="threeA"
-                aria-selected="false"><i class="bi bi-credit-card-2-front me-2"></i>Other Courses</a>
+                aria-selected="false"><i class="bi bi-credit-card-2-front me-2"></i>Other Courses, Proffession
+                examination </a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="tab-fourA" data-bs-toggle="tab" href="#fourA" role="tab" aria-controls="fourA"
@@ -71,8 +72,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Village 0f Birth </label>
-                                    <input type="text" value="{{$fatherParticulars[1]?? null}}"
-                                        class="form-control" id="father's_names" name="father_village_of_birth"
+                                    <input type="text" value="{{$fatherParticulars[1]?? null}}" class="form-control"
+                                        id="father's_names" name="father_village_of_birth"
                                         placeholder="Enter father's village of birth">
                                 </div>
                             </div>
@@ -84,8 +85,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Ward 0f Birth </label>
-                                    <input type="text" value="{{$fatherParticulars[2]?? null}}"
-                                        class="form-control" id="father's_names" name="father_ward_of_birth"
+                                    <input type="text" value="{{$fatherParticulars[2]?? null}}" class="form-control"
+                                        id="father's_names" name="father_ward_of_birth"
                                         placeholder="Enter father's Ward of birth">
                                 </div>
                             </div>
@@ -97,8 +98,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">District 0f Birth </label>
-                                    <input type="text" value="{{$fatherParticulars[3]?? null}}"
-                                        class="form-control" id="father's_names" name="father_district_of_birth"
+                                    <input type="text" value="{{$fatherParticulars[3]?? null}}" class="form-control"
+                                        id="father's_names" name="father_district_of_birth"
                                         placeholder="Enter father's district of birth">
                                 </div>
                             </div>
@@ -110,8 +111,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Region 0f Birth </label>
-                                    <input type="text" value="{{$fatherParticulars[4]?? null}}"
-                                        class="form-control" id="father's_names" name="father_region_of_birth"
+                                    <input type="text" value="{{$fatherParticulars[4]?? null}}" class="form-control"
+                                        id="father's_names" name="father_region_of_birth"
                                         placeholder="Enter father's region of birth">
                                 </div>
                             </div>
@@ -119,7 +120,7 @@
                     </div>
                 </div>
                 @php
-                
+
                 $motherParticulars = $staff->motherParticulars == null? null :
                 json_decode($staff->motherParticulars);//dd($motherParticulars );
                 @endphp
@@ -141,8 +142,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Village 0f Birth </label>
-                                    <input type="text" value="{{$motherParticulars[1]?? null}}"
-                                        class="form-control" id="father's_names" name="mother_village_of_birth"
+                                    <input type="text" value="{{$motherParticulars[1]?? null}}" class="form-control"
+                                        id="father's_names" name="mother_village_of_birth"
                                         placeholder="Enter father's village of birth">
                                 </div>
                             </div>
@@ -154,8 +155,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Ward 0f Birth </label>
-                                    <input type="text" value="{{$motherParticulars[2]?? null}}"
-                                        class="form-control" id="father's_names" name="mother_ward_of_birth"
+                                    <input type="text" value="{{$motherParticulars[2]?? null}}" class="form-control"
+                                        id="father's_names" name="mother_ward_of_birth"
                                         placeholder="Enter father's Ward of birth">
                                 </div>
                             </div>
@@ -167,8 +168,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">District 0f Birth </label>
-                                    <input type="text" value="{{$motherParticulars[3]?? null}}"
-                                        class="form-control" id="father's_names" name="mother_district_of_birth"
+                                    <input type="text" value="{{$motherParticulars[3]?? null}}" class="form-control"
+                                        id="father's_names" name="mother_district_of_birth"
                                         placeholder="Enter mother's district of birth">
                                 </div>
                             </div>
@@ -180,8 +181,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Region 0f Birth </label>
-                                    <input type="text" value="{{$motherParticulars[4]?? null}}"
-                                        class="form-control" id="father's_names" name="mother_region_of_birth"
+                                    <input type="text" value="{{$motherParticulars[4]?? null}}" class="form-control"
+                                        id="father's_names" name="mother_region_of_birth"
                                         placeholder="Enter mother's region of birth">
                                 </div>
                             </div>
@@ -199,9 +200,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Village </label>
-                                    <input type="text" value="{{$parentsAddress[0]?? null}}"
-                                        class="form-control" id="father's_names" name="parentsVillage"
-                                        placeholder="Enter current village">
+                                    <input type="text" value="{{$parentsAddress[0]?? null}}" class="form-control"
+                                        id="father's_names" name="parentsVillage" placeholder="Enter current village">
                                 </div>
                             </div>
                         </div>
@@ -212,9 +212,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Ward</label>
-                                    <input type="text" value="{{$parentsAddress[1]?? null}}"
-                                        class="form-control" id="father's_names" name="parentsWard"
-                                        placeholder="Enter current ward">
+                                    <input type="text" value="{{$parentsAddress[1]?? null}}" class="form-control"
+                                        id="father's_names" name="parentsWard" placeholder="Enter current ward">
                                 </div>
                             </div>
                         </div>
@@ -225,9 +224,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">District</label>
-                                    <input type="text" value="{{$parentsAddress[2]?? null}}"
-                                        class="form-control" id="father's_names" name="parentsDistrict"
-                                        placeholder="Enter current district">
+                                    <input type="text" value="{{$parentsAddress[2]?? null}}" class="form-control"
+                                        id="father's_names" name="parentsDistrict" placeholder="Enter current district">
                                 </div>
                             </div>
                         </div>
@@ -238,9 +236,8 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Region</label>
-                                    <input type="text" value="{{$parentsAddress[3]?? null}}"
-                                        class="form-control" id="father's_names" name="parentsRegion"
-                                        placeholder="Enter current region">
+                                    <input type="text" value="{{$parentsAddress[3]?? null}}" class="form-control"
+                                        id="father's_names" name="parentsRegion" placeholder="Enter current region">
                                 </div>
                             </div>
                         </div>
@@ -465,8 +462,7 @@
                             <div class="card-body">
                                 <div class="m-0">
                                     <label class="form-label" for="abc">Duration </label>
-                                    <input type="number" min="1" class="form-control" id="" name="duration"
-                                        placeholder="1">
+                                    <input type="text" class="form-control" id="" name="duration" placeholder="1">
                                 </div>
                             </div>
                         </div>
@@ -657,7 +653,6 @@
                         <thead>
                             <tr>
                                 <td>S/NO</td>
-                                <td>YEAR</th>
                                 <th>ORGANIZATION</th>
                                 <th>LOCATION</th>
                                 <th>POSITION</th>
@@ -674,18 +669,25 @@
                             @foreach ($staff->work_experiences as $work_experience)
                             <tr>
                                 <td>{{++$i}}</td>
-                                <td>{{$work_experience->year}}</td>
                                 <td>{{$work_experience->institution}}</td>
                                 <td>{{$work_experience->address}}</td>
                                 <td>{{$work_experience->position}}</td>
                                 <td>
-                                    {{$work_experience->duties}}
+                                    @php
+                                    $duties = $work_experience->duties == null? null :
+                                    json_decode($work_experience->duties);
+                                    @endphp
+                                    <ul>
+                                        @foreach ($duties as $duty)
+                                        <li>{{ $duty }}</li>
+                                        @endforeach
+                                    </ul>
                                 </td>
                                 <td>{{$work_experience->start_date}} - {{$work_experience->end_date}}</td>
                                 <td class="">
-                            <a href="" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="" class="btn btn-sm btn-danger">Delete</a>
-                        </td>
+                                    <a href="" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -20,7 +20,7 @@ class CreateWorkExperiencesTable extends Migration
             $table->string('address'); // Address of the institution
             $table->string('job_title'); // Job title
             $table->string('position'); // Position in the job (e.g., Manager, Intern)
-            $table->text('duties'); // Duties or responsibilities
+            $table->json('duties'); // Duties or responsibilities
             $table->string('supervisor_name')->nullable(); // Supervisor's name
             $table->string('supervisor_phone_number')->nullable(); // Supervisor's phone number
             $table->string('supervisor_address')->nullable(); // Supervisor's address
