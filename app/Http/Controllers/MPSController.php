@@ -29,8 +29,15 @@ class MPSController extends Controller
      */
     public function index()
     {
-        $mpsStudents = MPS::all();
+        $mpsStudents = MPS::whereNull('released_at')->get();
         return view('mps.index', compact('mpsStudents'));
+    }
+
+    public function all()
+    {
+        $mpsStudents = MPS::orderBy('created_at', 'desc')->get();
+        $scrumbName = "All";
+        return view('mps.index', compact('mpsStudents', 'scrumbName'));
     }
 
     /**
@@ -85,9 +92,10 @@ class MPSController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MPS $mPS)
+    public function show($studentId)
     {
-        //
+        $mpsStudents = MPS::where('student_id', $studentId)->get();
+        return view('mps.show', compact('mpsStudents'));
     }
 
     /**
@@ -168,6 +176,10 @@ class MPSController extends Controller
 
     public function release(Request $request, $mPSstudent)
     {
+        $request->validate([
+            'reason' => 'required'
+        ]);
+
         $mPSstudent = MPS::find($mPSstudent);
         if (!$mPSstudent) {
             abort(404);
@@ -175,6 +187,7 @@ class MPSController extends Controller
         $mPSstudent->released_at = Carbon::now();
         $mPSstudent->days = Carbon::parse($mPSstudent->arrested_at)->diffInDays(Carbon::now());
         $student = $mPSstudent->student;
+        $mPSstudent->release_reason = $request->reason;
         $student->beat_status = $mPSstudent->previous_beat_status;
         $student->save();
         $mPSstudent->save();
@@ -184,9 +197,7 @@ class MPSController extends Controller
     public function company($companyId)
     {
         $company = Company::find($companyId);
-        $mpsStudents = $company->lockUp;
-        // $mpsStudents = MPS::join('students', 'm_p_s.student_id', 'students.id')->join('companies', 'students.company_id', 'companies.name')
-        //                 ->where('students.company_id', $companyId)->get();
+        $mpsStudents = $company->lockUp->whereNull('released_at');
                         $scrumbName = $company->description;
         return view('mps.index', compact('mpsStudents', 'scrumbName'));
 

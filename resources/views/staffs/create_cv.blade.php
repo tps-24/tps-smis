@@ -17,6 +17,18 @@
 <!-- Scrumb ends -->
 @endsection
 @section('content')
+@include('layouts.sweet_alerts.index')
+<!-- Check if there are any validation errors -->
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+@include('layouts.sweet_alerts.index')
 <!-- Custom tabs start -->
 <div class="custom-tabs-container">
 
@@ -39,6 +51,10 @@
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="tab-fourA" data-bs-toggle="tab" href="#fourA" role="tab" aria-controls="fourA"
                 aria-selected="false"><i class="bi bi-eye-slash me-2"></i>Work Exprience</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="tab-fiveA" data-bs-toggle="tab" href="#fiveA" role="tab" aria-controls="fiveA"
+                aria-selected="false"><i class="bi bi-eye-slash me-2"></i>Referees</a>
         </li>
     </ul>
 
@@ -338,9 +354,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-sm btn-primary" type="button">Add School</button>
-                    </div>
+
                     <!-- <div class="col-sm-4 col-12">
                         <div class="card mb-2">
                             <div class="card-body">
@@ -360,6 +374,21 @@
                 </div>
                 <div class="row gx-4">
                     <h3>Secondary Schools</h3><br><br>
+
+                    <div class="col-sm-4 col-12">
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="m-0">
+                                    <label class="form-label" for="abc">Type </label>
+                                    <select class="form-control" name="secondary_school_type" id="">
+                                        <option value="" selected disabled>select school type</option>
+                                        <option value="2">Ordinary Level</option>
+                                        <option value="3">Advanced Level</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-sm-4 col-12">
                         <div class="card mb-2">
                             <div class="card-body">
@@ -371,6 +400,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="col-sm-4 col-12">
                         <div class="card mb-2">
                             <div class="card-body">
@@ -438,9 +468,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-sm btn-primary" type="button">Add School</button>
                     </div>
                 </div>
 
@@ -512,9 +539,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-sm btn-primary" type="button">Add College</button>
-                    </div>
                 </div><br>
 
                 <div class="d-flex justify-content-end">
@@ -532,8 +556,8 @@
                 <thead>
                     <tr>
                         <td>S/NO</td>
+                        <th style="width:100px;">Duration</th>
                         <th>College/Organization</th>
-                        <th>Duration</th>
                         <th>Theme and Award</th>
                         <th>Venue</th>
                         <th>Action</th>
@@ -546,16 +570,23 @@
                     @endphp
                     @if ($staff->schools)
                     @foreach ($staff->schools as $school)
-                    @if ($school->education_level_id == 4)
+                    @if ($school->education_level_id == 5)
                     <tr>
                         <td>{{++$i}}</td>
-                        <td>{{ $school->name }}</td>
                         <td>{{ $school->duration }}</td>
+                        <td>{{ $school->name }}</td>
                         <td>{{ $school->award }}</td>
-                        <td>{{ $school->country }}</td>
+                        <td>{{ $school->venue }}</td>
                         <td class="">
-                            <a href="" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="" class="btn btn-sm btn-danger">Delete</a>
+                            <!-- <a href="" class="btn btn-sm btn-warning">Edit</a> -->
+                            <form id="deleteSchoolForm{{ $school->id }}"
+                                action="{{route('staff.delete_school',['schoolId'=>$school->id])}}" method='POST'>
+                                @csrf
+                                <button class="btn btn-sm btn-danger"
+                                    onclick="confirmDelete('deleteSchoolForm{{ $school->id }}', 'Other Course or Proffessional ')"
+                                    type="button">Delete</button>
+                            </form>
+                            @include('layouts.sweet_alerts.confirm_delete')
                         </td>
                     </tr>
                     @endif
@@ -584,7 +615,7 @@
                                                 <div class="m-0">
                                                     <label class="form-label" for="abc">College/Organization </label>
                                                     <input type="text" class="form-control" id="" name="college"
-                                                        placeholder="Name">
+                                                        required placeholder="Name">
                                                 </div>
                                             </div>
                                         </div>
@@ -594,8 +625,8 @@
                                             <div class="card-body">
                                                 <div class="m-0">
                                                     <label class="form-label" for="abc">Duration </label>
-                                                    <input type="number" min="1" class="form-control" id=""
-                                                        name="duration" placeholder="1">
+                                                    <input type="text" class="form-control" id="" required
+                                                        name="duration" placeholder="1 month">
                                                 </div>
                                             </div>
                                         </div>
@@ -605,7 +636,7 @@
                                             <div class="card-body">
                                                 <div class="m-0">
                                                     <label class="form-label" for="abc">Theme and Award </label>
-                                                    <input type="text" class="form-control" id="" name="award">
+                                                    <input type="text" class="form-control" id="" name="award" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -616,7 +647,7 @@
                                             <div class="card-body">
                                                 <div class="m-0">
                                                     <label class="form-label" for="abc">Venue </label>
-                                                    <input type="text" class="form-control" id="" name="venue"
+                                                    <input type="text" class="form-control" id="" name="venue" required
                                                         placeholder="Tanzania">
                                                 </div>
                                             </div>
@@ -655,7 +686,7 @@
                                 <td>S/NO</td>
                                 <th>ORGANIZATION</th>
                                 <th>LOCATION</th>
-                                <th>POSITION</th>
+                                <th>TITLE</th>
                                 <th>DUTIES</th>
                                 <th>From-To</th>
                                 <th>Actions</th>
@@ -671,7 +702,7 @@
                                 <td>{{++$i}}</td>
                                 <td>{{$work_experience->institution}}</td>
                                 <td>{{$work_experience->address}}</td>
-                                <td>{{$work_experience->position}}</td>
+                                <td>{{$work_experience->job_title}}</td>
                                 <td>
                                     @php
                                     $duties = $work_experience->duties == null? null :
@@ -683,10 +714,18 @@
                                         @endforeach
                                     </ul>
                                 </td>
-                                <td>{{$work_experience->start_date}} - {{$work_experience->end_date}}</td>
+                                <td>{{$work_experience->start_date}} - {{$work_experience->end_date?? ''}}</td>
                                 <td class="">
-                                    <a href="" class="btn btn-sm btn-warning">Edit</a>
-                                    <a href="" class="btn btn-sm btn-danger">Delete</a>
+                                    <!-- <a href="" class="btn btn-sm btn-warning">Edit</a> -->
+                                    <form id="deleteForm{{ $work_experience->id }}"
+                                        action="{{route('staff.delete_experience',['experienceId'=>$work_experience->id])}}"
+                                        method='POST'>
+                                        @csrf
+                                        <button class="btn btn-sm btn-danger"
+                                            onclick="confirmDelete('deleteForm{{ $work_experience->id }}', 'Work experience ')"
+                                            type="button">Delete</button>
+                                    </form>
+                                    @include('layouts.sweet_alerts.confirm_delete')
                                 </td>
                             </tr>
                             @endforeach
@@ -713,8 +752,8 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                         <label class="form-label" for="abc">From </label>
-                                                        <input type="date" class="form-control" id="" name="start_date"
-                                                            placeholder="12-12-1990">
+                                                        <input type="number" min='1960' class="form-control" id=""
+                                                            name="start_date" required placeholder="1990">
                                                     </div>
                                                 </div>
                                             </div>
@@ -724,8 +763,9 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                         <label class="form-label" for="abc">To </label>
-                                                        <input type="date" min="1" class="form-control" id=""
-                                                            name="end_date" placeholder="12-12-1996">
+                                                        <input type="number" min="1" class="form-control" id=""
+                                                            type="number" min='1960'  name="end_date"
+                                                            placeholder="1996">
                                                     </div>
                                                 </div>
                                             </div>
@@ -737,7 +777,7 @@
                                                         <label class="form-label" for="abc">Organization/Institution
                                                         </label>
                                                         <input type="text" class="form-control" id="" name="institution"
-                                                            placeholder="TPS">
+                                                            required placeholder="TPS">
                                                     </div>
                                                 </div>
                                             </div>
@@ -753,17 +793,6 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-sm-6 col-12">
-                                            <div class="card mb-2">
-                                                <div class="card-body">
-                                                    <div class="m-0">
-                                                        <label class="form-label" for="abc">Position</label>
-                                                        <input type="text" class="form-control" id="" name="position"
-                                                            placeholder="Manager">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
                                         <div class="col-sm-6 col-12">
                                             <div class="card mb-2">
@@ -771,7 +800,7 @@
                                                     <div class="m-0">
                                                         <label class="form-label" for="abc">Location</label>
                                                         <input type="text" class="form-control" id="" name="address"
-                                                            placeholder="Arusha">
+                                                            required placeholder="Arusha">
                                                     </div>
                                                 </div>
                                             </div>
@@ -782,14 +811,13 @@
                                                 <div class="card-body">
                                                     <div class="m-0">
                                                         <label class="form-label" for="abc">Duties </label>
-                                                        <div class="d-flex gap-2 mb-2 task-row" data-index="0">
-
+                                                        <div class="d-flex gap-2 mb-2 duty-row" data-index="0">
                                                             <textarea class="form-control" id="duties" name="duties[]"
                                                                 placeholder="Enter job duties here..."
                                                                 rows="2"></textarea>
                                                             <button style="height:40px;" type="button"
-                                                                class="btn btn-danger delete-task-btn"
-                                                                onclick="deleteTask(0)">Delete</button>
+                                                                class="btn btn-danger delete-duty-btn"
+                                                                onclick="deleteDuty(0)">Delete</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -803,55 +831,255 @@
                                             Duty</button>
                                     </div>
                                 </form>
+                                <script
+                                    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js">
+                                </script>
+                                <div id="dutyContainer">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" onclick="submitWorkExperienceForm()"
+                                        class="btn btn-primary">Update</button>
+                                </div>
+
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" onclick="submitForm()" class="btn btn-primary">Update</button>
-                            </div>
+
+
 
                         </div>
 
-
-
                     </div>
-
                 </div>
             </div>
         </div>
+        <div class="tab-pane fade" id="fiveA" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-end mb-2">
+                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                            data-bs-target="#newReferee">Add</button>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <td>S/N</td>
+                                <th>NAME</th>
+                                <th>TITLE</th>
+                                <th>ORGANIZATION</th>
+                                <th>ADDRESS</th>
+                                <th>EMAIL</th>
+                                <th>PHONE</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                            $i = 0;
+                            @endphp
+                            @foreach ($staff->referees as $referee)
+                            <tr>
+                                <td>{{++$i}}</td>
+                                <td>{{$referee->referee_fullname}}</td>
+                                <td>{{$referee->title}}</td>
+                                <td>{{$referee->organization}}</td>
+                                <td>{{$referee->address}}</td>
+                                <td>{{$referee->email_address}}</td>
+                                <td>{{$referee->phone_number}}</td>
+
+                                <td class="">
+                                    <!-- <a href="" class="btn btn-sm btn-warning">Edit</a> -->
+                                    <form id="deleteForm{{ $referee->id }}"
+                                    action="{{ route('referees.delete', $referee) }}"
+                                        method='DELETE'>
+                                        @csrf
+                                        <button class="btn btn-sm btn-danger"
+                                            onclick="confirmDelete('deleteForm{{ $referee->id }}', 'Referee ')"
+                                            type="button">Delete</button>
+                                    </form>
+                                    @include('layouts.sweet_alerts.confirm_delete')
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                    <div class="modal fade" id="newReferee" tabindex="-1" aria-labelledby="newRefereeModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-info" id="newRefereeModalLabel">
+                                        Add Referees Details
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="refereeForm" action="{{route('referees.store')}}" method="post">
+                                        @csrf
+                                        <div class="row gx-4">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="card mb-2">
+                                                    <div class="card-body">
+                                                        <div class="m-0">
+                                                            <label class="form-label" for="abc">Names </label>
+                                                            <input type="text" class="form-control" id=""
+                                                                name="referee_fullname" required
+                                                                placeholder="HARUNI SAIDI SIDINGI">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <input type="text" class="form-control" id=""
+                                                                name="user_id" value="{{$staff->user->id}}" hidden>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="card mb-2">
+                                                    <div class="card-body">
+                                                        <div class="m-0">
+                                                            <label class="form-label" for="abc">Title </label>
+                                                            <input type="text" class="form-control" id=""
+                                                                name="title" required
+                                                                placeholder="Manager">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6 col-12">
+                                                <div class="card mb-2">
+                                                    <div class="card-body">
+                                                        <div class="m-0">
+                                                            <label class="form-label" for="abc">Organization </label>
+                                                            <input type="text" class="form-control" id=""
+                                                                name="organization" 
+                                                                placeholder="Manager">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6 col-12">
+                                                <div class="card mb-2">
+                                                    <div class="card-body">
+                                                        <div class="m-0">
+                                                            <label class="form-label" for="abc">Address </label>
+                                                            <input type="text" class="form-control" id=""
+                                                                name="address" 
+                                                                placeholder="Dodoma">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6 col-12">
+                                                <div class="card mb-2">
+                                                    <div class="card-body">
+                                                        <div class="m-0">
+                                                            <label class="form-label" for="abc">Email </label>
+                                                            <input type="text" class="form-control" id=""
+                                                                name="email_address" required
+                                                                placeholder="example@gmail.com">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="card mb-2">
+                                                    <div class="card-body">
+                                                        <div class="m-0">
+                                                            <label class="form-label" for="abc">Phone </label>
+                                                            <input type="text" class="form-control" id="" required
+                                                                name="phone_number" placeholder="0765100100">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button type="button" onclick="submiRefereeForm()" class="btn btn-primary">Update</button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row ends -->
+
+        </div>
     </div>
-    <!-- Row ends -->
 
 </div>
-</div>
-</div>
+
 <script>
-function submitForm() {
-    document.getElementById("work_experienceForm").submit();
+function submitWorkExperienceForm() {
+    document.getElementById('work_experienceForm').submit();
 }
-// Get the button and task container elements
-const addDutyButton = document.getElementById('addDutyButton');
-const taskContainer = document.getElementById('dutyContainer');
+function submiRefereeForm() {
+    document.getElementById('refereeForm').submit();
+}
+let dutyIndex = 1;
 
-// Function to add a new task input field
-addDutyButton.addEventListener('click', function() {
-    const taskCount = document.querySelectorAll('.duty-row').length; // Get the next task index
+document.getElementById('addDutyButton').addEventListener('click', () => {
+    const container = document.createElement('div');
+    container.className = 'd-flex gap-2 mb-2 duty-row';
+    container.setAttribute('data-index', dutyIndex);
 
-    // Create a new row for the new task
-    const newTaskRow = document.createElement('div');
-    newTaskRow.classList.add('d-flex', 'gap-2', 'mb-2', 'duty-row');
-    newTaskRow.setAttribute('data-index', taskCount); // Assign a unique index to the new row
-
-    // Add HTML structure for the task input and delete button
-    newTaskRow.innerHTML = `
-            <label for="">Task</label>
-            <input class="form-control" type="text" name="tasks[]" id="task-${taskCount}">
-            <button type="button" class="btn btn-danger delete-task-btn" onclick="deleteTask(${taskCount})">Delete</button>
-        `;
-
-    // Append the new task row to the task container
-    taskContainer.appendChild(newTaskRow);
-
-    // Recheck the delete button state (disable if only one task)
+    container.innerHTML = `
+        <textarea class="form-control" name="duties[]" placeholder="Enter job duties here..." rows="2"></textarea>
+        <button style="height:40px;" type="button" class="btn btn-danger delete-duty-btn" onclick="deleteDuty(${dutyIndex})">Delete</button>
+    `;
+    document.querySelector('[name="duties[]"]').parentNode.parentNode.appendChild(container);
+    dutyIndex++;
     checkAndDisableDeleteButton();
 });
+
+function deleteDuty(index) {
+    // Find all duty rows
+    const allDutyRows = document.querySelectorAll('.duty-row');
+
+    allDutyRows.forEach(row => {
+        if (parseInt(row.getAttribute('data-index')) === index) {
+            row.remove();
+        }
+    });
+
+    // Optional: reindex remaining rows
+    reindexDutyRows();
+    checkAndDisableDeleteButton();
+}
+
+function reindexDutyRows() {
+    const rows = document.querySelectorAll('.duty-row');
+    rows.forEach((row, i) => {
+        row.setAttribute('data-index', i);
+        const button = row.querySelector('.delete-duty-btn');
+        if (button) {
+            button.setAttribute('onclick', `deleteDuty(${i})`);
+        }
+    });
+}
+
+function checkAndDisableDeleteButton() {
+    const taskRows = document.querySelectorAll('.duty-row');
+    const deleteButtons = document.querySelectorAll('.delete-duty-btn');
+
+    // If only one task is left, disable the delete button for that task
+    if (taskRows.length === 1) {
+        deleteButtons.forEach(button => {
+            button.disabled = true; // Disable all delete buttons
+        });
+    } else {
+        // Enable the delete buttons for all tasks
+        deleteButtons.forEach(button => {
+            button.disabled = false;
+        });
+    }
+}
+
+// Run the check on initial load to ensure proper state
+document.addEventListener('DOMContentLoaded', checkAndDisableDeleteButton);
 </script>
 @endsection

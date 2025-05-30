@@ -9,7 +9,7 @@ class SemesterExamResult extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'semester_exam_id', 'score'];
+    protected $fillable = ['student_id', 'semester_exam_id', 'score','created_by'];
 
     public function student()
     {
@@ -22,6 +22,11 @@ class SemesterExamResult extends Model
     }
 
     public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
+        public function exam()
     {
         return $this->belongsTo(Semester::class);
     }

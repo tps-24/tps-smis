@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Semester extends Model
 {
@@ -38,4 +39,21 @@ class Semester extends Model
     // {
     //     return $this->hasMany(ProgrammeCourseSemester::class);
     // }
+
+//     public function assignedCourses()
+// {
+
+//         if (Auth::user()->hasRole('Super Administrator')) {
+//             return Course::all();
+//         }
+//         // Non-admin: only see assigned courses via course_instructors
+//         return Course::join('programme_course_semesters', 'courses.id', '=', 'programme_course_semesters.course_id')
+//             ->join('course_instructors', 'programme_course_semesters.id', '=', 'course_instructors.programme_course_semester_id')
+//             ->where('course_instructors.user_id', $this->id)
+//             ->select('courses.*')
+//             ->distinct()
+//             ->get();
+//     }
+
+
 }

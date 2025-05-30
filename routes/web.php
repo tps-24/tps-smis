@@ -1,50 +1,51 @@
 <?php
 
-use App\Http\Controllers\NotificationController;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\SessionProgrammeController;
-use App\Http\Controllers\ProgrammeController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\AttendenceController;
-use App\Http\Controllers\MPSController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\PatientController;
-use App\Http\Controllers\BeatController;
-use App\Http\Controllers\TimetableController;
-use App\Http\Controllers\GradingSystemController;
-use App\Http\Controllers\GradeMappingController;
-use App\Http\Controllers\SemesterController;
-use App\Http\Controllers\ProgrammeCourseSemesterController;
-use App\Http\Controllers\OptionalCourseEnrollmentController;
-use App\Http\Controllers\CourseWorkController;
-use App\Http\Controllers\SemesterExamController;
-use App\Http\Controllers\CourseworkResultController;
-use App\Http\Controllers\SemesterExamResultController;
-use App\Http\Controllers\FinalResultController;
-use App\Http\Controllers\ExcuseTypeController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\CampusController;
-use App\Http\Controllers\GuardAreaController;
-use App\Http\Controllers\PatrolAreaController;
 use App\Http\Controllers\AnnouncementController;
-use App\Http\Controllers\DownloadController;
-use App\Http\Controllers\MPSVisitorController;
-use App\Http\Controllers\StaffProgrammeCourseController;
-use App\Http\Controllers\TimeSheetController;
-use App\Http\Controllers\SafariStudentController;
-use App\Http\Controllers\LeaveRequestController; 
+use App\Http\Controllers\AttendenceController;
+use App\Http\Controllers\BeatController;
+use App\Http\Controllers\CampusController;
 use App\Http\Controllers\CertificateController;
-use Carbon\Carbon;
-use App\Http\Controllers\ResumeController;
-
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseWorkController;
+use App\Http\Controllers\CourseworkResultController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\ExcuseTypeController;
+use App\Http\Controllers\FinalResultController;
+use App\Http\Controllers\GradeMappingController;
+use App\Http\Controllers\GradingSystemController;
+use App\Http\Controllers\GuardAreaController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\MPSController;
+use App\Http\Controllers\MPSVisitorController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OptionalCourseEnrollmentController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PatrolAreaController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProgrammeController;
+use App\Http\Controllers\ProgrammeCourseSemesterController;
+use App\Http\Controllers\RefereeController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SafariStudentController;
+use App\Http\Controllers\SemesterController;
+use App\Http\Controllers\SemesterExamController;
+use App\Http\Controllers\SemesterExamResultController;
+use App\Http\Controllers\SessionProgrammeController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StaffProgrammeCourseController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherOnDutyController;
+use App\Http\Controllers\TimeSheetController;
+use App\Http\Controllers\TimetableController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/auth.php';
 
@@ -52,11 +53,9 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-
 // Route::get('/', function () {
 //     return view('dashboard.default_dashboard');
 // });
-
 
 Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
 
@@ -66,14 +65,11 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
     // Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
 });
 
-
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
-
-
 
 // Route::controller(BeatController::class)->prefix('beats')->group(function () {
 //     Route::get('/', 'index');
@@ -86,7 +82,7 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
 //     Route::get('/show_patrol_areas', 'list_patrol_areas')->name('beats.show_patrol_areas');
 //     Route::put('/update/{area_id}', 'update_area');
 //     Route::put('/update_patrol_area/{patrol_area_id}', 'update_patrol_area');
-    
+
 //     Route::get('/list-guards/{area_id}', 'list_guards');
 //     Route::get('/list-patrol/{patrolArea_id}', 'list_patrol');
 //     Route::get('/list-patrol-guards/{patrolArea_id}', 'list_patrol_guards');
@@ -94,23 +90,16 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
 //     Route::get('/downloadPdf/{company_id}/{beatType}/{day}', 'generateTodayPdf')->name('beats.downloadPdf');
 // });
 
-
-
 Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
 });
-
-    
-
 
 // Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
 //     Route::get('/course/{course}', [CourseController::class, 'show'])->name('course.show');
 //     Route::get('/course/{course}/coursework', [CourseworkController::class, 'index'])->name('coursework.index');
 //     Route::post('/course/{course}/coursework', [CourseworkController::class, 'store'])->name('coursework.store');
 //     Route::put('/course/{course}/coursework/{id}', [CourseworkController::class, 'update'])->name('coursework.update');
-   
+
 // });
-
-
 
 Route::get('/students/registration', [StudentController::class, 'createPage'])->name('students.createPage');
 Route::post('/students/registration', [StudentController::class, 'register'])->name('students.register');
@@ -119,10 +108,9 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
     Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
     Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
-   // Route::resource('students', StudentController::class);  
-    
-});
+    // Route::resource('students', StudentController::class);
 
+});
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/student/generate-certificate', [StudentController::class, 'generateCertificate']);
@@ -134,16 +122,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('students/search_certificate/{companyId}', [FinalResultController::class, 'search'])->name('students.search_certificate');
 
     Route::get('/staff/cv/{staffId}', [StaffController::class, 'generateResume'])->name('staff.cv');
-
-
+    Route::post('/staff/work_experience/delete/{experienceId}', [StaffController::class, 'deleteWorkExprience'])->name('staff.delete_experience');
+    Route::post('/staff/school/delete/{schoolId}', [StaffController::class, 'deleteSchool'])->name('staff.delete_school');
     Route::get('/semesters/{semesterId}/courses', [CourseworkResultController::class, 'index'])->name('semesters.index');
-    
-    
+
     Route::get('courseworks/{semesterId}/{courseId}', [CourseworkController::class, 'getCourseworks']);
 
     //Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('/coursework_results/coursework/{coursework}', [CourseworkResultController::class, 'getResultsByCourse']);
-
 
     Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
     Route::get('/coursework/upload_cw/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
@@ -153,8 +139,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/update-beat-status-back-from-safari/{studentId}', [StudentController::class, 'BackFromsafari'])->name('students.BackFromsafari');
 
     // Route::get('/coursework/upload_explanation/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
-    
-
 
     Route::post('/beats/{id}', [BeatController::class, 'update'])->name('beat.update');
     Route::get('/beats/generate', [BeatController::class, 'beatCreate'])->name('beats.beatCreate');
@@ -164,55 +148,54 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/fill-beats', [BeatController::class, 'fillBeats'])->name('beats.fillBeats');
     // Route::get('/beats', [BeatController::class, 'showBeats'])->name('beats.index');
     Route::get('/beats/{beat}', [BeatController::class, 'showBeat'])->name('beats.show');
-    
+
     Route::get('/beats/pdf/{company}', [BeatController::class, 'generatePDF'])->name('beats.generatePDF');
     Route::post('/generate-transcript', [FinalResultController::class, 'generateTranscript'])->name('final.generateTranscript');
     Route::post('/generate-certificate', [FinalResultController::class, 'generateCertificate'])->name('final.generateCertificate');
-    
-    
+
     // Route to generate and display the report
     Route::get('/report/generate', [BeatController::class, 'showReport'])->name('report.generate');
     // Route to download the report as a PDF
     Route::get('/report/history/{companyId}', [BeatController::class, 'downloadHistoryPdf'])->name('report.history');
-    
+
     Route::get('/beats/reserves/{companyId}/{date}', [BeatController::class, 'beatReserves'])->name('beats.reserves');
     Route::get('/beats/approve-reserve/{studentId}', [BeatController::class, 'approveReserve'])->name('beats.approve-reserve');
     Route::get('/beats/reserve-replacement/{reserveId}/{date}/{beatReserveId}', [BeatController::class, 'beatReplacementStudent'])->name('beats.reserve-replacement');
     Route::post('/beats/replace-reserve/{reserveId}/{studentId}/{date}/{beatReserveId}', [BeatController::class, 'beatReserveReplace'])->name('beats.replace-reserve');
-    Route::get('/beats/create-exchange/{beat}',[BeatController::class, 'createExchange'])->name(name: 'beats.create-exchange');
-    Route::post('/beats/exchange/{beat}',[BeatController::class, 'exchange'])->name(name: 'beats.exchange');
+    Route::get('/beats/create-exchange/{beat}', [BeatController::class, 'createExchange'])->name(name: 'beats.create-exchange');
+    Route::post('/beats/exchange/{beat}', [BeatController::class, 'exchange'])->name(name: 'beats.exchange');
 
     Route::get('/students/downloadSample', [StudentController::class, 'downloadSample'])->name('studentDownloadSample');
     Route::get('/staff/downloadSample', [StaffController::class, 'downloadSample'])->name('staffDownloadSample');
     Route::get('/courseworkResult/downloadSample', [CourseworkResultController::class, 'downloadSample'])->name('courseworkResultDownloadSample');
-    Route::get('students/upload-students', function(){
+    Route::get('students/upload-students', function () {
         return view('students.bulk_upload_explanation');
     })->name('uploadStudents');
 
-    Route::get('students/update-students', function(){
+    Route::get('students/update-students', function () {
         return view('students.bulk_update_student');
     })->name('updateStudents');
-    
-    Route::get('staff/upload-staff', function(){
+
+    Route::get('staff/upload-staff', function () {
         return view('staffs.bulk_upload_explanation');
     })->name('uploadStaff');
-  
-    Route::post('staff/search', [StaffController::class, 'search'])->name('staff.search');
+
+    Route::get('staff/search', [StaffController::class, 'search'])->name('staff.search');
     Route::get('/staff/create-cv/{staffId}', [StaffController::class, 'create_cv'])->name('staff.create-cv');
     Route::post('/staff/update-cv/{staffId}', [StaffController::class, 'update_cv'])->name('staff.update-cv');
     Route::post('/staff/update-school-cv/{staffId}', [StaffController::class, 'update_school_cv'])->name('staff.update_school-cv');
     Route::post('/staff/update_other_courses-cv/{staffId}', [StaffController::class, 'update_school_cv'])->name('staff.update_other_courses-cv');
     Route::post('/staff/update_work_experiences-cv/{staffId}', [StaffController::class, 'update_work_experience'])->name('staff.update_work_experience-cv');
     Route::get('/staff/generateResumeePdf/{staffId}', [StaffController::class, 'generateResumeePdf'])->name('staff.generateResumeePdf');
-    Route::get('/assign-instructors', [StaffProgrammeCourseController::class, 'showAssignInstructorsForm'])->name('assign.instructors.form');
+    Route::get('/assigned-instructors/{courseId}', [StaffProgrammeCourseController::class, 'showAssignInstructorsForm'])->name('assign.instructors.form');
     Route::post('/assign-instructors', [StaffProgrammeCourseController::class, 'assignInstructors'])->name('assign.instructors');
+    Route::post('/unassign-instructors/{courseInstructorId}', [StaffProgrammeCourseController::class, 'unAssignInstructor'])->name('unassign.course');
 
-   
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
         Route::post('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
         /**
-         * 
+         *
          *  Wizard route for student registration
          */
         Route::prefix('create')->group(function () {
@@ -231,21 +214,25 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
         Route::post('{id}/delete', 'destroy');
-        
-        Route::post('bulkimport', 'import');
 
+        Route::post('bulkimport', 'import');
 
     });
 
+    Route::resource('students', StudentController::class);
 
-    Route::resource('students', StudentController::class);  
-    
 });
 
+Route::group(['middleware' => ['auth']], function () {
 
-Route::group(['middleware' => ['auth']], function () {    
+    Route::controller(TeacherOnDutyController::class)->prefix('teacher-on-duty')->group(function () {
+        Route::get('', 'index')->name('teacher-on-duty');
+        Route::get('search', 'search')->name('teacher_on_duty.search');
+        Route::get('store/{staffId}', 'store')->name('teacher_on_duty.store');
+        Route::get('unassign/{teacherId}', 'unassign')->name('teacher_on_duty.unassign');
+    });
     // Define the custom route first
-    Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
+    Route::get('platoons/{companyName}', [AttendenceController::class, 'getPlatoons']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
 
     // Define the custom route first
@@ -254,48 +241,51 @@ Route::group(['middleware' => ['auth']], function () {
         [ProgrammeController::class, 'assignCoursesToSemester']
     );
 
-
     Route::controller(MPSController::class)->prefix('mps')->group(function () {
+        Route::get('/all', 'all')->name('mps.all');
         Route::post('search', 'search');
         Route::post('store/{id}', 'store');
-        Route::post('release/{id}', 'release');
+        Route::get('show/{studentId}', 'show')->name('mps.show');
+        Route::put('release/{id}', 'release')->name('mps.release');
         Route::get('{company}/company', 'company');
     });
 
     Route::controller(MPSVisitorController::class)->prefix('visitors')->group(function () {
-        Route::post('index','index')->name('visitors.index');
-        Route::post('store/{studentId}','store')->name('visitors.store');
-        Route::post('update/{studentId}','update')->name('visitors.update');
-        Route::post('search-student','searchStudent')->name('visitors.searchStudent');
+        Route::post('index', 'index')->name('visitors.index');
+        Route::post('store/{studentId}', 'store')->name('visitors.store');
+        Route::get('show/{studentId}', 'show')->name('visitors.show');
+        Route::post('update/{studentId}', 'update')->name('visitors.update');
+        Route::post('search-student', 'searchStudent')->name('visitors.searchStudent');
     });
-
-
-    Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
+    Route::get('final_results/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'getResults'])->name('final_results');
+    Route::get('final_results/create-generate', [FinalResultController::class, 'createGenerate'])->name('final_results.createGenerate');
+    Route::get('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
+    Route::post('final_results/generate/{sessionId}', [FinalResultController::class, 'generate'])->name('final_results.session.generate');
+    Route::get('final_results/return/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'returnResults'])->name('final_results.return');
+    Route::get('final_results/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'getResults'])->name('final_results');
     Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
     Route::post('/students/bulk-update-students', [StudentController::class, 'updateStudents'])->name('student.updateStudents');
-    Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('profile');
+    Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('staff.profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
     Route::post('users/search', [UserController::class, 'search'])->name('users.search');
-    
+
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::post('/students/{id}/approve', [StudentController::class, 'approveStudent'])->name('students.approve');
     Route::get('/student/complete-profile/{id}', [StudentController::class, 'completeProfile'])->name('students.complete_profile');
     Route::put('/student/profile-complete/{id}', [StudentController::class, 'profileComplete'])->name('students.profile_complete');
 
-Route::get('patrol-areas/{patrolArea}/edit', [PatrolAreaController::class, 'edit'])->name('patrol-areas.edit');
-Route::put('patrol-areas/{patrolArea}', [PatrolAreaController::class, 'update'])->name('patrol-areas.update');
-Route::get('guard-areas/{guardArea}/edit', [GuardAreaController::class, 'edit'])->name('guard-areas.edit');
-Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->name('guard-areas.update');
-Route::put('timesheets/{timesheetId}/reject', [TimeSheetController::class, 'reject'])->name('timesheets.reject');
-Route::put('timesheets/{timesheetId}/approve', [TimeSheetController::class, 'approve'])->name('timesheets.approve');
-Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('timesheets.filter');
+    Route::get('patrol-areas/{patrolArea}/edit', [PatrolAreaController::class, 'edit'])->name('patrol-areas.edit');
+    Route::put('patrol-areas/{patrolArea}', [PatrolAreaController::class, 'update'])->name('patrol-areas.update');
+    Route::get('guard-areas/{guardArea}/edit', [GuardAreaController::class, 'edit'])->name('guard-areas.edit');
+    Route::put('guard-areas/{guardArea}', [GuardAreaController::class, 'update'])->name('guard-areas.update');
+    Route::put('timesheets/{timesheetId}/reject', [TimeSheetController::class, 'reject'])->name('timesheets.reject');
+    Route::put('timesheets/{timesheetId}/approve', [TimeSheetController::class, 'approve'])->name('timesheets.approve');
+    Route::post('timesheets/filter', [TimeSheetController::class, 'filter'])->name('timesheets.filter');
 
-Route::post('students/{student}/safari/', [SafariStudentController::class, 'store'])->name('storeSafariStudent');
-Route::put('students/return-safari/{safariStudent}', [SafariStudentController::class, 'updateSafari'])->name('returnSafariStudent');
+    Route::post('students/{student}/safari/', [SafariStudentController::class, 'store'])->name('storeSafariStudent');
+    Route::put('students/return-safari/{safariStudent}', [SafariStudentController::class, 'updateSafari'])->name('returnSafariStudent');
 
-
-    
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UserController::class);
@@ -317,14 +307,11 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::resource('safari-students', SafariStudentController::class);
     Route::resource('certificates', CertificateController::class);
 
-
-
-    
     // Define the custom route first
 
     // routes/web.php
-    Route::get('platoons/{companyName}', [AttendenceController::class,'getPlatoons']);
-    Route::get('campanies/{campusId}', [GuardAreaController::class,'get_companies']);
+    Route::get('platoons/{companyName}', [AttendenceController::class, 'getPlatoons']);
+    Route::get('campanies/{campusId}', [GuardAreaController::class, 'get_companies']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
         Route::get('type-test/{type_id}', 'attendence');
@@ -338,22 +325,37 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
         Route::get('list-safari_students/{list_type}/{attendence_id}', action: 'list_safari');
         Route::post('store-absents/{attendence_id}/{date}', action: 'storeAbsent');
         Route::post('store-safari/{attendence_id}', action: 'storeSafari');
-        Route::get('today/{company_id}/{type}','today');
-        Route::get('generatepdf/{companyId}/{date}','generatePdf')->name('attendences.generatePdf');
-        Route::get('changanua/{attendenceId}/','changanua')->name('attendences.changanua');
-        Route::post('storeMchanganuo/{attendenceId}/','storeMchanganuo')->name('attendences.storeMchanganuo');
+        Route::get('today/{company_id}/{type}', 'today');
+        Route::get('generatepdf/{companyId}/{date}/{attendenceTypeId}', 'generatePdf')->name('attendences.generatePdf');
+        Route::get('changanua/{attendenceId}/', 'changanua')->name('attendences.changanua');
+        Route::post('storeMchanganuo/{attendenceId}/', 'storeMchanganuo')->name('attendences.storeMchanganuo');
 
-        Route::get('today/{company_id}/{type}/{date}', 'today')->name('today');
+        Route::get('today/{company_id}/{type}/{date}/{attendenceTypeId}', 'today')->name('today');
     });
 
-    Route::get('course/courseworks/create/{courseId}',[CourseWorkController::class,'create'])->name('course.coursework.create');
-    Route::get('course/courseworks/{courseId}',[CourseWorkController::class,'getCourse'])->name('course.coursework');
-    Route::post('course/courseworks/store/{courseId}',[CourseWorkController::class,'store'])->name('course.coursework.store');
+    Route::controller(ReportController::class)->prefix('reports')->group(function () {
+        Route::get('/', 'index')->name('reports.index');
+        Route::get('attendance/generate-report', 'generateAttendanceReport')->name('reports.generateAttendanceReport');
+        Route::get('hospital', 'hospital')->name('reports.hospital');
+        Route::get('hospital/generate-report', 'generateHospitalReport')->name('reports.generateHospitalReport');
+        Route::get('leaves', 'leaves')->name('reports.leaves');
+        Route::get('leaves/generate-report', 'generateLeavesReport')->name('reports.generateLeavesReport');
+        Route::get('mps', 'mps')->name('reports.mps');
+        Route::get('mps/generate-report', 'generateMPSReport')->name('reports.generateMPSReport');
 
+    });
+
+    //Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {});
+
+    Route::get('course/courseworks/create/{courseId}', [CourseWorkController::class, 'create'])->name('course.coursework.create');
+    Route::get('course/courseworks/{courseId}', [CourseWorkController::class, 'getCourse'])->name('course.coursework');
+    Route::post('course/courseworks/store/{courseId}', [CourseWorkController::class, 'store'])->name('course.coursework.store');
+    Route::post('enrollments/sessions', [EnrollmentController::class, 'store'])->name('enrollments.session.store');
+    Route::post('enrollments/sessions/delete/{id}', [EnrollmentController::class, 'destroy'])->name('enrollments.session.delete');
     // Route::get('course/courseworks/create/{courseId}',[SemesterExamController::class,'create'])->name('course.coursework.create');
     // Route::get('course/courseworks/{courseId}',[SemesterExamController::class,'getCourse'])->name('course.coursework');
     // Route::post('course/courseworks/store/{courseId}',[SemesterExamController::class,'store'])->name('course.coursework.store');
-    Route::resource('grading_systems', GradingSystemController::class); 
+    Route::resource('grading_systems', GradingSystemController::class);
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);
     Route::resource('assign-courses', ProgrammeCourseSemesterController::class);
@@ -368,8 +370,19 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('attendences', AttendenceController::class);
 
+    Route::controller(RefereeController::class)->prefix('referee')->group(function () {
+        Route::get('/referee/delete/{refereeId}', 'destroy')->name('referees.delete');
+    });
 
-    
+    Route::resource('referees', RefereeController::class);
+
+    Route::controller(SemesterExamResultController::class)->prefix('semester_exams')->group(function () {
+        Route::get('/upload_explanation/{courseId}/{semesterId}', 'getUploadExplanation')->name('exam.upload_explanation');
+        Route::post('/course_results/upload/{courseId}', 'uploadResults')->name('course_exam_results.upload');
+        Route::get('/course_results/configure/{courseId}', 'configure')->name('exam.configure');
+        Route::post('/course_results/store/{courseId}', 'store')->name('course.exam_result.store');
+        Route::get('/course_results/course/{courseId}/{semesterId}', 'getExamResultsByCourse')->name('course.getExamResults');
+    });
     // Route::resource('beats', BeatController::class);
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
@@ -388,7 +401,7 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
         /**
          * End of wizard for student registration
          */
-        Route::post('students/search', 'search')->name('students.search');
+        Route::get('students/search', 'search')->name('students.search');
         Route::get('dashboard', 'dashboard');
         Route::post('store', 'store');
         Route::post('{id}/update', 'update');
@@ -397,12 +410,10 @@ Route::put('students/return-safari/{safariStudent}', [SafariStudentController::c
 
     });
 
+    Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}', [NotificationController::class, 'show']);
+    Route::get('notifications/showNotifications/{notificationIds}', [NotificationController::class, 'showNotifications'])->name('notifications.showNotifications');
 
-
-    Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}',[NotificationController::class,'show']); 
-    Route::get('notifications/showNotifications/{notificationIds}',[NotificationController::class,'showNotifications'])->name('notifications.showNotifications'); 
-
-    Route::get('announcement/download/file/{documentPath}',[AnnouncementController::class,'downloadFile'])->name('download.file'); 
+    Route::get('announcement/download/file/{documentPath}', [AnnouncementController::class, 'downloadFile'])->name('download.file');
 
 });
 
@@ -412,7 +423,7 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
      *  Wizard route for student registration
      */
     Route::prefix('create')->group(function () {
-      
+
         Route::get('step-two/{type}', function () {
             return view('students/wizards/stepTwo');
         });
@@ -435,7 +446,6 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
 });
 //end
 
-
 Route::get('/hospital/viewDetails/{timeframe}', [PatientController::class, 'viewDetails'])->name('hospital.viewDetails');
 Route::get('/hospital/show/{id}', [PatientController::class, 'show'])->name('hospital.show');
 
@@ -447,14 +457,14 @@ Route::put('/patients/{id}/update-status', [PatientController::class, 'updateSta
 Route::put('/patient/{id}/status', [PatientController::class, 'updateStatus'])->name('update.patient.status');
 
 Route::get('/hospital', [PatientController::class, 'index'])->name('hospital.index');
+Route::get('/patients/show/{studentId}', [PatientController::class, 'showPatient'])->name('patients.show');
 Route::post('/patients/submit', [PatientController::class, 'submit'])->name('patients.submit');
-Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve'); 
+Route::patch('/patients/approve/{id}', [PatientController::class, 'approvePatient'])->name('patients.approve');
 Route::put('/patients/reject/{id}', [PatientController::class, 'reject'])->name('patients.reject');
 Route::put('/patients/treat/{id}', [PatientController::class, 'treat'])->name('patients.treat');
 Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
 Route::get('/dispensary', [PatientController::class, 'dispensaryPage'])->name('dispensary.page');
 Route::get('/statistics/download/{timeframe}', [PatientController::class, 'downloadStatisticsReport'])->name('statistics.download');
-
 
 // 🚀 Routes for Sending to Receptionist
 // Route::post('/students/send-to-receptionist', [PatientController::class, 'sendToReceptionist'])->name('students.sendToReceptionist');
@@ -489,10 +499,10 @@ Route::get('/generate-timetable', [TimetableController::class, 'generateTimetabl
 //Downloader Centre Routes
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index'); // List files
+    Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index');          // List files
     Route::get('/downloads/upload', [DownloadController::class, 'create'])->name('downloads.create'); // Upload form
-    Route::post('/downloads/upload', [DownloadController::class, 'store'])->name('downloads.store'); // Upload action
-    Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file'); // Download file
+    Route::post('/downloads/upload', [DownloadController::class, 'store'])->name('downloads.store');  // Upload action
+    Route::get('/download/{file}', [DownloadController::class, 'download'])->name('downloads.file');  // Download file
 });
 
 // Route::get('test', [BeatController::class,'beatReplacementStudent']);
@@ -504,30 +514,31 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
     ->name('downloads.delete')
     ->middleware('auth'); // Requires login to delete
 
-   
-    Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
-    Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
-    
-    Route::get('/leave-request', [LeaveRequestController::class, 'showPanel'])->name('leave-requests.panel');
-    
-    Route::get('/leave-requests/oc-panel', [LeaveRequestController::class, 'ocLeaveRequests'])->name('leave-requests.oc-panel');
-    Route::post('/oc/leave-requests/forward/{id}', [LeaveRequestController::class, 'forwardToChiefInstructor'])->name('oc.leave-requests.forward');
-    
-    Route::get('/chief_instructor/leave-requests', [LeaveRequestController::class, 'approvedLeaveRequestsForChiefInstructor'])->name('chief_instructor.leave-requests');
-    Route::put('/chief-instructor/leave-requests/{id}/approve', [LeaveRequestController::class, 'chiefInstructorApprove'])->name('leave-requests.chief-instructor-approve');
-    Route::get('/leave-requests/chief_instructor', [LeaveRequestController::class, 'chiefInstructorIndex'])->name('leave-requests.chief-instructor');
+Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
+Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
 
-    Route::put('/leave-requests/{id}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
-    Route::put('/leave-requests/{id}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
-    
-    Route::get('/leave-requests/statistics', [LeaveRequestController::class, 'statistics'])->name('leave-requests.statistics');
-    Route::get('/leave-requests/statistics/pdf', [LeaveRequestController::class, 'exportPdf'])->name('leave-requests.statistics.pdf');
-    
-    Route::get('/leave-requests/{id}/download', [LeaveRequestController::class, 'downloadPDF'])->name('leave-requests.download');
-    Route::get('/leave-requests/{id}/pdf', [LeaveRequestController::class, 'exportSinglePdf'])->name('leave-requests.single.pdf');
-    
-    Route::get('/leave-requests/rejected', [LeaveRequestController::class, 'rejected'])->name('leave-requests.rejected');
-    Route::get('/leave-requests/{id}/rejected-pdf', [LeaveRequestController::class, 'downloadRejectedPdf'])->name('leave-requests.rejected.pdf');
-    
+Route::get('/leave-request', [LeaveRequestController::class, 'showPanel'])->name('leave-requests.panel');
+Route::get('/leave-request/show/{studentId}', [LeaveRequestController::class, 'show'])->name('leave-requests.show');
+
+Route::get('/leave-requests/oc-panel', [LeaveRequestController::class, 'ocLeaveRequests'])->name('leave-requests.oc-panel');
+Route::post('/oc/leave-requests/forward/{id}', [LeaveRequestController::class, 'forwardToChiefInstructor'])->name('oc.leave-requests.forward');
+
+Route::get('/chief_instructor/leave-requests', [LeaveRequestController::class, 'approvedLeaveRequestsForChiefInstructor'])->name('chief_instructor.leave-requests');
+Route::put('/chief-instructor/leave-requests/{id}/approve', [LeaveRequestController::class, 'chiefInstructorApprove'])->name('leave-requests.chief-instructor-approve');
+Route::get('/leave-requests/chief_instructor', [LeaveRequestController::class, 'chiefInstructorIndex'])->name('leave-requests.chief-instructor');
+
+Route::put('/leave-requests/{id}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
+Route::put('/leave-requests/{id}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+Route::put('/leave-requests/{id}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+Route::delete('/leave-requests/{id}/delete', [LeaveRequestController::class, 'destroy'])->name('leave-requests.delete');
+Route::get('/leave-requests/statistics', [LeaveRequestController::class, 'statistics'])->name('leave-requests.statistics');
+Route::post('/leave-requests/return/{leaveId}', [LeaveRequestController::class, 'return'])->name('leave_request.return');
+Route::get('/leave-requests/statistics/pdf', [LeaveRequestController::class, 'exportPdf'])->name('leave-requests.statistics.pdf');
+
+Route::get('/leave-requests/{id}/download', [LeaveRequestController::class, 'downloadPDF'])->name('leave-requests.download');
+Route::get('/leave-requests/{id}/pdf', [LeaveRequestController::class, 'exportSinglePdf'])->name('leave-requests.single.pdf');
+
+Route::get('/leave-requests/rejected', [LeaveRequestController::class, 'rejected'])->name('leave-requests.rejected');
+Route::get('/leave-requests/{id}/rejected-pdf', [LeaveRequestController::class, 'downloadRejectedPdf'])->name('leave-requests.rejected.pdf');
 
 Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->name('staffs.resume');

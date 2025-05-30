@@ -54,6 +54,9 @@
             </div>
 
             <div class="d-flex justify-content-end mt-3">
+            @if($user->staff)
+                    <a href="{{ route('staffs.resume', $user->staff->id) }}" class="btn btn-primary me-2">Curriculum Vitae</a>
+                    @endif
               <button class="btn btn-danger me-2">Edit Profile</button>
               <button class="btn btn-success">Active</button> 
               <div class="pull-right" style="margin-left:5px">
@@ -118,7 +121,9 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-person"></i>
                                           </span>
+                                          @if($user->student)
                                           <input type="text" class="form-control" id="forceNumber" value="{{$user->student->force_number}}" Disabled>
+                                          @endif
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -165,7 +170,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-phone"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="contactNumber" value="{{$user->student->phone}}" Disabled>
+                                          <input type="text" class="form-control" id="contactNumber" value= @if($user->student) "{{$user->student->phone}}" @endif Disabled>
                                         </div>
 
                                       </div>
@@ -181,7 +186,7 @@
                                           <span class="input-group-text">
                                             <i class="bi bi-calendar4"></i>
                                           </span>
-                                          <input type="text" class="form-control" id="birthDay"  value="{{$user->student->dob}}" Disabled>
+                                          <input type="text" class="form-control" id="birthDay"  value=@if($user->student)"{{$user->student->dob}}"  @endif Disabled>
                                         </div>
                                       </div>
                                       <!-- Form field end -->
@@ -200,9 +205,9 @@
                                             <div class="card-body" style="background-color:rgb(209, 209, 214);">
                                                 <div class="d-flex align-items-center">
                                                     <div class="p-3  me-3">
-                                                        <p>Enrolled Course: {{$user->student->programme->programmeName}}</p>
-                                                        <p>NIDA: {{$user->student->nin}}</p>
-                                                        <p>Gender: {{$user->student->gender}}</p>
+                                                        <p>Enrolled Course:@if($user->student) @if($user->student->programme) {{$user->student->programme->programmeName}}@endif @endif</p>
+                                                        <p>NIDA:@if($user->student) {{$user->student->nin}}@endif</p>
+                                                        <p>Gender: @if($user->student) {{$user->student->gender}}@endif</p>
                                                     </div>
                                                 </div>
                                             </div>

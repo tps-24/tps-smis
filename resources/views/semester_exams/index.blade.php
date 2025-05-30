@@ -22,98 +22,105 @@
     {{ $value }}
 </div>
 @endsession
-
 <div class="row gx-4">
     <div class="col-sm-3">
-    <div class="card mb-3">
-        <div class="card-header">
-            <!-- Semester Tabs -->
-            <ul class="nav nav-tabs" id="semesterTabs" role="tablist">
-                @foreach ($semesters as $key => $semester)
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $key == 0 ? 'active bg-success text-white' : '' }}" id="tab-{{ $semester->id }}"
-                        data-bs-toggle="tab" data-bs-target="#semester-{{ $semester->id }}" type="button" role="tab"
-                        aria-controls="semester-{{ $semester->id }}"
-                        aria-selected="{{ $key == 0 ? 'true' : 'false' }}">
-                        {{ $semester->semester_name }}
-                    </button>
-                </li>
-                @endforeach
-            </ul>
-        </div>
+        <div class="card mb-3">
+            <div class="card-header">
+                <!-- Semester Tabs -->
+                <ul class="nav nav-tabs" id="semesterTabs" role="tablist">
+                    @foreach ($semesters as $key => $semester)
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {{ $key == 0 ? 'active bg-success text-white' : '' }}"
+                            id="tab-{{ $semester->id }}" data-bs-toggle="tab"
+                            data-bs-target="#semester-{{ $semester->id }}" type="button" role="tab"
+                            aria-controls="semester-{{ $semester->id }}"
+                            aria-selected="{{ $key == 0 ? 'true' : 'false' }}">
+                            {{ $semester->semester_name }}
+                        </button>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
 
-        <div class="card-body">
-            <!-- Tab Content for Semesters -->
-            <div class="tab-content" id="semesterTabsContent">
-                @foreach ($semesters as $key => $semester)
-                <div class="tab-pane fade {{ $key == 0 ? 'show active' : '' }}" id="semester-{{ $semester->id }}"
-                    role="tabpanel" aria-labelledby="tab-{{ $semester->id }}">
-                    <h5>Courses for {{ $semester->semester_name }}</h5>
-                    @if ($semester->courses->isNotEmpty())
-                    <ul>
-                        @foreach ($semester->courses as $course)
-                        <li>
-                            <a href="#" class="course-link" data-course-id="{{ $course->id }}">
-                                {{ $course->courseName }}
-                            </a>
-                        </li>
-                        @endforeach
-                    </ul>
-                    @else
-                    <p>No courses available for this semester.</p>
-                    @endif
+            <div class="card-body">
+                <!-- Tab Content for Semesters -->
+                <div class="tab-content" id="semesterTabsContent">
+                    @foreach ($semesters as $key => $semester)
+                    <div class="tab-pane fade {{ $key == 0 ? 'show active' : '' }}" id="semester-{{ $semester->id }}"
+                        role="tabpanel" aria-labelledby="tab-{{ $semester->id }}">
+
+                        <h5>Courses for {{ $semester->semester_name }}</h5>
+                        @if ($semester->courses->isNotEmpty())
+                        <ul>
+                            @foreach ($semester->courses as $course)
+                            <li>
+                                <a href="#" class="course-link" data-course-id="{{ $course->id }}" data-semester-id="{{ $semester->id }}">
+                                    {{ $course->courseName }}
+                                </a>
+                            </li>
+                            @endforeach
+                        </ul>
+                        @else
+                        <p>No courses available for this semester.</p>
+                        @endif
+                    </div>
+                    @endforeach
                 </div>
-                @endforeach
             </div>
         </div>
     </div>
-</div>
 
-<style>
-  /* Default Tabs */
-.nav-link {
-    color: black; /* Default text color */
-}
+    <style>
+    /* Default Tabs */
+    .nav-link {
+        color: black;
+        /* Default text color */
+    }
 
-/* Active Semester Tab */
-.nav-link.active {
-    color: #28a745; /* Green text for the active semester tab */
-}
+    /* Active Semester Tab */
+    .nav-link.active {
+        color: #28a745;
+        /* Green text for the active semester tab */
+    }
 
-/* Default Course Links */
-.course-link {
-    text-decoration: none;
-    color: black; /* Default text color for course links */
-}
+    /* Default Course Links */
+    .course-link {
+        text-decoration: none;
+        color: black;
+        /* Default text color for course links */
+    }
 
-/* Selected Course Link */
-.course-link.selected {
-    color: darkblue; /* Light blue text for the selected course */
-    font-weight: bold; /* Optional: Make it stand out more */
-}
+    /* Selected Course Link */
+    .course-link.selected {
+        color: darkblue;
+        /* Light blue text for the selected course */
+        font-weight: bold;
+        /* Optional: Make it stand out more */
+    }
+    </style>
 
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
         // Highlight the active semester tab
         document.querySelectorAll('#semesterTabs .nav-link').forEach(tab => {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('#semesterTabs .nav-link').forEach(link => link.classList.remove('active', 'bg-success', 'text-white'));
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('#semesterTabs .nav-link').forEach(link => link
+                    .classList.remove('active', 'bg-success', 'text-white'));
                 this.classList.add('active', 'bg-success', 'text-white');
             });
         });
 
         // Highlight the selected course
         document.querySelectorAll('.course-link').forEach(course => {
-            course.addEventListener('click', function (e) {
+            course.addEventListener('click', function(e) {
                 e.preventDefault(); // Prevent default link behavior
-                document.querySelectorAll('.course-link').forEach(link => link.classList.remove('selected'));
+                document.querySelectorAll('.course-link').forEach(link => link.classList.remove(
+                    'selected'));
                 this.classList.add('selected');
             });
         });
     });
-</script>
+    </script>
 
     <!-- Left section ends-->
 
@@ -133,7 +140,8 @@
 
                     <button disabled id="ca_configuration_btn" class="btn btn-success mb-2"
                         style="float:right !important; margin-right:1%;">
-                        <a href="" id="ca_configuration_link" style="color:white;"> <i class="fa fa-plus"></i> SE Configurations</a>
+                        <a href="" id="ca_configuration_link" style="color:white;"> <i class="fa fa-plus"></i> SE
+                            Configurations</a>
                     </button>
                 </div>
             </div>
@@ -177,20 +185,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Get the course ID
             const courseId = this.getAttribute('data-course-id');
+            const semesterId = this.getAttribute('data-semester-id');
 
             // Enable buttons and update their links dynamically
             const addLink = document.getElementById('add_link');
-            const addButton = document.getElementById('add_btn');
-            const uploadExplanationRoute = @json(route('coursework.upload_explanation', [
-                'courseId' => 'COURSE_ID_PLACEHOLDER'
+           // const addButton = document.getElementById('add_btn');
+            const uploadExplanationRoute = @json(route('exam.upload_explanation', [
+                'courseId' => 'COURSE_ID_PLACEHOLDER', 'semesterId' => 'SEMESTER_ID_PLACEHOLDER'
             ]));
+
             addLink.setAttribute('href', uploadExplanationRoute.replace('COURSE_ID_PLACEHOLDER',
-                courseId));
-            addButton.disabled = false;
+                courseId).replace('SEMESTER_ID_PLACEHOLDER',semesterId));
+            //addButton.disabled = false;
 
             const caConfigurationLink = document.getElementById('ca_configuration_link');
             const caConfigurationButton = document.getElementById('ca_configuration_btn');
-            const caConfigurationRoute = @json(route('course.coursework', ['courseId' =>
+            const caConfigurationRoute = @json(route('exam.configure', ['courseId' =>
                 'COURSE_ID_PLACEHOLDER'
             ]));
             caConfigurationLink.setAttribute('href', caConfigurationRoute.replace(
@@ -200,13 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Selected Course ID: ${courseId}`);
 
             // Fetch and display results for the selected course
-            fetchCourseworkResults(courseId);
+            fetchCourseworkResults(courseId, semesterId);
         });
     });
 
     // Function to fetch and render coursework results
-    function fetchCourseworkResults(courseId, page = 1) {
-        const apiUrl = `/tps-smis/coursework_results/course/${courseId}?page=${page}`;
+    function fetchCourseworkResults(courseId,semesterId, page = 1) {
+        const apiUrl = `/tps-smis/semester_exams/course_results/course/${courseId}/${semesterId}/?page=${page}`;
         const headingsContainer = document.getElementById('coursework-headings');
         const resultsContainer = document.getElementById('coursework-results');
         const paginationContainer = document.getElementById('pagination-container');
@@ -215,7 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error: Necessary DOM elements are missing');
             return;
         }
-
         fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {
@@ -224,8 +233,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                console.log('Fetched Data:', data);
-
+                console.log('Fetched Data:', data.results.data.data);
+                const addButton = document.getElementById('add_btn');   
+                if (!data.hasFinalResults) {
+                    addButton.disabled = false;
+                } else {
+                    addButton.disabled = true;
+                }
                 // Handle cases where no results are found
                 if (!data.results || !data.results.data || Object.keys(data.results.data).length === 0) {
                     headingsContainer.innerHTML = '';
@@ -247,16 +261,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultsContainer.innerHTML = '';
 
                 // Add dynamic coursework headings
-                data.courseworks.forEach(coursework => {
-                    const heading = document.createElement('th');
-                    heading.style.textAlign = 'center';
-                    heading.innerText = coursework.coursework_title;
-                    headingsContainer.appendChild(heading);
-                });
+                // data.courses.forEach(course => {
+                //     const heading = document.createElement('th');
+                //     heading.style.textAlign = 'center';
+                //     heading.innerText = course.id;
+                //     headingsContainer.appendChild(heading);
+                // });
 
                 const totalHeading = document.createElement('th');
                 totalHeading.style.textAlign = 'center';
-                totalHeading.innerText = 'Total CW';
+                totalHeading.innerText = 'Score';
                 headingsContainer.appendChild(totalHeading);
 
                 const actionsHeading = document.createElement('th');
@@ -264,29 +278,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 actionsHeading.innerText = 'Actions';
                 headingsContainer.appendChild(actionsHeading);
 
-                let rowIndex = 1;
-                Object.entries(data.results.data).forEach(([studentId, studentResult]) => {
+                let index = 0;
+
+
+
+                Object.entries(data.results.data.data).forEach(([index, result]) => {
+                     const student = result.student;
+                    const score = result.score;
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                    <td style="text-align: center;">${rowIndex++}</td>
-                    <td style="text-align: center;">${studentResult.student.force_number}</td>
-                    <td>${studentResult.student.first_name} ${studentResult.student.middle_name || ''} ${studentResult.student.last_name}</td>
-                `;
+                        <td style="text-align: center;">${parseInt(index) + 1}</td>
+                        <td style="text-align: center;">${student.force_number}</td>
+                        <td>${student.first_name} ${student.middle_name || ''} ${student.last_name}</td>
+                    `;
 
-                    data.courseworks.forEach(coursework => {
-                        const score = studentResult.scores[coursework.id] || '-';
-                        row.innerHTML += `<td style="text-align: center;">${score}</td>`;
-                    });
+                    // Since there's only one course in this response, directly add its score
+                    row.innerHTML += `<td style="text-align: center;">${score}</td>`;
 
                     row.innerHTML += `
-                    <td style="text-align: center;">${studentResult.total_cw}</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-info btn-sm">View</button>
-                        <button class="btn btn-primary btn-sm">Edit</button>
-                    </td>
-                `;
+                                <td style="text-align: center;">
+                                    <button class="btn btn-info btn-sm">View</button>
+                                    <button class="btn btn-primary btn-sm">Edit</button>
+                                </td>
+                            `;
+
                     resultsContainer.appendChild(row);
                 });
+
 
                 // Render pagination links dynamically
                 paginationContainer.innerHTML = `

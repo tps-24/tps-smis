@@ -36,25 +36,33 @@
 @endif
 
     <div class="container mt-5">
-        <h2>Assign Instructors to Programme Course</h2>
-
+        <h2>Assign Instructors to {{ $course->courseName }} Course</h2>
         <form action="{{ route('assign.instructors') }}" method="POST">
             @csrf
-
             <div class="form-group">
-                <label for="programmeCourseId">Programme Course ID:</label>
-                <input type="text" class="form-control" id="programmeCourseId" name="programmeCourseId">
-            </div>
+                <label for="programmeCourseId">Programme Course</label>
+                <select class="form-control" name="programme_id" id="" required>
+                    <option value="" selected disabled>select program</option>
+                    @foreach ($course->programmes as $program)
+                        <option value="{{$program->id}}">{{$program->programmeName}}</option>
+                    @endforeach
+                </select>
+            </div>       
 
-            <div class="form-group">
+                <input type="text" value="{{ $course->semesters[0]->pivot->semester_id }}"  class="form-control" id="programmeCourseId" name="semester_id" hidden>
+                <input type="text" value="{{ $course->semesters[0]->pivot->session_programme_id }}"  class="form-control" id="programmeCourseId" name="session_programme_id" hidden>
+                <input type="text" value="{{ $course->id }}"  class="form-control" id="programmeCourseId" name="course_id" hidden>
+                <div class="form-group">
                 <label for="staffIds">Instructors (Select multiple):</label>
-                <select class="form-control" id="staffIds" name="staff_ids[]" multiple>
+                <select class="form-control" id="staffIds" name="staff_ids[]" multiple required>
                     @foreach($staffs as $staff)
-                        <option value="{{ $staff->id }}">{{ $staff->firstName }} {{ $staff->lastName }}</option>
+                        @if ($staff->user->hasRole('Instructor'))
+                            <option value="{{ $staff->id }}">{{ $staff->firstName }} {{ $staff->lastName }}</option>    
+                        @endif                       
                     @endforeach
                 </select>
             </div>
-
+            
             <button type="submit" class="btn btn-primary">Assign Instructors</button>
         </form>
     </div>

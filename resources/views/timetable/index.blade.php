@@ -29,7 +29,7 @@
             </div>
         @endif
 
-<div class="text-center mb-3">
+<div class="text-center mb-3 mt-4">
     <a href="{{ route('timetable.generate') }}" class="btn btn-info">
         <i class="fas fa-sync"></i> Generate Timetable Automatically
     </a>

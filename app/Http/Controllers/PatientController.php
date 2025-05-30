@@ -126,7 +126,14 @@ public function show($id)
     return view('hospital.show', compact('patient'));
 }
     
-
+public function showPatient($id)
+{
+    // Fetch patient details from the database
+    $patients = Patient::where('student_id',$id)->get();
+    
+    // Pass the patient data to the view
+    return view('hospital.show', compact('patients'));
+}
 
 public function sendToReceptionist(Request $request)
 {
@@ -223,7 +230,7 @@ public function receptionistPage()
 
 public function doctorPage()
 {
-    if (!auth()->user()->hasRole('Doctor')) {
+    if (!(auth()->user()->hasRole('Doctor') || auth()->user()->hasRole('Super Administrator'))) {
         abort(403, 'You do not have access to this page.');
     }
 
@@ -272,7 +279,7 @@ public function saveDetails(Request $request)
 public function viewDetails(Request $request, $timeframe)
 {
     $sirMajor = Auth::user();
-
+    
     if (!$sirMajor) {
         return redirect()->route('login')->with('error', 'Please log in first.');
     }
@@ -287,7 +294,6 @@ public function viewDetails(Request $request, $timeframe)
 
     // Start query
     $query = Patient::query();
-
     // Apply filters
     if ($company_id) {
         $query->where('company_id', $company_id);
@@ -296,35 +302,33 @@ public function viewDetails(Request $request, $timeframe)
     if ($platoon) {
         $query->where('platoon', $platoon);
     }
-
     // Filter by timeframe
     switch ($timeframe) {
         case 'daily':
-            $query->whereDate('created_at', Carbon::today());
+            $patients =  Patient::whereDate('created_at', Carbon::today())->get();
             break;
         case 'weekly':
-            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()]);
+            $patients = Patient::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()])->get();
             break;
         case 'monthly':
-            $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()]);
+            $patients =  Patient::whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()])->get();
             break;
     }
 
     // Fetch patients
-    $patients = $query->get();
-
+    //$patients = $query->get();
     // Check and return with a message if empty
-    if ($patients->isEmpty()) {
-        return view('hospital.viewDetails', [
-            'patients' => [],
-            'timeframe' => $timeframe,
-            'company_id' => $company_id,
-            'platoon' => $platoon,
-            'message' => 'No patients found for this timeframe.',
-        ]);
-    }
-
-    return view('hospital.viewDetails', compact('patients', 'timeframe', 'company_id', 'platoon'));
+    // if ($patients->isEmpty()) {
+    //     return view('hospital.viewDetails', [
+    //         'patients' => [],
+    //         'timeframe' => $timeframe,
+    //         'company_id' => $company_id,
+    //         'platoon' => $platoon,
+    //         'message' => 'No patients found for this timeframe.',
+    //     ]);
+    // }
+    //dd( $patients);
+return view('hospital.viewDetails', compact('patients', 'timeframe', 'company_id', 'platoon'));
 }
 
 // public function dispensaryPage(Request $request)

@@ -92,11 +92,12 @@ class Student extends Model
 
     public function courses()
     {
-        $programmeCourses = $this->programme->courses()->get(); // Fixed here
-        $optionalCourses = $this->optionalCourses();
-        // return $programmeCourses->merge($optionalCourses);
+        $programmeCourses = $this->programme->courses(); // Fixed here
+        $optionalCourses = $this->optionalCourseEnrollments();
+         //return $programmeCourses->merge($optionalCourses);
         return $programmeCourses;
     }
+
 
     public function approve()
     {
@@ -127,5 +128,67 @@ class Student extends Model
 
     public function sick(){
         return $this->hasMany(Patient::class);
+    }
+       public function leaves(){
+        return $this->hasMany(LeaveRequest::class);
+    } 
+    public function getGPAAttribute()
+    {
+        $results = $this->finalResults;
+
+        $courses = $this->courses; // Retrieve ALL courses
+        $semester_one_total_credit_weight = 0;
+        $semester_one_total_grade_credit = 0;
+        $semester_two_total_credit_weight = 0;
+        $semester_two_total_grade_credit = 0;
+        foreach ($results as $result) {
+            if($result->semester_id == 1)
+                $semester_one_total_credit_weight += $this->getGradePoint($result->grade) * $result->course->programmes->first()->pivot->credit_weight;
+            else if($result->semester_id == 2)
+            $semester_two_total_credit_weight += $this->getGradePoint($result->grade) * $result->course->programmes->first()->pivot->credit_weight;
+        }
+        foreach ($courses as $course) {
+            if($course->semesters->first()->pivot->semester_id == 1)
+             $semester_one_total_grade_credit += $course->pivot->credit_weight; // Ensure no null error
+            else if($course->semesters->first()->pivot->semester_id == 2)
+                $semester_two_total_grade_credit += $course->pivot->credit_weight; 
+        }
+
+        //Calculation of gpa for each semester
+        $semesterOneGPA = $semester_one_total_grade_credit == 0? 0: $semester_one_total_credit_weight/$semester_one_total_grade_credit;
+        $semesterTwoGPA = $semester_two_total_grade_credit == 0? 0: $semester_two_total_credit_weight/$semester_two_total_grade_credit;
+
+        $overallGPA = round(($semesterOneGPA+$semesterTwoGPA)/2,1);
+    return collect([
+        'semesterOneGPA' => round($semesterOneGPA,1),
+        'semesterTwoGPA' => round($semesterTwoGPA,1),
+        'overallGPA' => $overallGPA,
+        'classAwarded' => $this->getClass($overallGPA),
+    ]);
+        return $total_credit > 0 ? round($total_grade_credit / $total_credit, 1) : null; // Avoid division by zero
+    }
+
+    function getClass($gpa){
+        if ($gpa >= 3.5 && $gpa <= 4) {
+            return ' First Class';
+        } else if ($gpa >= 3.0 && $gpa <= 3.4) {
+            return 'Second Class';
+        }
+        else if ($gpa >= 2.0 && $gpa <= 2.9) {
+            return 'Pass';
+        }
+        else{
+            return 'Failed';
+        }
+    }
+    function getGradePoint($grade){
+        switch($grade){
+            case 'A': return 4;
+            case 'B': return 3;
+            case 'C': return 2;
+            case 'D': return 1;
+            case 'F': return 0;
+            default: return 0;
+        } 
     }
 }

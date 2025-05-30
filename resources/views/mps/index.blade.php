@@ -22,9 +22,15 @@
 @section('content')
 @include('layouts.sweet_alerts.index')
 
-<div style="display: flex; justify-content: flex-end; margin-right: 2px;">
-    <a href="{{url('/mps/create')}}"><button class="btn btn-sm btn-success">Add Student</button></a>
+<div style="display: flex; justify-content: space-between; margin-right: 2px; margin-bottom: 2px;">
+    <a href="{{ route('mps.all') }}">
+        <button class="btn btn-sm btn-primary">View all</button>
+    </a>
+    <a href="{{ url('/mps/create') }}">
+        <button class="btn btn-sm btn-success">Add Student</button>
+    </a>
 </div>
+
 @if(isset($mpsStudents))
     @if ($mpsStudents->isNotEmpty())
         <div class="table-outer">
@@ -69,14 +75,44 @@
                                             data-bs-target="#statusModalEdit{{ $student->id }}">
                                             Edit
                                         </button>
-                                    <form id="releaseForm{{ $student->id }}" action="{{url('mps/release/' . $student->id)}}" method="POST">
-                                                        @csrf
-                                                        <button onclick="confirmAction('releaseForm{{ $student->id }}','Release Student', '{{ $student->student->first_name }} {{ $student->student->last_name }}', 'Release')" type="button" class="btn btn-sm btn-warning">Release</button>
-                                                    </form>
-                                    
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#statusModalRelease{{ $student->id }}">
+                                            Release
+                                        </button>                                   
                                     @endif
                                 </td>
                                 <td>
+                                    <div class="modal fade" id="statusModalRelease{{ $student->id }}" tabindex="-1"
+                                        aria-labelledby="statusModalRelease{{ $student->id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="statusModalRelease{{ $student->id }}">
+                                                        Release reasons for {{ $student->student->first_name }}
+                                                        {{ $student->student->last_name }}
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Form to update patient status -->
+                                                    <form action="{{route('mps.release', $student->id)}}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="mb-3">
+                                                            <label for="description" class="form-label">Reason</label>
+                                                            <textarea class="form-control" id="" name="reason" rows="3"
+                                                                required></textarea>
+                                                        </div>
+                                                        <div class="d-flex justify-content-end">
+                                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                        </div>
+                                                        
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="modal fade" id="statusModal{{  $student->id ?? '' }}" tabindex="-1"
                                         aria-labelledby="statusModalLabel{{  $student->id ?? '' }}" aria-hidden="true">
@@ -93,6 +129,9 @@
                                                     <h5>Name: {{ $student->student->first_name }} {{ $student->student->last_name }}</h5>
                                                     <h5>Company: {{ $student->student->company->name ?? ''}} - {{ $student->student->platoon ?? ''}}</h5>
                                                    <h5>Description</h5> <p>{{$student->description}}</p>
+                                                   @if ($student->release_reason)
+                                                       <h5>Release Reason</h5><p>{{$student->release_reason}}</p>
+                                                   @endif
                                                 </div>
                                             </div>
                                         </div>

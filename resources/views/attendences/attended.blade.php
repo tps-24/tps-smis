@@ -22,11 +22,11 @@
     <h1>No attendence recorded today.</h1>
 @else
 <h4>Attendances for {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}.</h4>
-<div class="d-flex  justify-content-end">
-    <a href="{{ route('attendences.generatePdf',['companyId'=>$company->id,'date'=>$date]) }}">
-        <button title="Download report" class="btn btn-sm btn-success"><i class="gap 2 bi bi-download"></i> Report</button>
-    </a>
-</div>
+    <div class="d-flex  justify-content-end">
+        <a href="{{ route('attendences.generatePdf',['companyId'=>$company->id,'date'=>$date, 'attendenceTypeId' => $attendenceType->id]) }}">
+            <button title="Download report" class="btn btn-sm btn-success"><i class="gap 2 bi bi-download"></i> Report</button>
+        </a>
+    </div>
     <div class="table-responsive">
         <table class="table table-striped truncate m-0">
             <thead>
@@ -38,7 +38,7 @@
                     <th>Mess</th>
                     <th>Off</th>
                     <th>Sick</th>
-                    <th>Safari</th>
+                    <th>Leave</th>
                     <th>Lock Up</th>
                     <th>Kazini</th>
                     <th>ME</th>

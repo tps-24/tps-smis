@@ -42,45 +42,44 @@
                 </div>
 
                 <div class="mt-1">
-                <p>&nbspHere you can configure coursework assessment types. If you encounter any issues, feel free to contact support.</p>
+                <p>&nbspHere you can configure course result assessment types. If you encounter any issues, feel free to contact support.</p>
                 </div>
                 
                 <div class="pull-right" style="float:right !important;">
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addCourseworkModal">
-                        <i class="fa fa-plus"></i> Add Assessment Type
+                        <i class="fa fa-plus"></i> Add Exam
                     </button>
                 </div>
             </div>
             <div class="card-body">
+                @if($course->semesterExams->isNotEmpty())
+                
                 <div class="table-outer">
                     <div class="table-responsive">
                         <table class="table table-striped truncate m-0">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Assessment Type</th>
                                     <th>Coursework Title</th>
                                     <th>Max Score</th>
-                                    <th>Due Date</th>
+                                    <th>Date</th>
                                     <th scope="col" width="280px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                              @foreach ($course->courseWorks as $index => $courseWork)
                                   <tr>
-                                      <td>{{ $index + 1 }}</td>
-                                      <td>{{ $courseWork->AssessmentType->type_name }}</td>
-                                      <td>{{ $courseWork->coursework_title }}</td>
-                                      <td>{{ $courseWork->max_score }}</td>
-                                      <td>{{ $courseWork->due_date }}</td>
+                                      <td>1</td>
+                                      <td>{{ $course->courseName }}</td>
+                                      <td>{{ $course->semesterExams[0]->max_score }}</td>
+                                      <td>{{ $course->semesterExams[0]->exam_date }}</td>
                                       <td>
-                                          <a class="btn btn-info btn-sm" href="{{ route('course_works.show', $courseWork->id) }}">
+                                          <a class="btn btn-info btn-sm" href="{{ route('course_works.show', $course->id) }}">
                                               <i class="fa-solid fa-list"></i> Show
                                           </a>
-                                          <a class="btn btn-primary btn-sm" href="{{ route('course_works.edit', $courseWork->id) }}">
+                                          <a class="btn btn-primary btn-sm" href="{{ route('course_works.edit', $course->id) }}">
                                               <i class="fa-solid fa-pen-to-square"></i> Edit
                                           </a>
-                                          <form method="POST" action="{{ route('course_works.destroy', $courseWork->id) }}" style="display:inline">
+                                          <form method="POST" action="{{ route('course_works.destroy', $course->id) }}" style="display:inline">
                                               @csrf
                                               @method('DELETE')
                                               <button type="submit" class="btn btn-danger btn-sm">
@@ -89,12 +88,13 @@
                                           </form>
                                       </td>
                                   </tr>
-                              @endforeach
                           </tbody>
 
                         </table>
                     </div>
-                </div>
+                </div>@else
+                No Course exam configured
+                @endif
             </div>
         </div>
     </div>
@@ -105,7 +105,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addCourseworkModalLabel">Add Coursework</h5>
+                <h5 class="modal-title" id="addCourseworkModalLabel">Add Course Exam</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -119,27 +119,16 @@
                         </ul>
                     </div>
                 @endif
-                <form method="POST" action="{{ route('course.coursework.store', ['courseId' => $course->id]) }}">
+                <form method="POST" action="{{ route('course.exam_result.store', ['courseId' => $course->id]) }}">
                     @csrf
-                    <div class="form-group">
-                        <strong>Assessment Type:</strong>
-                        <select name="assessment_type_id" class="form-control">
-                            @foreach ($assessmentTypes as $assessmentType)
-                                <option value="{{ $assessmentType->id }}">{{ $assessmentType->type_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <strong>Coursework Title:</strong>
-                        <input type="text" name="coursework_title" placeholder="Enter Coursework title" class="form-control">
-                    </div>
+                
                     <div class="form-group">
                         <strong>Max Score:</strong>
                         <input type="number" name="max_score" placeholder="Enter max score" class="form-control">
                     </div>
                     <div class="form-group">
-                        <strong>Due Date:</strong>
-                        <input type="date" name="due_date" placeholder="Enter Due Date" class="form-control">
+                        <strong>Date:</strong>
+                        <input type="date" name="exam_date" placeholder="Enter  Date" class="form-control">
                     </div>
                     <input type="number" name="created_by" value="{{ Auth::user()->id }}" hidden>
                     <div class="text-center mt-2">

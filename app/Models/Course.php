@@ -46,5 +46,37 @@ class Course extends Model
         return $this->hasMany(SemesterExam::class);
     }
 
+        public function enrolledSession()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+    public function programmeCourseSemestersInProgramme($programmeId)
+    {
+        return $this->programmes()
+            ->where('programmes.id', $programmeId)
+            ->first()
+            ?->programmeCourseSemesters
+            ->where('course_id', $this->id)
+            ->values();
+    }
+
+    public function instructors()
+{
+    return $this->hasManyThrough(
+        User::class,
+        CourseInstructor::class,
+        'programme_course_semester_id', // Foreign key on CourseInstructor
+        'id',                            // Local key on User
+        'id',                            // Local key on Course
+        'user_id'                        // Foreign key on CourseInstructor
+    )
+    ->join('programme_course_semesters', 'course_instructors.programme_course_semester_id', '=', 'programme_course_semesters.id')
+    ->where('programme_course_semesters.course_id', $this->id)
+    ->select('users.*');
+}
+    public function courseInstructors()
+{
+    return $this->hasMany(CourseInstructor::class, 'course_id', 'id');
+}
 
 }

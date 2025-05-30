@@ -36,7 +36,8 @@ class Staff extends Model
             'location',
             'user_id',
             'created_by',
-            'updated_by'
+            'updated_by',
+            'company_id'
         ];
 
 
@@ -53,6 +54,18 @@ class Staff extends Model
         public function user()
         {
             return $this->belongsTo(User::class);
+        }
+
+        public function referees()
+        {
+            return $this->hasManyThrough(
+                Referee::class, // Final model
+                User::class, // Intermediate model
+                'id', // Foreign key on users table
+                'user_id', // Foreign key on referees table
+                'user_id', // Local key in staff table
+                'id' // Local key in users table
+            );
         }
 
         // Function to check roles

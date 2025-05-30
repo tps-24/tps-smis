@@ -331,7 +331,7 @@ class BeatController extends Controller
         $groupB = $totalPlatoons->slice($mid)->values();
         
         // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
-        $groupBx = [8,9,10,11,12,13,14];
+        $groupBx = [1,2,3,4,5,6,7];
 
         // Convert array into a Laravel Collection
         $currentGroup = collect($groupBx);
@@ -367,7 +367,6 @@ class BeatController extends Controller
                 ->whereIn('platoon', $currentGroup)
                 ->whereNotIn('id', $usedStudentIds)
                 ->values();
-
             // $selectedStudents = collect();
             // $EligibleFemales =   count($companyStudents->where('gender', 'F'));
             // $EligibleMales =   count($companyStudents->where('gender', 'M'));
@@ -830,15 +829,22 @@ class BeatController extends Controller
 
 
     //Beat Report
+    // public function showReport(Request $request)
+    // {
+    //     $companies = Company::all();
+    //     $report = [];
+    //     foreach ($companies as $company) {
+    //         array_push($report, $this->beatHistory($company));
+    //     }
+    //     return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
+    // }
     public function showReport(Request $request)
-    {
-        $companies = Company::all();
-        $report = [];
-        foreach ($companies as $company) {
-            array_push($report, $this->beatHistory($company));
-        }
-        return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
-    }
+{
+    $companies = Company::all();
+    $report = $companies->map(fn($company) => $this->beatHistory($company));
+
+    return view('beats.beat_report', compact('report', 'companies'));
+}
 
     public function downloadHistoryPdf($companyId)
     {
@@ -869,17 +875,25 @@ class BeatController extends Controller
         $totalStudents = count($students);
         $totalEligibleStudents = count($students->whereIn('beat_status', [1, 2, 3]));
         $totalIneligibleStudents = count($students->whereNotIn('beat_status', [1, 2, 3]));
-        $eligibleStudentsPercent = round((($totalStudents - $totalIneligibleStudents) / $totalStudents) * 100, 2);
-        $InEligibleStudentsPercent = round((($totalIneligibleStudents) / $totalStudents) * 100, 2);
-
+        // $eligibleStudentsPercent = round((($totalStudents - $totalIneligibleStudents) / $totalStudents) * 100, 2);
+        $eligibleStudentsPercent = ($totalStudents > 0) 
+    ? round((($totalStudents - $totalIneligibleStudents) / $totalStudents) * 100, 2) 
+    : 0;
+        // $InEligibleStudentsPercent = round((($totalIneligibleStudents) / $totalStudents) * 100, 2);
+        $InEligibleStudentsPercent = ($totalStudents > 0) 
+    ? round(($totalIneligibleStudents / $totalStudents) * 100, 2) 
+    : 0; // Avoid division by zero
+       // dd($InEligibleStudentsPercent);
         $guardAreas = count($company->guardAreas);
         $patrolAreas = count($company->patrolAreas);
-        $current_round = $company->beatRound[0]->current_round;
+       // dd($company->beatRound[0]->current_round);
+        $current_round = optional($company->beatRound->first())->current_round;
+
         $attained_current_round = count($students->whereIn('beat_status', [1, 2, 3])->where('beat_round', $current_round)->values());
         $NotAttained_current_round = count($students->whereIn('beat_status', [1])->where('beat_round', '<', $current_round)->values());
         $exceededAttained_current_round = count($students->whereIn('beat_status', [1])->where('beat_round', '>', $current_round)->values());
         $fastingStudentCount = count($students->where('fast_status', 1)->values());
-        //dd($current_round);
+        
         $ICTStudents = $students->where('beat_exclusion_vitengo_id', 1)->values();
         $ujenziStudents = $students->where('beat_exclusion_vitengo_id', 2)->values();
         $hospitalStudents = $students->where('beat_exclusion_vitengo_id', 3)->values();
@@ -904,7 +918,13 @@ class BeatController extends Controller
         }
 
 
-        $days_per_round = round(($totalEligibleStudents / $number_of_guards), 0);
+        if ($number_of_guards > 0) {
+    $days_per_round = round(($totalEligibleStudents / $number_of_guards), 0);
+} else {
+    // Handle the case where there are no guards
+    $days_per_round = 0; // or some other default value or error
+}
+
         $company = [
             'company_id' => $company->id,
             'company_name' => $company->name,

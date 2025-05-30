@@ -13,6 +13,7 @@ class Attendence extends Model
       'sentry',
       'absent',
       'adm',
+      'ed',
       'safari',
       'off',
       'mess',
@@ -24,6 +25,8 @@ class Attendence extends Model
       'lockUp_students_ids',
       'total',
       'absent_student_ids',
+      'adm_student_ids',
+      'ed_student_ids',
       'session_programme_id',
       'created_at',
       'updated_at'
@@ -41,4 +44,9 @@ class Attendence extends Model
    {
       $this->attributes['absent_students'] = $students;
    }
+   public function sessionProgramme()
+{
+    return $this->belongsTo(SessionProgramme::class);
+}
+
 }

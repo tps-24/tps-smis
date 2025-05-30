@@ -14,7 +14,8 @@
     <meta property="og:description" content="System for facilitating essential functions of TPS Administration">
     <meta property="og:type" content="Management System">
     <meta property="og:site_name" content="TPS - Moshi">
-    <link rel="shortcut icon" href="/tps-smis/resources/assets/images/favicon.svg" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="shortcut icon" href="/tps-smis/resources/assets/images/police-tz-logo.png" />
    
 
 

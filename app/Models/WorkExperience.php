@@ -14,7 +14,7 @@ class WorkExperience extends Model
         'institution',
         'address',
         'job_title',
-        'position', 
+        //'position', 
         'duties',
         'supervisor_name',
         'supervisor_phone_number',

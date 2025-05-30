@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('chat', function ($user, $id) {
     return true;
 });
+Broadcast::channel('notifications', function ($user) {
+    return true; // or add logic to restrict access
+});
+
 
 // Broadcast::channel('notifications', function ($user) {
 //     // Return true if the user is authorized to listen to the channel

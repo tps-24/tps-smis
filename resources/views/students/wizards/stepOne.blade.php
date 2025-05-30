@@ -59,10 +59,10 @@
                         <select class="form-select" id="abc4" name="rank"
                             aria-label="Default select example">
                             <option value="default_value" {{ old('rank', 'default_value') == 'default_value' ? 'selected' : '' }} disabled>Select rank</option>
-                            <!-- <option @if(isset($student) && $student->rank == "Recruit") selected @endif value="Recruit" {{ old('rank', 'default_value') == 'Recruit' ? 'selected' : '' }}>Basic Recruit</option> -->
+                            <option @if(isset($student) && $student->rank == "Recruit") selected @endif value="Recruit" {{ old('rank', 'default_value') == 'Recruit' ? 'selected' : '' }}>Basic Recruit</option>
                             <option @if(isset($student) && $student->rank == "Constable") selected @endif value="Constable" {{ old('rank', 'default_value') == 'Constable' ? 'selected' : '' }}>Police Constable</option>
-                            <!-- <option @if(isset($student) && $student->rank == "Corporal") selected @endif value="Corporal" {{ old('rank', 'default_value') == 'Corporal' ? 'selected' : '' }}>Corporal</option>
-                            <option @if(isset($student) && $student->rank == "Sergeant") selected @endif value="Sergeant" {{ old('rank', 'default_value') == 'Sergeant' ? 'selected' : '' }}>Sergeant Major</option> -->
+                            <option @if(isset($student) && $student->rank == "CPL") selected @endif value="CPL" {{ old('rank', 'default_value') == 'CPL' ? 'selected' : '' }}>CPL</option>
+                            <option @if(isset($student) && $student->rank == "Sergeant") selected @endif value="Sergeant" {{ old('rank', 'default_value') == 'Sergeant' ? 'selected' : '' }}>Sergeant Major</option>
 
                         </select>
                     </div>
@@ -124,12 +124,12 @@
                         <select class="form-select" id="abc4" name="education_level" value="{{old('education_level')}}"
                             aria-label="Default select example">
                             <option value = "" selected disabled >select education</option>
-                            <option @if(isset($student) && $student->education_level == "Form Four") selected @endif
-                                value="Form Four" {{ old('education_level', 'default_value') == 'Form Four' ? 'selected' : '' }}>Form Four</option>
-                            <option @if(isset($student) && $student->education_level == "Form Six") selected @endif value="Form Six" {{ old('education_level', 'default_value') == 'Form Six' ? 'selected' : '' }}>Form Six</option>
-                            <option @if(isset($student) && $student->education_level == "Certificate") selected @endif value="Certificate" {{ old('education_level', 'default_value') == 'Certificate' ? 'selected' : '' }}>Certificate</option>
-                            <option @if(isset($student) && $student->education_level == "Diploma") selected @endif value="Diploma" {{ old('education_level', 'default_value') == 'Diploma' ? 'selected' : '' }}>Diploma</option>
-                            <option @if(isset($student) && $student->education_level == "Degree") selected @endif value="Degree" {{ old('education_level', 'default_value') == 'Degree' ? 'selected' : '' }}>Degree</option>
+                            <option @if(isset($student) && $student->education_level == "KIDATO CHA NNE") selected @endif
+                                value="KIDATO CHA NNE" {{ old('education_level', 'default_value') == 'KIDATO CHA NNE' ? 'selected' : '' }}>KIDATO CHA NNE</option>
+                            <option @if(isset($student) && $student->education_level == "KIDATO CHA SITA") selected @endif value="KIDATO CHA SITA" {{ old('education_level', 'default_value') == 'KIDATO CHA SITA' ? 'selected' : '' }}>KIDATO CHA SITA</option>
+                            <option @if(isset($student) && $student->education_level == "ASTASHAHADA") selected @endif value="ASTASHAHADA" {{ old('education_level', 'default_value') == 'ASTASHAHADA' ? 'selected' : '' }}>ASTASHAHADA</option>
+                            <option @if(isset($student) && $student->education_level == "STASHAHADA") selected @endif value="STASHAHADA" {{ old('education_level', 'default_value') == 'STASHAHADA' ? 'selected' : '' }}>STASHAHADA</option>
+                            <option @if(isset($student) && $student->education_level == "SHAHADA") selected @endif value="SHAHADA" {{ old('education_level', 'default_value') == 'SHAHADA' ? 'selected' : '' }}>SHAHADA</option>
 
                         </select>
                     </div>

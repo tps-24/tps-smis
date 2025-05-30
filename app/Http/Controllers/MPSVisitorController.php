@@ -66,9 +66,11 @@ class MPSVisitorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MPSVisitor $mPSVisitor)
+    public function show($studentId)
     {
-        //
+        $mpsVisitors = MPSVisitor::where('student_id', $studentId)->get();
+
+        return view('mps.visitors.show', compact('mpsVisitors'));
     }
 
     /**

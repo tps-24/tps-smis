@@ -15,12 +15,15 @@ class TimeSheetController extends Controller
     {
         $timesheets = [];
         $user = Auth::user();
-          if(!Gate::allows('viewAny', $user)){
-            $timesheets = TimeSheet::where('user_id', $user->id)->get();
-            //abort(403);
-          }else{
+        if($user->hasRole('Super Administrator') ||
+        $user->hasRole('Chief Instructor') || 
+        $user->hasRole('Commandant')|| $user->hasRole('Chief Instructor') ||
+        $user->hasRole('Academic Coordinator')){
             $timesheets = TimeSheet::all();
-          }               
+        }
+    else{
+            $timesheets = TimeSheet::where('user_id', $user->id)->get();
+          } 
         return view('time_sheets.index', compact('timesheets'));
     }
 

@@ -10,7 +10,7 @@ use App\Models\Course;
 use App\Models\User;
 use App\Models\ProgrammeCourseSemester;
 use App\Models\CourseInstructor;
-
+use Carbon\Carbon;
 
 
 class StaffProgrammeCourseController extends Controller
@@ -35,11 +35,13 @@ class StaffProgrammeCourseController extends Controller
 
 
     // Function to load the assign_instructors blade
-    public function showAssignInstructorsForm()
+    public function showAssignInstructorsForm($courseId)
     {
+        $course = Course::find($courseId);
         $staffs = Staff::get();
-        // dd( $staffs );
-        return view('instructors.assign_instructors', compact('staffs'));
+
+         //dd( $staffs );
+        return view('instructors.assign_instructors', compact('staffs','course'));
     }
     
     public function assignInstructorsold(Request $request, $programmeCourseId)
@@ -70,7 +72,7 @@ class StaffProgrammeCourseController extends Controller
 
     public function assignInstructors(Request $request)
     {
-        // dd($request);
+        //return $request->all();
         // Validate the incoming request data
         $validatedData = $request->validate([
             'programme_id' => 'required|exists:programmes,id',
@@ -78,8 +80,8 @@ class StaffProgrammeCourseController extends Controller
             'session_programme_id' => 'required|exists:session_programmes,id',
             'course_id' => 'required|exists:courses,id',
             'staff_ids' => 'required|array',
-            'staff_ids.*' => 'exists:users,id',
-            'academic_year' => 'required|string',
+            'staff_ids.*' => 'exists:staff,id',
+            //'academic_year' => 'required|string',
         ]);
 
         // Find the matching record in programme_course_semesters
@@ -92,24 +94,37 @@ class StaffProgrammeCourseController extends Controller
         if (!$programmeCourseSemester) {
             return redirect()->back()->with('error', 'Programme course semester record not found.');
         }
-
         // Get the ID of the programme_course_semesters record
         $programmeCourseSemesterId = $programmeCourseSemester->id;
-
+        $session_programme = SessionProgramme::find($validatedData['session_programme_id']);
         // Logic to assign instructors to the course
         foreach ($validatedData['staff_ids'] as $staffId) {
-            $staff = User::findOrFail($staffId);
+            $staff = Staff::findOrFail($staffId);
             // Attach the instructor to the course with the programme_course_semester_id and academic_year
-            CourseInstructor::create([
+            CourseInstructor::updateOrCreate(
+                [
+                    'programme_course_semester_id' => $programmeCourseSemesterId,
+                    'user_id' => $staff->user->id,  
+                ],
+                [
                 'programme_course_semester_id' => $programmeCourseSemesterId,
-                'user_id' => $staff->id,
-                'academic_year' => $validatedData['academic_year'],
+                'user_id' => $staff->user->id,
+                'course_id' => $validatedData['course_id'],
+                'academic_year' => Carbon::parse($session_programme->startDate)->year.'/'.Carbon::parse($session_programme->endDate)->year,
             ]);
         }
 
-        return redirect()->back()->with('success', 'Instructors assigned successfully.');
+        return redirect()->route('courses.show', $validatedData['course_id'])
+        ->with('success', 'Instructors assigned successfully.');
+// return redirect()->back()->with('success', 'Instructors assigned successfully.');
     }
     
+
+    public function unAssignInstructor($courseInstructorId){
+        $course_instructor = CourseInstructor::findOrFail($courseInstructorId);
+        $course_instructor->delete();
+        return redirect()->back()->with('success', 'Instructor Unassigned successfully.');
+    }
 
 
     /**

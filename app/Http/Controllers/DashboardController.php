@@ -1,29 +1,34 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Models\SessionProgramme;
-use App\Models\Company;
-use App\Models\Student;
-use App\Models\Platoon;
+use App\Models\Announcement;
 use App\Models\Attendence;
 use App\Models\Beat;
-use App\Models\Patient;
-use App\Models\Staff;
+use App\Models\Company;
+use App\Models\LeaveRequest;
 use App\Models\MPS;
-use App\Models\Announcement;
+use App\Models\Patient;
+use App\Models\Platoon;
+use App\Models\SessionProgramme;
+use App\Models\Staff;
+use App\Models\Student;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use App\Services\GraphDataService;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     private $selectedSessionId;
-    public function __construct()
+    protected $graphDataService;
+    public function __construct(GraphDataService $graphDataService)
     {
+        $this->graphDataService = $graphDataService;
         $this->selectedSessionId = session('selected_session');
-        if (!$this->selectedSessionId)
+        if (! $this->selectedSessionId) {
             $this->selectedSessionId = 1;
+        }
+
         $this->middleware(['auth', 'verified', 'check_active_session']);
     }
 
@@ -37,9 +42,7 @@ class DashboardController extends Controller
         }
         // Get the selected session ID from the session
         $selectedSessionId = session('selected_session');
-        $pending_message = session('pending_message');
-
-
+        $pending_message   = session('pending_message');
 
         $query = Patient::query();
 
@@ -53,14 +56,14 @@ class DashboardController extends Controller
             $query->where('platoon', $request->platoon);
         }
 
-        $today = Carbon::today();
-        $thisWeek = Carbon::now()->startOfWeek();
+        $today     = Carbon::today();
+        $thisWeek  = Carbon::now()->startOfWeek();
         $thisMonth = Carbon::now()->startOfMonth();
-        $thisYear = Carbon::now()->startOfYear();
+        $thisYear  = Carbon::now()->startOfYear();
 
         // Count statistics based on the selected filters
-        $dailyCount = (clone $query)->whereDate('created_at', $today)->count();
-        $weeklyCount = (clone $query)->whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
+        $dailyCount   = (clone $query)->whereDate('created_at', $today)->count();
+        $weeklyCount  = (clone $query)->whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
         $monthlyCount = (clone $query)->whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
 
         // Fetch list of companies
@@ -68,18 +71,15 @@ class DashboardController extends Controller
 
         // Patient distribution for the selected year (used in Pie Chart)
         $patientDistribution = (clone $query)
-            ->whereBetween('created_at', [$thisYear, Carbon::now()])
-            ->selectRaw('platoon, COUNT(*) as count')
-            ->groupBy('platoon')
-            ->pluck('count', 'platoon');
-
+            ->whereBetween('created_at', [$thisMonth, Carbon::now()])
+            ->selectRaw('company_id, COUNT(*) as count')
+            ->groupBy('company_id')
+            ->pluck('count', 'company_id');
 
         $recentAnnouncements = Announcement::where('expires_at', '>', Carbon::now())
             ->orderBy('created_at', 'desc')
             ->take(4)
             ->get();
-
-
 
         if (auth()->user()->hasRole('Student')) {
             return view('dashboard.student_dashboard', compact('pending_message', 'selectedSessionId'));
@@ -88,10 +88,10 @@ class DashboardController extends Controller
         } else {
             $todayStudentReport = $this->todayStudentReport();
 
-            $denttotalCount = Student::where('session_programme_id', $selectedSessionId ?? 1)->count();
+            $denttotalCount   = Student::where('session_programme_id', $selectedSessionId ?? 1)->count();
             $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)->where('beat_status', 1)->count();
-            $beats = Beat::where('date', Carbon::today()->toDateString())->get();
-            $filteredBeats = $beats->filter(function ($beat) use ($selectedSessionId) {
+            $beats            = Beat::where('date', Carbon::today()->toDateString())->get();
+            $filteredBeats    = $beats->filter(function ($beat) use ($selectedSessionId) {
                 $studentIds = json_decode($beat->student_ids, true);
                 return Student::whereIn('id', $studentIds)->where('session_programme_id', $selectedSessionId ?? 1)->exists();
             });
@@ -103,28 +103,37 @@ class DashboardController extends Controller
             // $patientsCount = Patient::whereDate('created_at', Carbon::today())->count();
 
             $patientsCount = Patient::where(function ($query) {
-                                    $query->where('excuse_type_id', 1)
-                                    ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
-                                    ->orWhere(function ($innerQuery) {
-                                        $innerQuery->where('excuse_type_id', 3)
-                                                ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
-                                    });
-                            })->count();
+        $query->where('excuse_type_id', 1)
+            ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
+            ->orWhere(function ($innerQuery) {
+                $innerQuery->where('excuse_type_id', 3)
+                    ->whereNull('released_at');
+            });
+    })
+    ->whereHas('student', function ($q) use ($selectedSessionId) {
+        $q->where('session_programme_id', $selectedSessionId);
+    })
+    ->count();
 
-            $staffsCount = Staff::count('forceNumber');
+            $staffsCount           = Staff::count('forceNumber');
             $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
-            $graphData = $this->getGraphData();
-            return view('dashboard.dashboard', compact('selectedSessionId', 'denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage', 'recentAnnouncements', 'todayStudentReport', 'graphData'));
+            $graphData             = $this->graphDataService->getGraphData();
+            return view('dashboard.dashboard', compact(
+                'selectedSessionId', 'denttotalCount',
+                'dentpresentCount', 'totalStudentsInBeats',
+                'patientsCount', 'staffsCount', 'beatStudentPercentage',
+                'recentAnnouncements', 'todayStudentReport',
+                'graphData'));
         }
     }
 
     public function getContent(Request $request)
     {
         $sessionProgrammeId = session('selected_session'); // Use session variable to get the selected session programme ID
-        $denttotalCount = Student::where('session_programme_id', $sessionProgrammeId)->count();
-        $dentpresentCount = Student::where('session_programme_id', $sessionProgrammeId)->where('beat_status', 1)->count();
-        $beats = Beat::where('date', Carbon::today()->toDateString())->get();
-        $filteredBeats = $beats->filter(function ($beat) use ($sessionProgrammeId) {
+        $denttotalCount     = Student::where('session_programme_id', $sessionProgrammeId)->count();
+        $dentpresentCount   = Student::where('session_programme_id', $sessionProgrammeId)->where('beat_status', 1)->count();
+        $beats              = Beat::where('date', Carbon::today()->toDateString())->get();
+        $filteredBeats      = $beats->filter(function ($beat) use ($sessionProgrammeId) {
             $studentIds = json_decode($beat->student_ids, true);
             return Student::whereIn('id', $studentIds)->where('session_programme_id', $sessionProgrammeId)->exists();
         });
@@ -132,17 +141,17 @@ class DashboardController extends Controller
             return count(json_decode($beat->student_ids, true));
         });
         // $patientsCount = Patient::where('created_at', Carbon::today()->toDateString())->count('student_id');
-        
-        $patientsCount = Patient::where(function ($query) {
-                            $query->where('excuse_type_id', 1)
-                            ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
-                            ->orWhere(function ($innerQuery) {
-                                $innerQuery->where('excuse_type_id', 3)
-                                        ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
-                            });
-                    })->count();
 
-        $staffsCount = Staff::count('forceNumber');
+        $patientsCount = Patient::where(function ($query) {
+            $query->where('excuse_type_id', 1)
+                ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
+                ->orWhere(function ($innerQuery) {
+                    $innerQuery->where('excuse_type_id', 3)
+                        ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
+                });
+        })->count();
+
+        $staffsCount           = Staff::count('forceNumber');
         $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
 
         return view('dashboard.partials.dashboard_content', compact('denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage'));
@@ -152,27 +161,27 @@ class DashboardController extends Controller
     {
         $timeRange = $request->input('timeRange');
         $startDate = $request->input('startDate');
-        $endDate = $request->input('endDate');
+        $endDate   = $request->input('endDate');
 
         // Default to today if no date range is selected
-        if (!$startDate || !$endDate) {
+        if (! $startDate || ! $endDate) {
             $startDate = Carbon::today()->toDateString();
-            $endDate = Carbon::today()->toDateString();
+            $endDate   = Carbon::today()->toDateString();
         }
 
         // Calculate start and end dates based on time range
         switch ($timeRange) {
             case 'daily':
                 $startDate = Carbon::today()->toDateString();
-                $endDate = Carbon::today()->toDateString();
+                $endDate   = Carbon::today()->toDateString();
                 break;
             case 'weekly':
                 $startDate = Carbon::now()->startOfWeek()->toDateString();
-                $endDate = Carbon::now()->endOfWeek()->toDateString();
+                $endDate   = Carbon::now()->endOfWeek()->toDateString();
                 break;
             case 'monthly':
                 $startDate = Carbon::now()->startOfMonth()->toDateString();
-                $endDate = Carbon::now()->endOfMonth()->toDateString();
+                $endDate   = Carbon::now()->endOfMonth()->toDateString();
                 break;
         }
 
@@ -189,16 +198,15 @@ class DashboardController extends Controller
         //                             ->orWhere('excuse_type_id', 3);
         //                     })
         //                     ->count();
-        
-        $sick = Patient::where(function ($query) {
-                            $query->where('excuse_type_id', 1)
-                            ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
-                            ->orWhere(function ($innerQuery) {
-                                $innerQuery->where('excuse_type_id', 3)
-                                        ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
-                            });
-                        })->count();
 
+        $sick = Patient::where(function ($query) {
+            $query->where('excuse_type_id', 1)
+                ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
+                ->orWhere(function ($innerQuery) {
+                    $innerQuery->where('excuse_type_id', 3)
+                        ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
+                });
+        })->count();
 
         // $lockedUp = Beat::whereBetween('date', [$startDate, $endDate])
         //     ->sum('student_count');
@@ -210,15 +218,14 @@ class DashboardController extends Controller
 
         // Build the data response
         $data = [
-            'labels' => $labels,
-            'absents' => array_fill(0, count($labels), $absents),
-            'sick' => array_fill(0, count($labels), $sick),
+            'labels'   => $labels,
+            'absents'  => array_fill(0, count($labels), $absents),
+            'sick'     => array_fill(0, count($labels), $sick),
             'lockedUp' => array_fill(0, count($labels), $lockedUp),
         ];
 
         return response()->json($data);
     }
-
 
     public function indexold()
     {
@@ -229,42 +236,42 @@ class DashboardController extends Controller
             ->orderBy('year', 'asc')
             ->get();
 
-        // Calculate the comparison with the previous week 
+        // Calculate the comparison with the previous week
         $weeklyComparison = [];
         foreach ($weeklyAttendance as $index => $week) {
             if ($index > 0) {
-                $previousWeek = $weeklyAttendance[$index - 1];
+                $previousWeek       = $weeklyAttendance[$index - 1];
                 $weeklyComparison[] = [
-                    'year' => $week->year,
-                    'week' => $week->week,
+                    'year'               => $week->year,
+                    'week'               => $week->week,
                     'present_difference' => $week->total_present - $previousWeek->total_present,
-                    'absent_difference' => $week->total_absent - $previousWeek->total_absent,
+                    'absent_difference'  => $week->total_absent - $previousWeek->total_absent,
                 ];
             }
         }
 
-        // Get the count of current programs 
+        // Get the count of current programs
         $currentProgramsCount = SessionProgramme::where('is_current', 1)->count();
-        // Get the count of inactive programs 
+        // Get the count of inactive programs
         $inactiveProgramsCount = SessionProgramme::where('is_current', 0)->count();
-        // Get program details 
+        // Get program details
         $programmes = SessionProgramme::where('is_current', 1)->get();
         // Additional data for graphs here
-
 
         return view('dashboard.default_dashboard', compact('currentProgramsCount', 'inactiveProgramsCount', 'programmes', 'weeklyAttendance', 'weeklyComparison'));
     }
 
-
     private function todayStudentReport()
     {
         $selectedSessionId = session('selected_session');
-        if (!$selectedSessionId)
+        if (! $selectedSessionId) {
             $selectedSessionId = 1;
+        }
+
         $present = 0;
-        $absent = 0;
-        $sick = 0;
-        $lockUp = 0;
+        $absent  = 0;
+        $sick    = 0;
+        $lockUp  = 0;
 
         $platoons = Platoon::all();
 
@@ -277,247 +284,18 @@ class DashboardController extends Controller
                 $lockUp += $platoon->today_attendence->get(0)->lockUp;
             }
         }
-        $total = Student::where('session_programme_id', $selectedSessionId)->count();
-        $presentPercent = $total == 0? 0: round(($present / ($total) * 100), 1);
+        $total          = Student::where('session_programme_id', $selectedSessionId)->count();
+        $presentPercent = $total == 0 ? 0 : round(($present / ($total) * 100), 1);
         return [
-            'present' => $present,
-            'absent' => $absent,
-            'sick' => $sick,
-            'lockUp' => $lockUp,
-            'presentPercent' => $presentPercent . '%'
+            'present'        => $present,
+            'absent'         => $absent,
+            'sick'           => $sick,
+            'lockUp'         => $lockUp,
+            'presentPercent' => $presentPercent . '%',
         ];
     }
-    public function getGraphData()
-    {
+    
 
-        $selectedSessionId = session('selected_session');
-        if (!$selectedSessionId)
-            $selectedSessionId = 1;
-        // Initialize arrays to store the data for each period
-        $attendanceData = [
-            'dates' => [],
-            'absents' => [],
-            'sick' => [],
-            'lockUps' => [],
-        ];
-
-        $weeklyData = [
-            'weeks' => [],
-            'absents' => [],
-            'sick' => [],
-            'lockUps' => [],
-        ];
-
-        $monthlyData = [
-            'months' => [],
-            'absents' => [],
-            'sick' => [],
-            'lockUps' => [],
-        ];
-
-        // Get the last 7 days and initialize the arrays for daily data
-        $lastSevenDays = collect();
-        $dateKeys = []; // To map the dates directly to indices
-        for ($i = 0; $i < 7; $i++) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $lastSevenDays->push($date);
-            $dateKeys[$date] = $i;
-            $attendanceData['absents'][$i] = 0;
-            $attendanceData['sick'][$i] = 0;
-            $attendanceData['lockUps'][$i] = 0;
-        }
-
-        // Keep the dates in the order as is (latest comes last)
-        $attendanceData['dates'] = $lastSevenDays->toArray();
-
-        // Get the last 5 weeks and initialize the arrays for weekly data
-        $lastFiveWeeks = collect();
-        $weekKeys = []; // To map weeks to indices
-        for ($i = 1; $i <= 5; $i++) {
-            $startOfWeek = Carbon::now()->subWeeks($i - 1)->startOfWeek()->format('Y-m-d');
-            $endOfWeek = Carbon::now()->subWeeks($i - 1)->endOfWeek()->format('Y-m-d');
-            $weekKey = "Week {$i}: {$startOfWeek} - {$endOfWeek}";
-
-            $lastFiveWeeks->push($weekKey);
-            $weekKeys[$startOfWeek] = $i - 1;  // Use start of week as the key
-            $weeklyData['weeks'] = [];
-            $weeklyData['absents'][] = 0;
-            $weeklyData['sick'][] = 0;
-            $weeklyData['lockUps'][] = 0;
-        }
-
-        // Keep the weeks in order (most recent comes last)
-        $weeklyData['weeks'] = $lastFiveWeeks->toArray();
-
-        // Get the last 3 months and initialize the arrays for monthly data
-        $lastThreeMonths = collect();
-        $monthKeys = []; // To map months to indices
-        for ($i = 0; $i < 3; $i++) {
-            $monthName = Carbon::now()->subMonths($i)->format('F Y');
-            $lastThreeMonths->push($monthName);
-            $monthKeys[$monthName] = $i;
-
-            $monthlyData['absents'][$i] = 0;
-            $monthlyData['sick'][$i] = 0;
-            $monthlyData['lockUps'][$i] = 0;
-        }
-
-        // Keep the months in order (most recent comes last)
-        $monthlyData['months'] = $lastThreeMonths->toArray();
-
-        // Retrieve all companies and their platoons
-        $companies = Company::all();
-
-        // Loop through each company and its platoons
-        foreach ($companies as $company) {
-
-            //dd($selectedSessionId);
-            foreach ($company->platoons as $platoon) {
-                // Get attendance records for the last 7 days
-                $attendances = $platoon->attendences()->where('session_programme_id', $selectedSessionId)
-                    ->where('created_at', '>=', Carbon::now()->subDays(7))
-                    ->get();
-                // Process attendance data for the last 7 days
-                foreach ($attendances as $attendance) {
-                    $attendanceDate = Carbon::parse($attendance->created_at)->format('Y-m-d');
-                    if (isset($dateKeys[$attendanceDate])) {
-                        $index = $dateKeys[$attendanceDate];
-                        $attendanceData['absents'][$index] += (int) $attendance->absent;
-                        if($attendanceData['sick'][$index] == 0){
-                            // $attendanceData['sick'][$index] = (int) Patient::whereDate('created_at',$attendanceDate)->whereNotNull('excuse_type_id')->count();
-                            // $attendanceData['sick'][$index] = (int) Patient::whereDate('created_at', $attendanceDate)
-                            // ->where(function ($query) {
-                            //     $query->where('excuse_type_id', 1)
-                            //           ->orWhere('excuse_type_id', 3);
-                            // })
-                            // ->count();
-
-                            $attendanceData['sick'][$index] = (int) Patient::
-                                where(function ($query) {
-                                    $query->where(function ($subQuery) {
-                                        $subQuery->where('excuse_type_id', 1)
-                                                ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()]);
-                                    })
-                                    ->orWhere(function ($subQuery) {
-                                        $subQuery->where('excuse_type_id', 3)
-                                                ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
-                                    });
-                                })
-                                ->count();
-
-                           
-
-                        }
-                        
-                        if($attendanceData['lockUps'][$index] == 0){
-                            // $attendanceData['lockUps'][$index] = (int) MPS::whereDate('arrested_at', $attendanceDate)->count();
-                            $attendanceData['lockUps'][$index] = (int) MPS::where('released_at', null)->count();
-                        }
-                    }
-
-                    // For weekly data, check which week the attendance falls into
-                    $attendanceWeek = Carbon::parse($attendance->created_at)->startOfWeek()->format('Y-m-d');
-                    if (isset($weekKeys[$attendanceWeek])) {
-                        $weekIndex = $weekKeys[$attendanceWeek];
-                        $weeklyData['absents'][$weekIndex] += (int) $attendance->absent;
-                        $startOfWeek = Carbon::parse(Carbon::now()->startOfWeek())->toDateString();  // Set a start time
-                        $endOfWeek = Carbon::parse(Carbon::now()->endOfWeek())->toDateString();  // Set a start time 
-                        if($weeklyData['sick'][$weekIndex] == 0){
-                            // $weeklyData['sick'][$weekIndex] = (int) Patient::whereBetween('created_at', [$startOfWeek, $endOfWeek])->whereNotNull('excuse_type_id')->count();
-
-                            $weeklyData['sick'][$weekIndex] = (int) Patient::
-                                where(function ($query) {
-                                    $query->where(function ($subQuery) {
-                                        $subQuery->where('excuse_type_id', 1)
-                                                ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()]);
-                                    })
-                                    ->orWhere(function ($subQuery) {
-                                        $subQuery->where('excuse_type_id', 3)
-                                                ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
-                                    });
-                                })
-                                ->count();
-                        }
-                        if ($weeklyData['lockUps'][$weekIndex] == 0) {
-                            // $weeklyData['lockUps'][$weekIndex] = (int) MPS::whereBetween('arrested_at', [$startOfWeek, $endOfWeek])->count();
-                            $weeklyData['lockUps'][$weekIndex] = (int) MPS::where('released_at', null)->count();
-                        }
-                    }
-
-                    for ($i = 0; $i < count($attendanceData['dates']); $i++) {
-                        $attendanceData['dates'][$i] = Carbon::parse($attendanceData['dates'][$i])->format('d-m-Y');
-                    }
-                    // For monthly data, check which month the attendance falls into
-                    $attendanceMonth = Carbon::parse($attendance->created_at)->format('F Y');
-                    if (isset($monthKeys[$attendanceMonth])) {
-                        $monthIndex = $monthKeys[$attendanceMonth];
-                        $monthlyData['absents'][$monthIndex] += (int) $attendance->absent;
-                        $carbonDate = Carbon::parse($attendanceMonth);
-                        $month = $carbonDate->month;
-                        $year = $carbonDate->year;
-                        if($monthlyData['sick'][$monthIndex] == 0){
-                        //    $monthlyData['sick'][$monthIndex] = (int) Patient::whereMonth('created_at', $month)->whereYear('created_at', $year)->count(); 
-                           $monthlyData['sick'][$monthIndex] = (int) Patient::whereMonth('created_at', $month)->whereYear('created_at', $year)
-                            ->where(function ($query) {
-                                $query->where('excuse_type_id', 1)
-                                      ->orWhere('excuse_type_id', 3);
-                            })
-                            ->count();
-                        }
-                        
-                        if ($monthlyData['lockUps'][$monthIndex] == 0) {
-                            $monthlyData['lockUps'][$monthIndex] = (int) MPS::whereMonth('arrested_at', $month)->whereYear('arrested_at', $year)->count();
-                        }
-
-                    }
-                }
-            }
-        }
-
-        // Reverse the daily data arrays to ensure the most recent data comes last
-        $attendanceData['absents'] = array_reverse($attendanceData['absents']);
-        $attendanceData['sick'] = array_reverse($attendanceData['sick']);
-        $attendanceData['lockUps'] = array_reverse($attendanceData['lockUps']);
-        $attendanceData['dates'] = array_reverse($attendanceData['dates']);
-
-        // Reverse the weekly data arrays to ensure the most recent data comes last
-        $weeklyData['absents'] = array_reverse($weeklyData['absents']);
-        $weeklyData['sick'] = array_reverse($weeklyData['sick']);
-        $weeklyData['lockUps'] = array_reverse($weeklyData['lockUps']);
-        $weeklyData['weeks'] = [];
-        $weekKeys = array_flip($weekKeys);
-        for ($i = count($weekKeys) - 1; $i >= 0; $i--) {
-            // Use the getWeekNumber function to get the week number and push it to the 'weeks' array
-            array_push($weeklyData['weeks'], "Week " . $this->getWeekNumber($weekKeys[$i]));
-        }
-
-        // Reverse the monthly data arrays to ensure the most recent data comes last
-        $monthlyData['absents'] = array_reverse($monthlyData['absents']);
-        $monthlyData['sick'] = array_reverse($monthlyData['sick']);
-        $monthlyData['lockUps'] = array_reverse($monthlyData['lockUps']);
-        $monthlyData['months'] = array_reverse($monthlyData['months']);
-
-        // Combine all three sets of data into the final response
-        return [
-            'dailyData' => $attendanceData,
-            'weeklyData' => $weeklyData,
-            'monthlyData' => $monthlyData,
-        ];
-    }
-
-    private function getWeekNumber($date)
-    {
-        $sessionProgramme = SessionProgramme::find($this->selectedSessionId);
-        // Define the specified start date (September 30, 2024)
-        $startDate = Carbon::createFromFormat('d-m-Y', Carbon::parse($sessionProgramme->startDate)->format('d-m-Y'));
-        //dd($date);
-        // Define the target date for which you want to calculate the week number
-        $date = Carbon::parse($date); // This could be the current date, or any specific date
-
-        // Calculate the difference in weeks between the start date and the target date
-        $weekNumber = $startDate->diffInWeeks($date) + 1;  // Adding 1 to make it 1-based (Week 1, Week 2, ...)
-        return (int) $weekNumber;
-    }
 
 
 }

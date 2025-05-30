@@ -7,7 +7,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
-                    <li class="breadcrumb-item"><a href="/tps-smis/attendences/">Attendences</a></li>
+                    <li class="breadcrumb-item"><a href="/tps-smis/attendences/">Attendances</a></li>
                     <li class="breadcrumb-item active" aria-current="page"><a href="#">Create</a></li>
                 </ol>
             </nav>

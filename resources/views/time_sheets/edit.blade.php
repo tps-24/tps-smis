@@ -121,7 +121,6 @@
     <!-- Existing tasks will be rendered here -->
 </div>
 
-<button type="button" id="addTaskButton" class="btn btn-primary">Add Task</button>
 
 <script>
     // Function to delete a task row

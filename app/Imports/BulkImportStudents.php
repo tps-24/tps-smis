@@ -48,10 +48,10 @@ class BulkImportStudents implements ToCollection, ToModel
                     $student->gender = $row[4];
                     $student->rank = 'Bigular';
                 } else {
-                    $student->gender = $row[4];
+                    
                     $student->rank = $row[20];
                 }
-
+                $student->gender = substr($row[4],0,1);
                 $student->phone = $row[5];
                 $student->nin = $row[7];
                 $student->blood_group = $row[8];
@@ -71,7 +71,7 @@ class BulkImportStudents implements ToCollection, ToModel
 
                 // **Only create a user account if session_programme_id is NOT 1 or 5**
                 if ($student->session_programme_id != 1 && $student->session_programme_id != 5) {
-                    $email = strtolower($row[1] . '.' . $row[3] . '@tpf.go.tz');
+                    $email = strtolower($row[1] .'.'.$row[3].'@tpf.go.tz');
                     $password = strtoupper($row[3]);
 
                     $user = new User();

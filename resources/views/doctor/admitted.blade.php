@@ -51,7 +51,7 @@
                                 <!-- <th>Excuse Type</th> -->
                                 <th>Status</th>
                                 <th>Admitted Date</th>
-                                <th>Discharge</th>
+                                <th>Follow Up</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -60,7 +60,7 @@
                                     <td>{{ $patient->student->first_name ?? '-' }}</td>
                                     <td>{{ $patient->student->last_name ?? '-' }}</td>
                                     <td>{{ $patient->platoon ?? '-' }}</td>
-                                    <td>{{ $patient->student->company_id ?? '-' }}</td>
+                                    <td>{{ $patient->student->company->name ?? '-' }}</td>
                                     <td>{{ $patient->admitted_type ?? '-' }}</td>
                                     <!-- <td>{{ $patient->excuseType->name ?? '-' }}</td> -->
                                     <td>{{ ucfirst($patient->status) }}</td>

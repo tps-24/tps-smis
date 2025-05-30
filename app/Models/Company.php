@@ -58,4 +58,16 @@ class Company extends Model
     public function sickStudents(){
         return $this->hasMany(Patient::class);
     }
+    public function leaves(){
+        return $this->hasMany(LeaveRequest::class);
+    }
+
+        public function staffs(){
+        return $this->hasMany(Staff::class);
+    }
+    public function teacherOnDuties()
+    {
+        return $this->hasMany(TeacherOnDuty::class);
+    }
+
 }

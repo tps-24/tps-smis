@@ -109,28 +109,32 @@
         daily = data.dailyData;
         weekly = data.weeklyData;
         monthly = data.monthlyData;
-
+        leaves_monthly_count =data.monthly;
         const dailyData = {
-            labels: daily.dates,
-            datasets: [
-                { label: 'Absents', data: daily.absents, backgroundColor: '#1E4093' },
-                { label: 'Sick', data: daily.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
-                { label: 'Locked up', data: daily.lockUps, backgroundColor: 'orange' },
-                { label: 'Absents Trends', data: daily.absents, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
-                { label: 'Sick Trends', data: daily.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
-                { label: 'Lock Up Trends', data: daily.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
-            ]
-        };
+    labels: daily.dates, // X-axis labels
+    datasets: [
+        { label: 'Absents', data: daily.absents, backgroundColor: '#1E4093' },
+        { label: 'Sick', data: daily.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+        { label: 'Leaves', data: data.daily, backgroundColor: 'rgba(12, 165, 106, 0.7)' },
+        { label: 'Locked up', data: daily.lockUps, backgroundColor: 'orange' },
+        { label: 'Absents Trends', data: daily.absents, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 }, // Ensure correct dataset
+        { label: 'Sick Trends', data: daily.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: false },
+        { label: 'Leaves Trend', data: data.daily, type: 'line', fill: false, borderColor: 'rgba(2, 131, 82, 0.7)', tension: 0.1 }, // Fix reference
+        { label: 'Lock Up Trends', data: daily.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: false }
+    ]
+};
 
         const weeklyData = {
             labels: weekly.weeks,
             datasets: [
                 { label: 'Absents', data: weekly.absents, backgroundColor: '#1E4093' },
                 { label: 'Sick', data: weekly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+                { label: 'Leaves', data: data.weekly, backgroundColor: 'rgba(12, 165, 106, 0.7)' },
                 { label: 'Locked up', data: weekly.lockUps, backgroundColor: 'orange' },
                 { label: 'Absents Trends', data: weekly.absents, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
-                { label: 'Sick Trends', data: weekly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
-                { label: 'Lock Up Trends', data: weekly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
+                { label: 'Sick Trends', data: weekly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: false },
+                { label: 'Leaves Trend', data: data.daily, type: 'line', fill: false, borderColor: 'rgba(2, 131, 82, 0.7)', tension: 0.1 },
+                { label: 'Lock Up Trends', data: weekly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: false }
             ]
         };
 
@@ -139,10 +143,12 @@
             datasets: [
                 { label: 'Absents', data: monthly.absents, backgroundColor: '#1E4093' },
                 { label: 'Sick', data: monthly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
+                { label: 'Leaves', data: leaves_monthly_count, backgroundColor: 'rgba(12, 165, 106, 0.7)' },
                 { label: 'Locked up', data: monthly.lockUps, backgroundColor: 'orange' },
                 { label: 'Absents Trends', data: monthly.absents, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
-                { label: 'Sick Trends', data: monthly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
-                { label: 'Lock Up Trends', data: monthly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
+                { label: 'Sick Trends', data: monthly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: false },
+                { label: 'Leaves Trend', data: leaves_monthly_count, type: 'line', fill: false, borderColor: 'rgba(2, 131, 82, 0.7)', tension: 0.1 },
+                { label: 'Lock Up Trends', data: monthly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: false }
             ]
         };
 

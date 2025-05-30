@@ -6,7 +6,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/tps-smis/" id="home">Home</a></li>
-                    <li class="breadcrumb-item"><a href="/tps-smis/attendences/">Today Attendence Summary</a>
+                    <li class="breadcrumb-item"><a href="/tps-smis/attendences/.$attendenceType->id">Today {{ $attendenceType->name }} Attendence Summary</a>
                     </li>
                 </ol>
             </nav>
@@ -17,7 +17,7 @@
 @endsection
 @section('content')
 @include('layouts.sweet_alerts.index')
-@if($companies->isNotEmpty())
+@if(count($companies) > 0)
 <div class="row ">
     <div class="col-6">
             <form action="{{ route('attendances.summary',['type_id' => $attendenceType->id]) }}" method="GET" class="form-inline d-flex gap-2">
@@ -85,11 +85,9 @@
                                                 <div class=""> <label class="form-label" for="abc4">Platoon</label>
                                                     <select style="height:60%" class="form-select" name="platoon" required id="platoons"
                                                         aria-label="Default select example">
-                                                        <option value="" disabled selected>Select a platoon</option>
+                                                        <option value="" disabled selected>Select a platoon</option>                      
                                                         @foreach($statistics[$j]['company']->platoons as $platoon)
-                                                            @if(count($platoon->today_attendence) < 1)
                                                                 <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
-                                                            @endif
                                                             @endforeach
                                                     </select>
                                                 </div>
@@ -128,7 +126,7 @@
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-between mt-1">
                                                                     <a class="text-primary ms-4"
-                                                                    href="{{ route('today',['company_id'=> $companies[$j]->id, 'type' => $attendenceType->id, 'date' => $date]) }}"
+                                                                    href="{{ route('today',['company_id'=> $companies[$j]->id, 'type' => $attendenceType->id, 'date' => $date, 'attendenceTypeId' => $attendenceType->id]) }}"
 >                                                                        <span>View</span>
                                                                     </a>
                                                                 </div>

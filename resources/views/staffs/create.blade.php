@@ -101,7 +101,7 @@
                                 <div class="card mb-4">
                                     <div class="card-body">
                                         <div class="row" style="margin-bottom:-1%">
-                                            <div class="col-sm-3 col-12" id="pfn0" style="margin-left:12.5%;">
+                                            <div class="col-sm-3 col-12" id="pfn0" >
                                                 <div class="card mb-4">
                                                 <div class="card-body">
                                                     <div class="m-0">
@@ -157,6 +157,21 @@
                                                 </div>
                                                 </div>
                                             </div>
+                                            <div class="col-sm-3 col-12">
+                                                    <div class="card mb-4">
+                                                        <div class="card-body">
+                                                            <div class="m-0">
+                                                                <label class="form-label abcd" for="abc">Company </label>
+                                                                <select class="form-control" name="company_id" id="" >
+                                                                    <option value="" selected disaled>company</option>
+                                                                    @foreach ($companies as $company)
+                                                                        <option value="{{$company->id}}">{{$company->description}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                         </div>
                                         <div class="row" style="margin-bottom:-1%">
                                             <div class="col-sm-3 col-12" style="margin-bottom:-1%">

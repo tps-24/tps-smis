@@ -51,8 +51,7 @@
                 <div class="d-flex justify-content-end mt-3">
                   
                     @if($user->staff)
-                    <a href="{{route('staff.cv', ['staffId'=> $user->staff->id])}}" class="btn btn-secondary me-2">My
-                        CV</a>
+                    <a href="{{ route('staffs.resume', $user->staff->id) }}" class="btn btn-primary me-2">Curriculum Vitae</a>
                     @endif
                     <button class="btn btn-danger me-2">Edit Profile</button>
                     <button class="btn btn-success">Active</button>

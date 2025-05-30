@@ -35,5 +35,12 @@ class Programme extends Model
     {
         return $this->hasMany(AdmittedStudent::class);
     }
+
+    public function programmeCourseSemesters()
+    {
+        return $this->hasMany(ProgrammeCourseSemester::class);
+    }
+
+    
     
 }

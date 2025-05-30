@@ -59,16 +59,14 @@
     <!-- Pie Chart Section -->
     <div class="card">
     <div class="card-header">
-        <h5 class="card-title">Patient Distribution for {{ now()->year }}</h5>
+        <h5 class="card-title">{{ now()->format('F') }} Patient Distribution</h5>
     </div>
     <div class="card-body d-flex justify-content-center">
         <canvas id="patientChart" style="max-width: 300px; max-height: 300px;"></canvas>
     </div>
 </div>
-
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var ctx = document.getElementById('patientChart').getContext('2d');
@@ -78,7 +76,6 @@
 
         var labels = Object.keys(patientData);
         var data = Object.values(patientData);
-
         // Colors for companies
         var companyColors = {
             "HQ": "green",
@@ -106,7 +103,9 @@
                     datasets: [{
                         label: 'Patients',
                         data: data,
-                        backgroundColor: backgroundColors
+                        backgroundColor: backgroundColors,
+                        borderColor: '#000000', // Black border
+                        borderWidth: 2 // Border thickness
                     }]
                 },
                 options: {

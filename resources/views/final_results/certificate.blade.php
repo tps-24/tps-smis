@@ -97,7 +97,7 @@
                 <li>Gender Issues and Child Protection</li>
                 <li>Public Health and Environmental Protection</li>
                 <li>Community Policing, Radicalization, Violent Extremism, and Terrorism</li>
-                <li>Drills and Parade</li>
+                <li>Drill and Parade</li>
                 <li>Military and Safety Training</li>
             </ul>
         </div>

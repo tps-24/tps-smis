@@ -157,9 +157,9 @@
                 </button>
             </div>
 
-                
+
                 <button id="export-btn" class="btn btn-secondary btn-sm" style="margin-top:-50px;">Export to Excel</button>
-                
+
             </div>
             <div class="card-body">
                 <div class="table-outer">
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to export results to Excel
 function exportToExcel(courseworkId) {
     const tableData = [];
-    
+
     // Define table headers based on the specified format
     tableData.push([
         'S/N',

@@ -105,6 +105,7 @@ body {
 
 
 @section('content')
+@include('layouts.sweet_alerts.index')
 <div class="d-flex justify-content-center">
     <h2>{{$staff->forceNumber}} {{$staff->rank}} {{substr($staff->firstName,0,1)}}.{{substr($staff->middleName,0,1)}}
         {{$staff->lastName}} - CV</h2>
@@ -147,9 +148,9 @@ body {
             </tr>
             <!-- father's details -->
             @php
-                    $fatherParticulars = $staff->fatherParticulars == null? null :
-                    json_decode($staff->fatherParticulars);
-                    @endphp
+            $fatherParticulars = $staff->fatherParticulars == null? null :
+            json_decode($staff->fatherParticulars);
+            @endphp
             <tr>
                 <th>Father's Names</th>
                 <td>{{$fatherParticulars[0]?? null}}</td>
@@ -169,9 +170,9 @@ body {
             </tr>
 
             <!-- mother's details -->
-            @php    
-                $motherParticulars = $staff->motherParticulars == null? null :
-                json_decode($staff->motherParticulars);//dd($motherParticulars );
+            @php
+            $motherParticulars = $staff->motherParticulars == null? null :
+            json_decode($staff->motherParticulars);//dd($motherParticulars );
             @endphp
             <tr>
                 <th>Mother's Names</th>
@@ -193,9 +194,9 @@ body {
 
             <!-- current parent address -->
             @php
-                $parentsAddress = $staff->parentsAddress == null? null :
-                json_decode($staff->parentsAddress);
-                @endphp
+            $parentsAddress = $staff->parentsAddress == null? null :
+            json_decode($staff->parentsAddress);
+            @endphp
             <tr>
                 <th rowspan="4">Parent current address</th>
                 <td><strong>Village: </strong>{{$parentsAddress[0]?? null}}</td>
@@ -234,8 +235,8 @@ body {
         </tbody>
     </table>
 
-    <h3>(B) EDUCATION AND TRAINING</h3><br><br>
-    <h3>1. Primary Schools</h3><br><br>
+    <h3>(B) EDUCATION AND TRAINING / ELIMU NA MAFUNZO YA UJUZI</h3><br><br>
+    <h3>1. Elimu ya Msingi</h3><br><br>
     <table class="table table-sm table-bordered">
         <thead>
             <tr>
@@ -263,7 +264,7 @@ body {
         </tbody>
     </table>
 
-    <h3>2. Secondary Schools</h3><br><br>
+    <h3>2. Elimu ya Sekondari</h3><br><br>
     <table class="table table-sm table-bordered">
         <thead>
             <tr>
@@ -293,7 +294,7 @@ body {
         </tbody>
     </table>
 
-    <h3>3. Colleges</h3><br><br>
+    <h3>3. Colleges/Vyuo alivyosoma</h3><br><br>
     <table class="table table-sm table-bordered">
         <thead>
             <tr>
@@ -320,6 +321,7 @@ body {
     </table>
 
     <h3>(C) OTHER COURSES, PROFESSIONAL EXAMINATION AND WORKSHOP ATTENDED</h3><br><br>
+    <h4>CURRENT TITLE / CHEO CHAKO KWA SASA {{$staff->rank}}</h4>
     <table class="table table-sm table-bordered">
         <thead>
             <tr>
@@ -352,11 +354,11 @@ body {
     <table class="table table-sm table-bordered">
         <thead>
             <tr>
-                <td>S/NO</td>
+                <td>S/N</td>
                 <td>Year</td>
                 <td>Organization</td>
                 <td>Location</td>
-                <td>Position</td>
+                <td>Title</td>
                 <td>Duties</td>
             </tr>
 
@@ -372,7 +374,7 @@ body {
                 <td>{{ substr($work_experience->start_date, 0, 4)}} - {{ substr($work_experience->end_date, 0, 4)}}</td>
                 <td>{{ $work_experience->institution }}</td>
                 <td>{{ $work_experience->address }}</td>
-                <td>{{ $work_experience->position }}</td>
+                <td>{{ $work_experience->job_title }}</td>
                 <td>
                     @php
                     $duties = $work_experience->duties == null? null :
@@ -388,6 +390,82 @@ body {
             @endforeach
             @endif
         </tbody>
+    </table>
+    <br>
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <td>S/N</td>
+                <td>Year</td>
+                <td>Organization</td>
+                <td>Location</td>
+                <td>Title</td>
+                <td>Duties</td>
+            </tr>
+
+        </thead>
+        <tbody>
+            @php
+            $i = 0;
+            @endphp
+            @if ($staff->work_experiences)
+            @foreach ($staff->work_experiences as $work_experience)
+            <tr>
+                <td>{{++$i}}</td>
+                <td>{{ substr($work_experience->start_date, 0, 4)}} - {{ substr($work_experience->end_date, 0, 4)}}</td>
+                <td>{{ $work_experience->institution }}</td>
+                <td>{{ $work_experience->address }}</td>
+                <td>{{ $work_experience->job_title }}</td>
+                <td>
+                    @php
+                    $duties = $work_experience->duties == null? null :
+                    json_decode($work_experience->duties);
+                    @endphp
+                    <ul>
+                        @foreach ($duties as $duty)
+                        <li>{{ $duty }}</li>
+                        @endforeach
+                    </ul>
+                </td>
+            </tr>
+            @endforeach
+            @endif
+        </tbody>
+    </table>
+    <br>
+    <h3>(E) REFEREES/WADHAMINI</h3>
+    <br><br>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>S/N</td>
+                <th>NAME</th>
+                <th>TITLE</th>
+                <th>ORGANIZATION</th>
+                <th>ADDRESS</th>
+                <th>EMAIL</th>
+                <th>PHONE</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+            $i = 0;
+            @endphp
+            @foreach ($staff->referees as $referee)
+            <tr>
+                <td>{{++$i}}</td>
+                <td>{{$referee->referee_fullname}}</td>
+                <td>{{$referee->title}}</td>
+                <td>{{$referee->organization}}</td>
+                <td>{{$referee->address}}</td>
+                <td>{{$referee->email_address}}</td>
+                <td>{{$referee->phone_number}}</td>
+
+
+            </tr>
+            @endforeach
+        </tbody>
+
     </table>
 </div>
 

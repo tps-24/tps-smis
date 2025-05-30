@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Platoon extends Model
 {
@@ -30,8 +31,8 @@ class Platoon extends Model
     private function sick(){
         return $this->hasManyThrough(Patient::class, Student::class, 'platoon', 'student_id', 'name', 'id');
     }
-    public function safari(){
-        return $this->hasManyThrough(SafariStudent::class, Student::class, 'platoon', 'student_id', 'name', 'id');
+    public function leaves(){
+        return $this->hasManyThrough(LeaveRequest::class, Student::class, 'platoon', 'student_id', 'name', 'id');
     }
     public function today_attendence(){
         $selectedSessionId = session('selected_session');
@@ -42,5 +43,25 @@ class Platoon extends Model
 
     public function today_sick(){
         return $this->sick();
+    }
+
+    public function today_admitted(){
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
+       return $this->sick()->where('session_programme_id', $selectedSessionId)->where('excuse_type_id',3)->whereNull('released_at');
+    }
+
+        public function todayEd(){
+        $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
+         $today = Carbon::today();
+            return $this->sick()
+                ->where('session_programme_id', $selectedSessionId)
+                ->where('excuse_type_id', 1) // ED
+                ->whereNull('released_at');
+                // ->whereDate('patients.created_at', '<=', $today)
+                // ->whereRaw("DATE_ADD(patients.created_at, INTERVAL rest_days DAY) >= ?", [$today]);
     }
 }

@@ -130,7 +130,8 @@
 
         .bottom-container {
             width: 80%;
-            padding-left:9%;
+            padding-left: %9;
+            padding-top:0px;
         }
         .col {
             display: inline-block;
@@ -160,10 +161,19 @@
             flex: 1;
             text-align: center;
         }
-
+    .tight-header {
+        margin-bottom: 4px !important;
+        margin-top: 1px !important;
+        padding: 0 !important;
+    }
+        .tight-table {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
     </style>
 </head>
 <body>
+
 @foreach($students as $student)
     <div class="container">
         <div class="header">
@@ -179,7 +189,7 @@
 
         <div class="details">
             <p>This is to certify that {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }} whose details are specified in the table below attained the grades against respective modules shown in the table for Examination results.</p>
-            <table>
+            <table class="tight-table">
                 <thead>
                     <tr>
                         <th width="35%">Award Holder</th>
@@ -202,26 +212,26 @@
                     </tr>
                     <tr>
                         <th colspan="3">Programme/Course Followed (Accredited by NACTE)</th>
-                        <td colspan="3">{{ $student->admittedStudent->programme->programmeName ?? ''}}</td>
+                        <td colspan="3">{{ $student->programme->programmeName ?? ''}}</td>
                     </tr>
                     <tr>
                         <th colspan="3">NTA Level Awarded</th>
-                        <td colspan="3">{{ $student->admittedStudent->programme->studyLevel->description ?? ''}}</td>
+                        <td colspan="3">{{ $student->programme->studyLevel->description ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th colspan="3">Overall GPA: {{ $student->overallGPA ?? ''}}</th>
-                        <td colspan="3">Class Awarded: {{ $student->classAwarded ?? ''}}</td>
+                        <th colspan="3">Overall GPA: {{ $student->gpa['overallGPA'] ?? ''}}</th>
+                        <td colspan="3">Class Awarded: <strong>{{ $student->gpa['classAwarded'] ?? ''}}</strong></td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
-        <h4>EXAMINATION RESULTS</h4>
+        <h4 class="tight-header">EXAMINATION RESULTS</h4>
 
         <div class="results-container">
         <div class="semester-table sem1" style="float: left; width: 48%; margin-right: 2%;">
             <h4>Semester I Results</h4>
-            <table style="margin-top: -15px;">
+            <table style="margin-top: -15px;" class="tight-table">
                 <thead>
                     <tr>
                         <th width="10%">Module Code</th>
@@ -243,7 +253,7 @@
                     @endforeach
                     <tr>
                         <td colspan="2"><b>Semester I GPA:</b></td>
-                        <td colspan="2">{{ $student->semesterOneGPA }}</td>
+                        <td colspan="2">{{ $student->gpa['semesterOneGPA'] }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -251,7 +261,7 @@
 
         <div class="semester-table sem2" style="float: right; width: 48%;">
             <h4>Semester II Results</h4>
-            <table style="margin-top: -15px;">
+            <table style="margin-top: -15px;" class="tight-table">
                 <thead>
                     <tr>
                         <th width="10%">Module Code</th>
@@ -280,7 +290,7 @@
 
                     <tr>
                         <td colspan="2"><b>Semester II GPA:</b></td>
-                        <td colspan="2">{{ $student->semesterTwoGPA }}</td>
+                        <td colspan="2">{{ $student->gpa['semesterTwoGPA'] }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -288,16 +298,18 @@
     </div>
 
 
-    <div class="bottom-container">
-        <div class="col text-left signature">
-            <p>OMARY S. KISALO - ACP</p>
-            <p>Chief Instructor</p>
+    <div class="bottom-container" style="padding-left: 9%;">
+        <div class="col text-left">
+            <span style=" position: absolute;  z-index:2;">OMARY S. KISALO - ACP</span><br>
+            <img style="height:40px; position: relative; width:100px; z-index:1;" src="{{ url('resources/assets/images/signatures/chief_instructor.jpeg') }}" alt="signature" ></br>
+            <span style="margin-top: -100px;">Chief Instructor</span>
         </div>
         <div class="col text-right date-issue">
             <p>{{ now()->toDateString() }}</p>
             <p>Date of Issue</p>
         </div>
     </div>
+
 
     <div style="page-break-after: always;"></div>
     <center>

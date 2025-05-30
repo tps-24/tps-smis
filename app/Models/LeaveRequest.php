@@ -15,6 +15,8 @@ class LeaveRequest extends Model
         'company_id',
         'platoon',
         'phone_number',
+        'previous_beat_status',
+        'current_beat_status',
         'location',
         'reason',
         'status',

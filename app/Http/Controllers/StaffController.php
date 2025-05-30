@@ -53,8 +53,9 @@ class StaffController extends Controller
     public function create()
     {
         $departments = Department::get();
+        $companies = Company::all();
         $roles = Role::pluck('name','name')->all();
-        return view('staffs.create', compact('departments', 'roles'));
+        return view('staffs.create', compact('departments', 'roles','companies'));
     }
 
     /**
@@ -66,6 +67,7 @@ class StaffController extends Controller
         $this->validate($request, [
             'forceNumber' => 'required|unique:staff',
             'rank' => 'required',
+            'company_id' => 'required',
             'firstName' => 'required',
             'lastName' => 'required',
             'gender' => 'required',
@@ -173,7 +175,7 @@ class StaffController extends Controller
     {        
         // Ensure the roles relationship is loaded
         $staff->load('roles');
-        
+        $companies = Company::all();
         $user = User::find($staff->user_id);
 
         $departments = Department::get();
@@ -181,63 +183,65 @@ class StaffController extends Controller
         $userRole = $user->roles->pluck('name','name')->all();
         $staffNextofkin = NextOfKin::where('staff_id', $staff->id)->first();
 
-        return view('staffs.edit', compact('staff', 'departments','roles', 'userRole', 'staffNextofkin'));
+        return view('staffs.edit', compact('staff', 'departments','roles', 'userRole', 'staffNextofkin','companies'));
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Staff $staff)
-    {
-        $this->validate($request, [
-            'forceNumber' => 'required|unique:staff,forceNumber,' . $staff->id,
-            'rank' => 'required',
-            'firstName' => 'required',
-            'lastName' => 'required',
-            'gender' => 'required',
-            // 'DoB' => 'required|date',
-            // 'maritalStatus' => 'required',
-            // 'phoneNumber' => 'required',
-            'email' => 'required|unique:staff,email,' . $staff->id,
-            'department_id' => 'required|integer',
-            // 'roles' => 'required',
-            // 'educationLevel' => 'required',
-            // 'contractType' => 'required',
-            // 'joiningDate' => 'required|date',
-            // 'location' => 'required',
-            'updated_by' => 'required|exists:users,id'
+{
+    $this->validate($request, [
+        'forceNumber' => 'required|unique:staff,forceNumber,' . $staff->id,
+        'rank' => 'required',
+        'firstName' => 'required',
+        'lastName' => 'required',
+        'gender' => 'required',
+        'company_id' => 'required',
+        // 'DoB' => 'required|date', 
+        // 'maritalStatus' => 'required', 
+        // 'phoneNumber' => 'required',
+        'email' => 'required|unique:staff,email,' . $staff->id,
+        'department_id' => 'required|integer',
+        // 'roles' => 'required',
+        // 'educationLevel' => 'required',
+        // 'contractType' => 'required',
+        // 'joiningDate' => 'required|date',
+        // 'location' => 'required',
+        'updated_by' => 'required|exists:users,id'
+    ]);
+
+    // Retrieve user ID associated with the staff
+    $userId = $staff->user_id;  // Better way to access the user_id directly
+    $fullName = $request->firstName . ' ' . $request->middleName . ' ' . $request->lastName;
+    
+    $input = $request->all();
+    // Update the associated user details
+    $user = User::find($userId);  // Simplified user retrieval
+
+    if ($user) {
+        $user->update([
+            'name' => $fullName,
+            //'email' => $input['email']
         ]);
+    }
 
-        $id = Staff::where('id', $staff->id)->pluck('user_id');
-        $fullName = $request->firstName . ' ' . $request->middleName . ' ' . $request->lastName;
-        $input = $request->all();
-        // $input = $request->only(['email', 'password']);
-        // $input = Arr::except($input,array('password'));  
+    // Update user roles
+    DB::table('model_has_roles')->where('model_id', $userId)->delete();
+    $user->assignRole($request->input('roles'));
 
-        $user = User::where('id', $id)->first();
+    // Update staff details
+    $staff->update($input);
 
-        if ($user) {
-            $user->update([
-                'name' => $fullName,
-                'email' => $input['email']
-            ]);
-        }
-
-        DB::table('model_has_roles')->where('model_id', $id)->delete();
-        
-        $user->assignRole($request->input('roles'));
-
-        $staff->update($request->all());
-
-        // Check if Next of Kin full name is provided
-        if (!empty($request->input('nextofkinFullname'))) {
-            // Validate NextOfKin fields
-            $this->validate($request, [
-                'nextofkinFullname' => 'required',
-                'nextofkinRelationship' => 'required',
-                'nextofkinPhoneNumber' => 'required',
-                'nextofkinPhysicalAddress' => 'required',
-            ]);
+    // Check if Next of Kin full name is provided
+    if ($request->has('nextofkinFullname') && !empty($request->input('nextofkinFullname'))) {
+        // Validate NextOfKin fields
+        $this->validate($request, [
+            'nextofkinFullname' => 'required',
+            'nextofkinRelationship' => 'required',
+            'nextofkinPhoneNumber' => 'required',
+            'nextofkinPhysicalAddress' => 'required',
+        ]);
 
         // Update or Create NextOfKin
         NextOfKin::updateOrCreate(
@@ -250,11 +254,12 @@ class StaffController extends Controller
                 'staff_id' => $staff->id,
             ]
         );
-
-        }
-
-        return redirect()->route('staffs.index')->with('success', 'Staff updated successfully.');
     }
+
+    // Redirect back with a success message
+    return redirect()->route('staffs.index')->with('success', 'Staff updated successfully.');
+}
+
 
 
     /**
@@ -280,25 +285,29 @@ class StaffController extends Controller
         }
         abort(404);
     }
-    public function search(Request $request)
-    {
+public function search(Request $request)
+{
+    $staffs = Staff::with(['company', 'department']);
 
-        $staffs = Staff::where('company_id', $request->company_id)
-                    ->orderBy('firstName');
-
-        if ($request->name) {
-            $staffs = $staffs->where(function ($query) use ($request) {
-                $query->where('firstName', 'like', '%' . $request->name . '%')
-                    ->orWhere('lastName', 'like', '%' . $request->name . '%')
-                    ->orWhere('middleName', 'like', '%' . $request->name . '%');
-            });
-        }
-        $companies = Company::all();
-        $staffs = $staffs->latest()->paginate(10);
-        return view('staffs.index',compact('staffs', 'companies'))
-        ->with('i', ($request->input('page', 1) - 1) * 10);
-
+    if ($request->filled('company_id')) {
+        $staffs->where('company_id', $request->company_id);
     }
+
+    if ($request->filled('name')) {
+        $staffs->where(function ($query) use ($request) {
+            $query->where('firstName', 'like', '%' . $request->name . '%')
+                  ->orWhere('middleName', 'like', '%' . $request->name . '%')
+                  ->orWhere('lastName', 'like', '%' . $request->name . '%');
+        });
+    }
+
+    $companies = Company::all();
+    $staffs = $staffs->orderBy('id', 'desc')->paginate(10)->appends($request->all());
+
+    return view('staffs.index', compact('staffs', 'companies'))
+        ->with('i', ($request->input('page', 1) - 1) * 10);
+}
+
 
     public function generateResume($staffId)
     {
@@ -386,6 +395,7 @@ class StaffController extends Controller
         //return $request->all();
         $staff = Staff::find($staff_id);
         if($request->primary_school_name){
+            $message = 'Primary';
             $school = School::create([
                 'staff_id' => $staff_id,
                 'name' =>$request->primary_school_name,
@@ -400,10 +410,11 @@ class StaffController extends Controller
         }
 
         if($request->secondary_school_name){
+            $message = $request->secondary_school_type == 2? 'O-Level': 'A-Level';
             $school = School::create([
                 'staff_id' => $staff_id,
                 'name' =>$request->secondary_school_name,
-                'education_level_id' =>2,
+                'education_level_id' =>$request->secondary_school_type,
                 'admission_year' =>$request->secondary_school_YoA,
                 'graduation_year' =>$request->secondary_school_YoG,
                 'award' =>$request->secondary_school_ward,
@@ -414,6 +425,7 @@ class StaffController extends Controller
         }
 
         if($request->colleges_name){
+            $message = 'College';
             $school = School::create([
                 'staff_id' => $staff_id,
                 'name' =>$request->colleges_name,
@@ -428,6 +440,7 @@ class StaffController extends Controller
         }
 
         if($request->venue){
+            $message = 'Other';
             $school = School::create([
                 'staff_id' => $staff_id,
                 'name' =>$request->college,
@@ -438,21 +451,56 @@ class StaffController extends Controller
                 'venue' =>$request->venue,
             ] );            
         }
-        return "Ok";
+        return redirect()->route('staff.cv',['staffId'=>$staff->id])->with('success', $message.' updated successfully.');
     }
     public function update_work_experience(Request $request, $staff_id){
+
+        $validator = Validator::make($request->all(), [
+            'start_date'    => ['required', 'integer', 'min:1960'],
+            'end_date'      => ['nullable', 'integer', 'min:1960', 'gte:start_date'],
+            'institution'   => ['required', 'string', 'max:255'],
+            'job_title'     => ['required', 'string', 'max:255'],
+            'address'       => ['required', 'string', 'max:255'],
+            'duties'        => ['required', 'array', 'min:1'],
+            'duties.*'      => ['required', 'string', 'min:3'],
+        ]);
+        
+        
+        if ($validator->fails()) {
+            // Redirect back with validation errors
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $staff = Staff::find($staff_id);
         WorkExperience::create([
             'user_id' =>$staff->id,
             'institution'=> $request->institution,
             'address'=> $request->address,
             'job_title'=> $request->job_title,
-            'position' => $request->position, 
+            //'position' => $request->position, 
             'start_date' =>  $request->start_date,
             'end_date' => $request->end_date,
             'address' => $request->address,
             'duties' => json_encode($request->duties),
         ]);
-        return $request->all();
+
+
+        return redirect()->route('staff.cv',['staffId'=>$staff->id])->with('success', 'Cv updated successfully.');
+    }
+
+    public function deleteWorkExprience($experienceId){
+        $workExperience = WorkExperience::find($experienceId);
+
+        $workExperience->delete();
+
+        return redirect()->back()->with('success', 'Work experience deleted successfully.');
+    }
+
+    public function deleteSchool($schoolId){
+        $school = School::find($schoolId);
+
+        $school->delete();
+
+        return redirect()->back()->with('success', 'School or Professional deleted successfully.');
     }
 }

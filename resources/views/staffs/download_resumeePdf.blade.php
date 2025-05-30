@@ -13,7 +13,7 @@
         <link rel="stylesheet" href="/tps-smis/resources/assets/fonts/bootstrap/bootstrap-icons.min.css" />
         <link rel="stylesheet" href="/tps-smis/resources/assets/css/main.min.css" />
         <link rel="stylesheet" href="/tps-smis/resources/assets/css/custom.css" />
-        <title>Document</title>
+        <title>CV Document</title>
 
         <style>
         .page-break {
@@ -197,8 +197,8 @@ td ul li {
         </tbody>
     </table>
     <div style="page-break-before: always;"></div>
-        <h3>(B) EDUCATION AND TRAINING</h3>
-        <h3>1. Primary Schools</h3>
+        <h3>(B) EDUCATION AND TRAINING / ELIMU NA MAFUNZO YA UJUZI</h3>
+        <h3>1. Elimu ya Msingi</h3>
         <table class="table table-sm table-bordered">
             <thead>
                 <tr>
@@ -226,7 +226,7 @@ td ul li {
             </tbody>
         </table>
 
-        <h3>2. Secondary Schools</h3>
+        <h3>2. Elimu ya Sekondari</h3>
         <table class="table table-sm table-bordered">
             <thead>
                 <tr>
@@ -256,7 +256,7 @@ td ul li {
             </tbody>
         </table>
 
-        <h3>3. Colleges</h3>
+        <h3>3. Colleges/Vyuo alivyosoma</h3>
         <table class="table table-sm table-bordered">
             <thead>
                 <tr>
@@ -287,7 +287,7 @@ td ul li {
             <thead>
                 <tr>
                     <td>S/NO</td>
-                    <td>Duration</td>
+                    <td style="width: 80px;">Duration</td>
                     <td>Theme and Award</td>
                     <td>College/Organization</td>
                     <td>Venue</td>
@@ -315,14 +315,15 @@ td ul li {
         </table>
 
         <h3>(D) WORK AND EXPERIENCE</h3>
+        <h4>CURRENT TITLE / CHEO CHAKO KWA SASA <strong>{{$staff->rank}}</strong> </h4>
         <table class="table table-sm table-bordered">
             <thead>
                 <tr>
                     <td>S/NO</td>
-                    <td>Year</td>
+                    <td style="width:90px;">Year</td>
                     <td>Organization</td>
                     <td>Location</td>
-                    <td>Position</td>
+                    <td>Title</td>
                     <td>Duties</td>
                 </tr>
 
@@ -339,7 +340,7 @@ td ul li {
                     </td>
                     <td>{{ $work_experience->institution }}</td>
                     <td>{{ $work_experience->address }}</td>
-                    <td>{{ $work_experience->position }}</td>
+                    <td>{{ $work_experience->job_title }}</td>
                     <td>
                         @php
                         $duties = $work_experience->duties == null? null :
@@ -356,6 +357,44 @@ td ul li {
                 @endif
             </tbody>
         </table>
+
+    <h3>(E) REFEREES/WADHAMINI</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>S/N</td>
+                <th>NAME</th>
+                <!-- <th>TITLE</th> -->
+                <th>ORGANIZATION</th>
+                <th>ADDRESS</th>
+                <th>EMAIL</th>
+                <th>PHONE</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+            $i = 0;
+            @endphp
+            @foreach ($staff->referees as $referee)
+            <tr>
+                <td>{{++$i}}</td>
+                <td>{{$referee->referee_fullname}}</td>
+                <!-- <td>{{$referee->title}}</td> -->
+                <td>{{$referee->organization}}</td>
+                <td>{{$referee->address}}</td>
+                <td>{{$referee->email_address}}</td>
+                <td>{{$referee->phone_number}}</td>
+            </tr>
+            @endforeach
+        </tbody>
+
+    </table>
+<br>
+<center style="display:flex;  text-align: end; gap: 50px;" >
+    <span>Signature.........................</span>
+    <span>Date......................</span>
+</center>
+
     </div>
 </body>
 

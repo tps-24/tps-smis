@@ -39,9 +39,9 @@ $i = 0;
                     @else
                     <div class="d-flex justify-content-center">
                         @endif
-                        <form class="d-flex" action="{{route('staff.search')}}" method="POST">
+                        <form class="d-flex" action="{{route('staff.search')}}" method="GET">
                             @csrf
-                            @method("POST")
+                            @method("GET")
                             <div class="d-flex gap-2">
                               <label for="">Filter </label>
                                 <!-- Name Search -->

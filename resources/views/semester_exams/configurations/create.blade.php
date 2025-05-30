@@ -43,21 +43,10 @@
                 @csrf
                 <div class="row">
                     
-                    <div class="col-xs-6 col-sm-6 col-md-12">
-                        <div class="form-group">
-                            <strong>Assessment Type:</strong>
-                            <select name="assessment_type_id" class="form-control">                                    
-                                    @foreach ($assessmentTypes as $assessmentType)
-                                        <option value="{{ $assessmentType->id }}">{{ $assessmentType->type_name }}</option>
-                                    @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Coursework Title:</strong>
-                            <input type="text" name="coursework_title" placeholder="Enter Coursework title" class="form-control">
+                            <strong>Exam date :</strong>
+                            <input type="date" name="exam_date" placeholder="" class="form-control">
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
@@ -66,13 +55,7 @@
                             <input type="number" name="max_score" placeholder="Enter max score" class="form-control">
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Due Date:</strong>
-                            <input type="date" name="due_date" placeholder="Enter Due Date" class="form-control">
-                        </div>
-                    </div>
-                    <input type="number" name="created_by" value="{{ Auth::user()->id }}" class="form-control" hidden>
+                    
                     <div class="col-xs-12 col-sm-12 col-md-12 text-center">
                         <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
                     </div>

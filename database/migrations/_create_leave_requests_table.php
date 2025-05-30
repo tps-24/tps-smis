@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('location');
             $table->text('reason');
             $table->text('attachments')->nullable(); // optional
-            $table->enum('status', ['pending', 'forwarded_to_chief_instructor', 'approved', 'rejected', 'ready'])->default('pending');
+            $table->enum('status', ['pending', 'forwarded_to_chief_instructor', 'on_leave', 'rejected', 'ready','returned'])->default('pending');
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();   
             $table->string('phone_number')->nullable(); 

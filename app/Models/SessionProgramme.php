@@ -22,7 +22,10 @@ class SessionProgramme extends Model
     {
         return $this->hasMany(User::class);
     }
-
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
     public function programmeCourseSemesters()
     {
         return $this->hasMany(ProgrammeCourseSemester::class);

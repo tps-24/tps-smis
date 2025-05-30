@@ -64,7 +64,7 @@ class StudentController extends Controller
         $students = Student::where('session_programme_id', $selectedSessionId)
                     ->where('company_id', $request->company_id)
                     ->where('platoon',$request->platoon)
-                    ->orderBy('first_name');
+                    ->orderBy('force_number');
                     //->latest()->paginate(90);
         //return view('students.index', compact('students'))
             //->with('i', ($request->input('page', 1) - 1) * 90);
@@ -107,11 +107,11 @@ class StudentController extends Controller
 
         $validator = Validator::make($request->all(), [
             'rank' => 'required',
-            'education_level' => 'required',
+            //'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'middle_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
-            'phone' => 'nullable|numeric|digits:10|unique:students',
+            'phone' => 'nullable|numeric|unique:students',
             'weight' => 'nullable|numeric',
             'height' => 'nullable|numeric',
             'home_region' => 'required|string|min:4',
@@ -294,7 +294,7 @@ class StudentController extends Controller
 
         $validator = Validator::make($request->all(), [
             'rank' => 'required',
-            'education_level' => 'required',
+            //'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'middle_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
@@ -349,9 +349,9 @@ class StudentController extends Controller
         // dd($request->file('photo'));
         $student = Student::findOrFail($id);
         $request->validate([
-            'education_level' => 'required',
+            //'education_level' => 'required',
             'home_region' => 'required|string|min:4',
-            'phone' => 'nullable|numeric|unique:students,phone,' . $student->id,
+            'phone' => 'nullable|numeric|unique:students,phone,'. $student->id,
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'next_of_kin' => 'nullable|array',
             'next_of_kin.*.name' => 'nullable|string',
@@ -571,9 +571,10 @@ class StudentController extends Controller
             $student_validate_rule = '|unique:students,force_number';
         }
 
+        
         $validatedData = $request->validate([
             'force_number' => 'nullable|regex:/^[A-Z]{1,2}\.\d+$/' . $student_validate_rule,
-            //'rank' => 'nullable',
+            'rank' => 'nullable',
             //'education_level' => 'required',
             'first_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
             'last_name' => 'required|max:30|alpha|regex:/^[A-Z]/',
@@ -595,7 +596,7 @@ class StudentController extends Controller
             //$student['rank'] = $validatedData['rank'];
             //$student['education_level'] = $validatedData['education_level'];
             $student['rank'] = $validatedData['rank'];
-            $student['education_level'] = $validatedData['education_level'];
+            $student['education_level'] = $request->education_level;
             $student['first_name'] = $validatedData['first_name'];
             $student['middle_name'] = $validatedData['middle_name'];
             $student['last_name'] = $validatedData['last_name'];
@@ -619,20 +620,24 @@ class StudentController extends Controller
 
     public function postStepTwo(Request $request, $type)
     {
+        
         $companies = Company::all();
+        
         $student = $request->session()->get('student');
+       // return $student;
         $validator = Validator::make($request->all(), [
-            'phone' => 'nullable|numeric|digits:10|unique:students,phone,' . $student->id . ',id',
-            'nin' => 'required|digits:20|numeric|unique:students,nin,' . $student->id . ',id',
-            'dob' => 'required|string',
+            'phone' => 'nullable|numeric|unique:students,phone,' . $student->id . ',id',
+            'nin' => 'nullable|digits:20|numeric|unique:students,nin,' . $student->id . ',id',
+            'dob' => 'nullable|string',
             'gender' => 'required|max:1|alpha|regex:/^[M,F]/',
-            'company_id' => 'required|max:2|numeric',
+            'company_id' => 'required|numeric',
             'platoon' => 'required|max:2',
-            'weight' => 'required|numeric',
-            'height' => 'required|numeric'
+            'weight' => 'nullable|numeric',
+            'height' => 'nullable|numeric'
         ]);
         if ($validator->errors()->any()) {
-            return view('students/wizards/stepTwo', compact('student', 'companies'))->withErrors($validator->errors());
+            $companies = Company::all();
+           return view('students.wizards.stepTwo', compact('companies', 'type'))->withErrors($validator->errors());
         }
         $student['phone'] = $request->phone;
         $student['nin'] = $request->nin;
@@ -644,7 +649,7 @@ class StudentController extends Controller
         $student['height'] = $request->height;
         $request->session()->put('student', $student);
         if ($type == "create") {
-            return redirect('students/create/step-three/create');
+            return redirect('students/create/step-three/create')->with('success','Student created successfully.');
         }
         return view('students.wizards.stepThree', compact('student','companies'));
 
@@ -659,17 +664,23 @@ class StudentController extends Controller
     public function postStepThree(Request $request, $type)
     {
         $validatedData = $request->validate([
-            'next_kin_phone' => 'nullable|numeric|digits:10',
-            'next_kin_names' => 'required|max:30',
-            'next_kin_address' => 'required|string|min:4',
-            'next_kin_relationship' => 'required|string|min:4',
-        ]);
 
+        ]);
+        $validator = Validator::make($request->all(), [
+            'next_kin_phone' => 'nullable|numeric|',
+            'next_kin_names' => 'nullable|max:30',
+            'next_kin_address' => 'nullable|string|min:4',
+            'next_kin_relationship' => 'nullable|string|min:4',
+        ]);
+                if ($validator->errors()->any()) {
+            $companies = Company::all();
+           return view('students.wizards.stepThree', compact('companies', 'type'))->withErrors($validator->errors());
+        }
         $student = $request->session()->get('student');
-        $student['next_kin_phone'] = $validatedData['next_kin_phone'];
-        $student['next_kin_names'] = $validatedData['next_kin_names'];
-        $student['next_kin_address'] = $validatedData['next_kin_address'];
-        $student['next_kin_relationship'] = $validatedData['next_kin_relationship'];
+        $student['next_kin_phone'] = $request->next_kin_phone;
+        $student['next_kin_names'] = $request->next_kin_names;
+        $student['next_kin_address'] = $request->next_kin_address;
+        $student['next_kin_relationship'] = $request->next_kin_relationship;
         if ($type == 'create') {
             $selectedSessionId = session('selected_session');
             if (!$selectedSessionId)
@@ -685,7 +696,7 @@ class StudentController extends Controller
         if ($type == "edit") {
             $message = "Student updated successfully.";
         } else {
-            $message = "";
+            $message = "Student created successfully.";
         }
         return redirect()->route('students.index')->with('success', $message);
         ;
