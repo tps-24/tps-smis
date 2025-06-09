@@ -32,12 +32,10 @@ class LeaveRequestController extends Controller
         // Super Admin, Admin, Teacher, and MPS Officer can view all companies
         if ($user->hasRole(['Super Administrator', 'Admin', 'MPS Officer'])) {
             $companies = Company::all();
-            $query     = Student::query();
         } else {
             // Sir Major can only see students from their assigned company
             $companies = collect([$assignedCompany]);
-            $query     = Student::where('company_id', $staff->company_id);
-            $leaves    = $staff->company->leaves()->orderBy('created_at', 'desc')->get();
+            $leaves = $staff->company->leaves()->orderBy('created_at', 'desc')->paginate(10);
         }
 
         // Filtering based on selected company
@@ -60,12 +58,47 @@ class LeaveRequestController extends Controller
             $query->where('id', (int) $request->student_id);
         }
 
-        $studentDetails = $query->get();
-        $message        = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
 
-        return view('leave-requests.index', compact('message', 'user', 'assignedCompany', 'companies', 'studentDetails', 'leaves'));
+        return view('leave-requests.index', compact( 'user', 'assignedCompany', 'companies',  'leaves'));
     }
 
+    public function search(Request $request){
+        
+        $user = auth()->user();
+        $staff  = $user->staff;
+        // Get company_id from staff table
+        $assignedCompany = $staff ? Company::find($staff->company_id) : null;
+        if ($user->hasRole(['Super Administrator', 'Admin', 'MPS Officer'])) {
+            $companies = Company::all();
+            $query     = Student::query();
+        } else {
+            // Sir Major can only see students from their assigned company
+            $companies = collect([$assignedCompany]);
+            $query     = Student::where('company_id', $staff->company_id);
+        }
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+
+        if ($request->filled('platoon')) {
+            $query->where('platoon', $request->platoon);
+        }
+
+        if ($request->filled('fullname')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('first_name', 'LIKE', "%{$request->fullname}%")
+                    ->orWhere('last_name', 'LIKE', "%{$request->fullname}%");
+            });
+        }
+
+        if ($request->filled('student_id')) {
+            $query->where('id', (int) $request->student_id);
+        }
+        $studentDetails = $query->paginate(15);
+        $studentDetails->appends($request->only(['company_id', 'platoon', 'fullname']));
+        $message        = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
+        return view('leave-requests.index', compact('message', 'user', 'assignedCompany', 'companies', 'studentDetails'));
+    }
 // Show all leave requests submitted to OC
     public function ocLeaveRequests()
     {
@@ -91,17 +124,24 @@ class LeaveRequestController extends Controller
             'company_id'   => 'required|exists:companies,id',
             'platoon'      => 'required|integer',
 
-            'phone_number' => 'nullable|string|max:20',
+            'phone_number' => 'nullable|string|max:15',
             'location'     => 'required|string|max:255',
             'reason'       => 'required|string',
-            'attachments'  => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+            'attachments'  => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:1548',
         ]);
-        // return $request->all();
+
+        $hasActiveLeave = LeaveRequest::where('student_id', $request->student_id)
+            ->whereNull('return_date')
+            ->exists();
+            if($hasActiveLeave){
+                return redirect()->back()->with('info', 'Student has active Leave');
+            }
+
         if ($request->hasFile('attachments')) {
             $validated['attachments'] = $request->file('attachments')->store('leave_attachments', 'public');
         }
 
-                                          // ✅ Set default status when creating the leave request
+        // ✅ Set default status when creating the leave request
         $validated['status'] = 'pending'; // or whatever default status you want ('pending', 'waiting', etc.)
 
         LeaveRequest::create($validated);
@@ -112,7 +152,7 @@ class LeaveRequestController extends Controller
     {
         $leaveRequests = LeaveRequest::where('status', 'forwarded_to_chief_instructor')
             ->with('student')
-            ->get();
+            ->paginate(10);
 //return $leaveRequests;
         return view('leave-requests.chief_instructor', compact('leaveRequests'));
     }
@@ -186,7 +226,7 @@ class LeaveRequestController extends Controller
         $approvedRequests = LeaveRequest::where('status', 'approved')
             ->with('student')
             ->latest()
-            ->get();
+            ->paginate(15);
 
         $totalRequests = $approvedRequests->count();
         $totalDays     = $approvedRequests->sum(function ($request) {
@@ -207,8 +247,8 @@ class LeaveRequestController extends Controller
     {
         $leaveRequests = LeaveRequest::with('student')
             ->where('status', 'rejected')
-            ->orderByDesc('rejected_at')
-            ->get();
+            ->orderByDesc('updated_at')
+            ->paginate(15);
 
         return view('leave-requests.rejected', compact('leaveRequests'));
     }
@@ -222,16 +262,16 @@ class LeaveRequestController extends Controller
         }
 
         $pdf = Pdf::loadView('leave-requests.rejected_pdf', compact('leaveRequest'));
-        return $pdf->download('rejected-leave-request-' . $leaveRequest->id . '.pdf');
+        return $pdf->stream('rejected-leave-request-' . $leaveRequest->id . '.pdf');
     }
     public function exportSinglePdf($id)
     {
         $leaveRequest = LeaveRequest::with(['student', 'company'])->findOrFail($id);
 
         $pdf = Pdf::loadView('leave-requests.pdf', compact('leaveRequest'));
-        //$pdf->setOptions(['defaultPaperSize' => 'a4', 'margin-top' => '20px']);
+        //$pdf->setOptions(['defaultPaperSize' => 'a4', 'margin-top' => '15px']);
         //return view('leave-requests.pdf', compact('leaveRequest'));
-        return $pdf->download('leave-request.pdf');
+        return $pdf->stream('leave-request.pdf');
     }
 
     public function destroy($leaveId)

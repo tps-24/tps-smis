@@ -42,7 +42,7 @@
                             <th>Status</th>
                             <th>Excuse Type</th>
                             <th>Days of Rest</th>
-                            <th>Date Admitted</th>
+                            <th>Date Attended</th>
                             <th>End Date of Rest</th>
                         </tr>
                     </thead>
@@ -51,7 +51,7 @@
                             <tr>
                                 <td>{{ optional($patient->student)->first_name ?? '-' }}</td>
                                 <td>{{ optional($patient->student)->last_name ?? '-' }}</td>
-                                <td>{{ $patient->platoon ?? '-' }}</td>
+                                <td>{{ $patient->company->name ?? '-' }} -{{ $patient->platoon ?? '-' }}</td>
                                 <td>{{ $patient->status ?? '-' }}</td>
                                 <td>{{ optional($patient->excuseType)->excuseName ?? '-' }}</td>
                                 <td>{{ $patient->rest_days ?? '-' }}</td>

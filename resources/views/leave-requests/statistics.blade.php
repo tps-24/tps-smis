@@ -4,10 +4,10 @@
 @include('layouts.sweet_alerts.index')
 <div class="container mx-auto p-6">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="mb-0">Rejected Leave Requests</h5>
-        <a href="{{ route('leave-requests.chief-instructor') }}" class="btn btn-secondary">
-            Back to Leave Requests
-        </a>
+<a href="{{ route('leave-requests.chief-instructor') }}" class="btn btn-primary">
+    <i class="bi bi-arrow-left"></i> Back
+</a>
+
     </div>
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
@@ -22,6 +22,7 @@
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
+                    <th>S/N</th>
                     <th> Student Name</th>
                     <!-- <th> Reason</th> -->
                     <th> Start date</th>
@@ -35,6 +36,7 @@
             <tbody>
                 @forelse ($approvedRequests as $request)
                 <tr>
+                    <td>{{$loop->iteration}}.</td>
                     <td>
                         {{ $request->student->first_name ?? '' }} {{ $request->student->last_name ?? '' }}
                     </td>
@@ -113,6 +115,7 @@
                 @endforelse
             </tbody>
         </table>
+        {!! $approvedRequests->links('pagination::bootstrap-5') !!}
     </div>
 </div>
 

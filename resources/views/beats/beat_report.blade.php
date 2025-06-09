@@ -38,7 +38,7 @@
         <li class="nav-item" role="presentation" style="font-size:22px">
             <a id="tab-one{{$company->name}}" data-bs-toggle="tab" href="#one{{$company->name}}" role="tab"
                 aria-controls="one{{$company->name}}" aria-selected="true" @if ($i==0) class="nav-link active" @else
-                class="nav-link" @endif> {{$company->name}} - Company</a>
+                class="nav-link" @endif> {{$company->description}} </a>
         </li>
         <?php    $i = +1; ?>
         @endforeach

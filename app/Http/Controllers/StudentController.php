@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Company;
+use App\Models\Platoon;
 use App\Models\SafariType;
 use App\Models\Programme;
 use App\Models\CourseworkResult;
@@ -24,7 +25,8 @@ use Hash;
 use Exception;
 use Illuminate\Support\Facades\Log; // Namespace for the Log facade
 
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
+//use Barryvdh\DomPDF\Facade as PDF;
 
 // use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -61,25 +63,32 @@ class StudentController extends Controller
         $selectedSessionId = session('selected_session');
         if (!$selectedSessionId)
             $selectedSessionId = 1;
-        $students = Student::where('session_programme_id', $selectedSessionId)
-                    ->where('company_id', $request->company_id)
-                    ->where('platoon',$request->platoon)
-                    ->orderBy('force_number');
+        $students = Student::where('session_programme_id', $selectedSessionId);                   
+        if($request->company_id){
+            $students = $students ->where('company_id', $request->company_id);
+            if($request->platoon){
+                $students = $students ->where('platoon',$request->platoon);
+            }            
+        }
+
                     //->latest()->paginate(90);
         //return view('students.index', compact('students'))
             //->with('i', ($request->input('page', 1) - 1) * 90);
             // ->where('company_id', $request->company_id)
             // ->where('platoon', $request->platoon);
-
+       // return $request->name;
         if ($request->name) {
             $students = $students->where(function ($query) use ($request) {
                 $query->where('first_name', 'like', '%' . $request->name . '%')
                     ->orWhere('last_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('force_number', 'like', '%' . $request->name . '%')
                     ->orWhere('middle_name', 'like', '%' . $request->name . '%');
             });
         }
-        $companies = Company::all();
-        $students = $students->latest()->paginate(90);
+       $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+            $query->where('session_programme_id', $selectedSessionId); // Filter students by session
+        })->get();
+        $students = $students->orderBy('force_number','asc')->latest()->paginate(90);
         return view('students.index', compact('students','companies'))
             ->with('i', ($request->input('page', 1) - 1) * 90);
 
@@ -767,5 +776,19 @@ class StudentController extends Controller
             $student->beat_status = 1;
         $student->save();   
         return redirect()->route('students.index')->with('success','Beat status back from Safari updated successfully.');
+    }
+    public function generatePdf($platoon, $company_id){
+        $platoon = Platoon::where('name',$platoon)->where('company_id', $company_id)->first();
+         $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
+        $students = $platoon->students()->where('session_programme_id', $selectedSessionId)->where('company_id', $company_id)->get();
+
+        $pdf = PDF::loadView('students.pdfSheet', compact('students','platoon'));
+        $pdf->set_option('margin_top', 10);
+        $pdf->set_option('isHtml5ParserEnabled', true);
+        $pdf->set_option('isPhpEnabled', true);
+        return $pdf->stream($platoon->name.".pdf");
+        return $students;
     }
 }

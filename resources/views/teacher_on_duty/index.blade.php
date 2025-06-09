@@ -53,7 +53,7 @@
             <thead>
                 <tr>
                     <th scope="col">No</th>
-                    <th scope="col">PF Number</th>
+                    <th scope="col">Force Number</th>
                     <th scope="col">Name</th>
                     <th scope="col">Rank</th>
                     <th scope="col">Company</th>
@@ -129,7 +129,7 @@
                 <thead>
                     <tr>
                         <th scope="col">No</th>
-                        <th scope="col">PF Number</th>
+                        <th scope="col">Force Number</th>
                         <th scope="col">Name</th>
                         <th scope="col">Rank</th>
                         <th scope="col">Company</th>

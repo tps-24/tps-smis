@@ -29,6 +29,7 @@
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
+                    <th>S/N</th>
                     <th>Student Name</th>
                     <th>Reason</th>
                     <th>Action</th>
@@ -37,6 +38,7 @@
             <tbody>
                 @foreach($leaveRequests as $request)
                     <tr>
+                        <td>{{$loop->iteration}}.</td>
                         <td>{{ $request->student->first_name }} {{ $request->student->last_name }}</td>
                         <td>{{ $request->reason }}</td>
                         <td class="d-flex gap-2">
@@ -54,6 +56,7 @@
                 @endforeach
             </tbody>
         </table>
+        {!! $leaveRequests->links('pagination::bootstrap-5') !!}
     @endif
 
     <!-- Modals (Placed Outside Table) -->

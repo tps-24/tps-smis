@@ -14,6 +14,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
@@ -35,10 +36,19 @@ class ReportController extends Controller
      */
     public function index()
     {
+        $user  = Auth::user();
+        $companies = collect();
         $selectedSessionId = $this->selectedSessionId;
-        $companies         = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+        if($user->hasRole(['Sir Major','Instructor','OC Coy'])){
+            $companies         = Company::where('id',$user->staff->company_id)->whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId);
-        })->get();
+         });
+        }else{
+            $companies         = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+            $query->where('session_programme_id', $selectedSessionId);
+        });
+        }
+        $companies = $companies->get();
 
         $data = $this->getAttendanceData($companies->pluck('id'));
 
@@ -199,8 +209,8 @@ class ReportController extends Controller
         $totalMps    = 0;
         $totalLeave  = 0;
         $totalSick   = 0;
-        $companies   = Company::whereHas('students', function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId); // Filter students by session
+        $companies   = Company::whereHas('students', function ($query) use ($selectedSessionId, $companyId) {
+            $query->where('session_programme_id', $selectedSessionId)->whereIn('company_id', $companyId); // Filter students by session
         })
             ->with(['platoons.attendences' => function ($query) use ($selectedSessionId, $selectedDate) {
                 // Filter attendances for the selected session and date
@@ -209,7 +219,7 @@ class ReportController extends Controller
             }])
             ->get();
 
-// Step 1: Get all absent_student_ids values
+    // Step 1: Get all absent_student_ids values
         $records = DB::table('attendences')->pluck('absent_student_ids');
 
         $counts = [];
@@ -272,9 +282,11 @@ class ReportController extends Controller
             ->get()
             ->groupBy('session_programme_id');
 
+            if($attendances->isEmpty()){
+                return redirect()->back()->with('info', 'No attendances recorded for today.');
+            }
 // Prepare an array to store session program attendance data
         $sessionProgrammeAttendance = [];
-
 // Loop through the grouped attendance data
 $sick_student_ids = [];
         foreach ($attendances as $sessionProgrammeId => $records) {
@@ -295,6 +307,7 @@ $sick_student_ids = [];
             ];
 
         }
+        return $sessionProgrammeAttendance;
         foreach($sessionProgrammeAttendance[0]['attendances'] as $attendance){
           $sick_student_ids =  array_merge(
                     $sick_student_ids,
@@ -524,6 +537,13 @@ $sick_student_ids = [];
     }
     private function getHospitalData()
     {
+        $user = Auth::user();
+        $company_ids = [];
+        if($user->hasRole(['Sir Major','Instructor','OC Coy'])){
+            $company_ids = [$user->staff->company_id];
+        }else{
+            $company_ids = Company::pluck('id');
+        }
         $selectedSessionId = session('selected_session') == '' ? 1 : session('selected_session');
         $sevenDaysAgo      = Carbon::today()->subDays(6); // 6 days ago + today = 7 days
 
@@ -534,8 +554,8 @@ $sick_student_ids = [];
             SUM(CASE WHEN excuse_type_id = 2 THEN 1 ELSE 0 END) as LD,
             SUM(CASE WHEN excuse_type_id = 3 THEN 1 ELSE 0 END) as Adm
             ")
-            ->whereHas('student', function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId);
+            ->whereHas('student', function ($query) use ($selectedSessionId,$company_ids) {
+                $query->where('session_programme_id', $selectedSessionId)->whereIn('company_id', $company_ids);
             })
             ->whereIn('excuse_type_id', [1, 2, 3])
             ->whereDate('created_at', '>=', $sevenDaysAgo)
@@ -587,8 +607,8 @@ $sick_student_ids = [];
         SUM(CASE WHEN excuse_type_id = 2 THEN 1 ELSE 0 END) as LD,
         SUM(CASE WHEN excuse_type_id = 3 THEN 1 ELSE 0 END) as Adm
     ")
-            ->whereHas('student', function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId);
+            ->whereHas('student', function ($query) use ($selectedSessionId ,$company_ids) {
+                $query->where('session_programme_id', $selectedSessionId)->whereIn('company_id', $company_ids);
             })
             ->whereIn('excuse_type_id', [1, 2, 3])
             ->whereDate('created_at', '>=', $fiveWeeksAgo)
@@ -630,8 +650,8 @@ $sick_student_ids = [];
         SUM(CASE WHEN excuse_type_id = 2 THEN 1 ELSE 0 END) as LD,
         SUM(CASE WHEN excuse_type_id = 3 THEN 1 ELSE 0 END) as Adm
     ")
-            ->whereHas('student', function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId);
+            ->whereHas('student', function ($query) use ($selectedSessionId, $company_ids) {
+                $query->where('session_programme_id', $selectedSessionId)->whereIn('company_id', $company_ids);
             })
             ->whereIn('excuse_type_id', [1, 2, 3])
             ->whereDate('created_at', '>=', $threeMonthsAgo)
@@ -666,7 +686,6 @@ $sick_student_ids = [];
 
         $monthlyCounts = array_map(function ($monthItem) use ($rawCounts) {
             $month = $monthItem['month'];
-
             return [
                 'month' => Carbon::parse($month)->format('F Y'),
                 'total' => $rawCounts[$month]['total'] ?? 0,
@@ -677,9 +696,10 @@ $sick_student_ids = [];
         }, $monthlyCounts);
 
         $mostOccurredStudents = Patient::select('student_id', DB::raw('COUNT(*) as occurrence_count'))
-            ->whereHas('student', function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId);
+            ->whereHas('student', function ($query) use ($selectedSessionId, $company_ids)  {
+                $query->where('session_programme_id', $selectedSessionId) ->whereIn('company_id', $company_ids);
             })
+           
             ->groupBy('student_id')           // Group by student_id to count occurrences
             ->orderByDesc('occurrence_count') // Sort by occurrence count in descending order
             ->limit(10)                       // Limit to the top 10 most occurred students
@@ -704,6 +724,13 @@ $sick_student_ids = [];
 
     private function getLeavesData()
     {
+        $user = Auth::user();
+        $company_ids = [];
+        if($user->hasRole(['Sir Major','Instructor','OC Coy'])){
+            $company_ids = [$user->staff->company_id];
+        }else{
+            $company_ids = Company::pluck('id');
+        }
         $selectedSessionId = session('selected_session') == '' ? 1 : session('selected_session');
 
         $sevenDaysAgo = Carbon::now()->subDays(6)->startOfDay();
@@ -718,6 +745,7 @@ $sick_student_ids = [];
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
             ->get()
+            ->whereIn('company_id', $company_ids)
             ->keyBy('date') // <-- group result by date for easier mapping
             ->toArray();
 
@@ -801,6 +829,7 @@ $sick_student_ids = [];
     ")
             ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-01')"))
             ->orderBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-01')"))
+            ->whereIn('company_id', $company_ids)
             ->get()
             ->keyBy('month_start_date');
 
@@ -820,8 +849,8 @@ $sick_student_ids = [];
         }
 
         $leaveRequests = LeaveRequest::select('student_id', DB::raw('COUNT(*) as occurrence_count'))
-            ->whereHas('student', function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId);
+            ->whereHas('student', function ($query) use ($selectedSessionId, $company_ids) {
+                $query->where('session_programme_id', $selectedSessionId)->whereIn('company_id', $company_ids);
             })
             ->groupBy('student_id')           // Group by student_id to count occurrences
             ->orderByDesc('occurrence_count') // Sort by occurrence count in descending order
@@ -848,23 +877,35 @@ $sick_student_ids = [];
     private function getMPSData()
     {
         $sevenDaysAgo = Carbon::now()->subDays(6)->toDateString();
-
+                $user = Auth::user();
+        $company_ids = [];
+        if($user->hasRole(['Sir Major','Instructor','OC Coy'])){
+            $company_ids = [$user->staff->company_id];
+        }else{
+            $company_ids = Company::pluck('id');
+        }
         // Fetch daily counts from both tables
-        $mpsCounts = DB::table('m_p_s')
-            ->selectRaw('DATE(arrested_at) as date, COUNT(DISTINCT student_id) as mps_count')
-            ->where('arrested_at', '>=', $sevenDaysAgo)
-            ->groupBy(DB::raw('DATE(arrested_at)'))
-            ->orderBy(DB::raw('DATE(arrested_at)'))
-            ->get()
-            ->keyBy('date');
 
-        $mpsVisitorCounts = DB::table('m_p_s_visitors') // Changed table name here
-            ->selectRaw('DATE(visited_at) as date, COUNT(DISTINCT student_id) as visitor_count')
-            ->where('visited_at', '>=', $sevenDaysAgo)
-            ->groupBy(DB::raw('DATE(visited_at)'))
-            ->orderBy(DB::raw('DATE(visited_at)'))
-            ->get()
-            ->keyBy('date');
+$mpsCounts = DB::table('m_p_s as mps')
+    ->join('students as s', 'mps.student_id', '=', 's.id')
+    ->selectRaw('DATE(mps.arrested_at) as date, COUNT(DISTINCT mps.student_id) as mps_count')
+    ->where('mps.arrested_at', '>=', $sevenDaysAgo)
+    ->whereIn('s.company_id', $company_ids)
+    ->groupByRaw('DATE(mps.arrested_at)')
+    ->orderByRaw('DATE(mps.arrested_at)')
+    ->get()
+    ->keyBy('date');
+
+
+$mpsVisitorCounts = DB::table('m_p_s_visitors as v')
+    ->join('students as s', 'v.student_id', '=', 's.id')
+    ->selectRaw('DATE(v.visited_at) as date, COUNT(DISTINCT v.student_id) as visitor_count')
+    ->where('v.visited_at', '>=', $sevenDaysAgo)
+    ->whereIn('s.company_id', $company_ids)
+    ->groupByRaw('DATE(v.visited_at)')
+    ->orderByRaw('DATE(v.visited_at)')
+    ->get()
+    ->keyBy('date');
 
         // Merge counts from both tables
         $dailyCounts = [];
@@ -927,17 +968,19 @@ $sick_student_ids = [];
                 return [$key => $item->mps_count];
             });
 
-        $monthlyVisitorRaw = DB::table('m_p_s_visitors') // Changed table name here
-            ->selectRaw('YEAR(visited_at) as year, MONTH(visited_at) as month, COUNT(DISTINCT student_id) as visitor_count')
-            ->whereDate('visited_at', '>=', $startOfThreeMonthsAgo->toDateString())
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                $key = sprintf('%04d-%02d', $item->year, $item->month);
-                return [$key => $item->visitor_count];
-            });
+$monthlyRaw = DB::table('m_p_s as mps')
+    ->join('students as s', 'mps.student_id', '=', 's.id')
+    ->selectRaw('YEAR(mps.arrested_at) as year, MONTH(mps.arrested_at) as month, COUNT(DISTINCT mps.student_id) as mps_count')
+    ->whereDate('mps.arrested_at', '>=', $startOfThreeMonthsAgo->toDateString())
+    ->whereIn('s.company_id', $company_ids) // Filter by one or more company IDs
+    ->groupByRaw('YEAR(mps.arrested_at), MONTH(mps.arrested_at)')
+    ->orderByRaw('YEAR(mps.arrested_at), MONTH(mps.arrested_at)')
+    ->get()
+    ->mapWithKeys(function ($item) {
+        $key = sprintf('%04d-%02d', $item->year, $item->month);
+        return [$key => $item->mps_count];
+    });
+
 
         // Merge counts from both tables
         $monthlyCounts = [];
@@ -952,23 +995,41 @@ $sick_student_ids = [];
             ];
         }
 
-        $currentLockedUpStudents = Mps::whereNull('released_at')
-            ->with('student') // assuming Mps belongsTo Student
-            ->get();
+$currentLockedUpStudents = Mps::whereNull('released_at')
+    ->whereHas('student', function($query) use ($company_ids) {
+        $query->whereIn('company_id', $company_ids);
+    })
+    ->with('student')
+    ->get();
 
-        $topLockedUpStudents = Mps::select('student_id', DB::raw('COUNT(*) as count'))
-            ->with('student') // eager load student relationship
-            ->groupBy('student_id')
-            ->orderByDesc('count')
-            ->take(10)
-            ->get();
 
-        $topVisitedStudents = MpsVisitor::select('student_id', DB::raw('COUNT(*) as count'))
-            ->with('student') // eager load student relationship
-            ->groupBy('student_id')
-            ->orderByDesc('count')
-            ->take(10)
-            ->get();
+$topLockedUpStudents = Mps::select(
+        'student_id',
+        DB::raw('COUNT(*) as count'),
+        'students.first_name',
+        'students.last_name',
+        'students.company_id'
+    )
+    ->join('students', 'm_p_s.student_id', '=', 'students.id')
+    ->whereIn('students.company_id', $company_ids)
+    ->groupBy('student_id', 'students.first_name', 'students.last_name', 'students.company_id')
+    ->orderByDesc('count')
+    ->take(10)
+    ->get();
+
+$topVisitedStudents = MpsVisitor::select(
+        'student_id',
+        DB::raw('COUNT(*) as count'),
+        'students.first_name',
+        'students.last_name',
+        'students.company_id'
+    )
+    ->join('students', 'm_p_s_visitors.student_id', '=', 'students.id')
+    ->whereIn('students.company_id', $company_ids)
+    ->groupBy('student_id', 'students.first_name', 'students.last_name', 'students.company_id')
+    ->orderByDesc('count')
+    ->take(10)
+    ->get();
 
         return [
             'dailyCounts'             => $dailyCounts,

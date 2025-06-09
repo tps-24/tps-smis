@@ -20,7 +20,7 @@ class ProgrammeController extends Controller
     {
         $this->middleware('permission:programme-create')->only(['create', 'store']);
         $this->middleware('permission:programme-list')->only(['index', 'show']);
-        $this->middleware('permission:programme-update')->only(['edit', 'update']);
+        $this->middleware('permission:programme-edit')->only(['edit', 'update']);
         $this->middleware('permission:programme-delete')->only(['destroy']);
         $this->middleware('permission:course-enrollment-create|course-enrollment-update')->only(['assignCoursesToSemester']);
     }

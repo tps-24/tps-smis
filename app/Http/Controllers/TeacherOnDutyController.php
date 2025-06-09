@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\TeacherOnDuty;
 use App\Models\Company;
 use App\Models\Staff;
+use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Http\Request;
 
 class TeacherOnDutyController extends Controller
@@ -20,9 +22,22 @@ class TeacherOnDutyController extends Controller
      */
     public function index(Request $request)
     {
-        $companies = Company::all();
-        $teachers = TeacherOnDuty::whereNull('end_date')->get();
-        $staffs = $companies[0]->staffs()->where('rank', 'CPL')->orWhere('rank', 'PC')->paginate(10);
+        $companies = [];
+
+        $user = Auth::user();
+        if($user->hasRole(['OC Coy'])){
+            $companies = [$user->staff->company];
+            $teachers = TeacherOnDuty::whereNull('end_date')->where('company_id', $user->staff->company_id)->get();
+            $staffs = $companies[0]->staffs()->where('rank', 'CPL')->orWhere('rank', 'PC')->where('company_id',$user->staff->company_id)->paginate(10);
+        }
+        else{
+            $companies = Company::all();
+            $teachers = TeacherOnDuty::whereNull('end_date')->get();
+            $staffs = $companies[0]->staffs()->where('rank', 'CPL')->orWhere('rank', 'PC')->paginate(10);
+        }  
+        
+       // return $companies[0];
+        //$staffs = $companies[0]->staffs()->where('rank', 'CPL')->orWhere('rank', 'PC')->where('company_id',$companies[0]->id)->paginate(10);
         return view('teacher_on_duty.index',compact('staffs','companies','teachers')) ->with('i', ($request->input('page', 1) - 1) * 10);
     }
 

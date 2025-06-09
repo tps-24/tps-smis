@@ -47,7 +47,7 @@
                                         href="{{route('download.file', ['documentPath' => $announcement->id]) }}"><small>Download
                                             Attachment</small></a>
                                 @endif
-                                <p><small>Announced by: <i>{{ $announcement->poster->name }}</i></small></p>
+                                <p><small>Announced by: <i>{{ $announcement->poster->staff->rank }} {{ $announcement->poster->name }} </i></small></p>
                                 <small>Posted At:
                                     {{ $announcement->created_at ? $announcement->created_at->format('d-m-Y H:i') : 'N/A' }}</small><br>
                                 
@@ -57,6 +57,7 @@
                                   <small>Expires At: {{ $announcement->expires_at ? $announcement->expires_at->format('d-m-Y H:i') : 'N/A' }}</small>
                                 @endif
                             </div>
+                            @can('announcement-create')
                             @if($announcement->created_at->gt(\Carbon\Carbon::now()->subHours(2)))
                                 <div class="btn-group">
                                     <a style="margin-right: 10px;" href="{{ route('announcements.edit', $announcement->id) }}"><button
@@ -70,6 +71,7 @@
                                 </div>
                                 @include('layouts.sweet_alerts.confirm_delete')
                             @endif
+                            @endcan
                         </li>
                     @endforeach
                 </ul>

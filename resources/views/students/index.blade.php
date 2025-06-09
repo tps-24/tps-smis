@@ -38,7 +38,7 @@
         <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name"
         placeholder="name(option)">
         <!-- Company Dropdown -->
-        <select class="form-select me-2" name="company_id" required>
+        <select class="form-select me-2" name="company_id" >
         <option value="" selected disabled>Select Company</option>
         @foreach ($companies as $company)
       <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
@@ -47,7 +47,7 @@
     @endforeach
         </select>
         <!-- Platoon Dropdown -->
-        <select onchange="this.form.submit()" class="form-select me-2" name="platoon" required>
+        <select onchange="this.form.submit()" class="form-select me-2" name="platoon" >
         <option value="" selected disabled>Select Platoon</option>
         @for ($i = 1; $i < 15; $i++)
       <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
@@ -63,11 +63,17 @@
       <a class="btn btn-success btn-sm mb-2" href="{{url('students/create')}}">Create Student</a>
     </div> -->
     @can('student-create')
-    <div class="col-3 pull-right">
+<div class="d-flex justify-content-end gap-2 col-3">
+  @if(request()->has('platoon'))
+  <a class="btn btn-success btn-sm mb-2" href="{{ route('students.generatePdf', [request('platoon'),request('company_id')]) }}">
+    <i class="gap 2 bi bi-download"></i>  Sheet
+  </a>
+  @endif
+  <a class="btn btn-success btn-sm mb-2" href="{{ url('students/create') }}">
+    <i class="fa fa-plus"></i> Create New Student
+  </a>
+</div>
 
-      <a class="btn btn-success mb-2 btn-sm" href="{{ url('students/create') }}"
-      style="float:right !important; margin-right:-22px"><i class="fa fa-plus"></i> Create New Student</a>
-    </div>
   @endcan
     </div>
   </div>

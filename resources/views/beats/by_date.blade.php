@@ -45,13 +45,14 @@
         <h2>Beats for {{ $date }}</h2>
 
         <div class="form-container">
-            <form id="generateBeatsForm" method="POST" action="{{ route('beats.fillBeats') }}" class="form-inline my-3">
+            @can('beat-create')
+            <form id="generateBeatsForm" method="POST" action="{{ route('beats.fillBeats') }}" class="form-inline my-3 pull-right">
                 @csrf
                 <input type="date" name="date" min="{{ Carbon\Carbon::today()->format('Y-m-d') }}" class="form-control"
                     required>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Generate Beats</button>
             </form>
-
+            @endcan
             <form action="{{ route('beats.byDate') }}" method="GET" class="form-inline mb-4">
                 <input type="date" name="date" class="form-control" value="{{ $date }}">
                 <button type="submit" class="btn btn-primary">Filter</button>

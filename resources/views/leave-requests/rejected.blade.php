@@ -46,6 +46,7 @@
 </tbody>
 
         </table>
+        {!! $leaveRequests->links('pagination::bootstrap-5') !!}
     @endif
 
 </div>

@@ -26,9 +26,12 @@
     <a href="{{ route('mps.all') }}">
         <button class="btn btn-sm btn-primary">View all</button>
     </a>
+    @can('mps-create')
     <a href="{{ url('/mps/create') }}">
         <button class="btn btn-sm btn-success">Add Student</button>
-    </a>
+    </a>        
+    @endcan
+
 </div>
 
 @if(isset($mpsStudents))
@@ -71,6 +74,7 @@
                                         More
                                     </button>
                                     @if(!$student->released_at)
+                                    @can('mps-edit')
                                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#statusModalEdit{{ $student->id }}">
                                             Edit
@@ -78,7 +82,8 @@
                                         <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#statusModalRelease{{ $student->id }}">
                                             Release
-                                        </button>                                   
+                                        </button>   
+                                        @endcan                                
                                     @endif
                                 </td>
                                 <td>

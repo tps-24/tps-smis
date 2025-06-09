@@ -15,7 +15,7 @@
 <!-- Scrumb ends -->
 @endsection
 @section('content')
-
+@include('layouts.sweet_alerts.index')
 <div class="d-flex justify-content-end" style="width:20%; margin-left: auto;">
         <form class="d-flex gap-2 w-100" action="{{ route('reports.generateAttendanceReport') }}" method="get">
             <select class="form-control w-100" name="company_id" id="company_id" required style="height: 40px;" required>

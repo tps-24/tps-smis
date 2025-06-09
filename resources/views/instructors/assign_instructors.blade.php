@@ -48,7 +48,6 @@
                     @endforeach
                 </select>
             </div>       
-
                 <input type="text" value="{{ $course->semesters[0]->pivot->semester_id }}"  class="form-control" id="programmeCourseId" name="semester_id" hidden>
                 <input type="text" value="{{ $course->semesters[0]->pivot->session_programme_id }}"  class="form-control" id="programmeCourseId" name="session_programme_id" hidden>
                 <input type="text" value="{{ $course->id }}"  class="form-control" id="programmeCourseId" name="course_id" hidden>

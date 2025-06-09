@@ -743,7 +743,7 @@ class BeatController extends Controller
         $groupB = $totalPlatoons->slice($mid)->values();
         // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
         // $currentGroup = $groupB;
-        $groupBx = [8,9,10,11,12,13,14];
+        $groupBx = [1,2,3,4,5,6,7];
 
         
         // Convert array into a Laravel Collection
@@ -840,7 +840,12 @@ class BeatController extends Controller
     // }
     public function showReport(Request $request)
 {
-    $companies = Company::all();
+    $selectedSessionId = session('selected_session');
+        if (!$selectedSessionId)
+            $selectedSessionId = 1;
+        $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+            $query->where('session_programme_id', $selectedSessionId); // Filter students by session
+        })->get();
     $report = $companies->map(fn($company) => $this->beatHistory($company));
 
     return view('beats.beat_report', compact('report', 'companies'));

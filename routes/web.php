@@ -407,7 +407,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('{id}/update', 'update');
         Route::post('{id}/delete', 'destroy');
         Route::post('bulkimport', 'import');
-
+        Route::get('generatePdf/{platoon}/{companyId}', 'generatePdf')->name('students.generatePdf');
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}', [NotificationController::class, 'show']);
@@ -515,6 +515,7 @@ Route::delete('/downloads/{id}', [DownloadController::class, 'destroy'])
     ->middleware('auth'); // Requires login to delete
 
 Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
+Route::get('/leave-requests/search', [LeaveRequestController::class, 'search'])->name('leave-requests.search');
 Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
 
 Route::get('/leave-request', [LeaveRequestController::class, 'showPanel'])->name('leave-requests.panel');

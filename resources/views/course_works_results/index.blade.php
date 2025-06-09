@@ -158,7 +158,7 @@
             </div>
 
 
-                <button id="export-btn" class="btn btn-secondary btn-sm" style="margin-top:-50px;">Export to Excel</button>
+                <!-- <button id="export-btn" class="btn btn-secondary btn-sm" style="margin-top:-50px;">Export to Excel</button> -->
 
             </div>
             <div class="card-body">
@@ -189,6 +189,8 @@
     <!-- Right section ends-->
 </div>
 <!-- Row ends -->
+
+
 @endsection
 
 @section('scripts')
@@ -290,8 +292,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const actionsHeading = document.createElement('th');
             actionsHeading.style.textAlign = 'center';
-            actionsHeading.innerText = 'Actions';
-            headingsContainer.appendChild(actionsHeading);
+            // actionsHeading.innerText = 'Actions';
+            // headingsContainer.appendChild(actionsHeading);
 
             // Ensure the page number is a valid integer
             page = parseInt(page, 10);
@@ -313,15 +315,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 data.courseworks.forEach(coursework => {
                     const score = studentResult.scores[coursework.id] || '-';
-                    row.innerHTML += `<td style="text-align: center;">${score}</td>`;
+                    row.innerHTML += `<td style="text-align: center;">
+                                        ${score}
+                                    </td>
+                                `;
+
                 });
 
                 row.innerHTML += `
                     <td style="text-align: center;">${studentResult.total_cw}</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-info btn-sm">View</button>
-                        <button class="btn btn-primary btn-sm">Edit</button>
-                    </td>
                 `;
                 resultsContainer.appendChild(row);
             });
@@ -440,5 +442,6 @@ document.getElementById('export-btn').addEventListener('click', function () {
 });
 
 </script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 @endsection

@@ -56,12 +56,15 @@
                     </div>
                     @endcan
                     @if ($course->instructors->isNotEmpty())
+                    <h3>Instructors</h3><br><br>
                     <table class="table-sm table">
                         <thead>
                             <th>S/N</th>
                             <th>Names</th>
                             <th>Email</th>
+                            @can('course-create')
                             <th>Actions</th>
+                            @endcan()
                         </thead>
                         <tbody>
                             @php
@@ -147,7 +150,7 @@
                     <input type="text" name="course_id" value="{{$course->id}}" hidden>
                     <label for="">Session Programme</label>
                     <select name="session_programme_id" class="form-control" id="" required>
-                        <option value="">session programme</option>
+                        <option disabled value="">session programme</option>
                         @foreach ($session_programmes as $session_programme)
                         <option value="{{$session_programme->id }}">{{$session_programme->session_programme_name}}
                         </option>
@@ -159,7 +162,7 @@
 
                     <label for="">Semester</label>
                     <select name="semester_id" class="form-control" id="" required>
-                        <option value="">semester</option>
+                        <option disabled value="">semester</option>
                         @foreach ($semesters as $semester)
                         <option value="{{$semester->id }}">{{$semester->semester_name}}
                         </option>

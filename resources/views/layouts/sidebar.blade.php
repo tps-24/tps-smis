@@ -390,9 +390,9 @@ a.active {
                     <span class="menu-text">Guards &amp; Patrols</span>
                 </a>
                 <ul class="treeview-menu">
-                    @can('beat-create')
+                    @can('beat-list')
                     <li>
-                        <a href="{{url('beats')}}">Generate Beat</a>
+                        <a href="{{url('beats')}}">Beat</a>
                     </li>
                     @endcan()
                     <li>

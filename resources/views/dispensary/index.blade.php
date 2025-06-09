@@ -4,7 +4,8 @@
 <div class="col-sm-12">
 
     <!-- Filter Form -->
-    <form method="GET" action="{{ route('dispensary.page') }}" class="d-flex mb-3">
+     <div class="d-flex justify-content-end gap-2">    
+    <form method="GET" action="{{ route('dispensary.page') }}" class="d-flex col-sm-4 justify-content-end mb-3" >
         <select name="company_id" class="form-select me-2">
             <option value="">Select Company</option>
             @foreach($companies as $company)
@@ -13,19 +14,18 @@
                 </option>
             @endforeach
         </select>
-
-        <select name="platoon" class="form-select me-2">
+        <!-- <select name="platoon" class="form-select me-2">
             <option value="">Select Platoon</option>
             @for ($i = 1; $i <= 15; $i++)
                 <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
                     {{ $i }}
                 </option>
             @endfor
-        </select>
+        </select> -->
 
         <button type="submit" class="btn btn-primary">Filter</button>
     </form>
-
+</div>
     <!-- Statistics Section -->
     <div class="card mb-3">
         <div class="card-header">
@@ -33,22 +33,29 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <!-- Daily Count -->
                 <div class="col-md-4">
                     <h6>Daily Count</h6>
                     <p>{{ $dailyCount }} Patients</p>
+                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'daily', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+                        class="btn btn-info">
+                        View Daily Patients
+                    </a>
                 </div>
-
-                <!-- Weekly Count -->
                 <div class="col-md-4">
                     <h6>Weekly Count</h6>
                     <p>{{ $weeklyCount }} Patients</p>
+                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'weekly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+                        class="btn btn-info">
+                        View Weekly Patients
+                    </a>
                 </div>
-
-                <!-- Monthly Count -->
                 <div class="col-md-4">
                     <h6>Monthly Count</h6>
                     <p>{{ $monthlyCount }} Patients</p>
+                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'monthly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+                        class="btn btn-info">
+                        View Monthly Patients
+                    </a>
                 </div>
             </div>
         </div>
@@ -59,7 +66,18 @@
     <!-- Pie Chart Section -->
     <div class="card">
     <div class="card-header">
-        <h5 class="card-title">{{ now()->format('F') }} Patient Distribution</h5>
+        <h5 class="card-title mb-3">{{ now()->format('F') }} Patient Distribution</h5>
+            <form action="" method="post" class="col-sm-4 d-flex gap-2">
+                <label for="" class="form-label">Monthly</label>
+                <div class="col-sm-6">
+                <select class="form-control" name="" id="">
+                    @foreach ($months as $month)
+                       <option value="{{$month}}">{{$month}}</option> 
+                    @endforeach                   
+                </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
     </div>
     <div class="card-body d-flex justify-content-center">
         <canvas id="patientChart" style="max-width: 300px; max-height: 300px;"></canvas>

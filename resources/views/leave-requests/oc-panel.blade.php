@@ -14,6 +14,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
+                    <th>S/N</th>
                     <th>Student Name</th>
                     <!-- <th>From Date</th>
                     <th>To Date</th> -->
@@ -24,6 +25,7 @@
             <tbody>
                 @foreach($leaveRequests as $request)
                     <tr>
+                        <td>{{$loop->iteration}}.</td>
                         <td>{{ $request->student->first_name }} {{ $request->student->last_name }}</td>
                         <!-- <td>{{ $request->from_date }}</td>
                         <td>{{ $request->to_date }}</td> -->

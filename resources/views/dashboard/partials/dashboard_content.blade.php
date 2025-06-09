@@ -38,11 +38,14 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-between mt-1">
+                    @can('attendance-list')
                     <a class="text-primary" href="{{route('attendences.index')}}">
                         <span>View All</span>
                         <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
-                    <div class="text-end">
+                    </a>                        
+                    @endcan
+                    <div></div>
+                    <div class="text-end float-end">
                         <p class="mb-0 text-primary">{{ $todayStudentReport['presentPercent'] }}</p>
                         <span class="badge bg-primary-subtle text-primary small">Today</span>
                     </div>
@@ -65,10 +68,13 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-between mt-1">
+                    @can('hospital-list')
                     <a class="text-primary" href="{{ route('hospital.index') }}">
                         <span>View All</span>
                         <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
+                    </a>                        
+                    @endcan
+                    <div></div>
                     <div class="text-end">
                         <p class="mb-0 text-info">0.0%</p>
                         <span class="badge bg-info-subtle text-info small">Today</span>

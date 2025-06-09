@@ -5,17 +5,15 @@ use App\Models\Announcement;
 use App\Models\Attendence;
 use App\Models\Beat;
 use App\Models\Company;
-use App\Models\LeaveRequest;
-use App\Models\MPS;
 use App\Models\Patient;
 use App\Models\Platoon;
 use App\Models\SessionProgramme;
 use App\Models\Staff;
 use App\Models\Student;
+use App\Services\GraphDataService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Services\GraphDataService;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -23,7 +21,7 @@ class DashboardController extends Controller
     protected $graphDataService;
     public function __construct(GraphDataService $graphDataService)
     {
-        $this->graphDataService = $graphDataService;
+        $this->graphDataService  = $graphDataService;
         $this->selectedSessionId = session('selected_session');
         if (! $this->selectedSessionId) {
             $this->selectedSessionId = 1;
@@ -41,19 +39,38 @@ class DashboardController extends Controller
             session(['selected_session' => request()->session_id]);
         }
         // Get the selected session ID from the session
-        $selectedSessionId = session('selected_session');
+       $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
+            $selectedSessionId = 1;
+        }
         $pending_message   = session('pending_message');
 
-        $query = Patient::query();
+        $dailyCount = $weeklyCount = $monthlyCount = 0;
+        $user       = Auth::user();
+        $companies  = [];
+        if ($user->hasRole(['Sir Major', 'OC Coy', 'Instructor'])) {
+            $companies = [$user->staff->company];
+        } else {
+            $companies = Company::all();
 
-        // Filter by company_id if provided
-        if ($request->filled('company_id')) {
-            $query->where('company_id', $request->company_id);
         }
 
-        // Filter by platoon if provided
-        if ($request->filled('platoon')) {
-            $query->where('platoon', $request->platoon);
+        $companyId = $request->input('company_id');
+        $platoon   = $request->input('platoon');
+        if ($companyId) {
+            $companies = [Company::find($companyId)];
+        }
+
+        foreach ($companies as $company) {
+            $admittedNotReleasedCount = $company->sickStudents->where('excuse_type_id', 3)->whereNull('is_discharged')->pluck('id');
+            $daily                    = $company->sickStudents()->whereDate('created_at', Carbon::today())->pluck('id');
+            $dailyCount += $admittedNotReleasedCount->merge($daily)->unique()->count();
+
+            $weekly = $company->sickStudents()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->pluck('id');
+            $weeklyCount += $admittedNotReleasedCount->merge($weekly)->unique()->count();
+
+            $monthly = $company->sickStudents()->whereMonth('created_at', now()->month)->pluck('id');
+            $monthlyCount += $admittedNotReleasedCount->merge($monthly)->unique()->count();
         }
 
         $today     = Carbon::today();
@@ -62,19 +79,51 @@ class DashboardController extends Controller
         $thisYear  = Carbon::now()->startOfYear();
 
         // Count statistics based on the selected filters
-        $dailyCount   = (clone $query)->whereDate('created_at', $today)->count();
-        $weeklyCount  = (clone $query)->whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
-        $monthlyCount = (clone $query)->whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
+        // $dailyCount   = (clone $query)->whereDate('created_at', $today)->count();
+        // $weeklyCount  = (clone $query)->whereBetween('created_at', [$thisWeek, Carbon::now()])->count();
+        // $monthlyCount = (clone $query)->whereBetween('created_at', [$thisMonth, Carbon::now()])->count();
 
-        // Fetch list of companies
-        $companies = Company::all();
+        // // Fetch list of companies
+        // $companies = Company::all();
 
-        // Patient distribution for the selected year (used in Pie Chart)
-        $patientDistribution = (clone $query)
-            ->whereBetween('created_at', [$thisMonth, Carbon::now()])
-            ->selectRaw('company_id, COUNT(*) as count')
-            ->groupBy('company_id')
-            ->pluck('count', 'company_id');
+        // // Patient distribution for the selected year (used in Pie Chart)
+        // $patientDistribution = (clone $query)
+        //     ->whereBetween('created_at', [$thisMonth, Carbon::now()])
+        //     ->selectRaw('company_id, COUNT(*) as count')
+        //     ->groupBy('company_id')
+        //     ->pluck('count', 'company_id');
+        if ($companyId) {
+            // If a company is selected, show platoon-based statistics
+            $patientDistribution = Patient::where('company_id', $companyId)
+                ->selectRaw('platoon, COUNT(*) as count')
+                ->groupBy('platoon')
+                ->whereMonth('created_at', now()->month)
+                ->pluck('count', 'platoon');
+
+            $isCompanySelected = true;
+        } else {
+            // Default: Show statistics grouped by company (HQ, A, B, C)
+            if ($user->hasRole(['Sir Major', 'OC Coy', 'Instructor'])) {
+                $patientDistribution = Patient::selectRaw('platoon, COUNT(*) as count')
+                    ->whereMonth('created_at', now()->month)
+                    ->groupBy('platoon')
+                    ->pluck('count', 'platoon');
+                $isCompanySelected = true;
+
+            } else {
+                $patientDistribution = Patient::selectRaw('company_id, COUNT(*) as count')
+                    ->groupBy('company_id')
+                    ->whereMonth('created_at', now()->month)
+                    ->pluck('count', 'company_id');
+                $isCompanySelected = false;
+            }
+
+        }
+        $months = [];
+
+        for ($i = 2; $i >= 0; $i--) {
+            $months[] = Carbon::now()->subMonths($i)->format('F Y'); // e.g. "April 2025"
+        }
 
         $recentAnnouncements = Announcement::where('expires_at', '>', Carbon::now())
             ->orderBy('created_at', 'desc')
@@ -84,7 +133,7 @@ class DashboardController extends Controller
         if (auth()->user()->hasRole('Student')) {
             return view('dashboard.student_dashboard', compact('pending_message', 'selectedSessionId'));
         } else if (auth()->user()->hasRole('Receptionist|Doctor')) {
-            return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies'));
+            return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies', 'months'));
         } else {
             $todayStudentReport = $this->todayStudentReport();
 
@@ -103,17 +152,17 @@ class DashboardController extends Controller
             // $patientsCount = Patient::whereDate('created_at', Carbon::today())->count();
 
             $patientsCount = Patient::where(function ($query) {
-        $query->where('excuse_type_id', 1)
-            ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
-            ->orWhere(function ($innerQuery) {
-                $innerQuery->where('excuse_type_id', 3)
-                    ->whereNull('released_at');
-            });
-    })
-    ->whereHas('student', function ($q) use ($selectedSessionId) {
-        $q->where('session_programme_id', $selectedSessionId);
-    })
-    ->count();
+                $query->where('excuse_type_id', 1)                
+                    ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
+                    ->orWhere(function ($innerQuery) {
+                        $innerQuery->where('excuse_type_id', 3)
+                            ->whereNull('released_at');
+                    });
+            })
+                ->whereHas('student', function ($q) use ($selectedSessionId) {
+                    $q->where('session_programme_id', $selectedSessionId);
+                })
+                ->count();
 
             $staffsCount           = Staff::count('forceNumber');
             $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
@@ -150,7 +199,6 @@ class DashboardController extends Controller
                         ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
                 });
         })->count();
-
         $staffsCount           = Staff::count('forceNumber');
         $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
 
@@ -294,8 +342,5 @@ class DashboardController extends Controller
             'presentPercent' => $presentPercent . '%',
         ];
     }
-    
-
-
 
 }

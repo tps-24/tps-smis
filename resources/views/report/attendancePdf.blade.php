@@ -17,7 +17,7 @@
     }
 
     th,
-    td {
+    td {    
         border: 1px solid #000;
         padding: 2px 2px;
 

@@ -20,11 +20,10 @@
         <div class="card-header">
             <h5 class="card-title">Fetch Students Details here ...</h5>
         </div>
-
         <!-- Search Form -->
         <div class="card mb-3">
             <div class="card-body">
-                <form action="{{ route('leave-requests.index') }}" method="GET"
+                <form action="{{ route('leave-requests.search') }}" method="GET"
                     class="d-flex justify-content-between mb-3">
                     <div class="d-flex">
                         <select class="form-select me-2" name="company_id">
@@ -49,10 +48,6 @@
                         </select>
                         <input type="text" class="form-control me-2" name="fullname" placeholder="Enter Name (optional)"
                             value="{{ request('fullname') }}">
-
-                        <input type="text" class="form-control me-2" name="student_id"
-                            placeholder="Enter Student ID (optional)" value="{{ request('student_id') }}">
-
                     </div>
                     <button type="submit" class="btn btn-primary">Search</button>
                 </form>
@@ -62,32 +57,34 @@
         <!-- Display Student Details -->
         @if(request()->has('company_id') || request()->has('platoon') || request()->has('fullname') ||
         request()->has('student_id'))
+        @if (isset($studentDetails))
         @if($studentDetails->isNotEmpty())
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th>S/N</th>
                         <th>First Name</th>
                         <th>Middle Name</th>
                         <th>Last Name</th>
                         <th>Platoon</th>
                         <th>Company</th>
-                        
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($studentDetails as $student)
                     <tr>
+                        <td>{{ $loop->iteration }}.</td>
                         <td>{{ $student->first_name ?? 'N/A' }}</td>
                         <td>{{ $student->middle_name ?? 'N/A' }}</td>
                         <td>{{ $student->last_name ?? 'N/A' }}</td>
                         <td>{{ $student->platoon ?? 'N/A' }}</td>
                         <td>{{ $student->company->name ?? 'N/A' }}</td>
                         <td>
-
                             <!-- Button to open Modal -->
-                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                            <button @if($student->hasActiveLeaveRecord()) disabled @endif class="btn btn-primary btn-sm"
+                                data-bs-toggle="modal"
                                 data-bs-target="#studentModal{{ $student->id }}">
                                 Enter Student Leave Details
                             </button>
@@ -185,17 +182,22 @@
                 </tbody>
             </table>
         </div>
+        {!! $studentDetails->links('pagination::bootstrap-5') !!}
         @else
         <p class="mt-3 text-danger">{{ $message }}</p>
         @endif
-        @endif
+        @endif              
+    @endif
     </div>
+    @if (isset($leaves))
+
     @if($leaves->isEmpty())
     <div class="alert alert-warning text-center">No leave requests found.</div>
     @else
     <table class="table table-bordered table-striped">
         <thead class="">
             <tr>
+                <th>S/N</th>
                 <th>Student Name</th>
                 <th>Reason</th>
                 <th>Status</th>
@@ -205,6 +207,7 @@
         <tbody>
             @foreach($leaves as $request)
             <tr>
+                <td>{{$loop->iteration}}.</td>
                 <td>{{ $request->student->first_name }} {{ $request->student->last_name }}</td>
                 <td>{{ $request->reason }}</td>
                 <td>{{$request->status}}</td>
@@ -223,9 +226,13 @@
                     </form>
                     @include('layouts.sweet_alerts.confirm_delete')
                     @elseif($request->status == 'approved')
-                        <a href="{{ route('leave-requests.single.pdf', $request->id) }}" class="btn btn-success">Print</a>
-                        @else
-                        Forwarded
+                    <a href="{{ route('leave-requests.single.pdf', $request->id) }}" class="btn btn-success">Print</a>
+                    @elseif($request->status == 'rejected')
+                    <a href="{{ route('leave-requests.rejected.pdf', $request->id) }}" class="btn btn-danger">
+                        Print
+                    </a>
+                    @else
+                    <button disabled class="btn btn-success">Print</button>
                     @endif
                 </td>
 
@@ -235,6 +242,7 @@
             @endforeach
         </tbody>
     </table>
+    {!! $leaves->links('pagination::bootstrap-5') !!}
     @endif
-
+    @endif
     @endsection

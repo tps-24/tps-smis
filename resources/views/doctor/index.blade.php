@@ -3,7 +3,7 @@
 @section('content')
 <div class="col-sm-12">
     <!-- Admitted Patients Button -->
-    <div class="mb-3">
+    <div class="d-flex gap-2 justify-content-end mb-3">
         <a href="{{ route('doctor.admitted') }}" class="btn btn-success">
             View Admitted Patients
         </a>
@@ -41,7 +41,7 @@
                                 <th>Last Name</th>
                                 <th>Platoon</th>
                                 <th>Status</th>
-                                <th>Date Admitted</th>
+                                <th>Date Attended</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -53,10 +53,6 @@
                                     <td>{{ $patient->platoon }}</td>
                                     <td>{{ ucfirst($patient->status) }}</td>
                                     <td>{{ $patient->created_at ?? '-' }}</td>
-                                   
-                                    
-                                   
-
                                     <td>
                                         <!-- Button to open modal -->
                                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#patientModal{{ $patient->id }}">
@@ -180,7 +176,7 @@
         let restDaysGroup = document.getElementById('restDaysGroup' + patientId);
         let selectedText = this.options[this.selectedIndex].text.trim().toLowerCase();
 
-        if (selectedText === 'admitted') {
+        if (selectedText === 'admitted' || selectedText === 'normal') {
             referralDiv.classList.remove('d-none');
             if (restDaysGroup) restDaysGroup.style.display = 'none';
         } else {

@@ -47,10 +47,12 @@
             <div class="card-header">
 
             </div>
+            @can('course-create')
             <div class="pull-right">
                 <a class="btn btn-success mb-2" href="{{ route('courses.create') }}"
                     style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New course</a>
             </div>
+            @endcan()
             <div class="card-body">
                 <div class="table-outer">
                     <div class="table-responsive">
@@ -66,10 +68,8 @@
                             </thead>
                             <tbody>
                                 @foreach ($courses as $key => $course)
-                                <tr>@php
-                                    $i = 0;
-                                    @endphp
-                                    <td>{{ ++$i }}</td>
+                                <tr>
+                                    <td>{{ $loop->iteration}}.</td>
                                     <td>{{ $course->courseName }}</td>
                                     <td>{{ $course->courseCode }}</td>
                                     <td>{{ $course->department->departmentName ?? '' }}</td>
