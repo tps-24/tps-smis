@@ -240,7 +240,7 @@ class PatientController extends Controller
                     $q->whereDate('created_at', Carbon::today())
                         ->orWhere(function ($q2) {
                             $q2->where('excuse_type_id', 3)
-                                ->whereNull('is_discharged');
+                                ->whereNull('released_at');
                         });
                 });
                 break;
@@ -249,7 +249,7 @@ class PatientController extends Controller
                     $q->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()])
                         ->orWhere(function ($q2) {
                             $q2->where('excuse_type_id', 3)
-                                ->whereNull('is_discharged');
+                                ->whereNull('released_at');;
                         });
                 });
                 break;
@@ -259,7 +259,7 @@ class PatientController extends Controller
                     $q->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()])
                         ->orWhere(function ($q2) {
                             $q2->where('excuse_type_id', 3)
-                                ->whereNull('is_discharged');
+                                ->whereNull('released_at');
                         });
                 });
                 break;
@@ -327,7 +327,7 @@ class PatientController extends Controller
         }
 
         foreach ($companies as $company) {
-            $admittedNotReleasedCount = $company->sickStudents->where('excuse_type_id', 3)->whereNull('is_discharged')->pluck('id');
+            $admittedNotReleasedCount = $company->sickStudents->where('excuse_type_id', 3)->whereNull('released_at')->pluck('id');
             $daily                    = $company->sickStudents()->whereDate('created_at', Carbon::today())->pluck('id');
             $dailyCount += $admittedNotReleasedCount->merge($daily)->unique()->count();
 
@@ -350,7 +350,8 @@ class PatientController extends Controller
             $patientDistribution = Patient::where('company_id', $companyId)
                 ->selectRaw('platoon, COUNT(*) as count')
                 ->groupBy('platoon')
-                ->whereMonth('created_at', now()->month)
+                ->whereMonth('created_at', $request->has('date')? Carbon::parse($request->date)->month : now()->month)
+                ->whereYear('created_at', $request->has('date')? Carbon::parse($request->date)->year : now()->year)
                 ->pluck('count', 'platoon');
 
             $isCompanySelected = true;
@@ -358,7 +359,8 @@ class PatientController extends Controller
             // Default: Show statistics grouped by company (HQ, A, B, C)
             if ($user->hasRole(['Sir Major', 'OC Coy', 'Instructor'])) {
                 $patientDistribution = Patient::selectRaw('platoon, COUNT(*) as count')
-                    ->whereMonth('created_at', now()->month)
+                ->whereMonth('created_at', $request->has('date')? Carbon::parse($request->date)->month : now()->month)
+                ->whereYear('created_at', $request->has('date')? Carbon::parse($request->date)->year : now()->year)
                     ->groupBy('platoon')
                     ->pluck('count', 'platoon');
                 $isCompanySelected = true;
@@ -366,7 +368,8 @@ class PatientController extends Controller
             } else {
                 $patientDistribution = Patient::selectRaw('company_id, COUNT(*) as count')
                     ->groupBy('company_id')
-                    ->whereMonth('created_at', now()->month)
+                    ->whereMonth('created_at', $request->has('date')? Carbon::parse($request->date)->month : now()->month)
+                    ->whereYear('created_at', $request->has('date')? Carbon::parse($request->date)->year : now()->year)
                     ->pluck('count', 'company_id');
                 $isCompanySelected = false;
             }
@@ -375,11 +378,13 @@ class PatientController extends Controller
         $months = [];
 
         for ($i = 2; $i >= 0; $i--) {
-            $months[] = Carbon::now()->subMonths($i)->format('F Y'); // e.g. "April 2025"
+            $months[] = Carbon::now()->subMonths($i); // e.g. "April 2025"
         }
-        $companies = Company::all();
+        //return $request->has('date')? Carbon::parse($request->date)->month : now()->month;
+        //$companies = Company::all();
+        $date =$request->has('date')? Carbon::parse($request->date)->format('F Y'): now()->format('F Y');
         return view('dispensary.index', compact(
-            'companies', 'dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'isCompanySelected','months'
+            'companies', 'dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'isCompanySelected','months','date'
         ));
     }
 
@@ -511,7 +516,7 @@ class PatientController extends Controller
             ->whereHas('excuseType', function ($q) {
                 $q->where('excuse_type_id', 3);
             })
-            ->whereIn('admitted_type', ['Referral', 'Internal']);
+            ->whereIn('admitted_type', ['Referral', 'Internal'])->whereNull('released_at');
 
         // Filter: Search by name
         if ($request->filled('search')) {

@@ -27,6 +27,7 @@ class AnnouncementController extends Controller
     {
         //$announcements = Announcement::where('expires_at', '>', Carbon::now())->orderBy('created_at', 'desc')->get();
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
+        // broadcast(new NotificationEvent($announcements[0]->title, $announcements[0]->type, 'announcement', $announcements[0], $announcements[0]->id, $announcements[0]->audience));
         return view('announcements.index', compact('announcements'));
     }
 
@@ -75,7 +76,7 @@ class AnnouncementController extends Controller
             //$announcement->company_id = Auth::user()->staff->company_id?? $request->audience;
         }
         $announcement->save();
-        broadcast(new NotificationEvent($announcement->title, $announcement->type, 'announcement', $announcement, $announcement->id));
+        broadcast(new NotificationEvent($announcement->title, $announcement->type, 'announcement', $announcement, $announcement->id, $announcement->audience));
         return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
     }
 

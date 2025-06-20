@@ -272,6 +272,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 totalHeading.style.textAlign = 'center';
                 totalHeading.innerText = 'Score';
                 headingsContainer.appendChild(totalHeading);
+                
+                const actionsHeading = document.createElement('th');
+                actionsHeading.style.textAlign = 'center';
+                actionsHeading.innerText = 'Actions';
+                headingsContainer.appendChild(actionsHeading);
                 let index = 0;
 
                 Object.entries(data.results.data.data).forEach(([index, result]) => {
@@ -285,7 +290,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
 
                     // Since there's only one course in this response, directly add its score
-                    row.innerHTML += `<td style="text-align: center;">${score}</td>`;
+                    row.innerHTML += `<td style="text-align: center;">${score}</td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-info btn-sm">View</button>
+                            <button class="btn btn-primary btn-sm">Edit</button>
+                        </td>
+                        `;
 
 
                     resultsContainer.appendChild(row);

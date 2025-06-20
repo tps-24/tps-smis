@@ -283,14 +283,14 @@ a.active {
                 </a>
             </li>
             @endcan()
-
+            @can('announcement-list')
             <li>
                 <a href="{{ route('announcements.index') }}">
                     <i class="bi bi-send"></i>
                     <span class="menu-text">Announcements</span>
                 </a>
             </li>
-
+            @endcan()
             <li>
                 <a href="{{ route('downloads.index') }}">
                     <i class="bi bi-download"></i>
@@ -463,6 +463,9 @@ a.active {
                     </li>
                     <li>
                         <a href="{{ route('excuse_types.index') }}">Excuse Type Settings</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('termination_reasons.index') }}">Termination Reason Settings</a>
                     </li>
                     <li>
                         <a href="{{ route('campuses.index') }}">Campus Settings</a>

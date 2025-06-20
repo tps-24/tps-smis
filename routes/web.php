@@ -13,6 +13,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExcuseTypeController;
+use App\Http\Controllers\TerminationReasonController;
 use App\Http\Controllers\FinalResultController;
 use App\Http\Controllers\GradeMappingController;
 use App\Http\Controllers\GradingSystemController;
@@ -137,7 +138,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/update-fasting-status/{studentId}/{fastingStatus}', [StudentController::class, 'updateFastStatus'])->name('updateFastingStatus');
     Route::get('/update-beat-status-to-safari/{studentId}', [StudentController::class, 'toSafari'])->name('students.toSafari');
     Route::get('/update-beat-status-back-from-safari/{studentId}', [StudentController::class, 'BackFromsafari'])->name('students.BackFromsafari');
-
+    Route::get('/students/approve/{studentId}', [StudentController::class, 'approve'])->name('students.approve');
     // Route::get('/coursework/upload_explanation/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
 
     Route::post('/beats/{id}', [BeatController::class, 'update'])->name('beat.update');
@@ -366,6 +367,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('semester_exams', SemesterExamResultController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
+    Route::resource('/settings/termination_reasons', TerminationReasonController::class);
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('attendences', AttendenceController::class);

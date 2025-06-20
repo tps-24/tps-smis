@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
-
+use Illuminate\Support\Facades\Log;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -16,9 +16,38 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('chat', function ($user, $id) {
     return true;
 });
-Broadcast::channel('notifications', function ($user) {
-    return true; // or add logic to restrict access
+Broadcast::channel('notifications.all', function ($user) {
+    return true;
 });
+Broadcast::channel('notifications.company', function ($user) {
+    if(!is_null($user->staff)){
+        if($user->staff->company_id == 1) return true;
+        return false;
+    }
+    return true;
+});
+// Broadcast::channel('notifications.{anouncementId}', function ($user, $anouncementId) {
+//                 Log::info('NotificationEvent created', [
+//                 $user
+//         ]);
+//             if($user->hasRole(['Super Administrator','Admin'])){
+//                 return true;
+//             }else if($user->hasRole(['Sir Major','	OC Coy','Instructor'])){
+//                 $announcement = Announcement::findOrFail($anouncementId);
+//                 if($announcement->type == 'All'){
+//                     return true;
+//                 }elseif($announcement->type == 'Company'){
+//                     if($user->staff->company_id == $announcement->company_id)
+//                     {
+//                         return true;
+//                     }
+//                 }
+//             }
+
+//     return false;
+// });
+
+
 
 
 // Broadcast::channel('notifications', function ($user) {

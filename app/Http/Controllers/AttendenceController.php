@@ -481,7 +481,7 @@ class AttendenceController extends Controller
             }
         }
 
-        //$hardcodedDate = Carbon::createFromFormat('d-m-Y', '7-5-2025');
+        //$hardcodedDate = Carbon::createFromFormat('d-m-Y', '8-6-2025');
 
         $type       = AttendenceType::find($type);
         $lockUp     = $this->getLockUpStudentsIds($platoon);
@@ -512,7 +512,7 @@ class AttendenceController extends Controller
             'lockUp_students_ids'   => count($lockUp) > 0 ? json_encode($lockUp) : null,
             'absent_student_ids'    => count($absent_ids) > 0 ? json_encode($absent_ids) : null,
             'total'                 => $total,
-            // 'created_at' => $hardcodedDate,
+             //'created_at' => $hardcodedDate,
             //'updated_at' =>$hardcodedDate
         ]);
 

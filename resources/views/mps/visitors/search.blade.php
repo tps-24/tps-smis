@@ -23,28 +23,29 @@
     </div>
 @endif
 <div class="card-body">
-    <form action="" method="POST" class="d-flex justify-content-between mb-3">
-        @csrf
-        <div class="d-flex">
-            <!-- Company Dropdown -->
-            <select class="form-select me-2" name="company_id" required>
-                <option value="">Select Company</option>
-                @foreach ($companies as $company)
-                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
-                @endforeach
-            </select>
-            <!-- Platoon Dropdown -->
-            <select class="form-select me-2" name="platoon" required>
-                <option value="">Select Platoon</option>
-                @for ($i = 1; $i < 15; $i++)
-                    <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
-                @endfor
-            </select>
-            <!-- Name Search -->
-            <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name" placeholder="name(option)">
-        </div>
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
+    <form action="{{ url('/mps/search') }}" method="POST" class="d-flex justify-content-between mb-3">
+    @csrf
+    <div class="d-flex">
+        <!-- Company Dropdown -->
+        <select class="form-select me-2" name="company_id" id="companies" required>
+            <option value="">Select Company</option>
+            @foreach ($companies as $company)
+                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                    {{ $company->name }}
+                </option>
+            @endforeach
+        </select>
+
+        <!-- Platoon Dropdown (populated by JS) -->
+        <select class="form-select me-2" name="platoon" id="platoons" required>
+            <option value="">Select Platoon</option>
+        </select>
+
+        <!-- Name Input -->
+        <input type="text" name="name" value="{{ request('name') }}" class="form-control me-2" placeholder="name (optional)">
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
     @if(isset($students))
     <?php $i = 0; ?>
             <div class="table-outer">
@@ -63,7 +64,7 @@
                             @foreach ($students as $student)
                                 <tr>
                                     <td>{{ ++$i }}.</td>
-                                    <td>{{$student->first_name}} {{$student->last_name}}</td>
+                                    <td>{{$student->force_number?? ''}} {{$student->rank}} {{$student->first_name}} {{$student->last_name}}</td>
                                     <td>{{$student->company->name}}</td>
                                     <td>{{$student->platoon}}</td>
                                     <td>
@@ -137,5 +138,56 @@
         <h4>Please seearch the student.</h4>
     @endif
 </div>
+<script>
+        const selectedCompanyId = "{{ request('company_id') }}";
+    const selectedPlatoonId = "{{ request('platoon') }}";
+    const companySelect = document.getElementById('companies');
+    const platoonsSelect = document.getElementById('platoons');
+
+    function fetchPlatoons(companyId, preselectId = null) {
+        platoonsSelect.innerHTML = '<option value="">Loading...</option>';
+        const url = '/tps-smis/platoons/' + companyId;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(platoons => {
+                platoonsSelect.innerHTML = '<option value="">Select a platoon</option>';
+                platoons.forEach(platoon => {
+                    const option = document.createElement('option');
+                    option.value = platoon.name;
+                    option.text = platoon.name;
+
+                    // Auto-select if it matches the previously selected platoon
+                    if (platoon.id == preselectId) {
+                        option.selected = true;
+                    }
+
+                    platoonsSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching platoons:', error);
+                platoonsSelect.innerHTML = '<option value="">Error loading platoons</option>';
+            });
+    }
+
+    // On company change
+    companySelect.addEventListener('change', function () {
+        const companyId = this.value;
+        if (companyId) {
+            fetchPlatoons(companyId);
+        } else {
+            platoonsSelect.innerHTML = '<option value="">Select a platoon</option>';
+        }
+    });
+
+    // On page load, fetch if company is preselected
+    document.addEventListener('DOMContentLoaded', function () {
+        if (selectedCompanyId) {
+            companySelect.value = selectedCompanyId;
+            fetchPlatoons(selectedCompanyId, selectedPlatoonId);
+        }
+    });
+</script>
 
 @endsection

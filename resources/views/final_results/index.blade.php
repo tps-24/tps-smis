@@ -295,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <th>Student Name</th>
                     <th style="text-align: center;">Score</th>
                     <th style="text-align: center;">Grade</th>
+                    <th style="text-align: center;">Actions</th>
                 `;
 
                 resultsContainer.innerHTML = '';
@@ -314,6 +315,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td>${fullName}</td>
                         <td style="text-align: center;">${result.total_score}</td>
                         <td style="text-align: center;">${result.grade}</td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-info btn-sm">View</button>
+                            <button class="btn btn-primary btn-sm">Edit</button>
+                        </td>
                     `;
 
                     resultsContainer.appendChild(row);

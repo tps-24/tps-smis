@@ -87,7 +87,10 @@
                                                         aria-label="Default select example">
                                                         <option value="" disabled selected>Select a platoon</option>                      
                                                         @foreach($statistics[$j]['company']->platoons as $platoon)
-                                                                <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
+                                                                @if ($platoon->today_attendence($attendenceType->id)->isEmpty())
+                                                                    <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
+                                                                @endif
+                                                                
                                                             @endforeach
                                                     </select>
                                                 </div>

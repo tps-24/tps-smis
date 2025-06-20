@@ -57,7 +57,7 @@
                         @foreach ($mpsStudents as $student)
                             <tr>
                                 <td>{{++$i}}</td>
-                                <td>{{$student->student->first_name ?? ''}} {{$student->student->last_name ?? ''}}</td>
+                                <td>{{$student->student->force_number ?? ''}} {{$student->student->rank ?? ''}} {{$student->student->first_name ?? ''}} {{$student->student->last_name ?? ''}}</td>
                                 <td>{{$student->days?? '-'}}</td>
                                 <td>{{$student->arrested_at}}</td>
                                 <td>
@@ -107,7 +107,7 @@
                                                         <div class="mb-3">
                                                             <label for="description" class="form-label">Reason</label>
                                                             <textarea class="form-control" id="" name="reason" rows="3"
-                                                                required></textarea>
+                                                                ></textarea>
                                                         </div>
                                                         <div class="d-flex justify-content-end">
                                                                 <button type="submit" class="btn btn-primary">Save</button>

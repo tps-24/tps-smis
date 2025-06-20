@@ -142,6 +142,7 @@
                     <th style="width: 5%;">S/N</th>
                     <th style="width: 15%;">FORCE NUMBER</th>
                     <th style="width: 50%;">NAMES</th>
+                    <th style="width: 50%;">STATUS</th>
                     <th style="width: 30%;">SIGNATURE</th>
                 </tr>
             </thead>
@@ -153,6 +154,7 @@
                     <td >
                         {{ trim("{$student->first_name} {$student->middle_name} {$student->last_name}") }}
                     </td>
+                    <td>{{$student->status}}</td>
                     <td ></td>
                 </tr>
                 @endforeach

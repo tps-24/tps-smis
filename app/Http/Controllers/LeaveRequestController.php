@@ -189,6 +189,7 @@ class LeaveRequestController extends Controller
         $leaveRequest->start_date           = $request->start_date;
         $leaveRequest->end_date             = $request->end_date;
         $leaveRequest->status               = 'approved';
+        $leaveRequest->approved_at               = now();
         $leaveRequest->previous_beat_status = $leaveRequest->student->beat_status;
         $leaveRequest->current_beat_status  = 4;
         // SafariStudent::create([

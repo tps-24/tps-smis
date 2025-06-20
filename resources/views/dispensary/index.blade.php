@@ -66,15 +66,23 @@
     <!-- Pie Chart Section -->
     <div class="card">
     <div class="card-header">
-        <h5 class="card-title mb-3">{{ now()->format('F') }} Patient Distribution</h5>
-            <form action="" method="post" class="col-sm-4 d-flex gap-2">
+        <h5 class="card-title mb-3">
+            {{ $date }}
+             Patient Distribution</h5>
+            <form action="{{route('dispensary.page')}}" method="get" class="col-sm-4 d-flex gap-2">
                 <label for="" class="form-label">Monthly</label>
                 <div class="col-sm-6">
-                <select class="form-control" name="" id="">
-                    @foreach ($months as $month)
-                       <option value="{{$month}}">{{$month}}</option> 
-                    @endforeach                   
-                </select>
+                    @php use Carbon\Carbon; @endphp
+            <select class="form-control" name="date" id="">
+                @foreach ($months as $month)
+                    <option 
+                        value="{{ Carbon::parse($month)->format('Y-m-d') }}" 
+                        @if (Carbon::parse($date)->format('F Y') == Carbon::parse($month)->format('F Y')) selected @endif>
+                        {{ Carbon::parse($month)->format('F Y') }}
+                    </option>
+                @endforeach                   
+            </select>
+
                 </div>
                 <button type="submit" class="btn btn-primary">Filter</button>
             </form>

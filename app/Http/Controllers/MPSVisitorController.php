@@ -17,6 +17,10 @@ class MPSVisitorController extends Controller
         $this->middleware('permission:mps-create', ['only' => ['create', 'store',]]);
         $this->middleware('permission:mps-edit', ['only' => ['edit', 'update','searchStudent']]);
         $this->middleware('permission:mps-delete', ['only' => ['destroy']]);
+                $this->selectedSessionId = session('selected_session');
+        if (! $this->selectedSessionId) {
+            $this->selectedSessionId = 1;
+        }
     }
     /**
      * Display a listing of the resource.
@@ -32,7 +36,10 @@ class MPSVisitorController extends Controller
      */
     public function create()
     {
-        $companies = Company::all();
+                $selectedSessionId = $this->selectedSessionId;
+        $companies         = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+            $query->where('session_programme_id', $selectedSessionId);
+        })->get();
         return view('mps.visitors.create', compact('companies'));
     }
 
@@ -117,8 +124,11 @@ class MPSVisitorController extends Controller
         return redirect()->route('visitors.index')->with('success', 'Visitor details deleted successfully.');
     }
     public function searchStudent(Request $request){
-        $companies = Company::all();
-        $students = Student::where('platoon', $request->platoon)->where('company_id', $request->company_id);//orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
+                $selectedSessionId = $this->selectedSessionId;
+        $companies         = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+            $query->where('session_programme_id', $selectedSessionId);
+        })->get();
+        $students = Student::where('platoon', $request->platoon)->where('company_id', $request->company_id)->where('session_programme_id', 1); //orWhere('last_name', 'like', '%' . $request->last_name . '%')->get();
         if ($request->name) {
             $students = $students->where(function ($query) use ($request) {
                 $query->where('first_name', 'like', '%' . $request->name . '%')

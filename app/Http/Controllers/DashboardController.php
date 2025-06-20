@@ -39,11 +39,11 @@ class DashboardController extends Controller
             session(['selected_session' => request()->session_id]);
         }
         // Get the selected session ID from the session
-       $selectedSessionId = session('selected_session');
+        $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
         }
-        $pending_message   = session('pending_message');
+        $pending_message = session('pending_message');
 
         $dailyCount = $weeklyCount = $monthlyCount = 0;
         $user       = Auth::user();
@@ -97,7 +97,8 @@ class DashboardController extends Controller
             $patientDistribution = Patient::where('company_id', $companyId)
                 ->selectRaw('platoon, COUNT(*) as count')
                 ->groupBy('platoon')
-                ->whereMonth('created_at', now()->month)
+                ->whereMonth('created_at', $request->has('date') ? Carbon::parse($request->date)->month : now()->month)
+                ->whereYear('created_at', $request->has('date') ? Carbon::parse($request->date)->year : now()->year)
                 ->pluck('count', 'platoon');
 
             $isCompanySelected = true;
@@ -105,7 +106,8 @@ class DashboardController extends Controller
             // Default: Show statistics grouped by company (HQ, A, B, C)
             if ($user->hasRole(['Sir Major', 'OC Coy', 'Instructor'])) {
                 $patientDistribution = Patient::selectRaw('platoon, COUNT(*) as count')
-                    ->whereMonth('created_at', now()->month)
+                    ->whereMonth('created_at', $request->has('date') ? Carbon::parse($request->date)->month : now()->month)
+                    ->whereYear('created_at', $request->has('date') ? Carbon::parse($request->date)->year : now()->year)
                     ->groupBy('platoon')
                     ->pluck('count', 'platoon');
                 $isCompanySelected = true;
@@ -113,7 +115,8 @@ class DashboardController extends Controller
             } else {
                 $patientDistribution = Patient::selectRaw('company_id, COUNT(*) as count')
                     ->groupBy('company_id')
-                    ->whereMonth('created_at', now()->month)
+                    ->whereMonth('created_at', $request->has('date') ? Carbon::parse($request->date)->month : now()->month)
+                    ->whereYear('created_at', $request->has('date') ? Carbon::parse($request->date)->year : now()->year)
                     ->pluck('count', 'company_id');
                 $isCompanySelected = false;
             }
@@ -124,7 +127,7 @@ class DashboardController extends Controller
         for ($i = 2; $i >= 0; $i--) {
             $months[] = Carbon::now()->subMonths($i)->format('F Y'); // e.g. "April 2025"
         }
-
+        $date                = $request->has('date') ? Carbon::parse($request->date)->format('F Y') : now()->format('F Y');
         $recentAnnouncements = Announcement::where('expires_at', '>', Carbon::now())
             ->orderBy('created_at', 'desc')
             ->take(4)
@@ -133,7 +136,7 @@ class DashboardController extends Controller
         if (auth()->user()->hasRole('Student')) {
             return view('dashboard.student_dashboard', compact('pending_message', 'selectedSessionId'));
         } else if (auth()->user()->hasRole('Receptionist|Doctor')) {
-            return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies', 'months'));
+            return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies', 'months', 'date'));
         } else {
             $todayStudentReport = $this->todayStudentReport();
 
@@ -152,7 +155,7 @@ class DashboardController extends Controller
             // $patientsCount = Patient::whereDate('created_at', Carbon::today())->count();
 
             $patientsCount = Patient::where(function ($query) {
-                $query->where('excuse_type_id', 1)                
+                $query->where('excuse_type_id', 1)
                     ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [Carbon::today()])
                     ->orWhere(function ($innerQuery) {
                         $innerQuery->where('excuse_type_id', 3)
@@ -324,13 +327,15 @@ class DashboardController extends Controller
         $platoons = Platoon::all();
 
         foreach ($platoons as $platoon) {
+            $attendance = $platoon->today_attendence()->first();
 
-            if (count($platoon->today_attendence) > 0) {
-                $present += $platoon->today_attendence->get(0)->present + $platoon->today_attendence->get(0)->kazini + $platoon->today_attendence->get(0)->sentry + $platoon->today_attendence->get(0)->messy;
-                $absent += $platoon->today_attendence->get(0)->absent;
-                $sick += $platoon->today_attendence->get(0)->sick;
-                $lockUp += $platoon->today_attendence->get(0)->lockUp;
+            if ($attendance) {
+                $present += $attendance->present + $attendance->kazini + $attendance->sentry + $attendance->messy;
+                $absent += $attendance->absent;
+                $sick += $attendance->sick;
+                $lockUp += $attendance->lockUp;
             }
+
         }
         $total          = Student::where('session_programme_id', $selectedSessionId)->count();
         $presentPercent = $total == 0 ? 0 : round(($present / ($total) * 100), 1);

@@ -14,65 +14,73 @@ var pusher = new Pusher('3a9b85e8ad0fb87a0a56', {
     reconnectionAttempts: 5, // Max number of reconnection attempts
     reconnectionDelay: 1000, // Time in ms before each retry attempt
     reconnectTimeout: 5000, // Timeout before retrying reconnection
+    authEndpoint: '/tps-smis/broadcasting/auth',  // ✅ Laravel default
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'  // ✅ Required if using web guard
+        }
+    }
 });
-var channel = pusher.subscribe('notifications');
-channel.bind('notification', function(data) {
-    //app.messages.push(JSON.stringify(data));
-    var notification = data.data;
-    if (notification_ids.length == 1) {
 
-        notification_ids = notification_ids.concat(JSON.stringify(data.id));
-    } else {
-        notification_ids = notification_ids.concat(",", JSON.stringify(data.id));
+//var userId = {{ auth()->user()->id }};
+var channel = pusher.subscribe(`private-notifications.all`);
+var companyChannel = pusher.subscribe(`private-notifications.company`);
+
+function handleNotification(data) {
+    console.log("Incoming notification:", data);
+
+    const notification = data?.data;
+    if (!notification || !data.id) return;
+
+    // Update notification count
+    const countLabel = document.querySelector('.count-label');
+    if (countLabel) {
+        countLabel.style.background = 'red';
+        const currentValue = parseInt(countLabel.textContent, 10) || 0;
+        countLabel.textContent = currentValue + 1;
     }
 
-    //let url_link = notifications.join();
-    //alert(url_link)
-    // Update notification count
-    var countLabel = document.querySelector('.count-label');
-    countLabel.style.background = 'red';
-    var currentValue = parseInt(countLabel.textContent, 10);
-    var newValue = currentValue + 1;
-    countLabel.textContent = newValue;
-
-    // Show alert with announcement data
-    //alert(`Title: ${announcement.title}\nMessage: ${announcement.message}`);
+    // Generate notification URL using a placeholder pattern
     var encodedId = encodeURIComponent(data.id);
-    url = `{{ route('notifications.showNotifications',['notificationIds'=>'announcement_id']) }}`;
-    url = url.replace('announcement_id', [encodedId]);
-    // Add notification to the dropdown
-    var notificationsContainer = document.querySelector('.dropdown-menu .mx-3.d-flex.flex-column');
-    var notificationItem = document.createElement('div');
-    notificationItem.className = 'notification-item';
-    notificationItem.innerHTML = `
-                        <div class="bg-${notification.type}-subtle border border-${notification.type} px-3 py-2 rounded-1"> 
-                            <a href="${url}" class="dropdown-item text-${notification.type} d-flex align-items-center">
-                                ${notification.title}
-                            </a>
-                            <p class="small m-0">${notification.created_at}</p>
-                        </div>
-                        `;
-    notificationsContainer.prepend(notificationItem); // Add to the top of the list
-});
+    var urlTemplate = `{{ route('notifications.showNotifications', ['notificationIds' => '__ID__']) }}`;
+    var url = urlTemplate.replace('__ID__', encodedId);
 
-// pusher.connection.bind('state_change', function (states) {
-//     //console.log('State changed from ' + states.previous + ' to ' + states.current);
-//     if (states.current === 'connected') {
-//         //console.log('Successfully connected to Pusher!');
-//     } else if (states.current === 'disconnected') {
-//         // console.log('Disconnected. Attempting to reconnect...');
-//         pusher.connect();
-//     }
-// });
+    // Append notification to dropdown
+    const notificationsContainer = document.querySelector('.dropdown-menu .mx-3.d-flex.flex-column');
+    if (notificationsContainer) {
+        const notificationItem = document.createElement('div');
+        notificationItem.className = 'notification-item';
+        notificationItem.innerHTML = `
+            <div class="bg-${notification.type}-subtle border border-${notification.type} px-3 py-2 rounded-1"> 
+                <a href="${url}" class="dropdown-item text-${notification.type} d-flex align-items-center">
+                    ${notification.title}
+                </a>
+                <p class="small m-0">${notification.created_at}</p>
+            </div>
+        `;
+        notificationsContainer.prepend(notificationItem);
+    }
+}
 
+// Bind event to both channels
+channel.bind('notification', handleNotification);
+companyChannel.bind('notification', handleNotification);
+
+// Monitor Pusher connection
 pusher.connection.bind('state_change', function(states) {
     console.log('Pusher state changed:', states.previous, '→', states.current);
+
+    if (states.current === 'disconnected') {
+        // Reconnect manually if desired
+        pusher.connect();
+    }
 });
 
-// Handle error events
+// Handle errors
 pusher.connection.bind('error', function(err) {
     console.error('Pusher connection error:', err);
 });
+
  </script>
 
 

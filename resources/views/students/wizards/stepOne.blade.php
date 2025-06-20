@@ -59,7 +59,7 @@
                         <select class="form-select" id="abc4" name="rank"
                             aria-label="Default select example">
                             <option value="default_value" {{ old('rank', 'default_value') == 'default_value' ? 'selected' : '' }} disabled>Select rank</option>
-                            <option @if(isset($student) && $student->rank == "Recruit") selected @endif value="Recruit" {{ old('rank', 'default_value') == 'Recruit' ? 'selected' : '' }}>Basic Recruit</option>
+                            <option @if(isset($student) && $student->rank == "RC") selected @endif value="RC" {{ old('rank', 'default_value') == 'RC' ? 'selected' : '' }}>Basic Recruit</option>
                             <option @if(isset($student) && $student->rank == "Constable") selected @endif value="Constable" {{ old('rank', 'default_value') == 'Constable' ? 'selected' : '' }}>Police Constable</option>
                             <option @if(isset($student) && $student->rank == "CPL") selected @endif value="CPL" {{ old('rank', 'default_value') == 'CPL' ? 'selected' : '' }}>CPL</option>
                             <option @if(isset($student) && $student->rank == "Sergeant") selected @endif value="Sergeant" {{ old('rank', 'default_value') == 'Sergeant' ? 'selected' : '' }}>Sergeant Major</option>

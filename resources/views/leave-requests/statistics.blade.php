@@ -90,7 +90,7 @@
                                             {{ $request->reason }}
                                         </p>
                                         <p><small>Approved at:
-                                                {{ \Carbon\Carbon::parse($request->approved_at)->format('d M Y H:i')?? '' }}
+                                            {{ $request->approved_at ? \Carbon\Carbon::parse($request->approved_at)->format('d M Y H:i') : '' }}
                                             </small></p>
                                     </div>
 
