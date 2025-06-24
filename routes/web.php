@@ -13,6 +13,8 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExcuseTypeController;
+use App\Http\Controllers\NotificationAudienceController;
+use App\Http\Controllers\NotificationTypesController;
 use App\Http\Controllers\TerminationReasonController;
 use App\Http\Controllers\FinalResultController;
 use App\Http\Controllers\GradeMappingController;
@@ -309,6 +311,32 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('certificates', CertificateController::class);
 
     // Define the custom route first
+
+    //Notification routes
+
+    Route::prefix('/notifications')->group(function(){
+        Route::prefix('/audiences')->controller(NotificationAudienceController::class)->group(function(){
+            Route::get('/','index')->name('notifications.audiences.index');
+            Route::get('/create','create')->name('notifications.audiences.create');
+            Route::get('/edit/{notificationAudience}','edit')->name('notifications.audiences.edit');
+            Route::delete('/destroy/{notificationAudience}','destroy')->name('notifications.audiences.destroy');
+            Route::get('/{notificationAudience}','show')->name('notifications.audiences.show');
+            Route::post('/store','store')->name('notifications.audiences.store');
+            Route::put('/update/{notificationAudience}','update')->name('notifications.audiences.update');
+        });
+
+        Route::prefix('/types')->controller(NotificationTypesController::class)->group(function(){
+            Route::get('/','index')->name('notifications.types.index');
+            Route::get('/create','create')->name('notifications.types.create');
+            Route::get('/edit/{notificationType}','edit')->name('notifications.types.edit');
+            Route::delete('/destroy/{notificationType}','destroy')->name('notifications.types.destroy');
+            Route::get('/{notificationType}','show')->name('notifications.types.show');
+            Route::post('/store','store')->name('notifications.types.store');
+            Route::put('/update/{notificationType}','update')->name('notifications.types.update');
+        });
+    });
+
+    //End of notification routes
 
     // routes/web.php
     Route::get('platoons/{companyName}', [AttendenceController::class, 'getPlatoons']);

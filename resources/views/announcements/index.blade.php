@@ -47,7 +47,7 @@
                                         href="{{route('download.file', ['documentPath' => $announcement->id]) }}"><small>Download
                                             Attachment</small></a>
                                 @endif
-                                <p><small>Announced by: <i>{{ $announcement->poster->staff->rank }} {{ $announcement->poster->name }} </i></small></p>
+                                <p><small>Announced by: <i>{{ $announcement->poster->staff ? $announcement->poster->staff->rank: '' }} {{ $announcement->poster->name }} </i></small></p>
                                 <small>Posted At:
                                     {{ $announcement->created_at ? $announcement->created_at->format('d-m-Y H:i') : 'N/A' }}</small><br>
                                 

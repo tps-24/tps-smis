@@ -354,7 +354,6 @@ public function search(Request $request)
         $pdf->set_option('isPhpEnabled', true);
 
         return $pdf->stream("resumee.pdf");
-        return view('staffs.download_resumeePdf', compact('staff', 'education_levels'));
     }
     public function update_cv(Request $request, $staff_id){
         $staff = Staff::find($staff_id);
@@ -387,7 +386,6 @@ public function search(Request $request)
             $request-> parentsRegion,
         ];
         $staff->save();
-        return $staff;
         return view('staffs.create_cv', compact('staff', 'education_levels'));
     }
 
@@ -480,7 +478,6 @@ public function search(Request $request)
             //'position' => $request->position, 
             'start_date' =>  $request->start_date,
             'end_date' => $request->end_date,
-            'address' => $request->address,
             'duties' => json_encode($request->duties),
         ]);
 

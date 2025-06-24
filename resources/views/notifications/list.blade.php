@@ -6,7 +6,21 @@ let notification_ids = "[";
 // Enable pusher logging - don't include this in production
 //Pusher.logToConsole = true;
 
+@php
+ $notifications = \App\Models\SharedNotification::unreadBy(auth()->id())->get();
+ $unreadCount = $notifications->count();
+@endphp
+    // Convert PHP variable to JavaScript
+    const notifications = @json($notifications);
+    const unreadCount = @json($unreadCount);
+    // Show it using alert
+    alert(JSON.stringify(unreadCount));
+        const countLabel = document.querySelector('.count-label');
+    if (countLabel) {
+        countLabel.style.background = 'red';
 
+        countLabel.textContent = currentValue + 1;
+    }
 var pusher = new Pusher('3a9b85e8ad0fb87a0a56', {
     cluster: 'mt1',
     encrypted: true, // Use encrypted connection (recommended)
