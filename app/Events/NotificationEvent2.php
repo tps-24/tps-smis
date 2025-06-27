@@ -4,9 +4,9 @@ namespace App\Events;
 
 use App\Models\NotificationAudience;
 use App\Models\SharedNotification;
-use Illuminate\Broadcasting\Channel;
+use App\Jobs\AttachUsersToNotification;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -37,13 +37,6 @@ class NotificationEvent2 implements ShouldBroadcast
         $this->audience = $audience;
         $this->data = $data;
         $this->body = $body;
-        Log::info('NotificationEvent created', [
-            'id' => $this->audience,
-            // 'title' => $this->title,
-            // 'type' => $this->type,
-            // 'category' => $this->category,
-            // 'notification' => $this->notification
-        ]);
 
        $notification = SharedNotification::create([
             'notification_audience_id' => $this->audience->id,
@@ -53,16 +46,17 @@ class NotificationEvent2 implements ShouldBroadcast
             'body' => $this->body,
             'data' => $this->data
         ]);
-        $notification->users()->attach([1]);
+        AttachUsersToNotification::dispatch($notification->id);
+        //$notification->users()->attach([1]);
 
     }
 
     /**
      * Get the channel the event should broadcast on.
      */
-    public function broadcastOn(): PrivateChannel
+    public function broadcastOn(): Channel
     {
-        return new PrivateChannel('notifications.' . $this->audience->id);
+        return new Channel('notifications.' . $this->audience->id);
     }
 
 

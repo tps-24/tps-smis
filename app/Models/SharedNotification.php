@@ -8,6 +8,7 @@ class SharedNotification extends Model
 {
     protected $fillable = ['notification_audience_id', 'notification_type_id', 'notification_category_id', 'title', 'body', 'data'];
     protected $casts = ['data' => 'array'];
+    protected $appends = ['type'];
 
     public function users()
     {
@@ -24,5 +25,13 @@ class SharedNotification extends Model
                 ->whereNull('read_at');
         });
     }
+public function type()
+{
+    return $this->belongsTo(NotificationType::class, 'notification_type_id');
+}
 
+public function getTypeAttribute(): string
+{
+    return $this->type?->style_class ?? 'primary';
+}
 }

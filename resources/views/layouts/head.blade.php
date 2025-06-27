@@ -8,6 +8,7 @@
     <!-- Meta -->
     <meta name="description" content="System for facilitating essential functions of TPS Administration" />
     <meta name="author" content="Tanzania Police School" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="canonical" href="http://localhost/tps-smis/">
     <meta property="og:url" content="http://localhost/tps-smis/">
     <meta property="og:title" content="TPS - Moshi | Tanzania Police School">

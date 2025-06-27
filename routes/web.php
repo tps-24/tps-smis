@@ -116,6 +116,9 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
 });
 
 Route::group(['middleware' => ['auth']], function () {
+    Route::post('/tps-smis/broadcasting/auth', function () {
+    return Broadcast::auth(request()); // ✅ Use the global request() helper
+});
     Route::get('/student/generate-certificate', [StudentController::class, 'generateCertificate']);
 
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
@@ -447,6 +450,9 @@ Route::group(['middleware' => ['auth']], function () {
 
 });
 
+Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
+     ->name('notifications.markAsRead');
+
 //start
 Route::controller(StudentController::class)->prefix('students')->group(function () {
     /**
@@ -573,3 +579,10 @@ Route::get('/leave-requests/rejected', [LeaveRequestController::class, 'rejected
 Route::get('/leave-requests/{id}/rejected-pdf', [LeaveRequestController::class, 'downloadRejectedPdf'])->name('leave-requests.rejected.pdf');
 
 Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->name('staffs.resume');
+
+
+
+
+
+
+

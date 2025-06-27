@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             // PatientsTableSeeder::class,
             //SafariTypeSeeder::class,
             //EducationLevelSeeder::class
-            //NotificationAudienceSeeder::class,
+            NotificationAudienceSeeder::class,
             NotificationTypeSeeder::class
         ]);
 
