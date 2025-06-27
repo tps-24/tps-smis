@@ -331,58 +331,51 @@
                     </a>
                 </li>
             @endcan
-            @can('leave-list')
-                <li class="treeview">
-                    <a href="#">
-                        <i class="bi bi-mouse3"></i>
-                        <span class="menu-text">Leave(s)</span>
-                    </a>
+          
 
-                    <ul class="treeview-menu">
-                        @if (auth()->check())
-                            @if (auth()->user()->hasRole('Student'))
-                                <li>
-                                    <a href="{{ route('leave-requests.index') }}">
-                                        Apply for Leave
-                                    </a>
-                                </li>
-                            @elseif (auth()->user()->hasRole('Sir Major'))
-                                <li>
-                                    <a href="{{ route('leave-requests.index') }}">
-                                        <i class="bi bi-inbox"></i> Sir Major Panel
-                                    </a>
-                                </li>
-                            @elseif (auth()->user()->hasRole('OC Coy'))
-                                <li>
-                                    <a href="{{ route('leave-requests.oc-panel') }}">
-                                        <i class="bi bi-person-video3"></i> OC Panel
-                                    </a>
-                                </li>
-                            @elseif (auth()->user()->hasRole('Chief Instructor'))
-                                <li>
-                                    <a href="{{ route('leave-requests.chief-instructor') }}">
-                                        <i class="bi bi-person-badge"></i> Chief Instructor Panel
-                                    </a>
-                                </li>
-                            @else
-                                <li>
-                                    <a href="{{ route('leave-requests.index') }}">
-                                        <i class="bi bi-inbox"></i> Leave Request Panel
-                                    </a>
-                                </li>
-                            @endif
-                        @else
-                            <li>
-                                <a href="/tps-smis">
-                                    <i class="bi bi-bar-chart-line"></i>
-                                    <span class="menu-text">Dashboard</span>
-                                </a>
-                            </li>
-                        @endif
+@can('leave-list')
+<li class="treeview">
+  <a href="#">
+    <i class="bi bi-mouse3"></i>
+    <span class="menu-text">Leave(s)</span>
+  </a>
+  <ul class="treeview-menu">
+    @auth
+      {{-- Student --}}
+      @role('Student')
+        <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-pencil-square"></i> Apply for Leave</a></li>
+      @endrole
 
-                    </ul>
-                </li>
-            @endcan
+      {{-- Sir Major --}}
+      @role('Sir Major')
+        <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a></li>
+      @endrole
+
+      {{-- OC Coy --}}
+      @role('OC Coy')
+        <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC Panel</a></li>
+      @endrole
+
+      {{-- Chief Instructor --}}
+      @role('Chief Instructor')
+        <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i> Chief Instructor Panel</a></li>
+      @endrole
+
+      {{-- Admins (see all) --}}
+      @hasanyrole('Admin|Super Administrator')
+        <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-pencil-square"></i> Apply for Leave</a></li>
+        <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a></li>
+        <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC Panel</a></li>
+        <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i> Chief Instructor Panel</a></li>
+      @endhasanyrole
+    @else
+      <li><a href="{{ url('/tps-smis') }}"><i class="bi bi-bar-chart-line"></i> Dashboard</a></li>
+    @endauth
+  </ul>
+</li>
+@endcan
+
+
             @can('beat-list')
                 <li class="treeview">
                     <a href="!#">
