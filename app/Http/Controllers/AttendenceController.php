@@ -199,10 +199,6 @@ class AttendenceController extends Controller
                 $total += $attendence[$i][0]['total'];
                 $sick += $attendence[$i][0]['adm'];
                 $sick += $attendence[$i][0]['ed'];
-                // $absent += $attendence[$i + 1][0]['absent'];
-                // $safari += $attendence[$i + 1][0]['safari'];
-                // $total += $attendence[$i + 1][0]['total'];
-                // $data->put($i +1, $attendence[$i+ 1][0]['present']);
             } else {
 
             }
@@ -292,13 +288,7 @@ class AttendenceController extends Controller
                 }
             }
 
-        } else if (
-            $user->hasRole('Admin') ||
-            $user->hasRole('Academic Coordinator') ||
-            $user->hasRole('Super Administrator') ||
-            $user->hasRole('Chief Instructor') ||
-            $user->hasRole('Staff Officer')
-        ) {
+        } else if ($user->hasAnyRole(['Admin', 'Academic Coordinator', 'Super Administrator', 'Chief Instructor', 'Staff Officer'])) {
             $selectedSessionId = session('selected_session');
             if (! $selectedSessionId) {
                 $selectedSessionId = 1;
@@ -356,6 +346,7 @@ class AttendenceController extends Controller
                     array_push($company_stats, $platoon->attendences()->whereDate('created_at', $date)->where('session_programme_id', $selectedSessionId)->where('attendenceType_id', $type)->get());
                 }
             }
+           
             array_push($statistics, [
                 'company'    => $company,
                 'statistics' => count($company_stats) > 0 ? $this->statistics($company_stats, $company->id) : $this->setZero($company->id),
@@ -428,7 +419,7 @@ class AttendenceController extends Controller
     public function getPlatoons($company_id)
     {
         $company = Company::find($company_id);
-        return response()->json($company->platoons);
+        return response()->json($company->platoons()->withCount('students')->get());
     }
 
     /**

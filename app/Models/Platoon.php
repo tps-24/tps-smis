@@ -24,6 +24,9 @@ class Platoon extends Model
         return $this->hasMany(Student::class,'platoon', 'name');
     }
 
+        public function platoon_students($companyId){
+        return $this->students()->where('company_id', $companyId)->get();
+    }
     public function lockUp(){
         return $this->hasManyThrough(MPS::class, Student::class, 'platoon', 'student_id', 'name', 'id');
     }
@@ -37,7 +40,6 @@ class Platoon extends Model
 public function today_attendence($attendanceType_id = null)
 {
     $selectedSessionId = session('selected_session', 1); // fallback to 1
-
     $query = $this->attendences()
         ->where('session_programme_id', $selectedSessionId)
         ->whereDate('created_at', \Carbon\Carbon::today());
@@ -73,4 +75,5 @@ public function today_attendence($attendanceType_id = null)
                 // ->whereDate('patients.created_at', '<=', $today)
                 // ->whereRaw("DATE_ADD(patients.created_at, INTERVAL rest_days DAY) >= ?", [$today]);
     }
+
 }

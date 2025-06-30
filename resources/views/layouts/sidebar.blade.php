@@ -472,7 +472,9 @@
                         <li>
                             <a href="{{ route('patrol-areas.index') }}">Patrol Areas</a>
                         </li>
-
+                        <li>
+                            <a href="{{ route('companies.index') }}">Companies Settings</a>
+                        </li>
                         <li class="treeview">
                             <a href="#!">
                                 <span class="menu-text">Notification </span>

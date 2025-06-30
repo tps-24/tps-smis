@@ -85,11 +85,12 @@
                                                 <div class=""> <label class="form-label" for="abc4">Platoon</label>
                                                     <select style="height:60%" class="form-select" name="platoon" required id="platoons"
                                                         aria-label="Default select example">
+                                                        
                                                         <option value="" disabled selected>Select a platoon</option>                      
                                                         @foreach($statistics[$j]['company']->platoons as $platoon)
-                                                                @if ($platoon->today_attendence($attendenceType->id)->isEmpty())
+                                                               @if ($platoon->today_attendence($attendenceType->id)->isEmpty())
                                                                     <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
-                                                                @endif
+                                                                 @endif 
                                                                 
                                                             @endforeach
                                                     </select>
