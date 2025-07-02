@@ -20,6 +20,12 @@ class AttendenceController extends Controller
     private $selectedSessionId;
     public function __construct()
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+
         $this->selectedSessionId = session('selected_session');
         if (! $this->selectedSessionId) {
             $this->selectedSessionId = 1;
@@ -42,6 +48,12 @@ class AttendenceController extends Controller
      */
     public function create(Request $request, $attendenceType_id)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
@@ -129,6 +141,11 @@ class AttendenceController extends Controller
      */
     public function today($company_id, $type, $date, $attendenceTypeId)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
 
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
@@ -269,6 +286,12 @@ class AttendenceController extends Controller
 
     public function attendence(Request $request, $type)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
@@ -436,6 +459,12 @@ class AttendenceController extends Controller
      */
     public function store(Request $request, $type, $platoon_id)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
@@ -795,6 +824,11 @@ class AttendenceController extends Controller
 
     private function getKaziniStudentsIds($platoon)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
 
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
@@ -835,6 +869,12 @@ class AttendenceController extends Controller
 
     private function getSickStudentIds($platoon)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;

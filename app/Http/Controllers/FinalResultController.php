@@ -25,6 +25,12 @@ class FinalResultController extends Controller
 
     public function studentList()
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 4;
@@ -344,6 +350,12 @@ class FinalResultController extends Controller
 
     public function search(Request $request, $companyId)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 4;
@@ -367,6 +379,12 @@ class FinalResultController extends Controller
 
     public function getResults($semesterId, $courseId, Request $request)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
         $perPage = 10;
         // Fetch final results with related student info
         $selectedSessionId = session('selected_session');
@@ -392,6 +410,12 @@ class FinalResultController extends Controller
 
     public function returnResults($semesterId, $courseId)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 4;

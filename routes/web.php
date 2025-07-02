@@ -45,6 +45,7 @@ use App\Http\Controllers\TeacherOnDutyController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\IntakeHistoryController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -115,6 +116,9 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/student/generate-certificate', [StudentController::class, 'generateCertificate']);
+
+    Route::get('/student/intake_summary', [IntakeHistoryController::class, 'index']);
+    Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
 
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/print-certificates', [FinalResultController::class, 'studentList'])->name('studentList');
@@ -307,10 +311,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('safari-students', SafariStudentController::class);
     Route::resource('certificates', CertificateController::class);
+    Route::resource('intake_history', IntakeHistoryController::class);
+
 
     // Define the custom route first
 
     // routes/web.php
+    Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
     Route::get('platoons/{companyName}', [AttendenceController::class, 'getPlatoons']);
     Route::get('campanies/{campusId}', [GuardAreaController::class, 'get_companies']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
@@ -371,6 +378,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('attendences', AttendenceController::class);
+    Route::resource('/students/intake_summary', IntakeHistoryController::class);
 
     Route::controller(RefereeController::class)->prefix('referee')->group(function () {
         Route::get('/referee/delete/{refereeId}', 'destroy')->name('referees.delete');

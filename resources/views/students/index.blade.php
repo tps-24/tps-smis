@@ -1,7 +1,7 @@
 @extends('layouts.main')
 @section('scrumb')
 <!-- Scrumb starts -->
-<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb" style="margin-right: 25px;">
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">

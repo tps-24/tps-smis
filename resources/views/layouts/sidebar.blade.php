@@ -115,6 +115,11 @@ a.active {
                         <a href="/tps-smis/students/create">Student Registration</a>
                     </li>
                     @endcan()
+                    @can('student-create')
+                    <li>
+                        <a href="/tps-smis/intake_history">Intake Summary</a>
+                    </li>
+                    @endcan()
                 </ul>
             </li>
             @endcan()
