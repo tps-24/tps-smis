@@ -13,6 +13,8 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExcuseTypeController;
+use App\Http\Controllers\NotificationAudienceController;
+use App\Http\Controllers\NotificationTypesController;
 use App\Http\Controllers\TerminationReasonController;
 use App\Http\Controllers\FinalResultController;
 use App\Http\Controllers\GradeMappingController;
@@ -46,6 +48,7 @@ use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\IntakeHistoryController;
+use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -115,6 +118,9 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
 });
 
 Route::group(['middleware' => ['auth']], function () {
+    Route::post('/tps-smis/broadcasting/auth', function () {
+    return Broadcast::auth(request()); // ✅ Use the global request() helper
+});
     Route::get('/student/generate-certificate', [StudentController::class, 'generateCertificate']);
 
     Route::get('/student/intake_summary', [IntakeHistoryController::class, 'index']);
@@ -313,8 +319,41 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('certificates', CertificateController::class);
     Route::resource('intake_history', IntakeHistoryController::class);
 
+    Route::resource('companies', CompanyController::class);
+    
 
     // Define the custom route first
+
+    Route::prefix('companies')->controller(CompanyController::class)->group(function () {
+        Route::post('/{companyId}/platoons', 'create_platoon')->name('companies.platoon.store');
+        Route::post('/{platoonId}/platoons/delete', 'create_platoon')->name('companies.platoon.destroy');
+    });
+
+    //Notification routes
+
+    Route::prefix('/notifications')->group(function(){
+        Route::prefix('/audiences')->controller(NotificationAudienceController::class)->group(function(){
+            Route::get('/','index')->name('notifications.audiences.index');
+            Route::get('/create','create')->name('notifications.audiences.create');
+            Route::get('/edit/{notificationAudience}','edit')->name('notifications.audiences.edit');
+            Route::delete('/destroy/{notificationAudience}','destroy')->name('notifications.audiences.destroy');
+            Route::get('/{notificationAudience}','show')->name('notifications.audiences.show');
+            Route::post('/store','store')->name('notifications.audiences.store');
+            Route::put('/update/{notificationAudience}','update')->name('notifications.audiences.update');
+        });
+
+        Route::prefix('/types')->controller(NotificationTypesController::class)->group(function(){
+            Route::get('/','index')->name('notifications.types.index');
+            Route::get('/create','create')->name('notifications.types.create');
+            Route::get('/edit/{notificationType}','edit')->name('notifications.types.edit');
+            Route::delete('/destroy/{notificationType}','destroy')->name('notifications.types.destroy');
+            Route::get('/{notificationType}','show')->name('notifications.types.show');
+            Route::post('/store','store')->name('notifications.types.store');
+            Route::put('/update/{notificationType}','update')->name('notifications.types.update');
+        });
+    });
+
+    //End of notification routes
 
     // routes/web.php
     Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
@@ -426,6 +465,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('announcement/download/file/{documentPath}', [AnnouncementController::class, 'downloadFile'])->name('download.file');
 
 });
+
+Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
+     ->name('notifications.markAsRead');
 
 //start
 Route::controller(StudentController::class)->prefix('students')->group(function () {

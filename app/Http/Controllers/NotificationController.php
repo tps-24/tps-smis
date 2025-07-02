@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Announcement;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -72,4 +73,15 @@ class NotificationController extends Controller
     {
         //
     }
+
+
+public function markAsRead($id)
+{
+    $user = auth()->user();
+    Log::info($id);
+    // Assuming SharedNotification is used and has a pivot table notification_user
+    $user->sharedNotifications()->updateExistingPivot($id, ['read_at' => now()]);
+
+    return response()->json(['status' => 'read']);
+}
 }

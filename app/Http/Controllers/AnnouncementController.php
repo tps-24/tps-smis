@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
+use App\Events\NotificationEvent2;
+use App\Models\NotificationAudience;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -27,7 +29,17 @@ class AnnouncementController extends Controller
     {
         //$announcements = Announcement::where('expires_at', '>', Carbon::now())->orderBy('created_at', 'desc')->get();
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
-        // broadcast(new NotificationEvent($announcements[0]->title, $announcements[0]->type, 'announcement', $announcements[0], $announcements[0]->id, $announcements[0]->audience));
+        $audience = NotificationAudience::find(1);
+        broadcast(new NotificationEvent2(
+            $announcements[1]->id,   // ID from announcement
+            $audience,                // Audience object or instance
+            1,  // Notification type
+            1,                        // Category (ensure 1 is a valid category ID)
+            $announcements[1]->title, // Title of the notification
+            $announcements[1],           // Full announcements object
+            "body"  // Body of the notification
+        ));
+        // broadcast(new NotificationEvent2($announcements[0]->id,$audience,$announcements[0]->type, 1, $announcements[0]->title, $announcements, $announcements));
         return view('announcements.index', compact('announcements'));
     }
 
@@ -52,9 +64,9 @@ class AnnouncementController extends Controller
             $expiresAt = Carbon::createFromFormat('Y-m-d\TH:i', $expiresAt);
         }
         foreach (Auth::user()->roles as $role) { {
-                $request->audience = Auth::user()->staff->company_id?? $request->audience;
+                $request->audience = Auth::user()->staff->company_id ?? $request->audience;
             }
-       }
+        }
         $announcement = new Announcement();
         $announcement->title = $request->title;
         $announcement->message = $request->message;
@@ -69,10 +81,10 @@ class AnnouncementController extends Controller
         //return $request->audience;
         if ($request->audience == "all") {
             $announcement->audience = $request->audience;
-        } else if($request->audience == "staff"){
+        } else if ($request->audience == "staff") {
             $announcement->company_id = $request->audience;
-            
-        }else{
+
+        } else {
             //$announcement->company_id = Auth::user()->staff->company_id?? $request->audience;
         }
         $announcement->save();
@@ -111,7 +123,8 @@ class AnnouncementController extends Controller
         return redirect()->route('announcements.index')->with('success', 'Announcement deleted successfully.');
     }
 
-    public function downloadFile ($announcementId) {
+    public function downloadFile($announcementId)
+    {
         $announcement = Announcement::find($announcementId);
         $path = storage_path('app/public/' . $announcement->document_path);
         if (file_exists($path)) {
@@ -119,5 +132,5 @@ class AnnouncementController extends Controller
         }
         abort(404);
     }
-    
+
 }

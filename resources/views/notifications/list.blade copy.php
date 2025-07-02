@@ -1,4 +1,4 @@
-  <style>
+ <style>
   .notification-box:hover {
     cursor: pointer;
   }
@@ -33,9 +33,6 @@
  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
  <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
  <script>
-let notification_ids = "[";
-// Enable pusher logging - don't include this in production
-//Pusher.logToConsole = true;
 
 @php
  $notifications = \App\Models\SharedNotification::unreadBy(auth()->id())->get();
@@ -43,29 +40,31 @@ let notification_ids = "[";
 @endphp
     // Convert PHP variable to JavaScript
     const notifications = @json($notifications);
-    const unreadCount = @json($unreadCount);
     const counts = @json($unreadCount);
-        updateNotificationCount(counts);
+    updateNotificationCount(counts);
         notifications.forEach(notification => {
         appendNotification(notification);
     });
-    // Show it using alert
-    //alert(JSON.stringify(unreadCount));
+
+
+appendNotification(notification);
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 var pusher = new Pusher('3a9b85e8ad0fb87a0a56', {
     cluster: 'mt1',
-    encrypted: true, // Use encrypted connection (recommended)
-    reconnection: true, // Enable automatic reconnection
-    reconnectionAttempts: 5, // Max number of reconnection attempts
-    reconnectionDelay: 1000, // Time in ms before each retry attempt
-    reconnectTimeout: 5000, // Timeout before retrying reconnection
-    authEndpoint: '/tps-smis/broadcasting/auth',  // ✅ Laravel default
+    forceTLS: true,               // Use TLS, replaces deprecated encrypted:true
+    reconnection: true,           // Automatic reconnection
+    reconnectionAttempts: 5,      // Max reconnection attempts
+    reconnectionDelay: 1000,      // Delay between attempts (ms)
+    reconnectTimeout: 5000,       // Timeout before retrying (ms)
+    authEndpoint: '/tps-smis/broadcasting/auth', // Your Laravel auth endpoint
     auth: {
         headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'  // ✅ Required if using web guard
+            'X-CSRF-TOKEN': csrfToken  // CSRF token from meta tag
         }
     }
 });
+
 
 //var userId = {{ auth()->user()->id }};
 var channel = pusher.subscribe(`private-notifications.all`);
@@ -73,20 +72,30 @@ var companyChannel = pusher.subscribe(`private-notifications.company`);
 
 function handleNotification(data) {
     console.log("Incoming notification:", data);
-alert(data)
+    alert("Coming");
     const notification = data?.data;
     if (!notification || !data.id) return;
 
     // Update notification count
-      updateNotificationCount(++counts);
-      
-      //appendNotification(notification);
-
+    //const countLabel = document.querySelector('.count-label');
+    // if (countLabel) {
+    //     countLabel.style.background = 'red';
+    //     const currentValue = parseInt(countLabel.textContent, 10) || 0;
+    //     countLabel.textContent = currentValue + 1;
+    // }
+    ++counts;
+    updateNotificationCount(counts);
     // Generate notification URL using a placeholder pattern
-    
+    // var encodedId = encodeURIComponent(data.id);
+    // var urlTemplate = `{{ route('notifications.showNotifications', ['notificationIds' => '__ID__']) }}`;
+    // var url = urlTemplate.replace('__ID__', encodedId);
+
     // Append notification to dropdown
     
 }
+
+    
+
 
 // Bind event to both channels
 channel.bind('notification', handleNotification);
@@ -184,5 +193,10 @@ function markNotificationAsRead(element) {
         window.location.href = url;
     });
 }
+
+
+
+
  </script>
+
 

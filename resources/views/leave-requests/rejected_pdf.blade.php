@@ -1,59 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="sw">
 <head>
-    <meta charset="utf-8">
-    <title>Rejected Leave Request</title>
+    <meta charset="UTF-8">
+    <title>Kibali cha Ruhusa Kilichokataliwa</title>
+
     <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 14px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .section { margin-bottom: 15px; }
-        .logo { width: 80px; height: auto; margin-bottom: 10px; }
-        .signature-section {
-            margin-top: 50px;
+        /* ----- PAGE SIZE & MARGINS ----- */
+        @page   { margin: 25px;  }
+        body    {
+             /*font-family: DejaVu Sans, sans-serif;
+                   font-size: 14px;  line-height: 1.55; */
+                  margin-top: 10px; /* Adjust top margin */
+                  color:#000;  padding:32px; }
+
+        /* ----- HEADER ----- */
+        .header           { text-align:center; margin-bottom:10px; }
+        .header img       { width:80px; height:80px; }
+        .header h2        { margin:6px 0 4px; font-size:20px; }
+        .header h3        { margin:0; font-size:16px; letter-spacing:.5px; }
+
+        /* ----- PERMIT TEXT ----- */
+        .permit-content   { margin-top:18px; }
+        .permit-content p { margin:12px 0; text-align:justify; }
+
+        /* ----- SIGNATURES ----- */
+        /* .signatures       { margin-top:26px; } */
+        .signatures table { width:100%; text-align:center; }
+        .signatures td    { 
+            /* padding-top:36px;  */
+            vertical-align:bottom; }
+        .signatures img   { width:65px; }
+
+        /* ----- FOOTER ----- */
+        .footer           { text-align:center; margin-top:40px; font-size:13px; }
+
+        /* ----- WATERMARK ----- */
+        .watermark1{
+            position:fixed;   top:25%; left:50%;
+            width:25%; height:25%;
+            transform:translate(-50%, -50%);
+            opacity:.06; z-index:-1;
         }
-        .signature-line {
-            margin-top: 60px;
-            border-top: 1px solid #000;
-            width: 200px;
-            text-align: center;
+        .watermark2{
+            position:fixed;   top:65%; left:50%;
+            width:25%; height:25%;
+            transform:translate(-50%, -50%);
+            opacity:.06; z-index:-1;
         }
     </style>
 </head>
+
 <body>
 
-    <!-- Logo + Header -->
+    {{-- ---------- HEADER ---------- --}}
     <div class="header">
-        <img src="{{ public_path('logo.png') }}" class="logo" alt="Logo">
-        <h2>Shule ya Polisi Moshi</h2>
-        <h4>Kibali cha ruhusa kilichokataliwa</h4>
+        <img src="{{ public_path('logo.png') }}" alt="Nembo ya Polisi">
+        <h2>SHULE YA POLISI TANZANIA - MOSHI</h2>
+        <h3>KIBALI KILICHOKATALIWA CHA MWANAFUNZI KUTOKA NJE YA SHULE</h3>
     </div>
 
-    <!-- Request Details -->
-    <div class="section">
-        <strong>Jina la Mwanafunzi:</strong> {{ $leaveRequest->student->first_name }} {{ $leaveRequest->student->last_name }}
+    {{-- Watermark --}}
+    <img src="{{ public_path('logo.png') }}" class="watermark1" alt="Watermark">
+
+    {{-- ---------- PERMIT BODY ---------- --}}
+    <div class="permit-content">
+        <p>
+            Mwanafunzi {{ 
+            $leaveRequest->student->first_name . ' ' .
+            $leaveRequest->student->middle_name . ' ' .
+            $leaveRequest->student->last_name }},
+            kutoka Kombania {{ $leaveRequest->company->name }},
+            Platuni namba {{ $leaveRequest->platoon }},
+            hajaruhusiwa kutoka nje ya shule kwenda
+            {{ $leaveRequest->location }}
+            kwa sababu {{ $leaveRequest->reason }},
+            Namba ya simu: {{ $leaveRequest->phone_number }}
+        </p>
+
+        
     </div>
 
-    <div class="section">
-        <strong>Sababu ya Ruhusa:</strong> {{ $leaveRequest->reason }}
+    {{-- ---------- SIGNATURES ---------- --}}
+    <div class="signatures">
+        <table>
+            <tr>
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="S/M Signature"><br>
+                    Sir Major
+                </td>
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="OC Signature"><br>
+                    OC-TPS Moshi
+                </td>
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="C/I Signature"><br>
+                    ChiefInstructor-TPS Moshi
+                </td>
+            </tr>
+        </table>
+    </div>
+       
+    {{-- ---------- FOOTER ---------- --}}
+    <div class="footer">
+        © {{ date('Y') }} Jeshi la Polisi Tanzania. Haki zote zimehifadhiwa.
     </div>
 
-    <div class="section">
-        <strong>Sababu ya Kukataliwa:</strong> {{ $leaveRequest->rejection_reason }}
+
+<hr class="mt-3 mb-3" style="margin: 75px 0 50px 0;">
+
+
+    {{-- ---------- HEADER ---------- --}}
+    <div class="header">
+        <img src="{{ public_path('logo.png') }}" alt="Nembo ya Polisi">
+        <h2>SHULE YA POLISI TANZANIA - MOSHI</h2>
+        <h3>KIBALI KILICHOKATALIWA CHA MWANAFUNZI KUTOKA NJE YA SHULE</h3>
     </div>
 
-    <div class="section">
-        <strong>Tarehe ya Kukataliwa:</strong> {{ \Carbon\Carbon::parse($leaveRequest->rejected_at)->format('d M, Y h:i A') }}
+    {{-- Watermark --}}
+    <img src="{{ public_path('logo.png') }}" class="watermark1" alt="Watermark">
+
+    {{-- ---------- PERMIT BODY ---------- --}}
+    <div class="permit-content">
+        <p>
+            Mwanafunzi {{ 
+            $leaveRequest->student->first_name . ' ' .
+            $leaveRequest->student->middle_name . ' ' .
+            $leaveRequest->student->last_name }},
+            kutoka Kombania {{ $leaveRequest->company->name }},
+            Platuni namba {{ $leaveRequest->platoon }},
+            hajaruhusiwa kutoka nje ya shule kwenda
+            {{ $leaveRequest->location }}
+            kwa sababu {{ $leaveRequest->reason }},
+            Namba ya simu: {{ $leaveRequest->phone_number }}
+        </p>
+
+        
     </div>
 
-    <!-- Signature Area -->
-    <div class="signature-section">
-    <p>Imetolewa na:</p>
-    <img src="{{ public_path('signatures/oc.png') }}" width="150" alt="Signature">
-    <div>Afisa Mkuu wa Mafunzo(CI- TPS MOSHI)</div>
-</div>
- <!-- Footer -->
- <div class="date-footer">
-        Printed: {{ \Carbon\Carbon::now()->format('d M Y, h:i A') }}
+    {{-- ---------- SIGNATURES ---------- --}}
+    <div class="signatures">
+        <table>
+            <tr>
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="S/M Signature"><br>
+                    Sir Major
+                </td>
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="OC Signature"><br>
+                    OC-TPS Moshi
+                </td>
+                <td>
+                    <img src="{{ public_path('signatures/oc.png') }}" alt="C/I Signature"><br>
+                    ChiefInstructor-TPS Moshi
+                </td>
+            </tr>
+        </table>
     </div>
+       
+    {{-- ---------- FOOTER ---------- --}}
+    <div class="footer">
+        © {{ date('Y') }} Jeshi la Polisi Tanzania. Haki zote zimehifadhiwa.
+    </div>
+
 </body>
 </html>

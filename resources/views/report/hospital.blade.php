@@ -113,42 +113,42 @@ var monthlyCounts = @json($monthlyCounts);
 const dailyData = {
     labels: dailyCounts.labels,
     datasets: [
-        { label: 'Treated', data: dailyCounts.total, backgroundColor: '#1E4093' },
-        { label: 'E.D', data: dailyCounts.ED, backgroundColor: 'orange'},
-        { label: 'L.D', data: dailyCounts.LD, backgroundColor: 'rgba(12, 165, 106, 0.7)' },
-        { label: 'Admitted', data: dailyCounts.Adm, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
-        { label: 'Treated Trends', data: dailyCounts.total, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
-        { label: 'E.D Trends', data: dailyCounts.ED, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1 },
-        { label: 'L.D Trend', data: dailyCounts.LD, type: 'line', fill: false, borderColor: 'rgba(2, 131, 82, 0.7)', tension: 0.1 },
-        { label: 'Admitted Trends', data: dailyCounts.Adm, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1 }
+        { label: 'Treated', data: dailyCounts.total, backgroundColor: '#4B70DD' },
+        { label: 'E.D', data: dailyCounts.ED, backgroundColor: '#5C6BC0'},
+        { label: 'L.D', data: dailyCounts.LD, backgroundColor: '#BA68C8' },
+        { label: 'Admitted', data: dailyCounts.Adm, backgroundColor: '#EF5350' },
+        { label: 'Treated Trends', data: dailyCounts.total, type: 'line', fill: false, borderColor: 'rgba(26, 35, 160, 0.7)', tension: 0.1},
+        { label: 'E.D Trends', data: dailyCounts.ED, type: 'line', fill: false, borderColor: 'rgba(58, 45, 133, 0.7)', tension: 0.1, hidden:true },
+        { label: 'L.D Trend', data: dailyCounts.LD, type: 'line', fill: false, borderColor: 'rgba(105, 2, 131, 0.7)', tension: 0.1 ,hidden:true },
+        { label: 'Admitted Trends', data: dailyCounts.Adm, type: 'line', fill: false, borderColor: 'rgba(192, 22, 22, 0.7)', tension: 0.1,hidden:true  }
     ]
 };
 
 const weeklyData = {
     labels: weeklyCounts.labels,
     datasets: [
-        { label: 'Treated', data: weeklyCounts.total, backgroundColor: '#1E4093' },
-        { label: 'E.D', data: weeklyCounts.ED, backgroundColor: 'orange'},
-        { label: 'L.D', data: weeklyCounts.LD, backgroundColor: 'rgba(12, 165, 106, 0.7)' },
-        { label: 'Admitted', data: weeklyCounts.Adm, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
-        { label: 'Treated Trends', data: weeklyCounts.total, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
-        { label: 'E.D Trends', data: weeklyCounts.ED, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1 },
-        { label: 'L.D Trend', data: weeklyCounts.LD, type: 'line', fill: false, borderColor: 'rgba(2, 131, 82, 0.7)', tension: 0.1 },
-        { label: 'Admitted Trends', data: weeklyCounts.Adm, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1 }
+        { label: 'Treated', data: weeklyCounts.total, backgroundColor: '#4B70DD' },
+        { label: 'E.D', data: weeklyCounts.ED, backgroundColor: '#5C6BC0'},
+        { label: 'L.D', data: weeklyCounts.LD, backgroundColor: '#BA68C8' },
+        { label: 'Admitted', data: weeklyCounts.Adm, backgroundColor: '#EF5350' },
+        { label: 'Treated Trends', data: weeklyCounts.total, type: 'line', fill: false, borderColor: 'rgba(26, 35, 160, 0.7)', tension: 0.1},
+        { label: 'E.D Trends', data: weeklyCounts.ED, type: 'line', fill: false, borderColor: 'rgba(58, 45, 133, 0.7)', tension: 0.1, hidden:true },
+        { label: 'L.D Trend', data: weeklyCounts.LD, type: 'line', fill: false, borderColor: 'rgba(105, 2, 131, 0.7)', tension: 0.1 ,hidden:true  },
+        { label: 'Admitted Trends', data: weeklyCounts.Adm, type: 'line', fill: false, borderColor: 'rgba(192, 22, 22, 0.7)', tension: 0.1,hidden:true }
     ]
 };
 
 const monthlyData = {
     labels: monthlyCounts.labels,
     datasets: [
-        { label: 'Treated', data: monthlyCounts.total, backgroundColor: '#1E4093' },
-        { label: 'E.D', data: monthlyCounts.ED, backgroundColor: 'orange'},
-        { label: 'L.D', data: monthlyCounts.LD, backgroundColor: 'rgba(12, 165, 106, 0.7)' },
-        { label: 'Admitted', data: monthlyCounts.Adm, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
-        { label: 'Treated Trends', data: monthlyCounts.total, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
-        { label: 'E.D Trends', data: monthlyCounts.ED, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1 },
-        { label: 'L.D Trend', data: monthlyCounts.LD, type: 'line', fill: false, borderColor: 'rgba(2, 131, 82, 0.7)', tension: 0.1 },
-        { label: 'Admitted Trends', data: monthlyCounts.Adm, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1 }
+        { label: 'Treated', data: monthlyCounts.total, backgroundColor: '#4B70DD' },
+        { label: 'E.D', data: monthlyCounts.ED, backgroundColor: '#5C6BC0'},
+        { label: 'L.D', data: monthlyCounts.LD, backgroundColor: '#BA68C8' },
+        { label: 'Admitted', data: monthlyCounts.Adm, backgroundColor: '#EF5350' },
+        { label: 'Treated Trends', data: monthlyCounts.total, type: 'line', fill: false, borderColor: 'rgba(26, 35, 160, 0.7)', tension: 0.1 },
+        { label: 'E.D Trends', data: monthlyCounts.ED, type: 'line', fill: false, borderColor: 'rgba(58, 45, 133, 0.7)', tension: 0.1, hidden:true },
+        { label: 'L.D Trend', data: monthlyCounts.LD, type: 'line', fill: false, borderColor: 'rgba(105, 2, 131, 0.7)', tension: 0.1 ,hidden:true  },
+        { label: 'Admitted Trends', data: monthlyCounts.Adm, type: 'line', fill: false, borderColor: 'rgba(192, 22, 22, 0.7)', tension: 0.1,hidden:true }
     ]
 };
 

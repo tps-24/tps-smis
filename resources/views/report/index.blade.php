@@ -118,7 +118,7 @@ const dailyData = {
             fill: false,
             borderColor: 'rgba(187, 91, 91, 0.7)',
             tension: 0.1,
-            hidden: false
+            hidden: true
         },
         {
             label: 'Leaves Trend',
@@ -126,7 +126,8 @@ const dailyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(2, 131, 82, 0.7)',
-            tension: 0.1
+            tension: 0.1,
+            hidden: true
         }, // Fix reference
         {
             label: 'Lock Up Trends',
@@ -135,7 +136,7 @@ const dailyData = {
             fill: false,
             borderColor: 'rgba(152, 94, 18, 0.7)',
             tension: 0.1,
-            hidden: false
+            hidden: true
         }
     ]
 };
@@ -177,7 +178,7 @@ const weeklyData = {
             fill: false,
             borderColor: 'rgba(187, 91, 91, 0.7)',
             tension: 0.1,
-            hidden: false
+            hidden: true
         },
         {
             label: 'Leaves Trend',
@@ -185,7 +186,8 @@ const weeklyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(2, 131, 82, 0.7)',
-            tension: 0.1
+            tension: 0.1,
+            hidden:true
         },
         {
             label: 'Lock Up Trends',
@@ -194,7 +196,7 @@ const weeklyData = {
             fill: false,
             borderColor: 'rgba(152, 94, 18, 0.7)',
             tension: 0.1,
-            hidden: false
+            hidden: true
         }
     ]
 };
@@ -236,7 +238,7 @@ const monthlyData = {
             fill: false,
             borderColor: 'rgba(187, 91, 91, 0.7)',
             tension: 0.1,
-            hidden: false
+            hidden: true
         },
         {
             label: 'Leaves Trend',
@@ -244,7 +246,8 @@ const monthlyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(2, 131, 82, 0.7)',
-            tension: 0.1
+            tension: 0.1,
+            hidden:true
         },
         {
             label: 'Lock Up Trends',
@@ -253,7 +256,7 @@ const monthlyData = {
             fill: false,
             borderColor: 'rgba(152, 94, 18, 0.7)',
             tension: 0.1,
-            hidden: false
+            hidden: true
         }
     ]
 };

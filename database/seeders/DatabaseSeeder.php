@@ -28,7 +28,9 @@ class DatabaseSeeder extends Seeder
             // GradingSystemsTableSeeder::class,
             // PatientsTableSeeder::class,
             //SafariTypeSeeder::class,
-            EducationLevelSeeder::class
+            //EducationLevelSeeder::class
+            NotificationAudienceSeeder::class,
+            NotificationTypeSeeder::class
         ]);
 
         // User::factory(10)->create();

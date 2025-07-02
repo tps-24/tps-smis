@@ -173,12 +173,12 @@ const dailyData = {
     datasets: [{
             label: 'Lock Up',
             data: dailyCounts.mps_counts,
-            backgroundColor: '#1E4093'
+            backgroundColor: '#DC3545'
         },
         {
             label: 'Visited',
             data: dailyCounts.visitor_counts,
-            backgroundColor: 'orange'
+            backgroundColor: '#FF9800'
         },
 
         {
@@ -186,7 +186,7 @@ const dailyData = {
             data: dailyCounts.mps_counts,
             type: 'line',
             fill: false,
-            borderColor: 'rgba(2, 11, 131, 0.7)',
+            borderColor: 'rgba(168, 17, 17, 0.7)',
             tension: 0.1
         },
         {
@@ -206,12 +206,12 @@ const weeklyData = {
     datasets: [{
             label: 'Lock Up',
             data: weeklyCounts.mps_counts,
-            backgroundColor: '#1E4093'
+            backgroundColor: '#DC3545'
         },
         {
             label: 'Visited',
             data: weeklyCounts.visitor_counts,
-            backgroundColor: 'orange'
+            backgroundColor: '#FF9800'
         },
 
         {
@@ -219,7 +219,7 @@ const weeklyData = {
             data: weeklyCounts.mps_counts,
             type: 'line',
             fill: false,
-            borderColor: 'rgba(2, 11, 131, 0.7)',
+            borderColor: 'rgba(168, 17, 17, 0.7)',
             tension: 0.1
         },
         {
@@ -238,12 +238,12 @@ const monthlyData = {
     datasets: [{
             label: 'Lock Up',
             data: monthlyCounts.mps_counts,
-            backgroundColor: '#1E4093'
+            backgroundColor: '#DC3545'
         },
         {
             label: 'Visited',
             data: monthlyCounts.visitor_counts,
-            backgroundColor: 'orange'
+            backgroundColor: '#FF9800'
         },
 
         {
@@ -251,7 +251,7 @@ const monthlyData = {
             data: monthlyCounts.mps_counts,
             type: 'line',
             fill: false,
-            borderColor: 'rgba(2, 11, 131, 0.7)',
+            borderColor: 'rgba(168, 17, 17, 0.7)',
             tension: 0.1
         },
         {

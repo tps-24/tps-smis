@@ -121,17 +121,17 @@ const dailyData = {
     datasets: [{
             label: 'Returned',
             data: dailyCounts.returned,
-            backgroundColor: '#1E4093'
+            backgroundColor: 'rgba(76, 175, 80, 0.6)'
         },
         {
             label: 'On Leave',
             data: dailyCounts.on_leave,
-            backgroundColor: 'orange'
+            backgroundColor: 'rgba(255, 193, 7, 0.5)'
         },
         {
             label: 'Late',
             data: dailyCounts.late,
-            backgroundColor: 'rgba(199, 9, 9, 0.56)'
+            backgroundColor: 'rgba(244, 67, 54, 0.5)'
         },
 
         {
@@ -139,8 +139,8 @@ const dailyData = {
             data: dailyCounts.returned,
             type: 'line',
             fill: false,
-            borderColor: 'rgba(2, 11, 131, 0.7)',
-            tension: 0.1
+            borderColor: 'rgba(91, 187, 142, 0.63)',
+            tension: 0
         },
         {
             label: 'On Leave Trends',
@@ -148,7 +148,8 @@ const dailyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(91, 187, 142, 0.63)',
-            tension: 0.1
+            tension: 0,
+            hidden:true
         },
         {
             label: 'Late Trend',
@@ -156,7 +157,8 @@ const dailyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(2, 131, 82, 0.7)',
-            tension: 0.1
+            tension: 0,
+            hidden:true
         },
 
     ]
@@ -167,25 +169,25 @@ const weeklyData = {
     datasets: [{
             label: 'Returned',
             data: weeklyCounts.returned,
-            backgroundColor: '#1E4093'
+            backgroundColor: 'rgba(76, 175, 80, 0.6)'
         },
         {
             label: 'On Leave',
             data: weeklyCounts.on_leave,
-            backgroundColor: 'orange'
+            backgroundColor: 'rgba(255, 193, 7, 0.5)'
         },
         {
             label: 'Late',
             data: weeklyCounts.late,
-            backgroundColor: 'rgba(199, 9, 9, 0.56)'
+            backgroundColor: 'rgba(244, 67, 54, 0.5)'
         },
         {
             label: 'Returned Trends',
             data: weeklyCounts.returned,
             type: 'line',
             fill: false,
-            borderColor: 'rgba(2, 11, 131, 0.7)',
-            tension: 0.1
+            borderColor: 'rgba(91, 187, 142, 0.63)',
+            tension: 0
         },
         {
             label: 'On Leave Trends',
@@ -193,7 +195,8 @@ const weeklyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(91, 187, 142, 0.63)',
-            tension: 0.1
+            tension: 0,
+            hidden:true
         },
         {
             label: 'Late Trend',
@@ -201,7 +204,8 @@ const weeklyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(2, 131, 82, 0.7)',
-            tension: 0.1
+            tension: 0,
+            hidden:true
         },
     ]
 };
@@ -211,33 +215,34 @@ const monthlyData = {
     datasets: [{
             label: 'Returned',
             data: monthlyCounts.returned,
-            backgroundColor: '#1E4093'
+            backgroundColor: 'rgba(76, 175, 80, 0.6)'
         },
         {
             label: 'On Leave',
             data: monthlyCounts.on_leave,
-            backgroundColor: 'orange'
+            backgroundColor: 'rgba(255, 193, 7, 0.5)'
         },
         {
             label: 'Late',
             data: monthlyCounts.late,
-            backgroundColor: 'rgba(199, 9, 9, 0.56)'
+            backgroundColor: 'rgba(244, 67, 54, 0.5)'
         },
         {
             label: 'Returned Trends',
             data: monthlyCounts.returned,
             type: 'line',
             fill: false,
-            borderColor: 'rgba(2, 11, 131, 0.7)',
-            tension: 0.1
+            borderColor: 'rgba(91, 187, 142, 0.63)',
+            tension: 0
         },
         {
             label: 'On Leave Trends',
             data: monthlyCounts.on_leave,
             type: 'line',
             fill: false,
-            borderColor: 'rgba(91, 187, 142, 0.63)',
-            tension: 0.1
+            borderColor: 'rgba(219, 169, 17, 0.5)',
+            tension: 0,
+            hidden:true 
         },
         {
             label: 'Late Trend',
@@ -245,7 +250,8 @@ const monthlyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(131, 2, 2, 0.56)',
-            tension: 0.1
+            tension: 0,
+            hidden:true
         },
     ]
 };

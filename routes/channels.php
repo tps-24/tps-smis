@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\Log;
 |
 */
 
-Broadcast::channel('chat', function ($user, $id) {
-    return true;
-});
+
 Broadcast::channel('notifications.all', function ($user) {
-    return true;
+    return !is_null($user); // authorize any authenticated user
 });
+
+
+
 Broadcast::channel('notifications.company', function ($user) {
     if(!is_null($user->staff)){
         if($user->staff->company_id == 1) return true;

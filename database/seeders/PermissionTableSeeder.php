@@ -14,7 +14,7 @@ class PermissionTableSeeder extends Seeder
     public function run(): void
     {
          $permissions = [ 
-            ['name' => 'role-list', 'description' => 'View roles'], 
+            /*['name' => 'role-list', 'description' => 'View roles'], 
             ['name' => 'role-create', 'description' => 'Create new roles'], 
             ['name' => 'role-edit', 'description' => 'Edit existing roles'], 
             ['name' => 'role-delete', 'description' => 'Delete roles'], 
@@ -128,7 +128,12 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'hospital-approve', 'description' => 'Approve sick students'],        
             ['name' => 'student-courses', 'description' => 'View Courses as Student'],        
             ['name' => 'student-coursework-list', 'description' => 'View Courseworks as Student'],        
-            ['name' => 'staff-view', 'description' => 'View staff profile'],        
+            ['name' => 'staff-view', 'description' => 'View staff profile'],
+            /*/
+            ['name' => 'teacher_on_duty-view', 'description' => 'View Teacher On duty'], 
+            ['name' => 'teacher_on_duty-create', 'description' => 'Create new Teacher On duty'], 
+            ['name' => 'teacher_on_duty-edit', 'description' => 'Edit Teacher on duty'],
+            ['name' => 'teacher_on_duty-delete', 'description' => 'Delete Teacher on duty'],         
             // Add other permissions here with descriptions 
             ]; 
 
