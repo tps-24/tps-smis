@@ -101,22 +101,27 @@
                 </li>
             @endif
             @can('student-list')
-                <li class="treeview">
-                    <a href="#!">
-                        <i class="bi bi-box"></i>
-                        <span class="menu-text">Students</span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li>
-                            <a href="/tps-smis/students">Student Details</a>
-                        </li>
-                        @can('student-create')
-                            <li>
-                                <a href="/tps-smis/students/create">Student Registration</a>
-                            </li>
-                        @endcan()
-                    </ul>
-                </li>
+            <li class="treeview">
+                <a href="#!">
+                    <i class="bi bi-box"></i>
+                    <span class="menu-text">Students</span>
+                </a>
+                <ul class="treeview-menu">
+                    <li>
+                        <a href="/tps-smis/students">Student Details</a>
+                    </li>
+                    @can('student-create')
+                    <li>
+                        <a href="/tps-smis/students/create">Student Registration</a>
+                    </li>
+                    @endcan()
+                    @can('student-create')
+                    <li>
+                        <a href="/tps-smis/intake_history">Intake Summary</a>
+                    </li>
+                    @endcan()
+                </ul>
+            </li>
             @endcan()
 
             @can('staff-list')

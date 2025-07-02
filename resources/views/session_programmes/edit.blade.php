@@ -56,7 +56,7 @@
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
                                 <strong>Description:</strong>
-                                <textarea type="text" name="description" placeholder="Enter Descriptions" class="form-control" value="{{ $session_programme->description }}">
+                                <textarea type="text" name="description" placeholder="Enter Descriptions" class="form-control">{{ $session_programme->description }}</textarea>
                             </div>
                         </div>
                         <div class="col-xs-6 col-sm-6 col-md-12">
@@ -81,13 +81,14 @@
                             <div class="form-group">
                                 <strong>Is Current:</strong>
                                 <select name="is_current" class="form-control">
-                                    if($session_programme->is_current == 1){
+
+                                    @if($session_programme->is_current == 1)
                                         <option value="1" selected>Yes</option>
                                         <option value="0">No</option>
-                                    }else{
+                                    @else
                                         <option value="1">Yes</option>
                                         <option value="0" selected>No</option>
-                                    }
+                                    @endif
                                 </select>
                             </div>
                         </div>

@@ -74,14 +74,14 @@ class SessionProgrammeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request,  SessionProgramme $sessionProgramme)
     {
         request()->validate([
-            'session_programme_name' => 'required|unique:session_programmes,session_programme_name',
+            'session_programme_name' => 'required|unique:session_programmes,session_programme_name,'. $sessionProgramme->id,
             'year' => 'required',
        ]);
    
-       $session_programme->update($request->all());
+       $sessionProgramme->update($request->all());
    
        return redirect()->route('session_programmes.index')
                        ->with('success','Session programme updated successfully');

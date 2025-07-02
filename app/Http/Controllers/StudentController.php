@@ -40,6 +40,12 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
@@ -61,6 +67,12 @@ class StudentController extends Controller
 
     public function search(Request $request)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
@@ -543,6 +555,12 @@ class StudentController extends Controller
 
     public function updateStudents(Request $request)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
         // Check if a session is selected
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
@@ -787,6 +805,12 @@ class StudentController extends Controller
     }
     public function generatePdf($platoon, $company_id)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
         $platoon           = Platoon::where('name', $platoon)->where('company_id', $company_id)->first();
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {

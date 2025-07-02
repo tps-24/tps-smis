@@ -134,7 +134,7 @@
             <img src="{{ asset('resources/assets/images/logo.png') }}" style="height: 40px; width: 30px; margin: 0 0;"
                 alt="Police Logo">
 
-            <h4>{{ strtoupper($platoon->company->name) }} {{ strtoupper($platoon->name) }} - PLT</h4>
+            <h4>{{ strtoupper($platoon->company->description) }} - PLT {{ strtoupper($platoon->name) }}</h4>
         </div>
         <table class="table table-sm table-bordered table-hover tight-table">
             <thead>
@@ -142,7 +142,7 @@
                     <th style="width: 5%;">S/N</th>
                     <th style="width: 15%;">FORCE NUMBER</th>
                     <th style="width: 50%;">NAMES</th>
-                    <th style="width: 50%;">STATUS</th>
+                    <!-- <th style="width: 50%;">STATUS</th> -->
                     <th style="width: 30%;">SIGNATURE</th>
                 </tr>
             </thead>
@@ -154,7 +154,7 @@
                     <td >
                         {{ trim("{$student->first_name} {$student->middle_name} {$student->last_name}") }}
                     </td>
-                    <td>{{$student->status}}</td>
+                    <!-- <td>{{$student->status}}</td> -->
                     <td ></td>
                 </tr>
                 @endforeach

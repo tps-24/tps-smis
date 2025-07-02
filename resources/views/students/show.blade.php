@@ -61,7 +61,7 @@
 
                             @else
                                 <button class="btn  btn-warning" data-bs-toggle="modal"
-                                    data-bs-target="#SafariDetails">Safari</button>
+                                    data-bs-target="#SafariDetails">To Safari</button>
                             @endif
                             @endif
                         @endcan
@@ -84,9 +84,8 @@
                         @can('student-edit')
                             <button class="btn btn-danger me-2">Edit Profile</button>
                         @endcan()
-                        <button class="btn btn-success">Active</button>
-                        <div class="pull-right" style="margin-left:5px">
-                            <a class="btn btn-primary" href="{{ route('students.index') }}"> Back</a>
+                        <div class="pull-right" style="margin-left:-5px">
+                            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : url('/tps-smis') }}" class="btn btn-primary"> Back</a>
                         </div>
                     </div>
                 </div>
@@ -226,25 +225,38 @@
 
                                                         <!-- Form field start -->
                                                         <div class="m-0">
-                                                            <label class="form-label" for="abt">About </label>
+                                                            
                                                             <div class="input-group">
                                                                 <span class="input-group-text">
-                                                                    <i class="bi bi-filter-circle"></i>
+                                                                    <i class="bi bi-filter-circle"></i> <label class="form-label" for="abt" style="font-size: medium;"> &nbsp;&nbsp;&nbsp;About - {{$student->force_number}} {{$student->rank}} {{$student->first_name}}</label>
                                                                 </span>
-                                                                <div class="card-body"
-                                                                    style="background-color:rgb(209, 209, 214);">
-                                                                    <div class="d-flex align-items-center">
-                                                                        <div class="p-3  me-3">
-                                                                            <p>Enrolled Course: @if ($student->programme)
-                                                                                {{$student->programme->programmeName}}
-                                                                            @endif
-                                                                            </p>
-                                                                            <p>NIDA: {{$student->nin}}</p>
-                                                                            <p>Gender: {{$student->gender}}</p>
+                                                            </div>
+                                                            <div class="card-body" style="background-color: rgb(209, 209, 214);">
+                                                                <div class="d-flex align-items-center">
+                                                                    <div class="p-3 me-3 w-100">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6 mb-2">
+                                                                        <p><strong>Enrolled Course:</strong> {{ $student->programme->programmeName ?? '-' }}</p>
+                                                                        <p><strong>Company:</strong> {{ $student->company->name ?? '-' }} - {{ $student->platoon ?? '-' }}</p>
+                                                                        <p><strong>Gender:</strong> {{ $student->gender ?? '-' }}</p>
+                                                                        <p><strong>Blood Group:</strong> {{ $student->blood_group ?? '-' }}</p>
+                                                                        <p><strong>Education:</strong> {{ $student->education ?? '-' }}</p>
+                                                                        <p><strong>Fani:</strong> {{ $student->fani ?? '-' }}</p>
+                                                                        <p><strong>Kitengo:</strong> {{ $student->vitengo->name ?? '-' }}</p>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-2">
+                                                                        <p><strong>NIDA:</strong> {{ $student->nin ?? '-' }}</p>
+                                                                        <p><strong>Home Region:</strong> {{ $student->home_region ?? '-' }}</p>
+                                                                        <p><strong>Entry Region:</strong> {{ $student->entry_region ?? '-' }}</p>
+                                                                        <p><strong>Bank Name:</strong> {{ $student->bank_name ?? '-' }}</p>
+                                                                        <p><strong>Account No.:</strong> {{ $student->account_no ?? '-' }}</p>
+                                                                        <p><strong>Height:</strong> {{ $student->height ? $student->height . ' cm' : '-' }}</p>
+                                                                        <p><strong>Weight:</strong> {{ $student->weight ? $student->weight . ' kg' : '-' }}</p>
                                                                         </div>
                                                                     </div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
+                                                                </div>
                                                         </div>
                                                         <!-- Form field end -->
 

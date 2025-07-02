@@ -3,27 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Staff;
-use App\Models\Company;
-use App\Models\User;
-use App\Imports\BulkImportStaff;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Department;
-use App\Models\NextOfKin;
 use Spatie\Permission\Models\Role;
 use Illuminate\View\View;
-use Illuminate\Support\Arr;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\RedirectResponse;
-use App\Http\Controllers\StaffController;
 use App\Models\EducationLevel;
 use App\Models\School;
 use App\Models\WorkExperience;
+use App\Models\Staff;
+use App\Models\Company;
+use App\Models\User;
+use App\Models\Department;
+use App\Models\NextOfKin;
+use App\Imports\BulkImportStaff;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
-use DB;
-use Hash;
-use Auth;
 
 class StaffController extends Controller
 {

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   @include('layouts.head')
-  
 
   <body>
     <!-- Page wrapper starts -->
@@ -17,14 +16,16 @@
           <!-- App body starts -->
           <div class="app-body">
             <!-- Row starts -->
-            <div class="row gx-4">
+            <div class="row">
               <div class="col-sm-12 col-12">
-                <div class="card mb-4">
-                  <div class="card-header">
+                <div class="card mb-4" style="margin-right: -26px;">
+                  <div class="card-header" >
                     <h5 class="card-title">
                     @yield('content')
                   </div>
-                  <div class="card-body"></div>
+                  <div class="card-body">
+                    
+                  </div>
                 </div>
               </div>
             </div>
