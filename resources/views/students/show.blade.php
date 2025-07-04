@@ -34,12 +34,23 @@
         .nav-tabs .nav-link.active {
             background-color: #f8f9fa;
         }
+
+        .leftlabel {
+            margin-top: 16px;
+            font-weight: normal;
+        }
     </style>
 
 @endsection
 @section('content')
     @include('layouts.sweet_alerts.index')
     <!-- Row starts -->
+    @php
+        function formatNida($value) {
+            if (!is_string($value) || strlen($value) < 20) return $value;
+            return substr($value, 0, 8) . '-' . substr($value, 8, 5) . '-' . substr($value, 13, 5) . '-' . substr($value, 18, 2);
+        }
+    @endphp
     <div class="row gx-4">
         <div class="col-sm-12 col-12">
             <div class="card mb-4">
@@ -60,7 +71,7 @@
                                 </form>
 
                             @else
-                                <button class="btn  btn-warning" data-bs-toggle="modal"
+                                <button class="btn  btn-dark" data-bs-toggle="modal"
                                     data-bs-target="#SafariDetails">To Safari</button>
                             @endif
                             @endif
@@ -71,18 +82,26 @@
                                 href="{{ route('updateFastingStatus', ['studentId' => $student->id, 'fastingStatus' => $student->fast_status == 0 ? 1 : 0]) }}">
                                 {{ $student->fast_status == 0 ? 'Not Fasting' : 'Fasting' }}</a>
                         @endcan()
-                        @if ($student->status === 'pending')
-                            <form action="{{ route('students.approve', $student->id) }}" method="POST" style="display:inline">
+                        @if ($student->status  != 'approved')
+                            <!-- <form action="{{ route('students.approve', $student->id) }}" method="POST" style="display:inline">
                                 @csrf
                                 @can('student-approve')
                                     <button type="submit" class="btn btn-warning" style="margin-right:5px">Approve</button>
                                 @endcan()
+                            </form> -->
+                            
+                            <form id="confirmForm{{ $student->id }}" action="{{ route('students.approve', $student->id) }}" method="post">
+                                @csrf
+                                    <button onclick="confirmAction('confirmForm{{ $student->id }}', 'Verify','{{$student->force_number}} {{$student->rank}} {{$student->first_name}}','Verify')" type="button" class="btn btn-info">
+                                        Verify
+                                    </button>
                             </form>
                         @else
-                            <button class="btn btn-success btn-sm" style="margin-right:5px">Approved</button>
+                            <button class="btn btn-success" style="margin-right:5px">Verified</button>
                         @endif
                         @can('student-edit')
-                            <button class="btn btn-danger me-2">Edit Profile</button>
+                            <button id="editAboutBtn" class="btn btn-warning me-2">Edit Profile</button>
+                            <button id="cancelEditBtn" class="btn btn-sm btn-danger d-none">✖ Cancel</button>
                         @endcan()
                         <div class="pull-right" style="margin-left:-5px">
                             <a href="{{ url()->previous() !== url()->current() ? url()->previous() : url('/tps-smis') }}" class="btn btn-primary"> Back</a>
@@ -134,140 +153,271 @@
                                     <div class="col-sm-12 col-12">
                                         <div class="card border mb-3">
                                             <div class="card-body">
-
                                                 <!-- Row starts -->
-                                                <div class="row gx-4">
-                                                    <div class="col-sm-2 col-12">
-
-                                                        <!-- Form field start -->
-                                                        <div class="mb-3">
-                                                            <label for="forceNumber" class="form-label">Force Number</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">
-                                                                    <i class="bi bi-person"></i>
-                                                                </span>
-                                                                <input type="text" class="form-control" id="forceNumber"
-                                                                    value="{{$student->force_number}}" Disabled>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Form field end -->
-
-                                                    </div>
-
-                                                    <div class="col-sm-3 col-12">
-
-                                                        <!-- Form field start -->
-                                                        <div class="mb-3">
-                                                            <label for="fullName" class="form-label">Full Name</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">
-                                                                    <i class="bi bi-person"></i>
-                                                                </span>
-                                                                <input type="text" class="form-control" id="fullName"
-                                                                    value="{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}"
-                                                                    Disabled>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Form field end -->
-
-                                                    </div>
-
-                                                    <div class="col-sm-3 col-12">
-
-                                                        <!-- Form field start -->
-                                                        <div class="mb-3">
-                                                            <label for="yourEmail" class="form-label">Email</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">
-                                                                    <i class="bi bi-envelope"></i>
-                                                                </span>
-                                                                <input type="email" class="form-control" id="yourEmail"
-                                                                    value="{{$student->user->email ?? ''}}" Disabled>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Form field end -->
-
-                                                    </div>
-                                                    <div class="col-sm-2 col-12">
-
-                                                        <!-- Form field start -->
-                                                        <div class="mb-3">
-                                                            <label for="contactNumber" class="form-label">Contact</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">
-                                                                    <i class="bi bi-phone"></i>
-                                                                </span>
-                                                                <input type="text" class="form-control" id="contactNumber"
-                                                                    value="{{$student->phone}}" Disabled>
-                                                            </div>
-
-                                                        </div>
-                                                        <!-- Form field end -->
-
-                                                    </div>
-                                                    <div class="col-sm-2 col-12">
-
-                                                        <!-- Form field start -->
-                                                        <div class="mb-3">
-                                                            <label for="birthDay" class="form-label">Date of Birth</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">
-                                                                    <i class="bi bi-calendar4"></i>
-                                                                </span>
-                                                                <input type="text" class="form-control" id="birthDay"
-                                                                    value="{{$student->dob}}" Disabled>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Form field end -->
-
-                                                    </div>
-                                                    <div class="col-12">
-
-                                                        <!-- Form field start -->
-                                                        <div class="m-0">
-                                                            
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">
-                                                                    <i class="bi bi-filter-circle"></i> <label class="form-label" for="abt" style="font-size: medium;"> &nbsp;&nbsp;&nbsp;About - {{$student->force_number}} {{$student->rank}} {{$student->first_name}}</label>
-                                                                </span>
-                                                            </div>
-                                                            <div class="card-body" style="background-color: rgb(209, 209, 214);">
-                                                                <div class="d-flex align-items-center">
-                                                                    <div class="p-3 me-3 w-100">
-                                                                    <div class="row">
-                                                                        <div class="col-md-6 mb-2">
-                                                                        <p><strong>Enrolled Course:</strong> {{ $student->programme->programmeName ?? '-' }}</p>
-                                                                        <p><strong>Company:</strong> {{ $student->company->name ?? '-' }} - {{ $student->platoon ?? '-' }}</p>
-                                                                        <p><strong>Gender:</strong> {{ $student->gender ?? '-' }}</p>
-                                                                        <p><strong>Blood Group:</strong> {{ $student->blood_group ?? '-' }}</p>
-                                                                        <p><strong>Education:</strong> {{ $student->education ?? '-' }}</p>
-                                                                        <p><strong>Fani:</strong> {{ $student->fani ?? '-' }}</p>
-                                                                        <p><strong>Kitengo:</strong> {{ $student->vitengo->name ?? '-' }}</p>
-                                                                        </div>
-                                                                        <div class="col-md-6 mb-2">
-                                                                        <p><strong>NIDA:</strong> {{ $student->nin ?? '-' }}</p>
-                                                                        <p><strong>Home Region:</strong> {{ $student->home_region ?? '-' }}</p>
-                                                                        <p><strong>Entry Region:</strong> {{ $student->entry_region ?? '-' }}</p>
-                                                                        <p><strong>Bank Name:</strong> {{ $student->bank_name ?? '-' }}</p>
-                                                                        <p><strong>Account No.:</strong> {{ $student->account_no ?? '-' }}</p>
-                                                                        <p><strong>Height:</strong> {{ $student->height ? $student->height . ' cm' : '-' }}</p>
-                                                                        <p><strong>Weight:</strong> {{ $student->weight ? $student->weight . ' kg' : '-' }}</p>
-                                                                        </div>
-                                                                    </div>
+                                                <form id="studentUpdateForm" method="POST" action="{{ route('students.update', $student->id) }}">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <!-- Editable fields go here -->
+                                                    <div class="row gx-4">
+                                                            <div class="col-sm-2 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="forceNumber" class="form-label">Force Number</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-person"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control static-field" id="forceNumber" value="{{$student->force_number}}" Disabled>
+                                                                        <input type="text" class="form-control editable-field d-none" id="forceNumber" value="{{$student->force_number}}">
                                                                     </div>
                                                                 </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-sm-3 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="fullName" class="form-label">Full Name</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-person"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control static-field" id="fullName" value="{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}" Disabled>
+                                                                        <input type="text" name="full_name" class="form-control editable-field d-none" id="fullName" value="{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}">
+                                                                    </div>
                                                                 </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-sm-3 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="yourEmail" class="form-label">Email</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-envelope"></i>
+                                                                        </span>
+                                                                        <input type="email" class="form-control static-field" id="yourEmail" value="{{$student->email ?? ''}}" Disabled>
+                                                                        <input type="email" name="email" class="form-control editable-field d-none" id="yourEmail" value="{{$student->email ?? ''}}">
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-sm-2 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="contactNumber" class="form-label">Contact</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-phone"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control static-field" id="contactNumber" value="{{$student->phone}}" Disabled>
+                                                                        <input type="text" name="phone" class="form-control editable-field d-none" id="contactNumber" value="{{$student->phone}}">
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-sm-2 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="birthDay" class="form-label">Date of Birth</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-calendar4"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control static-field" id="birthDay" value="{{$student->dob}}" Disabled>
+                                                                        <input type="date" name="dob" class="form-control editable-field d-none" id="birthDay" value="{{$student->dob}}">
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="m-0">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-filter-circle"></i> <label class="form-label" for="abt" style="font-size: medium;"> &nbsp;&nbsp;&nbsp;About - {{$student->force_number}} {{$student->rank}} {{$student->first_name}}</label>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="card-body" style="background-color: rgb(209, 209, 214);">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div class="p-3 me-3 w-100">
+                                                                            <div class="row">
+                                                                                <div class="col-md-6">
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="enrolledCourse" class="form-label" style="min-width: 150px; font-weight:bold;">Enrolled Course:</label>
+                                                                                        <p class="static-field leftlabel" style="font-size: medium;">{{ $student->programme->programmeName ?? '-' }}</p>
+                                                                                        <input type="text" class="form-control editable-field d-none" value="{{ $student->programme->programmeName ?? '' }}" disabled>
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="company" class="form-label" style="min-width: 150px; font-weight:bold">Company:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->company->name ?? '-' }} - {{ $student->platoon ?? '-' }}</p>
+                                                                                        <input type="text" class="form-control editable-field d-none" value="{{ $student->company->name ?? '' }} - {{ $student->platoon ?? '' }}" id="company" disabled>
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="gender" class="form-label" style="min-width: 150px; font-weight:bold">Gender:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->gender ?? '-' }}</p>
+                                                                                        <input type="text" class="form-control editable-field d-none" value="{{ $student->gender ?? '' }}" id="gender" disabled>
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="blood_group" class="form-label" style="min-width: 150px; font-weight:bold">Blood Group:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->blood_group ?? '-' }}</p>
+                                                                                        <select name="blood_group" id="blood_group" class="form-select editable-field d-none">
+                                                                                            <option value="" disabled selected>Select Blood Group</option>
+                                                                                            @php
+                                                                                                $bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+                                                                                            @endphp
+                                                                                            @foreach ($bloodGroups as $group)
+                                                                                                <option value="{{ $group }}" {{ ($student->blood_group ?? '') === $group ? 'selected' : '' }}>
+                                                                                                    {{ $group }}
+                                                                                                </option>
+                                                                                            @endforeach
+                                                                                        </select>
+
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="education_level" class="form-label" style="min-width: 150px; font-weight:bold">Education Level:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->education_level ?? '-' }}</p>
+                                                                                        <input type="text" name="education_level" class="form-control editable-field d-none" value="{{ $student->education_level ?? '' }}" id="education_level">
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="profession" class="form-label" style="min-width: 150px; font-weight:bold">Profession:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->profession ?? '-' }}</p>
+                                                                                        <input type="text" name="profession" class="form-control editable-field d-none" value="{{ $student->profession ?? '' }}" id="profession">
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="kitengo" class="form-label" style="min-width: 150px; font-weight:bold">Kitengo:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->vitengo->name ?? '-' }}</p>
+                                                                                        <select name="vitengo_id" id="vitengo_id" class="form-select editable-field d-none">
+                                                                                            <option value="">-- Select Kitengo --</option>
+                                                                                            @foreach ($vitengo as $kitengo)
+                                                                                            <option value="{{ $kitengo->id }}" {{ $student->vitengo_id == $kitengo->id ? 'selected' : '' }}>
+                                                                                                {{ $kitengo->name }}
+                                                                                            </option>
+                                                                                            @endforeach
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="col-md-6">
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="nin" class="form-label me-2" style="min-width: 150px; font-weight:bold">NIDA:</label>
+                                                                                        <p class="static-field leftlabel">{{ $student->nin ?? '-'}}</p>
+
+                                                                                        <input type="text" name="nin" class="form-control editable-field d-none" maxlength="23" id="nin" value="{{ $student->nin ?? '' }}">
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="home_region" class="form-label me-2" style="min-width: 150px; font-weight:bold">Home Region:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->home_region ?? '-' }}</p>
+                                                                                        <input type="text" name="home_region" class="form-control editable-field d-none" value="{{ $student->home_region ?? '' }}">
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="entry_region" class="form-label me-2" style="min-width: 150px; font-weight:bold">Entry Region:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->entry_region ?? '-' }}</p>
+                                                                                        <input type="text" name="entry_region" class="form-control editable-field d-none" value="{{ $student->entry_region ?? '' }}">
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="bank_name" class="form-label me-2" style="min-width: 150px; font-weight:bold">Bank Name:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->bank_name ?? '-' }}</p>
+                                                                                        <input type="text" name="bank_name" class="form-control editable-field d-none" value="{{ $student->bank_name ?? '' }}">
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="account_number" class="form-label me-2" style="min-width: 150px; font-weight:bold">Account No:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->account_number ?? '-' }}</p>
+                                                                                        <input type="text" name="account_number" class="form-control editable-field d-none" value="{{ $student->account_number ?? '' }}">
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="height" class="form-label me-2" style="min-width: 150px; font-weight:bold">Height:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->height ? $student->height . ' ft' : '-' }}</p>
+                                                                                        <input type="text" name="height" class="form-control editable-field d-none" value="{{ $student->height ?? '' }}">
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                        <label for="weight" class="form-label me-2" style="min-width: 150px; font-weight:bold">Weight:</label>
+                                                                                        <p class="static-field leftlabel"> {{ $student->weight ? $student->weight . ' KG' : '-' }}</p>
+                                                                                        <input type="text" name="weight" class="form-control editable-field d-none" value="{{ $student->weight ?? '' }}">
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                                
+                                                                <!-- Form field start -->
+                                                                <div class="m-0">
+                                                                    
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-filter-circle"></i> <label class="form-label" for="abt" style="font-size: large;"> &nbsp;&nbsp;&nbsp;Next of Kin(s) Informations</label>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="card-body" style="background-color: rgb(209, 209, 214);">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div class="w-100">
+                                                                                <table class="table table-bordered">
+                                                                                    <thead class="table-primary">
+                                                                                        <tr>
+                                                                                            <th>#</th>
+                                                                                            <th>Name</th>
+                                                                                            <th>Relationship</th>
+                                                                                            <th>Phone</th>
+                                                                                            <th>Address</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        @php
+                                                                                        if (empty($student->next_of_kin )) {
+                                                                                            $kins = [
+                                                                                                ['name' => '-', 'relationship' => '-', 'phone' => '-', 'address' => '-']
+                                                                                            ];
+                                                                                        }else{
+                                                                                            $kins = $student->next_of_kin;
+                                                                                        }
+                                                                                        @endphp
+                                                                                        @foreach ($kins as $kin)
+                                                                                            <tr>
+                                                                                            <td>{{ $loop->iteration }}</td>
+
+                                                                                            <td>
+                                                                                                <span class="static-field">{{ $kin['name'] }}</span>
+                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][name]" class="form-control form-control-sm editable-field d-none" value="{{ $kin['name'] }}">
+                                                                                            </td>
+
+                                                                                            <td>
+                                                                                                <span class="static-field">{{ $kin['relationship'] }}</span>
+                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][relationship]" class="form-control form-control-sm editable-field d-none" value="{{ $kin['relationship'] }}">
+                                                                                            </td>
+
+                                                                                            <td>
+                                                                                                <span class="static-field">{{ $kin['phone'] }}</span>
+                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][phone]" class="form-control form-control-sm editable-field d-none" value="{{ $kin['phone'] }}">
+                                                                                            </td>
+
+                                                                                            <td>
+                                                                                                <span class="static-field">{{ $kin['address'] }}</span>
+                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][address]" class="form-control form-control-sm editable-field d-none" value="{{ $kin['address'] }}">
+                                                                                            </td>
+                                                                                            </tr>
+                                                                                        @endforeach
+
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                        </div>
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
                                                         </div>
-                                                        <!-- Form field end -->
-
                                                     </div>
-
-                                                </div>
+                                                </form>
                                                 <!-- Row ends -->
-
                                             </div>
                                         </div>
                                     </div>
+                                    @if ($student->status  == 'approved')
+                                        <div class="d-flex justify-content-end" style="margin-left:-5px">
+                                            <p class="mb-0">Verified By: <span class="text-success">{{ $student->verifier->name ?? '-' }}</span></p>
+                                        </div>
+                                    @endif
                                 </div>
                                 <!-- Row ends -->
 
@@ -429,4 +579,82 @@
         </div>
 
     </div>
+    <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-primary">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="confirmSaveLabel">Confirm Changes</h5>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to save these updates to this student's profile and next-of-kin information?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="confirmSubmitBtn">Yes, Save Changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const editBtn = document.getElementById('editAboutBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    const staticFields = document.querySelectorAll('.static-field');
+    const editableFields = document.querySelectorAll('.editable-field');
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+    const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+    const form = document.getElementById('studentUpdateForm');
+
+    let isInEditMode = false;
+
+    function toggleEditMode(enable) {
+      staticFields.forEach(el => el.classList.toggle('d-none', enable));
+      editableFields.forEach(el => el.classList.toggle('d-none', !enable));
+      cancelBtn.classList.toggle('d-none', !enable);
+      editBtn.textContent = enable ? '💾 Save' : '✏️ Edit Profile';
+      isInEditMode = enable;
+    }
+
+    editBtn.addEventListener('click', function () {
+      if (!isInEditMode) {
+        toggleEditMode(true);
+      } else {
+        // Show confirmation modal before submitting
+        confirmModal.show();
+      }
+    });
+
+    cancelBtn.addEventListener('click', function () {
+      toggleEditMode(false);
+      editableFields.forEach((input, i) => {
+        input.value = staticFields[i].textContent.trim();
+      });
+    });
+
+    confirmSubmitBtn.addEventListener('click', function () {
+      form.submit();
+    });
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const nidaInput = document.querySelector('#nin');
+
+    if (nidaInput) {
+      nidaInput.addEventListener('input', function () {
+        let raw = this.value.replace(/[^0-9]/g, '').slice(0, 20);
+        let formatted = '';
+        if (raw.length > 0) formatted += raw.substring(0, 8);
+        if (raw.length >= 9) formatted += '-' + raw.substring(8, 13);
+        if (raw.length >= 14) formatted += '-' + raw.substring(13, 18);
+        if (raw.length >= 19) formatted += '-' + raw.substring(18, 20);
+        this.value = formatted;
+      });
+    }
+  });
+</script>
 @endsection

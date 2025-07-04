@@ -121,25 +121,15 @@
                             @can('student-edit')
                             <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
                             @if($student->status != 'approved')
-                            <form id="confirmForm{{ $student->id }}" action="{{ route('students.approve', $student->id) }}" method="post">
-                                @csrf
-                                <button onclick="confirmAction('confirmForm{{ $student->id }}', 'Verify','{{$student->force_number}} {{$student->rank}} {{$student->first_name}}','Verify')" type="button" class="btn btn-sm btn-warning">
-                                    Verify
-                                </button>
-                                
-                            </form>
+                            <button type="button" class="btn btn-sm btn-warning">
+                                Not Verified
+                            </button>
                             @else
                             <button type="button" class="btn btn-sm btn-success">
                                 Verified
                             </button>
                             @endif
                             @endcan
-
-                            @can('student-delete')
-                            <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-        data-bs-target="#createNewContact{{$student->id}}">Delete</button> -->
-                            @endcan
-
                         </td>
 
                         @can('beat-edit')

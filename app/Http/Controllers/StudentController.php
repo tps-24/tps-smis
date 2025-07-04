@@ -9,13 +9,13 @@ use App\Models\Programme;
 use App\Models\SafariType;
 use App\Models\Student;
 use App\Models\User;
+use App\Models\Vitengo;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
@@ -296,7 +296,8 @@ class StudentController extends Controller
     {
         $student      = Student::find($id);
         $safari_types = SafariType::all();
-        return view('students.show', compact('student', 'safari_types'));
+        $vitengo = Vitengo::all(); // or ->pluck('name', 'id') if you prefer
+        return view('students.show', compact('student', 'safari_types', 'vitengo'));
     }
     /**
      * Show the form for editing the specified resource.
@@ -314,51 +315,65 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updatex(Request $request, $id)
+    public function update(Request $request, $id)
     {
+        $student = Student::findOrFail($id);
 
-        $student = Student::find($id);
+        // dd($request->all);
+        $validated = $request->validate([
+            'full_name' => 'nullable|string|max:150',
+            'email' => 'nullable|email|max:150|unique:students,email,' . $student->id,
+            'phone' => 'nullable|string|max:20',
+            'dob' => 'nullable|date',
+            'blood_group' => 'nullable|string|max:10',
+            'education_level' => 'nullable|string|max:100',
+            'nin' => 'nullable|string|max:26|unique:students,nin,' . $student->id,
+            'home_region' => 'nullable|string|max:100',
+            'entry_region' => 'nullable|string|max:100',
+            'height' => 'nullable|numeric|min:4.0|max:10',
+            'weight' => 'nullable|numeric|min:20|max:300',
+            'account_number' => 'nullable|string|max:30',
+            'bank_name' => 'nullable|string|max:100',
+            'profession' => 'nullable|string|max:100',
+            'vitengo_id' => 'nullable',
+            'next_of_kin' => 'nullable|array',
+            'next_of_kin.*.name' => 'nullable|string|max:100',
+            'next_of_kin.*.relationship' => 'nullable|string|max:50',
+            'next_of_kin.*.phone' => 'nullable|string|max:20',
+            'next_of_kin.*.address' => 'nullable|string|max:150',
+        ]);
 
-        $validator = Validator::make($request->all(), [
-            'rank'        => 'required',
-            //'education_level' => 'required',
-            'first_name'  => 'required|max:30|alpha',
-            'last_name'   => 'required|max:30|alpha',
-            'middle_name' => 'required|max:30|alpha',
-            'phone'       => 'nullable|numeric|unique:students,phone,' . $student->id . ',id',
-            'weight'      => 'nullable|numeric',
-            'height'      => 'nullable|numeric',
-            'home_region' => 'required|string|min:4',
-            'nin'         => 'required|numeric|unique:students,nin,' . $student->id . ',id',
-            'dob'         => 'required|string',
-            'gender'      => 'required|max:1|alpha|regex:/^[M,F]/',
-            'company'     => 'required|max:2|alpha',
-            'platoon'     => 'required|max:1',
-            'blood_group' => 'required|max:2',
-        ]);
-        if ($validator->errors()->any()) {
-            return redirect()->back()->withErrors($validator->errors()); //->with('success',$validator->errors());
-        }
-        $student->update([
-            'force_number'    => $request->force_number,
-            'education_level' => $request->education_level,
-            'rank'            => $request->rank,
-            'first_name'      => $request->first_name,
-            'middle_name'     => $request->middle_name,
-            'last_name'       => $request->last_name,
-            'nin'             => $request->nin,
-            'home_region'     => $request->home_region,
-            'phone'           => $request->phone,
-            'height'          => $request->height,
-            'weight'          => $request->weight,
-            'gender'          => $request->gender,
-            'dob'             => $request->dob,
-            'company'         => $request->company,
-            'platoon'         => $request->platoon,
-            'blood_group'     => $request->blood_group,
-        ]);
-        //dd($request->all());
-        return redirect('students')->with('success', "Student updated successfully.");
+        // dd($validated);
+        $fields = [
+            'full_name', 'email', 'phone', 'dob', 'blood_group',
+            'education_level', 'nin', 'home_region', 'entry_region',
+            'height', 'weight', 'account_number', 'bank_name',
+            'profession', 'vitengo_id', 'next_of_kin'
+        ];
+
+        $student->update($request->only($fields));
+
+
+
+        // $student->update([
+        //     'full_name' => $validated['full_name'],
+        //     'email' => $validated['email'],
+        //     'phone' => $validated['phone'],
+        //     'dob' => $validated['dob'],
+        //     'blood_group' => $validated['blood_group'],
+        //     'education_level' => $validated['education_level'],
+        //     'nin' => $validated['nin'],
+        //     'home_region' => $validated['home_region'],
+        //     'entry_region' => $validated['entry_region'],
+        //     'height' => $validated['height'],
+        //     'weight' => $validated['weight'],
+        //     'account_number' => $validated['account_number'],
+        //     'bank_name' => $validated['bank_name'],
+        //     'profession' => $validated['profession'],
+        //     'next_of_kin' => $validated['next_of_kin'],
+        // ]);
+
+        return redirect()->back()->with('success', 'Student information updated successfully!');
     }
 
     /**
