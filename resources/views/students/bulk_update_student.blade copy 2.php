@@ -53,6 +53,17 @@
     </div>
 @endif
 
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <h5>🚨 Validation Issue:</h5>
+        <ul>
+            @foreach ($errors->all() as $validationError)
+                <li>{{ $validationError }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="d-flex justify-content-between align-items-center mt-4">
     <a href="{{ route('studentDownloadSample') }}" class="btn btn-sm btn-success">
         <i class="bi bi-download"></i>&nbsp;Download Sample for Updating Students

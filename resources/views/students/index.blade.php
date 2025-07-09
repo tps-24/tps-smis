@@ -119,7 +119,7 @@
                                 Show</a>
                             @endcan
                             @can('student-edit')
-                            <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a>
+                            <!-- <a class="btn btn-primary btn-sm" href="{{ route('students.edit', $student->id) }}">Edit</a> -->
                             @if($student->status != 'approved')
                             <button type="button" class="btn btn-sm btn-warning">
                                 Not Verified

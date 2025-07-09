@@ -319,62 +319,79 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
 
-        // dd($request->all);
-        $validated = $request->validate([
-            'full_name' => 'nullable|string|max:150',
-            'email' => 'nullable|email|max:150|unique:students,email,' . $student->id,
-            'phone' => 'nullable|string|max:20',
-            'dob' => 'nullable|date',
-            'blood_group' => 'nullable|string|max:10',
-            'education_level' => 'nullable|string|max:100',
-            'nin' => 'nullable|string|max:26|unique:students,nin,' . $student->id,
-            'home_region' => 'nullable|string|max:100',
-            'entry_region' => 'nullable|string|max:100',
-            'height' => 'nullable|numeric|min:4.0|max:10',
-            'weight' => 'nullable|numeric|min:20|max:300',
-            'account_number' => 'nullable|string|max:30',
-            'bank_name' => 'nullable|string|max:100',
-            'profession' => 'nullable|string|max:100',
-            'vitengo_id' => 'nullable',
-            'next_of_kin' => 'nullable|array',
-            'next_of_kin.*.name' => 'nullable|string|max:100',
-            'next_of_kin.*.relationship' => 'nullable|string|max:50',
-            'next_of_kin.*.phone' => 'nullable|string|max:20',
-            'next_of_kin.*.address' => 'nullable|string|max:150',
-        ]);
+        try {
+            $validated = $request->validate([
+                'full_name' => [
+                                    'nullable',
+                                    'string',
+                                    'max:250',
+                                    function ($attribute, $value, $fail) {
+                                        $parts = preg_split('/\s+/', trim($value));
+                                        if (count($parts) != 3) {
+                                            $fail('The full name must include first, middle, and last name (exactly 3 names).');
+                                        }
+                                    },
+                                ],
+                'force_number'      => 'nullable|string|max:10|unique:students,force_number,' . $student->id,
+                'email'             => 'nullable|email|max:150|unique:students,email,' . $student->id,
+                'phone'             => 'nullable|string|max:20',
+                'dob'               => 'nullable|date',
+                'blood_group'       => 'nullable|string|max:3',
+                'education_level'   => 'nullable|string|max:100',
+                'nin'               => 'nullable|string|max:23|unique:students,nin,' . $student->id,
+                'home_region'       => 'nullable|string|max:100',
+                'entry_region'      => 'nullable|string|max:100',
+                'height'            => 'nullable|numeric|min:4.0|max:10',
+                'weight'            => 'nullable|numeric|min:20|max:120',
+                'account_number'    => 'nullable|string|max:30',
+                'bank_name'         => 'nullable|string|max:100',
+                'profession'        => 'nullable|string|max:100',
+                'vitengo_id'        => 'nullable',
+                'next_of_kin'       => 'nullable|array',
+                'next_of_kin.*.name'         => 'nullable|string|max:100',
+                'next_of_kin.*.relationship' => 'nullable|string|max:50',
+                'next_of_kin.*.phone'        => 'nullable|string|max:20',
+                'next_of_kin.*.address'      => 'nullable|string|max:150',
+            ]);
 
-        // dd($validated);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->with('error', 'Form submission failed. Please check highlighted fields and try again.');
+        }
+
+
+        // Assign force_number only if student doesn't already have one
+        if (empty($student->force_number) && !empty($validated['force_number'])) {
+            $student->force_number = $validated['force_number'];
+            \Log::info("Force number assigned to student ID {$student->id}: {$validated['force_number']}");
+        }
+
+        // Split full_name into parts if provided
+        if (!empty($validated['full_name'])) {
+            $parts = preg_split('/\s+/', trim($validated['full_name']));
+            $student->first_name = $parts[0] ?? null;
+            $student->middle_name = count($parts) > 2 ? $parts[1] : null;
+            $student->last_name = count($parts) > 2 ? $parts[2] : ($parts[1] ?? null);
+            \Log::info("Name split for student {$student->id}", [
+                'first'  => $student->first_name,
+                'middle' => $student->middle_name,
+                'last'   => $student->last_name
+            ]);
+        }
+
+        // Update all other fields safely
         $fields = [
-            'full_name', 'email', 'phone', 'dob', 'blood_group',
-            'education_level', 'nin', 'home_region', 'entry_region',
-            'height', 'weight', 'account_number', 'bank_name',
-            'profession', 'vitengo_id', 'next_of_kin'
+            'email', 'phone', 'dob', 'blood_group', 'education_level',
+            'nin', 'home_region', 'entry_region', 'height', 'weight',
+            'account_number', 'bank_name', 'profession', 'vitengo_id', 'next_of_kin'
         ];
 
         $student->update($request->only($fields));
 
-
-
-        // $student->update([
-        //     'full_name' => $validated['full_name'],
-        //     'email' => $validated['email'],
-        //     'phone' => $validated['phone'],
-        //     'dob' => $validated['dob'],
-        //     'blood_group' => $validated['blood_group'],
-        //     'education_level' => $validated['education_level'],
-        //     'nin' => $validated['nin'],
-        //     'home_region' => $validated['home_region'],
-        //     'entry_region' => $validated['entry_region'],
-        //     'height' => $validated['height'],
-        //     'weight' => $validated['weight'],
-        //     'account_number' => $validated['account_number'],
-        //     'bank_name' => $validated['bank_name'],
-        //     'profession' => $validated['profession'],
-        //     'next_of_kin' => $validated['next_of_kin'],
-        // ]);
-
         return redirect()->back()->with('success', 'Student information updated successfully!');
     }
+
 
     /**
      * Update the specified student in storage.

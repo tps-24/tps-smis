@@ -154,7 +154,7 @@
                                         <div class="card border mb-3">
                                             <div class="card-body">
                                                 <!-- Row starts -->
-                                                <form id="studentUpdateForm" method="POST" action="{{ route('students.update', $student->id) }}">
+                                                <form id="studentUpdateForm" method="POST" action="{{ route('students.update', $student->id) }}" onsubmit="return validateFullNameBeforeSubmit();" enctype="multipart/form-data">
                                                     @csrf
                                                     @method('PUT')
                                                     <!-- Editable fields go here -->
@@ -175,15 +175,34 @@
                                                             </div>
                                                             <div class="col-sm-3 col-12">
                                                                 <!-- Form field start -->
-                                                                <div class="mb-3">
-                                                                    <label for="fullName" class="form-label">Full Name</label>
+                                                                 <div class="mb-3">
+                                                                    <label for="fullNameEdit" class="form-label">Full Name</label>
                                                                     <div class="input-group">
                                                                         <span class="input-group-text">
                                                                             <i class="bi bi-person"></i>
                                                                         </span>
-                                                                        <input type="text" class="form-control static-field" id="fullName" value="{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}" Disabled>
-                                                                        <input type="text" name="full_name" class="form-control editable-field d-none" id="fullName" value="{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}">
+
+                                                                        {{-- Static field --}}
+                                                                        <input type="text"
+                                                                            class="form-control static-field"
+                                                                            id="fullNameStatic"
+                                                                            value="{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}"
+                                                                            disabled>
+
+                                                                        {{-- Editable field --}}
+                                                                        <input type="text"
+                                                                            name="full_name"
+                                                                            class="form-control editable-field d-none"
+                                                                            id="fullNameEdit"
+                                                                            value="{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}"
+                                                                            placeholder="Enter first, middle, and last name">
+
                                                                     </div>
+                                                                    @if ($errors->has('full_name'))
+                                                                        <div class="text-danger small">
+                                                                            ⚠️ {{ $errors->first('full_name') }}
+                                                                        </div>
+                                                                    @endif
                                                                 </div>
                                                                 <!-- Form field end -->
                                                             </div>
@@ -199,6 +218,11 @@
                                                                         <input type="email" name="email" class="form-control editable-field d-none" id="yourEmail" value="{{$student->email ?? ''}}">
                                                                     </div>
                                                                 </div>
+                                                                @if ($errors->has('email'))
+                                                                    <div class="text-danger small">
+                                                                        ⚠️ {{ $errors->first('email') }}
+                                                                    </div>
+                                                                @endif
                                                                 <!-- Form field end -->
                                                             </div>
                                                             <div class="col-sm-2 col-12">
@@ -212,6 +236,11 @@
                                                                         <input type="text" class="form-control static-field" id="contactNumber" value="{{$student->phone}}" Disabled>
                                                                         <input type="text" name="phone" class="form-control editable-field d-none" id="contactNumber" value="{{$student->phone}}">
                                                                     </div>
+                                                                    @if ($errors->has('phone'))
+                                                                        <div class="text-danger small">
+                                                                            ⚠️ {{ $errors->first('phone') }}
+                                                                        </div>
+                                                                    @endif
                                                                 </div>
                                                                 <!-- Form field end -->
                                                             </div>
@@ -303,6 +332,11 @@
                                                                                         <p class="static-field leftlabel">{{ $student->nin ?? '-'}}</p>
 
                                                                                         <input type="text" name="nin" class="form-control editable-field d-none" maxlength="23" id="nin" value="{{ $student->nin ?? '' }}">
+                                                                                        @if ($errors->has('nin'))
+                                                                                            <div class="text-danger small">
+                                                                                                ⚠️ {{ $errors->first('nin') }}
+                                                                                            </div>
+                                                                                        @endif
                                                                                     </div>
                                                                                     <div class="d-flex align-items-center mb-2">
                                                                                         <label for="home_region" class="form-label me-2" style="min-width: 150px; font-weight:bold">Home Region:</label>
@@ -328,11 +362,21 @@
                                                                                         <label for="height" class="form-label me-2" style="min-width: 150px; font-weight:bold">Height:</label>
                                                                                         <p class="static-field leftlabel"> {{ $student->height ? $student->height . ' ft' : '-' }}</p>
                                                                                         <input type="text" name="height" class="form-control editable-field d-none" value="{{ $student->height ?? '' }}">
+                                                                                        @if ($errors->has('height'))
+                                                                                            <div class="text-danger small">
+                                                                                                ⚠️ {{ $errors->first('height') }}
+                                                                                            </div>
+                                                                                        @endif
                                                                                     </div>
                                                                                     <div class="d-flex align-items-center mb-2">
                                                                                         <label for="weight" class="form-label me-2" style="min-width: 150px; font-weight:bold">Weight:</label>
                                                                                         <p class="static-field leftlabel"> {{ $student->weight ? $student->weight . ' KG' : '-' }}</p>
                                                                                         <input type="text" name="weight" class="form-control editable-field d-none" value="{{ $student->weight ?? '' }}">
+                                                                                        @if ($errors->has('weight'))
+                                                                                            <div class="text-danger small">
+                                                                                                ⚠️ {{ $errors->first('weight') }}
+                                                                                            </div>
+                                                                                        @endif
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -656,5 +700,23 @@
       });
     }
   });
+</script>
+<script>
+    function validateFullNameBeforeSubmit() {
+        const input = document.getElementById('fullNameEdit');
+        const feedback = document.getElementById('nameFeedback');
+        const parts = input.value.trim().split(/\s+/);
+
+        if (parts.length !== 3) {
+            input.classList.add('is-invalid');
+            feedback.classList.remove('d-none');
+            feedback.innerText = "⚠️ Please enter exactly three names: First, Middle, and Last Name.";
+            return false; // Prevent form submission
+        } else {
+            input.classList.remove('is-invalid');
+            feedback.classList.add('d-none');
+            return true; // Proceed with form submission
+        }
+    }
 </script>
 @endsection
