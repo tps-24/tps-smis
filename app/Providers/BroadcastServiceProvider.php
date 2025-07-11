@@ -12,7 +12,10 @@ class BroadcastServiceProvider extends ServiceProvider
      */
 public function boot()
 {
-Broadcast::routes(['middleware' => ['web', 'auth']]);
+    Broadcast::routes([
+        'prefix' => 'tps-smis', // optional, only if your app uses this prefix
+        'middleware' => ['auth'], // make sure you're using appropriate middleware
+    ]);
 
     require base_path('routes/channels.php');
 }

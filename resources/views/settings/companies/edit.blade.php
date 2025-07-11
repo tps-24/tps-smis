@@ -7,8 +7,8 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Campuses</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">Edit Campus</a></li>
+        <li class="breadcrumb-item"><a href="#">Company</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Edit Company</a></li>
       </ol>
     </nav>
   </div>
@@ -26,7 +26,7 @@
                         <div class="pull-left">
                         </div>
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('campuses.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('companies.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -41,21 +41,31 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('campuses.update', $campus->id) }}">
+                <form method="POST" action="{{ route('companies.update', $company->id) }}">
                     @csrf
                     @method('PUT')
 
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
+                                <strong>Company Name:</strong>
+                                <input type="text" name="name" placeholder="Enter company name" class="form-control" value="{{ $company->name }}">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
                                 <strong>Campus Name:</strong>
-                                <input type="text" name="campusName" placeholder="Enter campus name" class="form-control" value="{{ $campus->campusName }}">
+                                <select class="form-control" name="campus_id" id="" required>
+                                    @foreach ($campuses as $campus)
+                                        <option @if ($company->campus->id == $campus->id) selected @endif value="{{ $campus->id }}">{{ $campus->campusName }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
                                 <strong>Descriptions:</strong>
-                                <input type="textarea" name="description" placeholder="Enter Descriptions for this campus" class="form-control" value="{{ $campus->description }}">
+                                <input type="textarea" name="description" placeholder="Enter Descriptions for this company" class="form-control" value="{{ $company->description }}">
                             </div>
                         </div>
                         <input type="number" name="updated_by" value="{{ Auth::user()->id }}" class="form-control" hidden>

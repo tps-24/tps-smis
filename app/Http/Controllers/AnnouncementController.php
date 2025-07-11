@@ -39,7 +39,7 @@ class AnnouncementController extends Controller
             $announcements[1],           // Full announcements object
             "body"  // Body of the notification
         ));
-        // broadcast(new NotificationEvent2($announcements[0]->id,$audience,$announcements[0]->type, 1, $announcements[0]->title, $announcements, $announcements));
+         //broadcast(new NotificationEvent2($announcements[0]->id,$audience,$announcements[0]->type, 1, $announcements[0]->title, $announcements, $announcements));
         return view('announcements.index', compact('announcements'));
     }
 

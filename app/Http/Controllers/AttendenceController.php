@@ -442,7 +442,7 @@ class AttendenceController extends Controller
     public function getPlatoons($company_id)
     {
         $company = Company::find($company_id);
-        return response()->json($company->platoons()->withCount('students')->get());
+        return response()->json($company->platoons()->orderBy('name','asc')->withCount('students')->get());
     }
 
     /**

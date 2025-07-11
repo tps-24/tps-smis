@@ -7,6 +7,7 @@ use App\Models\SharedNotification;
 use App\Jobs\AttachUsersToNotification;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel; 
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -56,7 +57,7 @@ class NotificationEvent2 implements ShouldBroadcast
      */
     public function broadcastOn(): Channel
     {
-        return new Channel('notifications.' . $this->audience->id);
+        return new PrivateChannel('notifications.all');
     }
 
 
