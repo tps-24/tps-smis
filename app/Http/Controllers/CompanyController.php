@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Platoon;
+use App\Models\Campus;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -32,7 +33,8 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        return view('settings.campuses.create');
+        $campuses = Campus::get();
+        return view('settings.companies.create', compact('campuses'));
     }
 
     /**
@@ -42,15 +44,16 @@ class CompanyController extends Controller
     {
         // dd($request);
         $this->validate($request, [
-            'campusName' => 'required|unique:campuses,campusName',
+            'name' => 'required|unique:companies,name',
+            'campus_id' => 'required',
             'description' => 'required',
         ]);
 
         // If validation passes, you can proceed with storing the data
         Company::create($request->all());
     
-        return redirect()->route('campuses.index')
-                        ->with('success','Campus added successfully');
+        return redirect()->route('companies.index')
+                        ->with('success','Company added successfully');
     }
 
     /**
@@ -58,15 +61,16 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        return view('settings.campuses.show',compact('company'));
+        return view('settings.companies.show',compact('company'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Company $campus)
+    public function edit(Company $company)
     {
-        return view('settings.campuses.edit',compact('campus'));
+        $campuses = Campus::get();
+        return view('settings.companies.edit',compact('company','campuses'));
     }
 
     /**
@@ -75,14 +79,15 @@ class CompanyController extends Controller
     public function update(Request $request, Company $company)
     {
         request()->validate([
-            'campusName' => 'required|unique:campuses,campusName,'.$company->id,
+            'name' => 'required|unique:companies,name,'.$company->id,
+            'campus_id' => 'required',
             'description' => 'required',
         ]);
    
        $company->update($request->all());
    
-       return redirect()->route('campuses.index')
-                       ->with('success','Campus updated successfully');
+       return redirect()->route('companies.index')
+                       ->with('success','Company updated successfully');
     }
 
     /**
@@ -92,7 +97,7 @@ class CompanyController extends Controller
     {
         $company->delete();
     
-        return redirect()->route('campuses.index')
+        return redirect()->route('companies.index')
                         ->with('success','Campus deleted successfully');
     }
 
@@ -119,6 +124,16 @@ class CompanyController extends Controller
             'name' => $request->name            
         ]);
 
-        return redirect()->back()->with('success','Platoon created successfully');
+                return redirect()->route('companies.index')
+                        ->with('success','Platoon created successfully');
+    }
+
+        public function destroy_platoon(Request $request, $platoonId)
+    {
+        $platoon = Platoon::find($platoonId);
+        $platoon->delete();
+    
+        return redirect()->route('companies.index')
+                        ->with('success','Platoon deleted successfully');
     }
 }

@@ -117,10 +117,12 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
 
 });
 
+Route::post('/tps-smis/broadcasting/auth', function (Request $request) {
+    return Broadcast::auth($request);
+})->middleware(['web', 'auth']);
+
 Route::group(['middleware' => ['auth']], function () {
-    Route::post('/tps-smis/broadcasting/auth', function () {
-    return Broadcast::auth(request()); // ✅ Use the global request() helper
-});
+
     Route::get('/student/generate-certificate', [StudentController::class, 'generateCertificate']);
 
     Route::get('/student/intake_summary', [IntakeHistoryController::class, 'index']);
@@ -325,8 +327,8 @@ Route::group(['middleware' => ['auth']], function () {
     // Define the custom route first
 
     Route::prefix('companies')->controller(CompanyController::class)->group(function () {
-        Route::post('/{companyId}/platoons', 'create_platoon')->name('companies.platoon.store');
-        Route::post('/{platoonId}/platoons/delete', 'create_platoon')->name('companies.platoon.destroy');
+        Route::post('/{companyId}/store/platoon', 'create_platoon')->name('companies.platoon.store');
+        Route::get('/{platoonId}/platoon/delete', 'destroy_platoon')->name('companies.platoon.destroy');
     });
 
     //Notification routes

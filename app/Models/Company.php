@@ -10,7 +10,7 @@ class Company extends Model
     
     // use HasFactory;
     protected $fillable = [
-        'name'
+        'name','campus_id','description'
     ];
 
 

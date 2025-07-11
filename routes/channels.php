@@ -14,8 +14,11 @@ use Illuminate\Support\Facades\Log;
 */
 
 
+//Broadcast::routes(['prefix' => 'tps-smis', 'middleware' => ['web', 'auth']]);
+Broadcast::routes();
 Broadcast::channel('notifications.all', function ($user) {
-    return !is_null($user); // authorize any authenticated user
+    return true;
+    //return !is_null($user); // authorize any authenticated user
 });
 
 

@@ -6,8 +6,8 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Campuses</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">View Campus</a></li>
+        <li class="breadcrumb-item"><a href="#">Companies</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">View Company</a></li>
       </ol>
     </nav>
   </div>
@@ -23,7 +23,7 @@
                 <div class="row">
                     <div class="col-lg-12 margin-tb">
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" style="margin-left:10px" href="{{ route('campuses.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" style="margin-left:10px" href="{{ route('companies.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -31,14 +31,14 @@
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Campus Name:</strong>
-                            {{ $campus->campusName }}
+                            <strong>Company Name:</strong>
+                            {{ $company->name }}
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
-                            <strong>Campus Description:</strong>
-                            {{ $campus->description }}
+                            <strong>Company Description:</strong>
+                            {{ $company->description }}
                         </div>
                     </div>
                 </div>

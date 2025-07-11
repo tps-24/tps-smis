@@ -29,17 +29,17 @@ class AnnouncementController extends Controller
     {
         //$announcements = Announcement::where('expires_at', '>', Carbon::now())->orderBy('created_at', 'desc')->get();
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
-        $audience = NotificationAudience::find(1);
-        broadcast(new NotificationEvent2(
-            $announcements[1]->id,   // ID from announcement
-            $audience,                // Audience object or instance
-            1,  // Notification type
-            1,                        // Category (ensure 1 is a valid category ID)
-            $announcements[1]->title, // Title of the notification
-            $announcements[1],           // Full announcements object
-            "body"  // Body of the notification
-        ));
-        // broadcast(new NotificationEvent2($announcements[0]->id,$audience,$announcements[0]->type, 1, $announcements[0]->title, $announcements, $announcements));
+        // $audience = NotificationAudience::find(1);
+        // broadcast(new NotificationEvent2(
+        //     $announcements[1]->id,   // ID from announcement
+        //     $audience,                // Audience object or instance
+        //     1,  // Notification type
+        //     1,                        // Category (ensure 1 is a valid category ID)
+        //     $announcements[1]->title, // Title of the notification
+        //     $announcements[1],           // Full announcements object
+        //     "body"  // Body of the notification
+        // ));
+         //broadcast(new NotificationEvent2($announcements[0]->id,$audience,$announcements[0]->type, 1, $announcements[0]->title, $announcements, $announcements));
         return view('announcements.index', compact('announcements'));
     }
 
@@ -88,7 +88,16 @@ class AnnouncementController extends Controller
             //$announcement->company_id = Auth::user()->staff->company_id?? $request->audience;
         }
         $announcement->save();
-        broadcast(new NotificationEvent($announcement->title, $announcement->type, 'announcement', $announcement, $announcement->id, $announcement->audience));
+        $audience = NotificationAudience::find(1);
+            broadcast(new NotificationEvent2(
+            $announcement->id,   // ID from announcement
+            $audience,                // Audience object or instance
+            1,  // Notification type
+            1,                        // Category (ensure 1 is a valid category ID)
+            $announcement->title, // Title of the notification
+            $announcement,           // Full announcements object
+            "body"  // Body of the notification
+        ));
         return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
     }
 

@@ -144,8 +144,8 @@ class GraphDataService
                         }
 
                         if ($attendanceData['lockUps'][$index] == 0) {
-                            // $attendanceData['lockUps'][$index] = (int) MPS::whereDate('arrested_at', $attendanceDate)->count();
-                            $attendanceData['lockUps'][$index] = (int) MPS::where('released_at', null)->count();
+                             $attendanceData['lockUps'][$index] = (int) MPS::whereDate('arrested_at', $attendanceDate)->count();
+                            //$attendanceData['lockUps'][$index] = (int) MPS::where('released_at', null)->count();
                         }
                     }
 
@@ -173,8 +173,8 @@ class GraphDataService
                                 ->count();
                         }
                         if ($weeklyData['lockUps'][$weekIndex] == 0) {
-                            // $weeklyData['lockUps'][$weekIndex] = (int) MPS::whereBetween('arrested_at', [$startOfWeek, $endOfWeek])->count();
-                            $weeklyData['lockUps'][$weekIndex] = (int) MPS::where('released_at', null)->count();
+                             $weeklyData['lockUps'][$weekIndex] = (int) MPS::whereBetween('arrested_at', [$startOfWeek, $endOfWeek])->count();
+                            //$weeklyData['lockUps'][$weekIndex] = (int) MPS::where('released_at', null)->count();
                         }
                     }
 

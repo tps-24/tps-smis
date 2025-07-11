@@ -7,7 +7,7 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
         <li class="breadcrumb-item"><a href="#">Campuses</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">Register Campus</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Register Company</a></li>
       </ol>
     </nav>
   </div>
@@ -24,7 +24,7 @@
                         <div class="pull-left">
                         </div>
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('campuses.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('companies.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>
@@ -38,19 +38,30 @@
                     </ul>
                     </div>
                 @endif
-            <form method="POST" action="{{ route('campuses.store') }}">
+            <form method="POST" action="{{ route('companies.store') }}">
                 @csrf
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
+                            <strong>Company Name:</strong>
+                            <input type="text" name="name" placeholder="Enter company name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="form-group">
                             <strong>Campus Name:</strong>
-                            <input type="text" name="campusName" placeholder="Enter campus name" class="form-control">
+                            <select class="form-control" name="campus_id" id="" required>
+                                <option value="" selected disabled>campus</option>
+                                @foreach ($campuses as $campus)
+                                    <option value="{{ $campus->id }}">{{ $campus->campusName }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
                             <strong>Descriptions:</strong>
-                            <input type="textarea" name="description" placeholder="Enter Descriptions for this campus" class="form-control">
+                            <input type="textarea" name="description" placeholder="Enter Descriptions for this company" class="form-control">
                         </div>
                     </div>
                     <input type="number" name="created_by" value="{{ Auth::user()->id }}" class="form-control" hidden>

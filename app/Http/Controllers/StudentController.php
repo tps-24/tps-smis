@@ -235,15 +235,6 @@ class StudentController extends Controller
 
     }
 
-    public function approve($studentId)
-    {
-        return "mmmmmmh";
-        $student = Student::findOrFail($studentId);
-        if (! $student) {
-            return redirect()->back()->with('info', 'Student is not found.');
-        }
-        return;
-    }
     public function myCourses()
     {
         $user      = auth()->user()->id;
@@ -285,7 +276,11 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
         $student->approve();
-        return redirect()->route('students.index')->with('success', 'Student approved successfully.');
+            return redirect()->route('students.search', [
+                'company_id' => $student->company_id,
+                'platoon'    => $student->platoon,
+            ])->with('success', 'Student approved successfully.');
+        //return redirect()->route('students.index')->with('success', 'Student approved successfully.');
     }
 
     /**

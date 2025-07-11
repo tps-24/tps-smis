@@ -47,4 +47,5 @@
       }
     </style>
     @yield('style')
+    
   </head>

@@ -48,10 +48,10 @@
                     <a class="btn btn-primary btn-sm" href="{{ route('companies.edit',$company->id) }}">
                       <i class="fa-solid fa-pen-to-square"></i> Edit
                     </a>
-                    <form method="POST" action="{{ route('companies.destroy', $company->id) }}" style="display:inline">
+                    <form id="deleteForm{{ $company->id }}" method="POST" action="{{ route('companies.destroy', $company->id) }}" style="display:inline">
                       @csrf
                       @method('DELETE')
-                      <button type="submit" class="btn btn-danger btn-sm">
+                      <button type="button" onclick="confirmDelete('deleteForm{{ $company->id }}','Company')" class="btn btn-danger btn-sm">
                         <i class="fa-solid fa-trash"></i> Delete
                       </button>
                     </form>
@@ -92,7 +92,8 @@
   <!-- Modal -->
   <div class="modal fade" id="platoonModal" tabindex="-1" aria-labelledby="platoonModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form method="POST" id="platoonForm" action="{{ route('companies.platoon.store',6) }}">
+      
+      <form id="platoonForm" method="POST">
         @csrf
         <div class="modal-content">
           <div class="modal-header">
@@ -107,7 +108,7 @@
             <input type="hidden" name="company_id" id="modal-company-id">
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save Platoon</button>
+            <button type="button" class="btn btn-primary" id="savePlatoon">Save Platoon</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
           </div>
         </div>
@@ -146,12 +147,22 @@
           tableBody.innerHTML = '';
 
           if (platoons.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="3">No platoons found.</td></tr>';
+            tableBody.innerHTML = `<tr><td colspan="3">No platoons found.</td></tr>`;
           } else {
             platoons.forEach((platoon) => {
+              const formAction ="/tps-smis/companies/"+platoon.id+"/platoon/delete";
+              const platoonId = platoon.id;
+              //alert(formAction)
               const row = document.createElement('tr');
               row.innerHTML = `
                 <td>${platoon.name}</td>
+                <td>
+                  <form id="deletePlatoon${platoonId}" method="get" action="${formAction}">
+                    @csrf
+                    <input type="hidden" name="_method" value="GET">
+                    <button type="button" onclick="confirmDelete('deletePlatoon${platoonId}','Platoon')" class="btn btn-danger delete-button">Delete</button>
+                  </form>
+                </td>
               `;
               tableBody.appendChild(row);
             });
@@ -159,9 +170,27 @@
         })
         .catch(error => {
           console.error('Error:', error);
-          tableBody.innerHTML = '<tr><td colspan="3" class="text-danger">Error loading platoons.</td></tr>';
+          tableBody.innerHTML = `<tr>
+            <td colspan="3" class="text-danger">Error loading platoons.</td>
+          </tr>`;
         });
     });
+  });
+
+    document.getElementById('savePlatoon').addEventListener('click', () => {
+    const form = document.getElementById('platoonForm');
+    const companyId = document.getElementById('modal-company-id').value;
+    // Dynamically set the form's action
+    form.action = `/tps-smis/companies/${companyId}/store/platoon`; // adjust URL pattern as needed
+
+    // Optionally, validate form with custom logic
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    // Submit form via JS
+    form.submit();
   });
 </script>
 @endsection
