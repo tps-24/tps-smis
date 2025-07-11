@@ -12,13 +12,13 @@ class Student extends Model
 
     protected $fillable = [
         'force_number', 'rank', 'first_name', 'middle_name', 'last_name',
-        'user_id', 'vitengo_id', 'gender', 'blood_group', 'phone', 'nin',
-        'dob', 'education_level', 'home_region', 'company_id', 'programme_id', 'session_programme_id',
+        'user_id', 'vitengo_id', 'gender', 'blood_group', 'email', 'phone', 'nin',
+        'dob', 'education_level', 'profession', 'home_region', 'entry_region', 'company_id', 'programme_id', 'session_programme_id',
         'height', 'weight', 'platoon', 'next_kin_names', 'next_kin_phone',
         'next_kin_relationship', 'next_kin_address', 'next_of_kin', 'profile_complete', 'photo',
         'status', 'approved_at', 'rejected_at', 'reject_reason', 'approved_by',
         'rejected_by', 'transcript_printed', 'certificate_printed', 'printed_by',
-        'reprint_reason', 'beat_exclusion_vitengo_id', 'beat_emergency',
+        'reprint_reason', 'beat_exclusion_vitengo_id', 'beat_emergency', 'bank_name', 'account_number', 'study_level_id',
     ];
 
     public function user()
@@ -101,6 +101,12 @@ class Student extends Model
         $this->approved_by = Auth::user()->id;
         $this->save();
     }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'approved_by')->withDefault();
+    }
+
 
     public function beats()
     {
