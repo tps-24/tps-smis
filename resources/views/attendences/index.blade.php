@@ -62,10 +62,19 @@
                         ?>
                         @foreach ($companies as $company)
                             <li class="nav-item" role="presentation">
-                                <a id="tab-one{{$company->name}}" data-bs-toggle="tab" href="#one{{$company->name}}"
-                                    role="tab" aria-controls="one{{$company->name}}" aria-selected="true" @if ($i == 0)
-                                    class="nav-link active" @else class="nav-link" @endif> {{$company->name}} Coy</a>
+                                <a 
+                                    id="tab-one{{ $company->name }}" 
+                                    data-bs-toggle="tab" 
+                                    href="#one{{ $company->name }}"
+                                    role="tab" 
+                                    aria-controls="one{{ $company->name }}" 
+                                    aria-selected="{{ $selectedCompany && $selectedCompany->id == $company->id ? 'true' : 'false' }}"
+                                    class="nav-link {{ $selectedCompany && $selectedCompany->id == $company->id ? 'active' : '' }}"
+                                >
+                                    {{ $company->name }} Coy
+                                </a>
                             </li>
+
                             <?php    $i = +1; ?>
                         @endforeach
                     </ul>
@@ -73,9 +82,17 @@
 
                     <!-- Tab content start -->
                     <div class="tab-content h-300">
+                        @php
+                            $foundActiveTab = false;
+                        @endphp
                         @for ($j = 0; $j < count($statistics); ++$j)
-                        <div id="one{{$statistics[$j]['company']->name}}" @if ($j == 0) class="tab-pane fade show active"
-                            @else class="tab-pane fade" @endif role="tabpanel">
+                                @php
+                                   $isActive = !$foundActiveTab && $selectedCompany->id == $statistics[$j]['company']->id;
+                                @endphp
+                            <div id="one{{$statistics[$j]['company']->name}}" 
+                                class="tab-pane fade {{ $isActive ? 'show active' : '' }}" 
+                                role="tabpanel">
+                           
                             @if(Carbon\Carbon::parse("$date") == \Carbon\Carbon::today())
                                 <div class="justify-content-end">
                                         <form action="{{ route('attendences.create',['attendenceType' => $attendenceType->id]) }}" method="POST">
@@ -130,8 +147,7 @@
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-between mt-1">
                                                                     <a class="text-primary ms-4"
-                                                                    href="{{ route('today',['company_id'=> $companies[$j]->id, 'type' => $attendenceType->id, 'date' => $date, 'attendenceTypeId' => $attendenceType->id]) }}"
->                                                                        <span>View</span>
+                                                                    href="{{ route('today',['company_id'=> $companies[$j]->id, 'type' => $attendenceType->id, 'date' => $date, 'attendenceTypeId' => $attendenceType->id]) }}">                                                                        <span>View</span>
                                                                     </a>
                                                                 </div>
                                                             </div>
@@ -239,6 +255,11 @@
                             <!-- Row ends -->
 
                         </div>
+                        @php
+                            if ($isActive) {
+                                $foundActiveTab = true;
+                            }
+                        @endphp
                         @endfor
                     </div>
                     <!-- Tab content end -->

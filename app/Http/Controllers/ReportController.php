@@ -307,7 +307,6 @@ $sick_student_ids = [];
             ];
 
         }
-        return $sessionProgrammeAttendance;
         foreach($sessionProgrammeAttendance[0]['attendances'] as $attendance){
           $sick_student_ids =  array_merge(
                     $sick_student_ids,

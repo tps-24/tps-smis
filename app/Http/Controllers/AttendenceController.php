@@ -38,9 +38,13 @@ class AttendenceController extends Controller
     }
     /**
      */
-    public function index()
+    public function index(Request $request)
     {
-        return redirect()->to('attendences/type/1');
+     $companyId = $request->company_id ?? null;
+    return redirect()->route('attendences.type', [
+        'type' => 1,
+        'company' => $companyId, // this becomes a query parameter
+    ]);
     }
 
     /**
@@ -168,14 +172,6 @@ class AttendenceController extends Controller
                     // dd($absent_students_ids == NULL);
                     $att->absent_students = $absent_students_ids != null ? Student::whereIn('id', $absent_students_ids)->get() : [];
                     $safari_students_ids  = explode(',', $att->safari_student_ids);
-                    // if (count($absent_students_ids) > 0) {
-                    //     for ($i = 0; $i < count($absent_students_ids); ++$i) {
-                    //         $student = Student::find($absent_students_ids[$i]);
-                    //         $absent_students->push($student);
-                    //     }
-                    //     $att->absent_students = $absent_students;
-                    //     //$attendences->push($att);
-                    // }
 
                     //return $att->absent_students;
                     //Safari students
@@ -190,7 +186,6 @@ class AttendenceController extends Controller
 
                 }
 
-                //return view('attendences.attended', compact('attendences', 'page','absent_students','company'));
             }
 
         }
@@ -282,6 +277,7 @@ class AttendenceController extends Controller
 
     public function attendence(Request $request, $type)
     {
+        $companyId = $request->input('companyId')?? null;
         // Check if a session ID has been submitted
         if (request()->has('session_id')) {
             // Store the selected session ID in the session
@@ -317,46 +313,13 @@ class AttendenceController extends Controller
                 $selectedSessionId = 1;
             }
 
-            //return $selectedSessionId;
             $this->companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
                 $query->where('session_programme_id', $selectedSessionId);
             })->get();
 
         }
-
-        // foreach ($roles as $role) {
-        //     if (
-        //         $role->name == 'Admin' ||
-        //         $role->name == 'Academic Coordinator' ||
-        //         $role->name == 'Super Administrator' ||
-        //         $role->name == 'Chief Instructor' ||
-        //         $role->name == 'Staff Officer'
-        //     ) {
-        //         $this->companies = Company::all();
-        //     } else if ($user->hasRole('Teacher') || $user->hasRole('Sir Major')) {
-        //         //return Auth::user()->staff;
-        //         $this->companies = [Auth::user()->staff->company];
-        //         if (count($this->companies) != 0)
-        //             if ($this->companies[0] == null) {
-        //                 return view('attendences/index', compact('attendenceType', 'date'));
-        //             }
-        //     } else {
-        //         abort(403);
-        //     }
-        // }
-
         $statistics = [];
-        // $this->companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
-        //     $query->where('session_programme_id', $selectedSessionId);
-        // })->get();
-        // $this->companies->whereHas('students', function ($query) use ($selectedSessionId) {
-        //     $query->where('session_programme_id', $selectedSessionId);
-        // })->get();
-        // return $this->companies->whereHas('students', function ($query) use ($selectedSessionId) use ($selectedSessionId){
-        //     $query->where('session_programme_id', $selectedSessionId);
-        // })->get();
 
-        //return $this->companies;
         foreach ($this->companies as $company) {
             $company_stats     = [];
             $company->platoons = $company->platoons()
@@ -376,7 +339,14 @@ class AttendenceController extends Controller
             ]);
         }
         $companies = $this->companies;
-        return view('attendences/index', compact('statistics', 'companies', 'attendenceType', 'date'));
+
+        $companyId = $request->companyId;
+
+        // Use fallback if null, string "null", or invalid
+        $selectedCompany = (is_numeric($companyId) && Company::find($companyId))
+            ? Company::findOrFail($companyId)
+            : $this->companies->get(0)->first();
+        return view('attendences/index', compact('statistics', 'companies', 'attendenceType', 'date','selectedCompany'));
 
     }
 
@@ -538,7 +508,11 @@ class AttendenceController extends Controller
 
         $attendence->session_programme_id = $selectedSessionId;
         $attendence->save();
-        return redirect()->to('attendences/type/' . $type->id)->with('success', 'Attendances saved successfully.');
+        $companyId = $platoon->company_id;
+        
+        return redirect()
+        ->to('attendences/type/' . $type->id . '?companyId=' . $companyId)
+        ->with('success', 'Attendances saved successfully.');
 
     }
 
