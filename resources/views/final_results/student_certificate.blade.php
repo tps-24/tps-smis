@@ -107,7 +107,7 @@
                                         <table class="table table-striped truncate m-0">
                                             <thead>
                                                 <tr>
-                                                    <th><input class="form-check-input" type="checkbox" id="selectAll"></th>
+                                                    <th><input class="form-check-input select-all" type="checkbox" id="selectAll{{ $company->id }}"></th>
                                                     <th>No</th>
                                                     <th>Force Number</th>
                                                     <th>Name</th>
@@ -169,14 +169,40 @@
 
     @section('scripts')
 
-        <script>
-            document.getElementById('selectAll').addEventListener('click', function () {
-                const checkboxes = document.querySelectorAll('.student-checkbox');
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle "Select All" toggle
+        document.querySelectorAll('.select-all').forEach(selectAll => {
+            selectAll.addEventListener('click', function () {
+                const currentTabPane = this.closest('.tab-pane');
+                const checkboxes = currentTabPane.querySelectorAll('.student-checkbox');
                 checkboxes.forEach(checkbox => {
                     checkbox.checked = this.checked;
                 });
             });
-        </script>
+        });
+
+        // Handle individual checkbox changes
+        document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function () {
+                const currentTabPane = this.closest('.tab-pane');
+                const checkboxes = currentTabPane.querySelectorAll('.student-checkbox');
+                const selectAll = currentTabPane.querySelector('.select-all');
+
+                if (!this.checked) {
+                    // If one is unchecked, uncheck the "Select All"
+                    if (selectAll) selectAll.checked = false;
+                } else {
+                    // If all are checked, check the "Select All"
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    if (selectAll) selectAll.checked = allChecked;
+                }
+            });
+        });
+    });
+</script>
+
+
 
 
 

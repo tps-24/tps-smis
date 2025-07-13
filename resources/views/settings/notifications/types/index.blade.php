@@ -26,7 +26,7 @@
         
       </div>
       <div class="pull-right" >
-          <a class="btn btn-success mb-2" href="{{ route('notifications.types.create') }}" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Campus</a>
+          <a class="btn btn-success mb-2" href="{{ route('notifications.types.create') }}" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Type</a>
       </div>
       <div class="card-body">
         <div class="table-outer">

@@ -300,7 +300,7 @@ class AttendenceController extends Controller
         $roles          = Auth::user()->roles;
 
         if ($user->hasRole(['Teacher', 'Instructor', 'OC Coy']) || $user->hasRole('Sir Major')) {
-            $this->companies = [$user->staff->company];
+            $this->companies = collect([$user->staff->company]);
             if (count($this->companies) != 0) {
                 if ($this->companies[0] == null) {
                     return view('attendences/index', compact('attendenceType', 'date'));

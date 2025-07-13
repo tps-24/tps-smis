@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
-use App\Events\NotificationEvent2;
 use App\Models\NotificationAudience;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
@@ -89,7 +88,7 @@ class AnnouncementController extends Controller
         }
         $announcement->save();
         $audience = NotificationAudience::find(1);
-            broadcast(new NotificationEvent2(
+            broadcast(new NotificationEvent(
             $announcement->id,   // ID from announcement
             $audience,                // Audience object or instance
             1,  // Notification type
