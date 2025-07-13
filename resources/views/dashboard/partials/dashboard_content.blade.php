@@ -39,7 +39,7 @@
                 </div>
                 <div class="d-flex align-items-center justify-content-between mt-1">
                     @can('attendance-list')
-                    <a class="text-primary" href="{{route('attendences.index')}}">
+                    <a class="text-primary" href="/tps-smis/attendences/type/1">
                         <span>View All</span>
                         <i class="bi bi-arrow-right ms-2"></i>
                     </a>                        

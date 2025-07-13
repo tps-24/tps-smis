@@ -34,237 +34,156 @@ class ReportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $user  = Auth::user();
-        $companies = collect();
-        $selectedSessionId = $this->selectedSessionId;
-        if($user->hasRole(['Sir Major','Instructor','OC Coy'])){
-            $companies         = Company::where('id',$user->staff->company_id)->whereHas('students', function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId);
-         });
-        }else{
-            $companies         = Company::whereHas('students', function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId);
-        });
-        }
-        $companies = $companies->get();
+    public function index(Request $request)
+{
+    $user = Auth::user();
+    $selectedSessionId = session('selected_session') ?: 1;
 
-        $data = $this->getAttendanceData($companies->pluck('id'));
+    // Determine which companies to show
+    $companies = $user->hasRole(['Sir Major', 'Instructor', 'OC Coy']) ?
+        Company::where('id', $user->staff->company_id)
+            ->whereHas('students', fn ($query) => $query->where('session_programme_id', $selectedSessionId))
+        : Company::whereHas('students', fn ($query) => $query->where('session_programme_id', $selectedSessionId));
 
-        $dailyCounts = [
-            'labels' => $data['dailyCounts']->pluck('date')->toArray(),
-            'absent' => $data['dailyCounts']->pluck('total_absent')->map(fn($val) => (int) $val)->toArray(),
-            'kazini' => $data['dailyCounts']->pluck('total_kazini')->map(fn($val) => (int) $val)->toArray(),
-        ];
+    $companies = $companies->get();
+    $companyIds = $companies->pluck('id');
 
-        $weeklyCounts = [
-            'labels' => $data['weeklyCounts']->pluck('week_start')->toArray(),
-            'absent' => $data['weeklyCounts']->pluck('total_absent')->map(fn($val) => (int) $val)->toArray(),
-            'kazini' => $data['weeklyCounts']->pluck('total_kazini')->map(fn($val) => (int) $val)->toArray(),
-        ];
+    $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : null;
+    $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : null;
 
-        $monthlyCounts = [
-            'labels' => $data['monthlyCounts']->pluck('month')->toArray(),
-            'absent' => $data['monthlyCounts']->pluck('total_absent')->map(fn($val) => (int) $val)->toArray(),
-            'kazini' => $data['monthlyCounts']->pluck('total_kazini')->map(fn($val) => (int) $val)->toArray(),
-        ];
-        $mostAbsentStudent = $data['mostAbsentStudent'];
-        $graphData         = $this->graphDataService->getGraphData();
-        return view('report.index', compact(
-            'companies',
-            'dailyCounts',
-            'weeklyCounts',
-            'monthlyCounts',
-            'mostAbsentStudent',
-            'graphData'
-        ));
+    // Call data helper
+    $data = $this->getAttendanceData($companyIds, $startDate, $endDate);
+
+    return view('report.index', [
+        'companies' => $companies,
+        'dailyCounts' => $data['dailyCounts'],
+        'weeklyCounts' => $data['weeklyCounts'],
+        'monthlyCounts' => $data['monthlyCounts'],
+        'mostAbsentStudent' => $data['mostAbsentStudent'],
+        'graphData' => $this->graphDataService->getGraphData(),
+    ]);
+}
+
+
+    private function getAttendanceData($companyIds, $startDate = null, $endDate = null)
+{
+    $now = Carbon::today();
+    $startDate = $startDate ?: $now->copy()->subDays(6);
+    $endDate = $endDate ?: $now;
+
+    // Daily counts
+    $rawDaily = DB::table('attendences')
+        ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id')
+        ->whereIn('platoons.company_id', $companyIds)
+        ->whereBetween('attendences.created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+        ->select(
+            DB::raw('DATE(attendences.created_at) as date'),
+            DB::raw('SUM(attendences.absent) as total_absent'),
+            DB::raw('SUM(attendences.kazini) as total_kazini')
+        )
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get()
+        ->keyBy('date');
+
+    $days = collect();
+    $period = Carbon::parse($startDate)->diffInDays($endDate);
+    for ($i = 0; $i <= $period; $i++) {
+        $days->push(Carbon::parse($startDate)->addDays($i)->toDateString());
     }
 
-    private function getAttendanceData($companyId)
-    {
-        //$companyId = [1]; // Or pass it in manually
+    $dailyCounts = $days->map(fn ($date) => [
+        'date' => $date,
+        'total_absent' => $rawDaily[$date]->total_absent ?? 0,
+        'total_kazini' => $rawDaily[$date]->total_kazini ?? 0,
+    ]);
 
-        $rawData = DB::table('attendences')
-            ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id')
-            ->select(
-                DB::raw('DATE(attendences.created_at) as date'),
-                DB::raw('SUM(attendences.absent) as total_absent'),
-                DB::raw('SUM(attendences.kazini) as total_kazini')
-            )
-            ->whereIn('platoons.company_id', $companyId)
-            ->where('attendences.created_at', '>=', Carbon::today()->subDays(6))
-            ->groupBy(DB::raw('DATE(attendences.created_at)'))
-            ->orderBy('date', 'asc')
-            ->get()
-            ->keyBy('date'); // Key by date for easy merging
+    // Weekly counts
+    $rawWeekly = DB::table('attendences')
+        ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id')
+        ->join('companies', 'platoons.company_id', '=', 'companies.id')
+        ->whereIn('companies.id', $companyIds)
+        ->whereBetween('attendences.created_at', [$startDate, $endDate])
+        ->select(
+            DB::raw('YEARWEEK(attendences.created_at, 1) as year_week'),
+            DB::raw('MIN(DATE(attendences.created_at)) as week_start'),
+            DB::raw('SUM(attendences.absent) as total_absent'),
+            DB::raw('SUM(attendences.kazini) as total_kazini'),
+        )
+        ->groupBy(DB::raw('YEARWEEK(attendences.created_at, 1)'))
+        ->orderBy('year_week')
+        ->get()
+        ->keyBy('year_week');
 
-// Step 2: Generate last 7 days including today
-        $dates = collect();
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i)->toDateString();
-            $dates->push($date);
-        }
-
-// Step 3: Merge data with zero fallback
-        $dailyCounts = $dates->map(function ($date) use ($rawData) {
-            return [
-                'date'         => $date,
-                'total_absent' => $rawData->has($date) ? $rawData[$date]->total_absent : 0,
-                'total_kazini' => $rawData->has($date) ? $rawData[$date]->total_kazini : 0,
-            ];
-        });
-
-        $rawData = DB::table('attendences')
-            ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id') // Join platoons table
-            ->join('companies', 'platoons.company_id', '=', 'companies.id')  // Join companies table
-            ->select(
-                DB::raw('YEARWEEK(attendences.created_at, 1) as year_week'), // '1' means weeks start on Monday
-                DB::raw('MIN(DATE(attendences.created_at)) as week_start'),
-                DB::raw('SUM(attendences.absent) as total_absent'),
-                DB::raw('SUM(attendences.kazini) as total_kazini'),
-                'companies.name as company_name' // Add company name to selection
-            )
-            ->whereIn('companies.id', $companyId)                                              // Filter by company_id
-            ->where('attendences.created_at', '>=', Carbon::now()->startOfWeek()->subWeeks(4)) // From 4 weeks ago
-            ->groupBy(DB::raw('YEARWEEK(attendences.created_at, 1)'), 'companies.name')        // Group by week and company name
-            ->orderBy('year_week', 'asc')                                                      // Order by year_week ascending
-            ->get()
-            ->keyBy('year_week'); // Key the
-
-// Step 2: Generate last 5 weeks including current
-        $weeks = collect();
-        for ($i = 4; $i >= 0; $i--) {
-            $startOfWeek = Carbon::now()->startOfWeek()->subWeeks($i);
-            $yearWeek    = $startOfWeek->format('oW'); // ISO-8601 year + week number (e.g. 202520)
-            $weeks->push([
-                'year_week'  => $yearWeek,
-                'week_start' => $startOfWeek->toDateString(),
-            ]);
-        }
-
-// Step 3: Merge with raw data and fill missing with zero
-        $weeklyCounts = $weeks->map(function ($week) use ($rawData) {
-            $yearWeek = $week['year_week'];
-            $record   = $rawData->get($yearWeek);
-
-            return [
-                'week_start'   => $week['week_start'],
-                'year_week'    => $yearWeek,
-                'total_absent' => $record ? $record->total_absent : 0,
-                'total_kazini' => $record ? $record->total_kazini : 0,
-            ];
-        });
-
-        $rawData = DB::table('attendences')
-            ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id') // Join platoons table
-            ->join('companies', 'platoons.company_id', '=', 'companies.id')  // Join companies table
-            ->select(
-                DB::raw('YEAR(attendences.created_at) as year'),
-                DB::raw('MONTH(attendences.created_at) as month'),
-                DB::raw('SUM(attendences.absent) as total_absent'),
-                DB::raw('SUM(attendences.kazini) as total_kazini'),
-                'companies.name as company_name' // Add company name to selection
-            )
-            ->whereIn('companies.id', $companyId)                                                                          // Filter by company_id
-            ->where('attendences.created_at', '>=', Carbon::now()->startOfMonth()->subMonths(2))                           // Last 3 months
-            ->groupBy(DB::raw('YEAR(attendences.created_at)'), DB::raw('MONTH(attendences.created_at)'), 'companies.name') // Group by year, month, and company
-            ->orderByRaw('YEAR(attendences.created_at), MONTH(attendences.created_at)')                                    // Order by year and month
-            ->get()
-            ->mapWithKeys(function ($item) {
-                $key = $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT); // Format: YYYY-MM
-                return [$key => $item];
-            });
-
-// Step 2: Generate last 3 months including current
-        $months = collect();
-        for ($i = 2; $i >= 0; $i--) {
-            $date = Carbon::now()->startOfMonth()->subMonths($i);
-            $key  = $date->format('Y-m');
-            $months->push([
-                'month_label' => $date->format('F Y'), // e.g. "May 2025"
-                'year_month'  => $key,
-            ]);
-        }
-
-// Step 3: Merge data and fill in zero values where needed
-        $monthlyCounts = $months->map(function ($month) use ($rawData) {
-            $key    = $month['year_month'];
-            $record = $rawData->get($key);
-
-            return [
-                'month'        => $month['month_label'],
-                'year_month'   => $key,
-                'total_absent' => $record ? $record->total_absent : 0,
-                'total_kazini' => $record ? $record->total_kazini : 0,
-            ];
-        });
-// Return the 5-week attendance summary
-
-        $selectedSessionId = session('selected_session') == '' ? 1 : session('selected_session');
-
-        $selectedDate = Carbon::today(); //createFromFormat('d-m-Y', '12-5-2025');
-
-        $totalAbsent = 0;
-        $totalMps    = 0;
-        $totalLeave  = 0;
-        $totalSick   = 0;
-        $companies   = Company::whereHas('students', function ($query) use ($selectedSessionId, $companyId) {
-            $query->where('session_programme_id', $selectedSessionId)->whereIn('company_id', $companyId); // Filter students by session
-        })
-            ->with(['platoons.attendences' => function ($query) use ($selectedSessionId, $selectedDate) {
-                // Filter attendances for the selected session and date
-                $query->where('session_programme_id', $selectedSessionId)
-                    ->whereDate('created_at', $selectedDate); // Filter by specific date
-            }])
-            ->get();
-
-    // Step 1: Get all absent_student_ids values
-        $records = DB::table('attendences')->pluck('absent_student_ids');
-
-        $counts = [];
-
-        foreach ($records as $rawValue) {
-            $ids = json_decode($rawValue, true);
-
-            if (! is_array($ids)) {
-                continue;
-            }
-
-            foreach ($ids as $id) {
-                if (is_numeric($id)) {
-                    $id          = (int) $id;
-                    $counts[$id] = ($counts[$id] ?? 0) + 1;
-                }
-            }
-        }
-
-// Step 2: Sort and take top 10
-        arsort($counts);
-        $top10 = array_slice($counts, 0, 10, true); // Keep keys (student IDs)
-
-// Step 3: Fetch full Student models
-        $studentIds = array_keys($top10);
-        $students   = Student::whereIn('id', $studentIds)->get()->keyBy('id');
-
-// Step 4: Build result with model and absence count
-        $mostAbsentStudent = [];
-
-        foreach ($top10 as $id => $absenceCount) {
-            $mostAbsentStudent[] = [
-                'student' => $students->get($id),
-                'count'   => $absenceCount,
-            ];
-        }
-
-        return [
-            'dailyCounts'       => $dailyCounts,
-            'weeklyCounts'      => $weeklyCounts,
-            'monthlyCounts'     => $monthlyCounts,
-            'mostAbsentStudent' => $mostAbsentStudent,
-        ];
-
+    $weeklyCounts = collect();
+    $startOfWeek = $startDate->copy()->startOfWeek();
+    while ($startOfWeek <= $endDate) {
+        $key = $startOfWeek->format('oW');
+        $record = $rawWeekly->get($key);
+        $weeklyCounts->push([
+            'week_start' => $startOfWeek->toDateString(),
+            'total_absent' => $record?->total_absent ?? 0,
+            'total_kazini' => $record?->total_kazini ?? 0,
+        ]);
+        $startOfWeek->addWeek();
     }
+
+    // Monthly counts
+    $rawMonthly = DB::table('attendences')
+        ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id')
+        ->join('companies', 'platoons.company_id', '=', 'companies.id')
+        ->whereIn('companies.id', $companyIds)
+        ->whereBetween('attendences.created_at', [$startDate, $endDate])
+        ->select(
+            DB::raw('YEAR(attendences.created_at) as year'),
+            DB::raw('MONTH(attendences.created_at) as month'),
+            DB::raw('SUM(attendences.absent) as total_absent'),
+            DB::raw('SUM(attendences.kazini) as total_kazini')
+        )
+        ->groupBy(DB::raw('YEAR(attendences.created_at)'), DB::raw('MONTH(attendences.created_at)'))
+        ->orderByRaw('YEAR(attendences.created_at), MONTH(attendences.created_at)')
+        ->get()
+        ->mapWithKeys(fn ($item) => [
+            $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT) => $item,
+        ]);
+
+    $monthlyCounts = collect();
+    $currentMonth = $startDate->copy()->startOfMonth();
+    while ($currentMonth <= $endDate) {
+        $key = $currentMonth->format('Y-m');
+        $record = $rawMonthly->get($key);
+        $monthlyCounts->push([
+            'month' => $currentMonth->format('F Y'),
+            'total_absent' => $record?->total_absent ?? 0,
+            'total_kazini' => $record?->total_kazini ?? 0,
+        ]);
+        $currentMonth->addMonth();
+    }
+
+    // Top 10 absent students (optional)
+    $absentCounts = DB::table('attendences')
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->pluck('absent_student_ids')
+        ->flatMap(fn ($v) => json_decode($v, true) ?? [])
+        ->filter(fn ($id) => is_numeric($id))
+        ->countBy()
+        ->sortDesc()
+        ->take(10);
+
+    $students = Student::whereIn('id', $absentCounts->keys())->get()->keyBy('id');
+    $mostAbsentStudent = $absentCounts->map(fn ($count, $id) => [
+        'student' => $students[$id] ?? null,
+        'count' => $count,
+    ])->values();
+
+    return [
+        'dailyCounts' => $dailyCounts,
+        'weeklyCounts' => $weeklyCounts,
+        'monthlyCounts' => $monthlyCounts,
+        'mostAbsentStudent' => $mostAbsentStudent,
+    ];
+}
+
 
     public function generateAttendanceReport(Request $request)
     {

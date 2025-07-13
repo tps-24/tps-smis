@@ -16,27 +16,53 @@
 @endsection
 @section('content')
 @include('layouts.sweet_alerts.index')
-<div class="d-flex justify-content-end" style="width:20%; margin-left: auto;">
-        <form class="d-flex gap-2 w-100" action="{{ route('reports.generateAttendanceReport') }}" method="get">
-            <select class="form-control w-100" name="company_id" id="company_id" required style="height: 40px;" required>
-                <option value="" selected disabled> company</option>
-                @foreach ($companies as $company)
+<div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+
+    <!-- Filter Buttons -->
+    <div class="btn-group" role="group" aria-label="Filter options">
+        <button type="button" class="btn btn-primary" onclick="showDaily()">Daily</button>
+        <button type="button" class="btn btn-secondary" onclick="showWeekly()">Weekly</button>
+        <button type="button" class="btn btn-success" onclick="showMonthly()">Monthly</button>
+    </div>
+
+    <!-- Date Filter Form -->
+    <form class="d-flex gap-2 align-items-end" method="GET" action="">
+        <div class="input-group">
+            <span class="input-group-text">Start Date</span>
+            <input type="date" class="form-control" name="start_date"
+                value="{{ request('start_date') }}"
+                max="{{ \Carbon\Carbon::yesterday()->toDateString() }}">
+
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text">End Date</span>
+            <input type="date" class="form-control" name="end_date"
+                value="{{ request('end_date') }}"
+                max="{{ \Carbon\Carbon::today()->toDateString() }}">
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    <!-- Report Download -->
+    <form class="d-flex gap-2 align-items-end" action="{{ route('reports.generateAttendanceReport') }}" method="get">
+        <select class="form-control" name="company_id" id="company_id" required style="min-width: 200px;">
+            <option value="" selected disabled>Company</option>
+            @foreach ($companies as $company)
                 <option value="{{ $company->id }}">{{ $company->description }}</option>
-                @endforeach
-            </select>
-            <button title="Download report" type="submit" class="btn btn-success"
-                style="min-width: 120px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                <i class="bi bi-download me-1"></i> Report
-            </button>
-        </form>
+            @endforeach
+        </select>
+
+        <button title="Download report" type="submit" class="btn btn-success"
+            style="min-width: 120px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-download me-1"></i> Report
+        </button>
+    </form>
+
 </div>
 
-
-<div class="btn-group mb-3" role="group" aria-label="Filter options">
-    <button type="button" class="btn btn-primary" onclick="showDaily()">Daily</button>
-    <button type="button" class="btn btn-secondary" onclick="showWeekly()">Weekly</button>
-    <button type="button" class="btn btn-success" onclick="showMonthly()">Monthly</button>
-</div>
 <div class="chart-container" style=" padding: 0 10% 0 10%">
     <canvas id="groupedBarChart"></canvas>
 </div>
