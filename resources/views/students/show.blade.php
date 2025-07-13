@@ -104,7 +104,7 @@
                             <button id="cancelEditBtn" class="btn btn-sm btn-danger d-none">✖ Cancel</button>
                         @endcan()
                         <div class="pull-right" style="margin-left:-5px">
-                            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : url('/tps-smis') }}" class="btn btn-primary"> Back</a>
+                            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : url('/') }}" class="btn btn-primary"> Back</a>
                         </div>
                     </div>
                 </div>
@@ -168,7 +168,7 @@
                                                                             <i class="bi bi-person"></i>
                                                                         </span>
                                                                         <input type="text" class="form-control static-field" id="forceNumber" value="{{$student->force_number}}" Disabled>
-                                                                        <input type="text" class="form-control editable-field d-none" id="forceNumber" value="{{$student->force_number}}">
+                                                                        <input type="text" name="force_number" class="form-control editable-field d-none" id="forceNumber" value="{{$student->force_number}}">
                                                                     </div>
                                                                 </div>
                                                                 <!-- Form field end -->
