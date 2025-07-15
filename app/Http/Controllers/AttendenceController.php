@@ -677,7 +677,7 @@ class AttendenceController extends Controller
             if ($date != Carbon::today()->toDateString()) {
                 $attendence = $platoon->attendences->where('created_at', $date)->first();
             } else {
-                $attendence = $platoon->today_attendence->first();
+                $attendence = $platoon->today_attendence()->first();
             }
 
             if ($attendence) {

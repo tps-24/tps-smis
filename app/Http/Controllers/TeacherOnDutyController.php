@@ -128,24 +128,34 @@ public function store(Request $request, $staffId)
 
     public function search(Request $request)
     {
-        $staffs = Staff::where('company_id', $request->company_id)
-            ->orderBy('firstName');
+if (!$request->filled('name') && !$request->filled('company_id')) {
+    return redirect()->back()->with('error','At least one of name, force number or company is required.');
+}
 
-        if ($request->name) {
-            $staffs = $staffs->whereIn('rank', ['CPL', 'PC'])
-                ->where(function ($query) use ($request) {
-                    $query->where('firstName', 'like', '%' . $request->name . '%')
-                        ->orWhere('lastName', 'like', '%' . $request->name . '%')
-                        ->orWhere('middleName', 'like', '%' . $request->name . '%')
-                        ->orWhere('forceNumber', 'like', '%' . $request->name . '%');
-                });
-        }
+$staffs = Staff::query();
+
+if ($request->filled('company_id')) {
+    $staffs->where('company_id', $request->company_id);
+}
+
+if ($request->filled('name')) {
+    $staffs->whereIn('rank', ['CPL', 'PC'])
+        ->where(function ($query) use ($request) {
+            $query->where('firstName', 'like', '%' . $request->name . '%')
+                ->orWhere('lastName', 'like', '%' . $request->name . '%')
+                ->orWhere('middleName', 'like', '%' . $request->name . '%')
+                ->orWhere('forceNumber', 'like', '%' . $request->name . '%');
+        });
+}
+
+$staffs = $staffs->orderBy('firstName');
+
 
         $companies = Company::has('staffs')->get();
         $teachers  = TeacherOnDuty::whereNull('end_date')->orderBy('company_id', 'asc')->get();
 
         // 👇 Append search parameters to pagination
-        $staffs = $staffs->latest()->paginate(10)->appends($request->all());
+        $staffs = $staffs->paginate(10)->appends($request->all());
 
         return view('teacher_on_duty.index', compact('staffs', 'companies', 'teachers'))
             ->with('i', ($request->input('page', 1) - 1) * 10);
