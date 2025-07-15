@@ -41,10 +41,112 @@ class PatientController extends Controller
         ]);
     }
 
-    public function index(Request $request)
-    {
-        return $this->dispensaryPage($request);
+ public function index(Request $request)
+{
+    $dailyCount = $weeklyCount = $monthlyCount = 0;
+    $user       = Auth::user();
+
+    $companies = $user->hasRole(['Sir Major', 'OC Coy', 'Instructor'])
+        ? [$user->staff->company]
+        : Company::all();
+
+    $companyId = $request->input('company_id');
+    $date      = $request->has('date') ? Carbon::parse($request->date) : now();
+
+    if ($companyId) {
+        $company = Company::find($companyId);
+        if ($company) {
+            $companies = [$company];
+        }
     }
+
+    foreach ($companies as $company) {
+        $admittedNotReleasedIds = $company->sickStudents()
+            ->where('excuse_type_id', 3)
+            ->whereNull('released_at')
+            ->pluck('id');
+
+        $dailyIds = $company->sickStudents()
+            ->whereDate('created_at', Carbon::today())
+            ->pluck('id');
+
+        $weeklyIds = $company->sickStudents()
+            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->pluck('id');
+
+        $monthlyIds = $company->sickStudents()
+            ->whereMonth('created_at', now()->month)
+            ->pluck('id');
+
+        $dailyCount += $admittedNotReleasedIds->merge($dailyIds)->unique()->count();
+        $weeklyCount += $admittedNotReleasedIds->merge($weeklyIds)->unique()->count();
+        $monthlyCount += $admittedNotReleasedIds->merge($monthlyIds)->unique()->count();
+    }
+
+    // Patient distribution
+    if ($companyId) {
+        $patientDistribution = Patient::where('company_id', $companyId)
+            ->whereMonth('created_at', $date->month)
+            ->whereYear('created_at', $date->year)
+            ->selectRaw('platoon, COUNT(*) as count')
+            ->groupBy('platoon')
+            ->pluck('count', 'platoon');
+
+        $isCompanySelected = true;
+    } else {
+        if ($user->hasRole(['Sir Major', 'OC Coy', 'Instructor'])) {
+            $patientDistribution = Patient::whereMonth('created_at', $date->month)
+                ->whereYear('created_at', $date->year)
+                ->selectRaw('platoon, COUNT(*) as count')
+                ->groupBy('platoon')
+                ->pluck('count', 'platoon');
+
+            $isCompanySelected = true;
+        } else {
+            $patientDistribution = Patient::whereMonth('created_at', $date->month)
+                ->whereYear('created_at', $date->year)
+                ->selectRaw('company_id, COUNT(*) as count')
+                ->groupBy('company_id')
+                ->pluck('count', 'company_id');
+
+            $isCompanySelected = false;
+        }
+    }
+
+    // Prepare month options
+    $months = collect(range(2, 0))->map(fn($i) => Carbon::now()->subMonths($i));
+
+    // Students list with search
+    $students = null;
+    
+    if ($isCompanySelected) {
+        $selectedCompany = $company; // Selected or role-restricted company
+        $studentsQuery = $company->students();
+        $programmeId = session('selected_session',1);
+        if ($request->filled('platoon')) {
+            $studentsQuery->where('platoon', $request->input('platoon'))->where('session_programme_id',$programmeId);
+        }
+
+        if ($request->filled('name')) {
+            $name = $request->input('name');
+            $studentsQuery->where(function ($query) use ($name) {
+                $query->where('first_name', 'like', "%$name%")
+                    ->orWhere('middle_name', 'like', "%$name%")
+                    ->orWhere('last_name', 'like', "%$name%");
+            });
+        }
+
+        $students = $studentsQuery->paginate(50)->appends($request->query());
+    }
+
+    return view('hospital.index', compact(
+        'companies', 'dailyCount', 'weeklyCount', 'monthlyCount',
+        'patientDistribution', 'isCompanySelected', 'months', 'students'
+    ))->with('date', $date->format('F Y'));
+}
+
+
+
 
     public function show($id)
     {

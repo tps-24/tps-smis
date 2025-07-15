@@ -16,10 +16,130 @@ use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\CarbonPeriod;
 
 class GraphDataService
 {
     private $selectedSessionId;
+public function getGraphData2(String $start_date = null, String $end_date = null)
+{
+    $userId = auth()->id();
+    $programmeId = auth()->user()->session_programme_id;
+
+    // === If custom date range is provided (only daily) ===
+    if ($start_date && $end_date) {
+        $start = Carbon::parse($start_date)->startOfDay();
+        $end = Carbon::parse($end_date)->endOfDay();
+
+        $attendanceData = $this->getDailyData($start, $end, $userId, $programmeId);
+
+        return response()->json([
+            'dailyData' => $attendanceData,
+        ]);
+    }
+
+    $today = Carbon::now();
+
+    // === 7 days daily data ===
+    $dailyStart = $today->copy()->subDays(6)->startOfDay();
+    $dailyEnd = $today->copy()->endOfDay();
+    $dailyData = $this->getDailyData($dailyStart, $dailyEnd, $userId, $programmeId);
+    $dailyCounts = collect($dailyData['data'])->map(fn($item) => $item['absents']);
+
+    // === 5 weeks weekly data ===
+    $weeklyLabels = [];
+    $weeklyStats = [];
+
+    for ($i = 4; $i >= 0; $i--) {
+        $startOfWeek = $today->copy()->subWeeks($i)->startOfWeek();
+        $endOfWeek = $startOfWeek->copy()->endOfWeek();
+
+        $weeklyLabels[] = "Week ".$this->getWeekNumber($startOfWeek);
+
+        $weeklyStats[] = [
+            'absents'  => Attendence::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count(),
+            'leaves'   => LeaveRequest::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count(),
+            'lockUp'      => MPS::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count(),
+            'sick' => Patient::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count(),
+        ];
+    }
+
+    // === 3 months monthly data ===
+    $monthlyLabels = [];
+    $monthlyStats = [];
+
+    for ($i = 2; $i >= 0; $i--) {
+        $startOfMonth = $today->copy()->subMonths($i)->startOfMonth();
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+        $monthlyLabels[] = $startOfMonth->format('F Y'); // e.g. "July 2025"
+
+        $monthlyStats[] = [
+            'absents'  => Attendence::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count(),
+            'leaves'   => LeaveRequest::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count(),
+            'lockUp'      => MPS::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count(),
+            'sick' => Patient::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count(),
+        ];
+    }
+
+    return [
+        'dailyData' => $dailyData,
+        'weeklyData' => [
+            'labels' => $weeklyLabels,
+            'data'   => $weeklyStats
+        ],
+        'monthlyData' => [
+            'labels' => $monthlyLabels,
+            'data'   => $monthlyStats
+        ],
+        'daily'   => $dailyCounts->toArray(),
+        'weekly'  => collect($weeklyStats)->pluck('absents')->toArray(),
+        'monthly' => collect($monthlyStats)->pluck('leaves')->toArray(), // adjust as needed
+    ];
+}
+
+
+protected function getDailyData($start, $end, $userId, $programmeId)
+{
+    $dates = CarbonPeriod::create($start, $end)->toArray();
+
+    $data = collect($dates)->map(function ($date) use ($programmeId, $userId) {
+        return [
+            'date'     => $date->format('Y-m-d'),
+            'absents'  => Attendence::whereDate('created_at', $date)->count(),
+            'sick' => Patient::whereDate('created_at', $date)->count(),
+            'lockUp'      => MPS::whereDate('created_at', $date)->count(),
+            'leaves'   => LeaveRequest::whereDate('created_at', $date)->count(),
+        ];
+    });
+
+    return [
+        'dates' => $data->pluck('date')->toArray(),
+        'data'  => $data->toArray()
+    ];
+}
+
+
+
+        private function getWeekNumber($date)
+    {
+        $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
+            $selectedSessionId = 1;
+        }
+        $sessionProgramme = SessionProgramme::find($selectedSessionId);
+        // Define the specified start date (September 30, 2024)
+        $startDate = Carbon::createFromFormat('d-m-Y', Carbon::parse($sessionProgramme->startDate)->format('d-m-Y'));
+                                      //dd($date);
+                                      // Define the target date for which you want to calculate the week number
+        $date = Carbon::parse($date); // This could be the current date, or any specific date
+
+                                                          // Calculate the difference in weeks between the start date and the target date
+        $weekNumber = $startDate->diffInWeeks($date) + 1; // Adding 1 to make it 1-based (Week 1, Week 2, ...)
+        return (int) $weekNumber;
+    }
+    
+
     public function getGraphData()
     {
 
@@ -384,6 +504,14 @@ class GraphDataService
         $leaves_daily_count   = array_column($weeklyCounts, 'total');
         $leaves_monthly_count = array_column($merged, 'total');
 
+        // dd([
+        //     'dailyData'   => $attendanceData,
+        //     'weeklyData'  => $weeklyData,
+        //     'monthlyData' => $monthlyData,
+        //     'daily'       => array_column($dailyCounts, 'total'),
+        //     'weekly'      => array_column($weekly, 'total'),
+        //     'monthly'     => $leaves_monthly_count,
+        // ]);
         // Combine all three sets of data into the final response
         return [
             'dailyData'   => $attendanceData,
@@ -393,23 +521,5 @@ class GraphDataService
             'weekly'      => array_column($weekly, 'total'),
             'monthly'     => $leaves_monthly_count,
         ];
-    }
-
-        private function getWeekNumber($date)
-    {
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 1;
-        }
-        $sessionProgramme = SessionProgramme::find($selectedSessionId);
-        // Define the specified start date (September 30, 2024)
-        $startDate = Carbon::createFromFormat('d-m-Y', Carbon::parse($sessionProgramme->startDate)->format('d-m-Y'));
-                                      //dd($date);
-                                      // Define the target date for which you want to calculate the week number
-        $date = Carbon::parse($date); // This could be the current date, or any specific date
-
-                                                          // Calculate the difference in weeks between the start date and the target date
-        $weekNumber = $startDate->diffInWeeks($date) + 1; // Adding 1 to make it 1-based (Week 1, Week 2, ...)
-        return (int) $weekNumber;
     }
 }

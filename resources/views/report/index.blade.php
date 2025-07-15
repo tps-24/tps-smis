@@ -26,7 +26,7 @@
     </div>
 
     <!-- Date Filter Form -->
-    <form class="d-flex gap-2 align-items-end" method="GET" action="">
+    <form class="d-flex gap-2 align-items-end" method="GET" action="{{ route('reports.index') }}">
         <div class="input-group">
             <span class="input-group-text">Start Date</span>
             <input type="date" class="form-control" name="start_date"
@@ -107,8 +107,9 @@ daily = data.dailyData;
 weekly = data.weeklyData;
 monthly = data.monthlyData;
 leaves_monthly_count = data.monthly;
+console.log(daily)
 const dailyData = {
-    labels: daily.dates, // X-axis labels
+    labels: daily.labels, // X-axis labels
     datasets: [{
             label: 'Absents',
             data: daily.absents,
@@ -168,7 +169,7 @@ const dailyData = {
 };
 
 const weeklyData = {
-    labels: weekly.weeks,
+    labels: weekly.labels,
     datasets: [{
             label: 'Absents',
             data: weekly.absents,
@@ -228,7 +229,7 @@ const weeklyData = {
 };
 
 const monthlyData = {
-    labels: monthly.months,
+    labels: monthly.labels,
     datasets: [{
             label: 'Absents',
             data: monthly.absents,
@@ -316,8 +317,8 @@ let chart = new Chart(ctx, {
                     }
                 },
                 // Dynamically set the max value of the y-axis to be higher than the highest bar
-                suggestedMax: Math.max(...daily.absents, ...daily.sick, ...daily.lockUps) *
-                1.5, // 20% more than the highest value
+                // suggestedMax: Math.max(...daily.absents, ...daily.sick, ...daily.lockUps) *
+                // 1.5, // 20% more than the highest value
             }
         },
         layout: {

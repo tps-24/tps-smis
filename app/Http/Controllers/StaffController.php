@@ -293,6 +293,7 @@ public function search(Request $request)
         $staffs->where(function ($query) use ($request) {
             $query->where('firstName', 'like', '%' . $request->name . '%')
                   ->orWhere('middleName', 'like', '%' . $request->name . '%')
+                  ->orWhere('forceNumber', 'like', '%' . $request->name . '%')
                   ->orWhere('lastName', 'like', '%' . $request->name . '%');
         });
     }

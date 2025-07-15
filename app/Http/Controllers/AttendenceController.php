@@ -341,11 +341,10 @@ class AttendenceController extends Controller
         $companies = $this->companies;
 
         $companyId = $request->companyId;
-
         // Use fallback if null, string "null", or invalid
         $selectedCompany = (is_numeric($companyId) && Company::find($companyId))
             ? Company::findOrFail($companyId)
-            : $this->companies->get(0)->first();
+            : $this->companies->first();
         return view('attendences/index', compact('statistics', 'companies', 'attendenceType', 'date','selectedCompany'));
 
     }
