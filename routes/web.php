@@ -56,7 +56,7 @@ require __DIR__ . '/auth.php';
 
 Auth::routes();
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/tps_smis', [HomeController::class, 'index'])->name('home');
 
 // Route::get('/', function () {
 //     return view('dashboard.default_dashboard');
