@@ -36,6 +36,7 @@ class ReportController extends Controller
      */
     public function index(Request $request)
 {
+    
     $user = Auth::user();
     $selectedSessionId = session('selected_session') ?: 1;
 
@@ -56,7 +57,6 @@ class ReportController extends Controller
     // Parse optional date range filters
     $startDate = $request->filled('start_date') ? Carbon::parse($request->input('start_date')) : null;
     $endDate = $request->filled('end_date') ? Carbon::parse($request->input('end_date')) : null;
-
     // Call data helper only with dates if both are provided
     if ($startDate && $endDate) {
         $data = $this->getAttendanceData($companyIds, $startDate, $endDate);
@@ -70,7 +70,7 @@ class ReportController extends Controller
         'weeklyCounts' => $data['weeklyCounts'],
         'monthlyCounts' => $data['monthlyCounts'],
         'mostAbsentStudent' => $data['mostAbsentStudent'],
-        'graphData' => $this->graphDataService->getGraphData(),
+        'graphData' => $this->graphDataService->getGraphData($startDate, $endDate),
     ]);
 }
 
