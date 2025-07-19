@@ -48,6 +48,7 @@ use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\IntakeHistoryController;
+use App\Http\Controllers\StaffSummaryController;
 use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -193,6 +194,9 @@ Route::group(['middleware' => ['auth']], function () {
         return view('staffs.bulk_upload_explanation');
     })->name('uploadStaff');
 
+    Route::get('/staffs/summary', [StaffSummaryController::class, 'index'])->name('staffs.summary.index');
+    Route::get('staff/filter', [StaffSummaryController::class, 'filterStaff'])->name('staff.filter');
+    Route::post('staff/change-status/', [StaffController::class, 'change_status'])->name('staff.change_status');
     Route::get('staff/search', [StaffController::class, 'search'])->name('staff.search');
     Route::get('/staff/create-cv/{staffId}', [StaffController::class, 'create_cv'])->name('staff.create-cv');
     Route::post('/staff/update-cv/{staffId}', [StaffController::class, 'update_cv'])->name('staff.update-cv');
@@ -320,6 +324,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('safari-students', SafariStudentController::class);
     Route::resource('certificates', CertificateController::class);
     Route::resource('intake_history', IntakeHistoryController::class);
+    
 
     Route::resource('companies', CompanyController::class);
     
@@ -359,6 +364,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     // routes/web.php
     Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
+    
     Route::get('platoons/{companyName}', [AttendenceController::class, 'getPlatoons']);
     Route::get('campanies/{campusId}', [GuardAreaController::class, 'get_companies']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');

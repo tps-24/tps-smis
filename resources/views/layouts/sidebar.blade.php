@@ -138,6 +138,9 @@
                                         <li>
                                             <a href="{{ route('staffs.create') }}">Staff Registration</a>
                                         </li>
+                                        <li>
+                                            <a href="{{ route('staffs.summary.index') }}">Staff Summary</a>
+                                        </li>
                                         @can('timesheet-list')
                                             <li>
                                                 <a href="{{ route('timesheets.index') }}">
