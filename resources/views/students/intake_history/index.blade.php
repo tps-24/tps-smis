@@ -1,5 +1,23 @@
 @extends('layouts.main')
 
+@section('style')
+  <style>
+    .bscrumb {
+      background-color: #f8f9fa;
+      margin-right: 25px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .card-header {
+      /* background-color: #007bff; */
+      /* color: white; */
+    }
+    .card-body {
+      padding: 20px;
+    }
+
+  </style>
+@endsection
+
 @section('scrumb')
 <nav class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
   <div class="container-fluid">
@@ -11,17 +29,18 @@
       </ol>
     </nav>
   </div>
-</nav>
+  </nav>
 @endsection
 
 @section('content')
+<div class="card mb-4" style="margin-right: 0px;">
 <div class="card-header">
   <h5 class="card-title">Intake Management Summary</h5>
   <p class="card-text">This page provides a summary of the intake history of students.</p>
 </div>
 
-<div class="card-body" style="margin-right: -25px;">
-  <div class="row">
+<div class="card-body" style="margin-right: 0px;">
+  <div class="row" style="margin-right: -10px;">
     @php
       $cardTypes = [
         ['key' => 'totalEnrolled', 'label' => 'Enrolled Students', 'color' => 'primary'],
@@ -42,34 +61,51 @@
     </div>
     @endforeach
   </div>
-</div>
 
-<!-- Result Section -->
-<div id="studentTableContainer" class="mt-4" style="display: none;">
-  <h4 id="studentTableTitle" class="mb-3"></h4>
+  <!-- Result Section -->
+   
+  <div class="row gx-4" style="margin-right: -25px;">
+    <div class="col-sm-12">
+      <div class="card-body">
+        <center>Filtering</center> 
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card-body" style="background-color:blue; margin-right: 0px;">
+        <span>Blah</span>
+      </div>
+    </div>
+    <div class="col-sm-8" style="margin-right:-2000px">
+      <div class="card-body" style="padding-right: -20px !important; ">
+      <div id="studentTableContainer" class="mt-1" style="display: none;">
+        <h4 id="studentTableTitle" class="mb-3"></h4>
 
-  <div class="table-responsive">
-    <table class="table table-striped table-bordered text-center align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>SNo</th>
-          <th>Name</th>
-          <th>Force No.</th>
-          <th>Region</th>
-          <th>Status</th>
-          <th>Verified</th>
-          <th>View</th>
-        </tr>
-      </thead>
-      <tbody id="studentTableBody"></tbody>
-    </table>
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered text-center align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>SNo</th>
+                <th>Force No.</th>
+                <th>Name</th>
+                <th>Region</th>
+                <th>Status</th>
+                <th>View</th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-end mt-3" id="pagination-container">
+            <!-- Pagination links will render here -->
+        </div>
+    </div>
+    </div>
   </div>
-
-<!-- Pagination -->
-<div class="d-flex justify-content-end mt-3" id="pagination-container">
-    <!-- Pagination links will render here -->
 </div>
 
+</div>
 </div>
 
 @endsection
@@ -106,18 +142,27 @@
         students.forEach((student, index) => {
           const serialNumber = startIndex + index + 1;
 
-          body.innerHTML += `
-            <tr>
-              <td>${serialNumber}</td>
-              <td>${student.first_name}</td>
-              <td>${student.force_number ?? '-'}</td>
-              <td>${student.entry_region}</td>
-              <td>${student.status}</td>
-              <td>${student.is_verified ? 'Yes' : 'No'}</td>
-              <td>
+        let statusBadge = '';
+        if (student.status === 'approved') {
+          statusBadge = `<span class="badge bg-success">✅ Verified</span>`;
+        } else if (student.status === 'pending') {
+          statusBadge = `<span class="badge bg-warning text-dark">⏳ Pending</span>`;
+        } else {
+          statusBadge = `<span class="badge bg-secondary">❔ Unknown</span>`;
+        }
+
+        body.innerHTML += `
+          <tr>
+            <td>${serialNumber}</td>
+            <td>${student.force_number ?? '-'}</td>
+            <td>${student.first_name} ${student.middle_name} ${student.last_name}</td>
+            <td>${student.entry_region}</td>
+            <td>${statusBadge}</td>
+            <td>
               <a href="{{ url('students') }}/${student.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
-              </td>
-            </tr>`;
+            </td>
+          </tr>`;
+
         });
 
         renderPagination(data, type);

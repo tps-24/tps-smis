@@ -463,7 +463,7 @@
                             <a href="{{ route('excuse_types.index') }}">Excuse Type Settings</a>
                         </li>
                         <li>
-                            <a href="{{ route('termination_reasons.index') }}">Termination Reason Settings</a>
+                            <a href="{{ route('termination_reasons.index') }}">Termination Reasons</a>
                         </li>
                         <li>
                             <a href="{{ route('campuses.index') }}">Campus Settings</a>

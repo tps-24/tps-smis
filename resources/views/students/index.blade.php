@@ -126,11 +126,53 @@
                             </button>
                             @else
                             <button type="button" class="btn btn-sm btn-success">
-                                Verified
+                                ✅ &nbsp;Verified
                             </button>
                             @endif
                             @endcan
+                            <!-- Trigger Button -->
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#dismissStudentModal">
+                            🛑Dismiss
+                            </button>
                         </td>
+                        <!-- Modal -->
+                        <div class="modal fade" id="dismissStudentModal" tabindex="-1" aria-labelledby="dismissStudentModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-danger">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title" id="dismissStudentModalLabel">Confirm Dismissal</h5>
+                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <form method="POST" action="{{ route('students.dismiss', $student->id) }}">
+                                @csrf
+                                @method('PUT')
+
+                                <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="reason_id" class="form-label">Dismissal Reason</label>
+                                    <select name="reason_id" id="reason_id" class="form-select" required>
+                                    <option value="">-- Select Reason --</option>
+                                    @foreach ($terminationReasons as $reason)
+                                        <option value="{{ $reason->id }}">{{ $reason->reason }}</option>
+                                    @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="dismissed_at" class="form-label">Dismissal Date</label>
+                                    <input type="date" name="dismissed_at" id="dismissed_at" class="form-control" required>
+                                </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Confirm Dismissal</button>
+                                </div>
+                            </form>
+                            </div>
+                        </div>
+                        </div>
 
                         @can('beat-edit')
                         <td>

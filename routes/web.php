@@ -51,6 +51,8 @@ use App\Http\Controllers\IntakeHistoryController;
 use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Http\Request;
 
 require __DIR__ . '/auth.php';
 
@@ -203,6 +205,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/assigned-instructors/{courseId}', [StaffProgrammeCourseController::class, 'showAssignInstructorsForm'])->name('assign.instructors.form');
     Route::post('/assign-instructors', [StaffProgrammeCourseController::class, 'assignInstructors'])->name('assign.instructors');
     Route::post('/unassign-instructors/{courseInstructorId}', [StaffProgrammeCourseController::class, 'unAssignInstructor'])->name('unassign.course');
+    Route::put('/students/{id}/dismiss', [StudentController::class, 'dismiss'])->name('students.dismiss');
+
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
@@ -468,7 +472,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 });
 
-Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
+Route::get('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
      ->name('notifications.markAsRead');
 
 //start
