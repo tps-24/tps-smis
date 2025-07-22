@@ -37,7 +37,7 @@
 
 @endsection
 @section('content')
-
+@include('layouts.sweet_alerts.index')
 <!-- Row starts -->
 <div class="row gx-4">
     <div class="col-sm-12 col-12">
@@ -47,7 +47,18 @@
               <img src="/tps-smis/resources/assets/images/profile/avatar.jpg" alt="Profile Picture" />
             </div>
 
-            <div class="d-flex justify-content-end mt-3">
+            <div class="d-flex justify-content-end mt-3 gap-2">
+            <form id="changeStatusForm"  action="{{ route('staff.change_status') }}" method="post">
+              @csrf
+                <select onchange="confirmAction('changeStatusForm','Change Status','Status','Change')" class="form-control" name="status" id="" >
+                    <option @if ($staff->status=='active') selected @endif value="active">Active</option>
+                    <option @if ($staff->status=='leave') selected @endif value="leave">Leave</option>
+                    <option @if ($staff->status=='study') selected @endif value="study">Study</option>
+                    <option @if ($staff->status=='trip') selected @endif value="trip">Trip</option>
+                    <option @if ($staff->status=='dismissed') selected @endif value="dismissed">Dismissed</option>
+                </select>
+                <input type="text" name="staff_id" value="{{ $staff->id }}" hidden>
+            </form>
             <a href="{{ route('staffs.resume', $staff->id) }}" class="btn btn-primary me-2">Curriculumn Vitae</a>
             <button class="btn btn-danger me-2">Edit Profile</button>
               <button class="btn btn-success">Active</button> 
@@ -322,4 +333,8 @@
     </div>
 </div>
 <!-- Row ends -->
+
+<script>
+  
+</script>
  @endsection

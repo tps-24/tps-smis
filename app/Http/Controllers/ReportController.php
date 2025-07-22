@@ -36,23 +36,33 @@ class ReportController extends Controller
      */
     public function index(Request $request)
 {
+    
     $user = Auth::user();
     $selectedSessionId = session('selected_session') ?: 1;
 
-    // Determine which companies to show
-    $companies = $user->hasRole(['Sir Major', 'Instructor', 'OC Coy']) ?
-        Company::where('id', $user->staff->company_id)
-            ->whereHas('students', fn ($query) => $query->where('session_programme_id', $selectedSessionId))
-        : Company::whereHas('students', fn ($query) => $query->where('session_programme_id', $selectedSessionId));
+    // Determine the companies based on user role
+    $companiesQuery = Company::query();
 
-    $companies = $companies->get();
+    if ($user->hasRole(['Sir Major', 'Instructor', 'OC Coy'])) {
+        $companiesQuery->where('id', $user->staff->company_id);
+    }
+
+    $companiesQuery->whereHas('students', function ($query) use ($selectedSessionId) {
+        $query->where('session_programme_id', $selectedSessionId);
+    });
+
+    $companies = $companiesQuery->get();
     $companyIds = $companies->pluck('id');
 
-    $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : null;
-    $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : null;
-
-    // Call data helper
-    $data = $this->getAttendanceData($companyIds, $startDate, $endDate);
+    // Parse optional date range filters
+    $startDate = $request->filled('start_date') ? Carbon::parse($request->input('start_date')) : null;
+    $endDate = $request->filled('end_date') ? Carbon::parse($request->input('end_date')) : null;
+    // Call data helper only with dates if both are provided
+    if ($startDate && $endDate) {
+        $data = $this->getAttendanceData($companyIds, $startDate, $endDate);
+    } else {
+        $data = $this->getAttendanceData($companyIds); // use default logic (all data)
+    }
 
     return view('report.index', [
         'companies' => $companies,
@@ -60,22 +70,36 @@ class ReportController extends Controller
         'weeklyCounts' => $data['weeklyCounts'],
         'monthlyCounts' => $data['monthlyCounts'],
         'mostAbsentStudent' => $data['mostAbsentStudent'],
-        'graphData' => $this->graphDataService->getGraphData(),
+        'graphData' => $this->graphDataService->getGraphData($startDate, $endDate),
     ]);
 }
+
 
 
     private function getAttendanceData($companyIds, $startDate = null, $endDate = null)
 {
     $now = Carbon::today();
-    $startDate = $startDate ?: $now->copy()->subDays(6);
-    $endDate = $endDate ?: $now;
 
-    // Daily counts
-    $rawDaily = DB::table('attendences')
+    // If either date is missing, treat as no date filter
+    $hasDateFilter = $startDate !== null && $endDate !== null;
+
+    // Use defaults only if you want a default range when dates not provided,
+    // but your request was to query total if dates null, so skip default range here.
+    if (!$hasDateFilter) {
+        $startDate = null;
+        $endDate = null;
+    }
+
+    // DAILY QUERY
+    $dailyQuery = DB::table('attendences')
         ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id')
-        ->whereIn('platoons.company_id', $companyIds)
-        ->whereBetween('attendences.created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+        ->whereIn('platoons.company_id', $companyIds);
+
+    if ($hasDateFilter) {
+        $dailyQuery->whereBetween('attendences.created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()]);
+    }
+
+    $rawDaily = $dailyQuery
         ->select(
             DB::raw('DATE(attendences.created_at) as date'),
             DB::raw('SUM(attendences.absent) as total_absent'),
@@ -86,10 +110,16 @@ class ReportController extends Controller
         ->get()
         ->keyBy('date');
 
-    $days = collect();
-    $period = Carbon::parse($startDate)->diffInDays($endDate);
-    for ($i = 0; $i <= $period; $i++) {
-        $days->push(Carbon::parse($startDate)->addDays($i)->toDateString());
+    // For date labels, if no date filter, get all distinct dates from data
+    if ($hasDateFilter) {
+        $days = collect();
+        $period = Carbon::parse($startDate)->diffInDays($endDate);
+        for ($i = 0; $i <= $period; $i++) {
+            $days->push(Carbon::parse($startDate)->addDays($i)->toDateString());
+        }
+    } else {
+        // Use dates present in the data for labels
+        $days = $rawDaily->keys();
     }
 
     $dailyCounts = $days->map(fn ($date) => [
@@ -98,12 +128,17 @@ class ReportController extends Controller
         'total_kazini' => $rawDaily[$date]->total_kazini ?? 0,
     ]);
 
-    // Weekly counts
-    $rawWeekly = DB::table('attendences')
+    // WEEKLY QUERY
+    $weeklyQuery = DB::table('attendences')
         ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id')
         ->join('companies', 'platoons.company_id', '=', 'companies.id')
-        ->whereIn('companies.id', $companyIds)
-        ->whereBetween('attendences.created_at', [$startDate, $endDate])
+        ->whereIn('companies.id', $companyIds);
+
+    if ($hasDateFilter) {
+        $weeklyQuery->whereBetween('attendences.created_at', [$startDate, $endDate]);
+    }
+
+    $rawWeekly = $weeklyQuery
         ->select(
             DB::raw('YEARWEEK(attendences.created_at, 1) as year_week'),
             DB::raw('MIN(DATE(attendences.created_at)) as week_start'),
@@ -116,24 +151,41 @@ class ReportController extends Controller
         ->keyBy('year_week');
 
     $weeklyCounts = collect();
-    $startOfWeek = $startDate->copy()->startOfWeek();
-    while ($startOfWeek <= $endDate) {
-        $key = $startOfWeek->format('oW');
-        $record = $rawWeekly->get($key);
-        $weeklyCounts->push([
-            'week_start' => $startOfWeek->toDateString(),
-            'total_absent' => $record?->total_absent ?? 0,
-            'total_kazini' => $record?->total_kazini ?? 0,
-        ]);
-        $startOfWeek->addWeek();
+
+    if ($hasDateFilter) {
+        $startOfWeek = $startDate->copy()->startOfWeek();
+        while ($startOfWeek <= $endDate) {
+            $key = $startOfWeek->format('oW');
+            $record = $rawWeekly->get($key);
+            $weeklyCounts->push([
+                'week_start' => $startOfWeek->toDateString(),
+                'total_absent' => $record?->total_absent ?? 0,
+                'total_kazini' => $record?->total_kazini ?? 0,
+            ]);
+            $startOfWeek->addWeek();
+        }
+    } else {
+        // No date filter: just return all weeks found
+        foreach ($rawWeekly as $weekData) {
+            $weeklyCounts->push([
+                'week_start' => $weekData->week_start,
+                'total_absent' => $weekData->total_absent,
+                'total_kazini' => $weekData->total_kazini,
+            ]);
+        }
     }
 
-    // Monthly counts
-    $rawMonthly = DB::table('attendences')
+    // MONTHLY QUERY
+    $monthlyQuery = DB::table('attendences')
         ->join('platoons', 'attendences.platoon_id', '=', 'platoons.id')
         ->join('companies', 'platoons.company_id', '=', 'companies.id')
-        ->whereIn('companies.id', $companyIds)
-        ->whereBetween('attendences.created_at', [$startDate, $endDate])
+        ->whereIn('companies.id', $companyIds);
+
+    if ($hasDateFilter) {
+        $monthlyQuery->whereBetween('attendences.created_at', [$startDate, $endDate]);
+    }
+
+    $rawMonthly = $monthlyQuery
         ->select(
             DB::raw('YEAR(attendences.created_at) as year'),
             DB::raw('MONTH(attendences.created_at) as month'),
@@ -148,21 +200,36 @@ class ReportController extends Controller
         ]);
 
     $monthlyCounts = collect();
-    $currentMonth = $startDate->copy()->startOfMonth();
-    while ($currentMonth <= $endDate) {
-        $key = $currentMonth->format('Y-m');
-        $record = $rawMonthly->get($key);
-        $monthlyCounts->push([
-            'month' => $currentMonth->format('F Y'),
-            'total_absent' => $record?->total_absent ?? 0,
-            'total_kazini' => $record?->total_kazini ?? 0,
-        ]);
-        $currentMonth->addMonth();
+
+    if ($hasDateFilter) {
+        $currentMonth = $startDate->copy()->startOfMonth();
+        while ($currentMonth <= $endDate) {
+            $key = $currentMonth->format('Y-m');
+            $record = $rawMonthly->get($key);
+            $monthlyCounts->push([
+                'month' => $currentMonth->format('F Y'),
+                'total_absent' => $record?->total_absent ?? 0,
+                'total_kazini' => $record?->total_kazini ?? 0,
+            ]);
+            $currentMonth->addMonth();
+        }
+    } else {
+        foreach ($rawMonthly as $monthData) {
+            $monthlyCounts->push([
+                'month' => Carbon::createFromDate($monthData->year, $monthData->month)->format('F Y'),
+                'total_absent' => $monthData->total_absent,
+                'total_kazini' => $monthData->total_kazini,
+            ]);
+        }
     }
 
-    // Top 10 absent students (optional)
-    $absentCounts = DB::table('attendences')
-        ->whereBetween('created_at', [$startDate, $endDate])
+    // Top 10 absent students
+    $absentQuery = DB::table('attendences');
+    if ($hasDateFilter) {
+        $absentQuery->whereBetween('created_at', [$startDate, $endDate]);
+    }
+
+    $absentCounts = $absentQuery
         ->pluck('absent_student_ids')
         ->flatMap(fn ($v) => json_decode($v, true) ?? [])
         ->filter(fn ($id) => is_numeric($id))
@@ -183,6 +250,7 @@ class ReportController extends Controller
         'mostAbsentStudent' => $mostAbsentStudent,
     ];
 }
+
 
 
     public function generateAttendanceReport(Request $request)

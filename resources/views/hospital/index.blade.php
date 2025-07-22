@@ -50,18 +50,13 @@
                 <form action="{{ route('hospital.index') }}" method="GET" class="d-flex justify-content-between mb-3">
                     <div class="d-flex">
                         <select class="form-select me-2" name="company_id">
-                            @if(auth()->user()->hasRole('Sir Major'))
-                            <option value="{{ $assignedCompany->id ?? '' }}">{{ $assignedCompany->name ?? 'N/A' }}
-                            </option>
-                            @else
                             <option value="" disabled>Select Company</option>
                             @foreach($companies as $company)
                             <option value="{{ $company->id }}"
-                                {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                {{ request('company_id') == $company->id ? 'selected' : '' }}   >
                                 {{ $company->name }}
                             </option>
                             @endforeach
-                            @endif
                         </select>
                         <select class="form-select me-2" name="platoon">
                             <option value="">Select Platoon</option>
@@ -69,11 +64,9 @@
                                 {{ request('platoon') == $i ? 'selected' : '' }}>{{ $i }}</option>
                                 @endfor
                         </select>
-                        <input type="text" class="form-control me-2" name="fullname" placeholder="Enter Name (optional)"
-                            value="{{ request('fullname') }}">
+                        <input type="text" class="form-control me-2" name="name" placeholder="Enter Name (optional)"
+                            value="{{ request('name') }}">
 
-                        <input type="text" class="form-control me-2" name="student_id"
-                            placeholder="Enter Student ID (optional)" value="{{ request('student_id') }}">
 
                     </div>
                     <button type="submit" class="btn btn-primary">Search</button>
@@ -84,7 +77,7 @@
         <!-- Display Student Details -->
         @if(request()->has('company_id') || request()->has('platoon') || request()->has('fullname') ||
         request()->has('student_id'))
-        @if($studentDetails->isNotEmpty())
+        @if($students->isNotEmpty())
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
@@ -98,7 +91,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($studentDetails as $student)
+                    @if ($isCompanySelected)
+                        
+                    @foreach($students as $student)
                     <tr>
                         <td>{{ $student->first_name ?? 'N/A' }}</td>
                         <td>{{ $student->middle_name ?? 'N/A' }}</td>
@@ -155,9 +150,11 @@
                         </td>
                     </tr>
                     @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>
+        {!! $students->links('pagination::bootstrap-5') !!}
         @else
         <p class="mt-3 text-danger">{{ $message }}</p>
         @endif

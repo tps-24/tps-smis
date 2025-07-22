@@ -16,11 +16,160 @@ use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\CarbonPeriod;
 
 class GraphDataService
 {
     private $selectedSessionId;
-    public function getGraphData()
+public function getGraphData(String $start_date = null, String $end_date = null)
+{
+    $userId = auth()->id();
+    $programmeId = auth()->user()->session_programme_id;
+
+    // === If custom date range is provided (only daily) ===
+    if ($start_date && $end_date) {
+        $start = Carbon::parse($start_date)->startOfDay();
+        $end = Carbon::parse($end_date)->endOfDay();
+
+        $attendanceData = $this->getDailyData($start, $end, $userId, $programmeId);
+        //dd(['dailyData' => $attendanceData]);
+        return [
+            'dailyData' => $attendanceData,
+        ];
+    }
+
+    $today = Carbon::now();
+
+    // === 7 days daily data ===
+    $dailyStart = $today->copy()->subDays(6)->startOfDay();
+    $dailyEnd = $today->copy()->endOfDay();
+    $dailyData = $this->getDailyData($dailyStart, $dailyEnd, $userId, $programmeId);
+    $dailyCounts = collect($dailyData['data'])->map(fn($item) => $item['absents']);
+
+    // === 5 weeks weekly data ===
+    $today = now();
+
+    // Use provided dates or fallback to today
+    $start = $start_date ? Carbon::parse($start_date)->startOfWeek() : $today->copy()->subWeeks(4)->startOfWeek();
+    $end   = $end_date   ? Carbon::parse($end_date)->endOfWeek()   : $today->copy()->endOfWeek();
+
+    // === 5 weeks weekly data ===
+    $weeklyLabels = [];
+    $weeklyStats = [];
+
+    $current = $start->copy();
+
+    while ($current->lte($end)) {
+        $startOfWeek = $current->copy()->startOfWeek();
+        $endOfWeek   = $current->copy()->endOfWeek();
+
+        $weeklyLabels[] = "Week " . $this->getWeekNumber($startOfWeek);
+
+        $weeklyStats[] = [
+            'absents' => (int) Attendence::whereBetween('created_at', [$startOfWeek, $endOfWeek])->sum('absent'),
+            'leaves'  => LeaveRequest::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count(),
+            'lockUps'  => MPS::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count(),
+            'sick'    => Patient::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count(),
+        ];
+
+        $current->addWeek(); // Move to next week
+    }
+
+    $weeklyStats = [
+    'absents' => array_values(array_column($weeklyStats, 'absents')),
+    'leaves'  => array_values(array_column($weeklyStats, 'leaves')),
+    'lockUps' => array_values(array_column($weeklyStats, 'lockUps')),
+    'sick'    => array_values(array_column($weeklyStats, 'sick')),
+    ];
+    // === 3 months monthly data ===
+    $monthlyLabels = [];
+    $monthlyStats = [];
+
+    for ($i = 2; $i >= 0; $i--) {
+        $startOfMonth = $today->copy()->subMonths($i)->startOfMonth();
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+        $monthlyLabels[] = $startOfMonth->format('F Y'); // e.g. "July 2025"
+
+        $monthlyStats[] = [
+            'absents'  => (int) Attendence::whereBetween('created_at', [$startOfMonth, $endOfMonth])->sum('absent'),
+            'leaves'   => LeaveRequest::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count(),
+            'lockUps'      => MPS::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count(),
+            'sick' => Patient::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count(),
+        ];
+    }
+    $monthlyStats = [
+    'absents' => array_values(array_column($monthlyStats, 'absents')),
+    'leaves'  => array_values(array_column($monthlyStats, 'leaves')),
+    'lockUps' => array_values(array_column($monthlyStats, 'lockUps')),
+    'sick'    => array_values(array_column($monthlyStats, 'sick')),
+    ];
+    // dd($monthlyStats);
+    // dd([
+    //     'dailyData' => $dailyData,
+    //     'weeklyData' => array_merge(['labels' => $weeklyLabels], $weeklyStats),
+    //     'monthlyData' => array_merge(['labels' => $monthlyLabels], $monthlyStats),
+    //     'daily'   => $dailyCounts->toArray(),
+    //     'weekly'  => collect($weeklyStats)->pluck('absents')->toArray(),
+    //     'monthly' => collect($monthlyStats)->pluck('leaves')->toArray(), // adjust as needed
+    // ]);
+    return [
+        'dailyData' => $dailyData,
+        'weeklyData' => array_merge(['labels' => $weeklyLabels], $weeklyStats),
+        'monthlyData' => array_merge(['labels' => $monthlyLabels], $monthlyStats),
+        'daily'   => $dailyCounts->toArray(),
+        'weekly'  => collect($weeklyStats)->pluck('absents')->toArray(),
+        'monthly' => collect($monthlyStats)->pluck('leaves')->toArray(), // adjust as needed
+    ];
+}
+
+
+protected function getDailyData($start, $end, $userId, $programmeId)
+{
+    $dates = CarbonPeriod::create($start, $end)->toArray();
+
+    $data = collect($dates)->map(function ($date) use ($programmeId, $userId) {
+        return [
+            'date'     => $date->format('Y-m-d'),
+            'absents'  => (int) Attendence::whereDate('created_at', $date)->sum('absent'),
+            'sick' => Patient::whereDate('created_at', $date)->count(),
+            'lockUps'      => MPS::whereDate('created_at', $date)->count(),
+            'leaves'   => LeaveRequest::whereDate('created_at', $date)->count(),
+        ];
+    });
+
+    return [
+        'labels' => $data->pluck('date')->toArray(),
+        'data'=>$data->toArray(),
+        'absents' => $data->pluck('absents')->toArray(),
+        'sick' => $data->pluck('sick')->toArray(),
+        'lockUps' => $data->pluck('lockUps')->toArray(),
+        'leaves' => $data->pluck('leaves')->toArray()
+    ];
+}
+
+
+
+        private function getWeekNumber($date)
+    {
+        $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
+            $selectedSessionId = 1;
+        }
+        $sessionProgramme = SessionProgramme::find($selectedSessionId);
+        // Define the specified start date (September 30, 2024)
+        $startDate = Carbon::createFromFormat('d-m-Y', Carbon::parse($sessionProgramme->startDate)->format('d-m-Y'));
+                                      //dd($date);
+                                      // Define the target date for which you want to calculate the week number
+        $date = Carbon::parse($date); // This could be the current date, or any specific date
+
+                                                          // Calculate the difference in weeks between the start date and the target date
+        $weekNumber = $startDate->diffInWeeks($date) + 1; // Adding 1 to make it 1-based (Week 1, Week 2, ...)
+        return (int) $weekNumber;
+    }
+    
+
+    public function getGraphData2()
     {
 
         $selectedSessionId = session('selected_session');
@@ -63,7 +212,7 @@ class GraphDataService
         }
 
         // Keep the dates in the order as is (latest comes last)
-        $attendanceData['dates'] = $lastSevenDays->toArray();
+        $attendanceData['labels'] = $lastSevenDays->toArray();
 
         // Get the last 5 weeks and initialize the arrays for weekly data
         $lastFiveWeeks = collect();
@@ -82,7 +231,7 @@ class GraphDataService
         }
 
         // Keep the weeks in order (most recent comes last)
-        $weeklyData['weeks'] = $lastFiveWeeks->toArray();
+        $weeklyData['labels'] = $lastFiveWeeks->toArray();
 
         // Get the last 3 months and initialize the arrays for monthly data
         $lastThreeMonths = collect();
@@ -98,7 +247,7 @@ class GraphDataService
         }
 
         // Keep the months in order (most recent comes last)
-        $monthlyData['months'] = $lastThreeMonths->toArray();
+        $monthlyData['labels'] = $lastThreeMonths->toArray();
 
         // Retrieve all companies and their platoons
         $companies = Company::all();
@@ -384,6 +533,14 @@ class GraphDataService
         $leaves_daily_count   = array_column($weeklyCounts, 'total');
         $leaves_monthly_count = array_column($merged, 'total');
 
+        // dd([
+        //     'dailyData'   => $attendanceData,
+        //     'weeklyData'  => $weeklyData,
+        //     'monthlyData' => $monthlyData,
+        //     'daily'       => array_column($dailyCounts, 'total'),
+        //     'weekly'      => array_column($weekly, 'total'),
+        //     'monthly'     => $leaves_monthly_count,
+        // ]);
         // Combine all three sets of data into the final response
         return [
             'dailyData'   => $attendanceData,
@@ -393,23 +550,5 @@ class GraphDataService
             'weekly'      => array_column($weekly, 'total'),
             'monthly'     => $leaves_monthly_count,
         ];
-    }
-
-        private function getWeekNumber($date)
-    {
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 1;
-        }
-        $sessionProgramme = SessionProgramme::find($selectedSessionId);
-        // Define the specified start date (September 30, 2024)
-        $startDate = Carbon::createFromFormat('d-m-Y', Carbon::parse($sessionProgramme->startDate)->format('d-m-Y'));
-                                      //dd($date);
-                                      // Define the target date for which you want to calculate the week number
-        $date = Carbon::parse($date); // This could be the current date, or any specific date
-
-                                                          // Calculate the difference in weeks between the start date and the target date
-        $weekNumber = $startDate->diffInWeeks($date) + 1; // Adding 1 to make it 1-based (Week 1, Week 2, ...)
-        return (int) $weekNumber;
     }
 }

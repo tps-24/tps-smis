@@ -113,7 +113,7 @@
                                     placeholder="name(option)">
                                 <!-- Company Dropdown -->
                                 <select onchange="this.form.submit()" class="form-select me-2" name="company_id"
-                                    required>
+                                    >
                                     <option value="" selected disabled>Select Company</option>
                                     @foreach ($companies as $company)
                                     <option value="{{ $company->id }}"
@@ -142,7 +142,7 @@
                             @foreach ($staffs as $key => $staff)
                             <tr>
                                 <td>{{ ++$i }}</td>
-                                <td>{{ $staff->forceNumber }} {{ $staff->rank }} {{ $staff->firstName }}  {{ $staff->lastName }}</td>
+                                <td>{{ $staff->forceNumber }} {{ $staff->rank }}  {{ $staff->lastName }}</td>
                                 <td>{{ $staff->company->name ?? '' }}</td>
                                 <td>{{ $staff->email ?? '' }}</td>
                                 <td>{{ $staff->phoneNumber }}</td>

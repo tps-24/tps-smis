@@ -293,6 +293,7 @@ public function search(Request $request)
         $staffs->where(function ($query) use ($request) {
             $query->where('firstName', 'like', '%' . $request->name . '%')
                   ->orWhere('middleName', 'like', '%' . $request->name . '%')
+                  ->orWhere('forceNumber', 'like', '%' . $request->name . '%')
                   ->orWhere('lastName', 'like', '%' . $request->name . '%');
         });
     }
@@ -495,5 +496,15 @@ public function search(Request $request)
         $school->delete();
 
         return redirect()->back()->with('success', 'School or Professional deleted successfully.');
+    }
+    public function change_status(Request $request){
+        $status = $request->status;
+        $staff = Staff::find($request->staff_id);
+        if( !$staff){
+            return redirect()->back()->with('info','Staff is not found.');
+        }
+        $staff->status = $status;
+        $staff->save();
+        return redirect()->route('staffs.summary.index')->with('success','Status changed successfully.');
     }
 }

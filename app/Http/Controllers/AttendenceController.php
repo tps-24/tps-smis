@@ -341,11 +341,10 @@ class AttendenceController extends Controller
         $companies = $this->companies;
 
         $companyId = $request->companyId;
-
         // Use fallback if null, string "null", or invalid
         $selectedCompany = (is_numeric($companyId) && Company::find($companyId))
             ? Company::findOrFail($companyId)
-            : $this->companies->get(0)->first();
+            : $this->companies->first();
         return view('attendences/index', compact('statistics', 'companies', 'attendenceType', 'date','selectedCompany'));
 
     }
@@ -678,7 +677,7 @@ class AttendenceController extends Controller
             if ($date != Carbon::today()->toDateString()) {
                 $attendence = $platoon->attendences->where('created_at', $date)->first();
             } else {
-                $attendence = $platoon->today_attendence->first();
+                $attendence = $platoon->today_attendence()->first();
             }
 
             if ($attendence) {

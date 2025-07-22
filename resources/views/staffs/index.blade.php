@@ -45,11 +45,10 @@ $i = 0;
                             <div class="d-flex gap-2">
                               <label for="">Filter </label>
                                 <!-- Name Search -->
-                                <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name"
-                                    placeholder="name(option)">
+                                <input type="text" name="name" value="{{ old('name', request('name')) }}" class="form-control me-2" placeholder="Name (optional)" autocapitalize="on">
                                 <!-- Company Dropdown -->
                                 <select onchange="this.form.submit()" class="form-select me-2" name="company_id"
-                                    required>
+                                    >
                                     <option value="" selected disabled>Select Company</option>
                                     @foreach ($companies as $company)
                                     <option value="{{ $company->id }}"
