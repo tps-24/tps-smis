@@ -16,6 +16,7 @@
 
 @section('content')
 @include('layouts.sweet_alerts.index')
+
 <div class="card-header">
   <h5 class="card-title">Staff Summary</h5>
   <p class="card-text">This page provides a summary of the staff summary.</p>
@@ -24,7 +25,7 @@
 <div class="card-body" style="margin-right: -25px;">
   <div class="row">
     @php
-      $cardTypes = [       
+      $cardTypes = [
         ['key' => 'active', 'label' => 'Active', 'color' => 'primary'],
         ['key' => 'leave', 'label' => 'Leave', 'color' => 'success'],
         ['key' => 'study', 'label' => 'Study', 'color' => 'info'],
@@ -45,6 +46,18 @@
   </div>
 </div>
 
+<!-- Filter Form -->
+<div class="d-flex justify-content-center my-3">
+  <form id="staffFilterForm" class="d-flex flex-nowrap gap-2 align-items-center col-12 col-md-8 col-lg-6">
+    <div class="input-group">
+      <span class="input-group-text">Name</span>
+      <input type="text" class="form-control" name="staff_name" placeholder="Enter staff name">
+    </div>
+    <input type="hidden" name="status" id="filterStatus" value="">
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </form>
+</div>
+
 <!-- Result Section -->
 <div id="studentTableContainer" class="mt-4" style="display: none;">
   <h4 id="studentTableTitle" class="mb-3"></h4>
@@ -57,6 +70,7 @@
           <th>Force Number</th>
           <th>Name</th>
           <th>Designation</th>
+          <th>Status</th>
           <th>View</th>
         </tr>
       </thead>
@@ -64,36 +78,35 @@
     </table>
   </div>
 
-<!-- Pagination -->
-<div class="d-flex justify-content-end mt-3" id="pagination-container">
-    <!-- Pagination links will render here -->
+  <!-- Pagination -->
+  <div class="d-flex justify-content-end mt-3" id="pagination-container"></div>
 </div>
-
-</div>
-
 @endsection
 
 @section('scripts')
 <script>
-  let currentFilterType = 'totalEnrolled';
+  let currentFilterType = 'total';
 
   const labels = {
-    totalEnrolled: "Total Staff",
-    currentStudents: "Active Staff",
-    dismissed: "Dismissed Staff",
-    active: "Active Students",
-    study: "",
-    leave: "",
-    verified: "Verified Students"
+    total: "Total Staff",
+    active: "Active Staff",
+    leave: "Staff on Leave",
+    study: "Staff on Study",
+    dismissed: "Dismissed Staff"
   };
 
-  function showStaffs(type, page = 1) {
+  function showStaffs(type = 'total', page = 1) {
     currentFilterType = type;
+    document.getElementById('filterStatus').value = type;
 
-    const sessionId = document.getElementById('programmeSession')?.value || '';
-    const baseUrl = "{{ url('staff/filter') }}";
+    const form = document.getElementById('staffFilterForm');
+    const formData = new FormData(form);
+    formData.append('type', type);
 
-    fetch(`${baseUrl}?type=${type}&page=${page}&session_id=${sessionId}`)
+    const params = new URLSearchParams(formData).toString();
+    const url = `{{ url('staff/filter') }}?${params}&page=${page}`;
+
+    fetch(url)
       .then(response => response.json())
       .then(data => {
         const staffs = data.staffs.data;
@@ -101,11 +114,11 @@
         const title = document.getElementById('studentTableTitle');
         const body = document.getElementById('studentTableBody');
 
-        title.textContent = labels[type] ?? "Students";
+        title.textContent = labels[type] ?? "Staff";
         body.innerHTML = '';
-        
+
         let startIndex = (data.staffs.current_page - 1) * data.staffs.per_page;
-        
+
         staffs.forEach((staff, index) => {
           const serialNumber = startIndex + index + 1;
           body.innerHTML += `
@@ -113,36 +126,29 @@
               <td>${serialNumber}</td>
               <td>${staff.forceNumber ?? '-'}</td>
               <td>${staff.rank ?? '-'} ${staff.firstName} ${staff.lastName}</td>
-              <td>${staff.designation?? ''}</td>
+              <td>${staff.designation ?? '-'}</td>
+              <td>${staff.status ?? '-'}</td>
               <td>
-              <a href="{{ url('staffs') }}/${staff.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
+                <a href="/tps-smis/staffs/${staff.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
               </td>
-            </tr>`;
+            </tr>
+          `;
         });
 
         renderPagination(data, type);
         container.style.display = 'block';
       })
-      .catch((e) => {
-        alert("Could not load student data."+e);
-      });
+      .catch(err => alert("Failed to load staff data: " + err));
   }
 
   function renderPagination(data, type) {
     const paginationContainer = document.getElementById('pagination-container');
-    if (!paginationContainer) {
-      console.error('Pagination container not found.');
-      return;
-    }
-
     paginationContainer.innerHTML = `
-      <nav aria-label="Student pagination">
+      <nav>
         <ul class="pagination justify-content-end flex-wrap mb-0">
           ${data.staffs.links.map(link => {
-            const page = link.url ? new URL(link.url, window.location.origin).searchParams.get('page') : null;
-            const label = link.label
-              .replace(/&laquo;/g, '«')
-              .replace(/&raquo;/g, '»');
+            const page = link.url ? new URL(link.url).searchParams.get('page') : null;
+            const label = link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»');
 
             return `
               <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
@@ -158,14 +164,18 @@
       link.addEventListener('click', function (e) {
         e.preventDefault();
         const page = this.getAttribute('data-page');
-        if (page) showStaffs(type, parseInt(page));
+        if (page) showStaffs(currentFilterType, parseInt(page));
       });
     });
   }
+
+  document.getElementById('staffFilterForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    showStaffs(currentFilterType);
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     showStaffs(currentFilterType);
   });
 </script>
-
 @endsection

@@ -38,51 +38,40 @@ class StaffSummaryController extends Controller
     }
 
     public function filterStaff(Request $request)
-    {
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 1;
-        }
-        // Get the type from the request, defaulting to 'totalEnrolled'
-        $type = $request->get('type');
-        if (! in_array($type, ['active','total', 'study', 'leave','trip', 'dismissed'])) {
-            $type = 'total'; // Default type
-        }
+{
+    $type = $request->get('type', 'total'); // optional type filter, default total
+    $validTypes = ['active', 'study', 'leave', 'trip', 'dismissed'];
 
-        $query = Staff::query();
+    $query = Staff::query();
 
-        switch ($type) {
-            case 'active':
-                $query->where('status', 'active');
-                break;
-            case 'study':
-                $query->where('status', 'study');
-                break;
-
-            case 'leave':
-                $query->where('status', 'leave');
-                break;
-
-            case 'trip':
-                $query->where('status', 'trip');
-                break;
-
-            case 'dismissed':
-                $query->where('status', 'dismissed');
-                break;
-
-            case 'total':
-            default:
-                $query->get();
-                break;
-        }
-
-        $staffs = $query->paginate(10);
-
-        return response()->json([
-            'staffs' => $staffs,
-        ]);
+    // Filter by status type if valid
+    if (in_array($type, $validTypes)) {
+        $query->where('status', $type);
     }
+
+    // Filter by staff name (search firstName or lastName)
+    if ($request->filled('staff_name')) {
+        $name = $request->staff_name;
+        $query->where(function ($q) use ($name) {
+            $q->where('firstName', 'like', "%$name%")
+              ->orWhere('lastName', 'like', "%$name%")
+              ->orWhere('forceNumber', 'like', "%$name%");
+        });
+    }
+
+    // Optionally, filter by force number
+    if ($request->filled('force_number')) {
+        $query->where('forceNumber', 'like', '%' . $request->force_number . '%');
+    }
+
+    // Paginate the result (10 per page)
+    $staffs = $query->paginate(10);
+
+    return response()->json([
+        'staffs' => $staffs,
+    ]);
+}
+
 
 
 

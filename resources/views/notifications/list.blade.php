@@ -38,8 +38,7 @@
 </div>
 
 <!-- Laravel Echo -->
-<script src="https://cdn.jsdelivr.net/npm/laravel-echo/dist/echo.iife.js"></script>
-
+     <script src="/tps-smis/resources/assets/js/echo.iife.js"></script>
 <script>
   @php
     $notifications = \App\Models\SharedNotification::unreadBy(auth()->id())->get();

@@ -106,7 +106,7 @@
 </table>
 
 <!-- Include Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="/tps-smis/resources/assets/js/chart.js"></script>
 
 <!-- Chart Container -->
 
