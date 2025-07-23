@@ -10,6 +10,8 @@ use App\Models\SafariType;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Vitengo;
+use App\Models\TerminationReason;
+use App\Models\StudentDismissal;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Hash;
@@ -54,13 +56,16 @@ class StudentController extends Controller
         // Global approved count based on selected session only
         $approvedCount = Student::where('session_programme_id', $selectedSessionId)
             ->where('status', 'approved')
+            ->where('enrollment_status', 1)
             ->count();
+    
+        $terminationReasons = TerminationReason::orderBy('reason')->get();
 
-        $students  = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
+        $students  = Student::where('session_programme_id', $selectedSessionId)->where('enrollment_status', 1)->orderBy('company_id')->orderBy('platoon')->paginate(20);
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId); // Filter students by session
         })->get();
-        return view('students.index', compact('students', 'companies', 'approvedCount'))
+        return view('students.index', compact('students', 'companies', 'approvedCount', 'terminationReasons'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
     }
 
@@ -97,18 +102,43 @@ class StudentController extends Controller
         }
 
         // Clone the query before pagination to get approved count
-        $approvedCount = (clone $students)->where('status', 'approved')->count();
+        $approvedCount = (clone $students)->where('enrollment_status', 1)->where('status', 'approved')->count();
+        
+        $terminationReasons = TerminationReason::orderBy('reason')->get();
 
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId);
         })->get();
 
-        $students = $students->orderBy('first_name', 'asc')->latest()->paginate(90);
+        $students = $students->where('enrollment_status', 1)->orderBy('first_name', 'asc')->latest()->paginate(90);
 
-        return view('students.index', compact('students', 'companies', 'approvedCount'))
+        return view('students.index', compact('students', 'companies', 'approvedCount', 'terminationReasons'))
             ->with('i', ($request->input('page', 1) - 1) * 90);
 
     }
+
+    public function dismiss(Request $request, $id)
+    {
+        $request->validate([
+            'reason_id' => 'required|exists:termination_reasons,id',
+            'dismissed_at' => 'required|date',
+        ]);
+
+        $student = Student::findOrFail($id);
+        StudentDismissal::create([
+            'student_id'   => $student->id,
+            'reason_id'    => $request->reason_id,
+            'dismissed_at' => $request->dismissed_at,
+        ]);
+
+        // Update student status means dismissed en 1 means active/available
+        $student->update([
+            'enrollment_status' => 0, 
+        ]);
+
+        return redirect()->back()->with('success', 'Student has been dismissed successfully.');
+    }
+
 
 
     /**

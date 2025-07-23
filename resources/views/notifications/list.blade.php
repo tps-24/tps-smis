@@ -46,7 +46,7 @@
   @endphp
 
   const notifications = @json($notifications);
-  let counts = @json($unreadCount);
+  let counts = {!! json_encode($unreadCount) !!};
 
   updateNotificationCount(counts);
   notifications.forEach(appendNotification);
@@ -262,8 +262,9 @@
     const id = '';
     const created_at = '';
     const category = '';
+    const shared_id = JSON.stringify(notification.id);
         const url = notification.notification_category_id
-      ? `/tps-smis/notifications/showNotifications/${notification.notification_category_id}`
+      ? `/tps-smis/notifications/showNotifications/${JSON.stringify(notification.data.id)}`
       : '#';
 if (typeof notification.data !== 'undefined') {
   notification = notification.data; // extract the real object, not stringify yet
@@ -278,7 +279,7 @@ if (typeof notification.data !== 'undefined') {
     div.innerHTML = `
       <div
         class="notification-box bg-${notification.type ?? 'primary'}-subtle border border-${notification.type ?? 'primary'} px-3 py-2 rounded-1"
-        data-id="${notification.id}"
+        data-id="${shared_id}"
         data-url="${url}"
         onclick="markNotificationAsRead(this)"
       >
@@ -295,9 +296,8 @@ if (typeof notification.data !== 'undefined') {
   function markNotificationAsRead(element) {
     const id = element.getAttribute('data-id');
     const url = element.getAttribute('data-url');
-
     fetch(`/tps-smis/notifications/mark-as-read/${id}`, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
         Accept: 'application/json',

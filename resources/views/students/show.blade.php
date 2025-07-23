@@ -422,22 +422,22 @@
 
                                                                                             <td>
                                                                                                 <span class="static-field">{{ $kin['name'] }}</span>
-                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][name]" class="form-control form-control-sm editable-field d-none" value="{{ $kin['name'] }}">
+                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][name]" class="form-control form-control-sm editable-field d-none">
                                                                                             </td>
 
                                                                                             <td>
                                                                                                 <span class="static-field">{{ $kin['relationship'] }}</span>
-                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][relationship]" class="form-control form-control-sm editable-field d-none" value="{{ $kin['relationship'] }}">
+                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][relationship]" class="form-control form-control-sm editable-field d-none">
                                                                                             </td>
 
                                                                                             <td>
                                                                                                 <span class="static-field">{{ $kin['phone'] }}</span>
-                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][phone]" class="form-control form-control-sm editable-field d-none" value="{{ $kin['phone'] }}">
+                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][phone]" class="form-control form-control-sm editable-field d-none">
                                                                                             </td>
 
                                                                                             <td>
                                                                                                 <span class="static-field">{{ $kin['address'] }}</span>
-                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][address]" class="form-control form-control-sm editable-field d-none" value="{{ $kin['address'] }}">
+                                                                                                <input type="text" name="next_of_kin[{{ $loop->index }}][address]" class="form-control form-control-sm editable-field d-none">
                                                                                             </td>
                                                                                             </tr>
                                                                                         @endforeach
