@@ -43,7 +43,7 @@
             @endforeach
 
         </div>
-
+        <input type="text" name="date" value="{{ $date }}" hidden>
         <div class=" mt-4">
             <label class="form-check-label" style="text-decoration:underline; color:blue;">
                 <input id="selectAll" class="form-check-input" type="checkbox" onclick="toggleSelectAll(this)">

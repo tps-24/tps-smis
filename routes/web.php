@@ -374,6 +374,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('campanies/{campusId}', [GuardAreaController::class, 'get_companies']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+        Route::post('store/request',  'requestAttendance')->name('attendance.store.request');
+        Route::get('show/request',  'createAttendanceRequests')->name('attendance.show.request');
+        Route::post('request/update-status',  'updateRequestStatus')->name('attendance.request.update-status');
+        
         Route::get('type-test/{type_id}', 'attendence');
         Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
         // Route::post('create/{type_id}', 'create');

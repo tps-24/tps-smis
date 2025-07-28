@@ -8,6 +8,7 @@ use App\Models\MPS;
 use App\Models\Patient;
 use App\Models\Platoon;
 use App\Models\Student;
+use App\Models\AttendanceRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -40,11 +41,11 @@ class AttendenceController extends Controller
      */
     public function index(Request $request)
     {
-     $companyId = $request->company_id ?? null;
-    return redirect()->route('attendences.type', [
-        'type' => 1,
-        'company' => $companyId, // this becomes a query parameter
-    ]);
+        $companyId = $request->company_id ?? null;
+        return redirect()->route('attendences.type', [
+            'type'    => 1,
+            'company' => $companyId, // this becomes a query parameter
+        ]);
     }
 
     /**
@@ -52,6 +53,7 @@ class AttendenceController extends Controller
      */
     public function create(Request $request, $attendenceType_id)
     {
+        $date = $request->date;
         // Check if a session ID has been submitted
         if (request()->has('session_id')) {
             // Store the selected session ID in the session
@@ -79,7 +81,7 @@ class AttendenceController extends Controller
 
         return view(
             'attendences/create',
-            compact('students', 'attendenceType', 'platoon')
+            compact('students', 'attendenceType', 'platoon','date')
         );
     }
 
@@ -162,7 +164,7 @@ class AttendenceController extends Controller
         $date        = Carbon::parse($date)->format('Y-m-d');
         foreach ($company->platoons as $platoon) {
             if ($platoon->attendences->isNotEmpty()) {
-                $platoon_attendences = $platoon->attendences()->where('attendenceType_id', $type)->whereDate('created_at', $date)->where('session_programme_id', $selectedSessionId)->get();
+                $platoon_attendences = $platoon->attendences()->where('attendenceType_id', $type)->whereDate('date', $date)->where('session_programme_id', $selectedSessionId)->get();
                 $absent_students     = new \Illuminate\Database\Eloquent\Collection;
                 $safari_students     = new \Illuminate\Database\Eloquent\Collection;
 
@@ -277,7 +279,7 @@ class AttendenceController extends Controller
 
     public function attendence(Request $request, $type)
     {
-        $companyId = $request->input('companyId')?? null;
+        $companyId = $request->input('companyId') ?? null;
         // Check if a session ID has been submitted
         if (request()->has('session_id')) {
             // Store the selected session ID in the session
@@ -328,11 +330,11 @@ class AttendenceController extends Controller
                 })->get()->unique('id');
 
             foreach ($company->platoons as $platoon) {
-                if (count($platoon->attendences()->whereDate('created_at', $date)->where('session_programme_id', $selectedSessionId)->where('attendenceType_id', $type)->get()) > 0) {
-                    array_push($company_stats, $platoon->attendences()->whereDate('created_at', $date)->where('session_programme_id', $selectedSessionId)->where('attendenceType_id', $type)->get());
+                if (count($platoon->attendences()->whereDate('date', $date)->where('session_programme_id', $selectedSessionId)->where('attendenceType_id', $type)->get()) > 0) {
+                    array_push($company_stats, $platoon->attendences()->whereDate('date', $date)->where('session_programme_id', $selectedSessionId)->where('attendenceType_id', $type)->get());
                 }
             }
-           
+
             array_push($statistics, [
                 'company'    => $company,
                 'statistics' => count($company_stats) > 0 ? $this->statistics($company_stats, $company->id) : $this->setZero($company->id),
@@ -343,9 +345,9 @@ class AttendenceController extends Controller
         $companyId = $request->companyId;
         // Use fallback if null, string "null", or invalid
         $selectedCompany = (is_numeric($companyId) && Company::find($companyId))
-            ? Company::findOrFail($companyId)
-            : $this->companies->first();
-        return view('attendences/index', compact('statistics', 'companies', 'attendenceType', 'date','selectedCompany'));
+        ? Company::findOrFail($companyId)
+        : $this->companies->first();
+        return view('attendences/index', compact('statistics', 'companies', 'attendenceType', 'date', 'selectedCompany'));
 
     }
 
@@ -411,7 +413,7 @@ class AttendenceController extends Controller
     public function getPlatoons($company_id)
     {
         $company = Company::find($company_id);
-        return response()->json($company->platoons()->orderBy('name','asc')->withCount('students')->get());
+        return response()->json($company->platoons()->orderBy('name', 'asc')->withCount('students')->get());
     }
 
     /**
@@ -456,8 +458,9 @@ class AttendenceController extends Controller
         $todayRecords = Attendence::leftJoin('platoons', 'attendences.platoon_id', 'platoons.id')
             ->where('attendences.platoon_id', $platoon_id)
             ->where('attendences.attendenceType_id', $type)
+            ->where('attendences.date', $request->date)
             ->where('session_programme_id', $selectedSessionId)
-            ->whereDate('attendences.created_at', Carbon::today())->get();
+            ->whereDate('attendences.date', Carbon::parse($request->date))->get();
         if (! $todayRecords->isEmpty()) {
             return redirect()->to('attendences/type/' . $type)->with('error', "Attendences for this platoon already recorded.");
         }
@@ -501,17 +504,19 @@ class AttendenceController extends Controller
             'lockUp_students_ids'   => count($lockUp) > 0 ? json_encode($lockUp) : null,
             'absent_student_ids'    => count($absent_ids) > 0 ? json_encode($absent_ids) : null,
             'total'                 => $total,
-             //'created_at' => $hardcodedDate,
+            'recorded_by'           => $request->user()->id,
+            'date' => $request->date
+            //'created_at' => $hardcodedDate,
             //'updated_at' =>$hardcodedDate
         ]);
 
         $attendence->session_programme_id = $selectedSessionId;
         $attendence->save();
         $companyId = $platoon->company_id;
-        
+
         return redirect()
-        ->to('attendences/type/' . $type->id . '?companyId=' . $companyId)
-        ->with('success', 'Attendances saved successfully.');
+            ->to('attendences/type/' . $type->id . '?companyId=' . $companyId)
+            ->with('success', 'Attendances saved successfully.');
 
     }
 
@@ -838,7 +843,7 @@ class AttendenceController extends Controller
             // Store the selected session ID in the session
             session(['selected_session' => request()->session_id]);
         }
-        
+
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
@@ -885,4 +890,50 @@ class AttendenceController extends Controller
         }
 
         return $platoon->leaves()->where('students.company_id', $platoon->company_id)->where('session_programme_id', $selectedSessionId)->whereNull('leave_requests.return_date')->pluck('student_id')->toArray();}
-}
+
+    public function requestAttendance(Request $request){
+        $request->validate([
+            'company_id' => 'required|exists:companies,id',
+                'date'       => 'required|date',
+                'reason'     => 'required|string|min:5|max:500',
+            ], [
+                'company_id.required' => 'Company is required.',
+                'reason.required'     => 'Please provide a reason.',
+                'reason.min'          => 'Reason must be at least 5 characters.',
+            ]);
+
+                //  Check if a pending request already exists
+            $alreadyPending = AttendanceRequest::where('company_id', $request->company_id)
+                ->where('date', $request->date)
+                ->where('requested_by', $request->user()->id)
+                ->where('status', 'pending')
+                ->where('attendenceType_id', $request->attendenceType_id)               
+                ->exists();
+
+            if ($alreadyPending) {
+                return redirect()->back()->with('info', 'You have already made a pending attendance request for this company and date.');
+            }
+            AttendanceRequest::create([
+                'date' => $request->date,
+                'company_id' => $request->company_id,
+                'requested_by' => $request->user()->id,
+                'attendenceType_id' =>$request->attendenceType_id,
+                'reason' => $request->reason,
+            ]);
+            return redirect()->back()->with('success', 'Attendance request submitted successfully.');
+    }
+
+    public function createAttendanceRequests(){
+        $requests = AttendanceRequest::orderBy('created_at','desc')->paginate(15);
+        return view('attendences.request', compact('requests'));
+    }
+
+    public function updateRequestStatus(Request $request){
+        $attendanceRequest = AttendanceRequest::find($request->attendanceRequestId);
+        $attendanceRequest->status = $request->status;
+        $attendanceRequest->approved_by = $request->user()->id;
+        $attendanceRequest->save();
+
+        return redirect()->back()->with('success', 'Attendance request status updated successfully.');
+    }
+    }

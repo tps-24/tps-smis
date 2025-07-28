@@ -37,12 +37,15 @@ class Platoon extends Model
     public function leaves(){
         return $this->hasManyThrough(LeaveRequest::class, Student::class, 'platoon', 'student_id', 'name', 'id');
     }
-public function today_attendence($attendanceType_id = null)
+public function today_attendence($attendanceType_id = null, $date = null)
 {
     $selectedSessionId = session('selected_session', 1); // fallback to 1
+    if(!$date){
+        $date = \Carbon\Carbon::today();
+    }
     $query = $this->attendences()
         ->where('session_programme_id', $selectedSessionId)
-        ->whereDate('created_at', \Carbon\Carbon::today());
+        ->whereDate('date', \Carbon\Carbon::parse($date));
 
     if ($attendanceType_id) {
         $query->where('attendenceType_id', $attendanceType_id);
