@@ -348,7 +348,7 @@
     @auth
       {{-- Student --}}
       @role('Student')
-        <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-pencil-square"></i> Apply for Leave</a></li>
+        <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for Leave</a></li>
       @endrole
 
       {{-- Sir Major --}}
@@ -368,7 +368,7 @@
 
       {{-- Admins (see all) --}}
       @hasanyrole('Admin|Super Administrator')
-        <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-pencil-square"></i> Apply for Leave</a></li>
+        <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for Leave</a></li>
         <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a></li>
         <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC Panel</a></li>
         <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i> Chief Instructor Panel</a></li>

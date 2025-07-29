@@ -597,3 +597,12 @@ Route::get('/leave-requests/rejected', [LeaveRequestController::class, 'rejected
 Route::get('/leave-requests/{id}/rejected-pdf', [LeaveRequestController::class, 'downloadRejectedPdf'])->name('leave-requests.rejected.pdf');
 
 Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->name('staffs.resume');
+
+  // Show the form to students
+    Route::get('/leave-request', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
+
+    // Store leave request
+    Route::post('/leave-request', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+
+
+    

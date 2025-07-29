@@ -49,9 +49,14 @@ class User extends Authenticatable
         ];
     }
 
+    //public function student()
+//{
+ //   return $this->hasOne(Student::class);
+//}
+
     public function student()
     {
-        return $this->hasOne(Student::class, 'user_id', 'id');
+       return $this->hasOne(Student::class, 'user_id', 'id');
     }
     public function staff()
     {
@@ -87,6 +92,7 @@ public function sharedNotifications()
                 ->withPivot('read_at')
                 ->withTimestamps();
 }
+
 
 
 }
