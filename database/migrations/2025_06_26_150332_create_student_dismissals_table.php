@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('student_dismissals', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('student_id')->constrained();
+            $table->foreignId('reason_id')->constrained('termination_reasons');
+            $table->date('dismissed_at');
             $table->timestamps();
         });
     }

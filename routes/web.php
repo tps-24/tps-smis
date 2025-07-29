@@ -48,9 +48,12 @@ use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\IntakeHistoryController;
+use App\Http\Controllers\StaffSummaryController;
 use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Http\Request;
 
 require __DIR__ . '/auth.php';
 
@@ -130,6 +133,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/print-certificates', [FinalResultController::class, 'studentList'])->name('studentList');
+    Route::get('/print-certificates/summary', [FinalResultController::class, 'summary'])->name('studentList');
     Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
     Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
     Route::get('students/search_certificate/{companyId}', [FinalResultController::class, 'search'])->name('students.search_certificate');
@@ -193,6 +197,9 @@ Route::group(['middleware' => ['auth']], function () {
         return view('staffs.bulk_upload_explanation');
     })->name('uploadStaff');
 
+    Route::get('/staffs/summary', [StaffSummaryController::class, 'index'])->name('staffs.summary.index');
+    Route::get('staff/filter', [StaffSummaryController::class, 'filterStaff'])->name('staff.filter');
+    Route::post('staff/change-status/', [StaffController::class, 'change_status'])->name('staff.change_status');
     Route::get('staff/search', [StaffController::class, 'search'])->name('staff.search');
     Route::get('/staff/create-cv/{staffId}', [StaffController::class, 'create_cv'])->name('staff.create-cv');
     Route::post('/staff/update-cv/{staffId}', [StaffController::class, 'update_cv'])->name('staff.update-cv');
@@ -203,6 +210,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/assigned-instructors/{courseId}', [StaffProgrammeCourseController::class, 'showAssignInstructorsForm'])->name('assign.instructors.form');
     Route::post('/assign-instructors', [StaffProgrammeCourseController::class, 'assignInstructors'])->name('assign.instructors');
     Route::post('/unassign-instructors/{courseInstructorId}', [StaffProgrammeCourseController::class, 'unAssignInstructor'])->name('unassign.course');
+    Route::put('/students/{id}/dismiss', [StudentController::class, 'dismiss'])->name('students.dismiss');
+
 
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
@@ -320,6 +329,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('safari-students', SafariStudentController::class);
     Route::resource('certificates', CertificateController::class);
     Route::resource('intake_history', IntakeHistoryController::class);
+    
 
     Route::resource('companies', CompanyController::class);
     
@@ -359,10 +369,15 @@ Route::group(['middleware' => ['auth']], function () {
 
     // routes/web.php
     Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
+    
     Route::get('platoons/{companyName}', [AttendenceController::class, 'getPlatoons']);
     Route::get('campanies/{campusId}', [GuardAreaController::class, 'get_companies']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+        Route::post('store/request',  'requestAttendance')->name('attendance.store.request');
+        Route::get('show/request',  'createAttendanceRequests')->name('attendance.show.request');
+        Route::post('request/update-status',  'updateRequestStatus')->name('attendance.request.update-status');
+        
         Route::get('type-test/{type_id}', 'attendence');
         Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
         // Route::post('create/{type_id}', 'create');
@@ -468,7 +483,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 });
 
-Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
+Route::get('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
      ->name('notifications.markAsRead');
 
 //start

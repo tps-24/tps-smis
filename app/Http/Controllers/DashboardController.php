@@ -167,7 +167,7 @@ class DashboardController extends Controller
                 })
                 ->count();
 
-            $staffsCount           = Staff::count('forceNumber');
+            $staffsCount           = Staff::where('status','!=','dismissed')->count('forceNumber');
             $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
             $graphData             = $this->graphDataService->getGraphData();
             return view('dashboard.dashboard', compact(

@@ -75,13 +75,21 @@ class NotificationController extends Controller
     }
 
 
-public function markAsRead($id)
+public function markAsRead(Request $request, $id)
 {
-    $user = auth()->user();
-    Log::info($id);
-    // Assuming SharedNotification is used and has a pivot table notification_user
+    $user = $request->user();
+
+    // Ensure the notification belongs to the user to prevent unauthorized access
+    $notification = $user->sharedNotifications()->find($id);
+
+    if (!$notification) {
+        return response()->json(['error' => 'Notification not found.'], 404);
+    }
+
+    // Update the pivot table
     $user->sharedNotifications()->updateExistingPivot($id, ['read_at' => now()]);
 
     return response()->json(['status' => 'read']);
 }
+
 }

@@ -37,7 +37,7 @@
 
 @endsection
 @section('content')
-
+@include('layouts.sweet_alerts.index')
 <!-- Row starts -->
 <div class="row gx-4">
     <div class="col-sm-12 col-12">
@@ -47,10 +47,29 @@
               <img src="/tps-smis/resources/assets/images/profile/avatar.jpg" alt="Profile Picture" />
             </div>
 
-            <div class="d-flex justify-content-end mt-3">
+            <div class="d-flex justify-content-end mt-3 gap-2">
             <a href="{{ route('staffs.resume', $staff->id) }}" class="btn btn-primary me-2">Curriculumn Vitae</a>
             <button class="btn btn-danger me-2">Edit Profile</button>
-              <button class="btn btn-success">Active</button> 
+            <form id="changeStatusForm"  action="{{ route('staff.change_status') }}" method="post">
+              @csrf
+              <select 
+                  name="status" 
+                  class="form-control bg-success text-white" 
+                  onchange="confirmAction('changeStatusForm', 'Change Status', 'Status', 'Change')">
+                  
+                  @php
+                      $statuses = ['active', 'leave', 'study', 'trip', 'dismissed'];
+                  @endphp
+
+                  @foreach ($statuses as $status)
+                      <option value="{{ $status }}" {{ $staff->status === $status ? 'selected' : '' }}>
+                          {{ ucfirst($status) }}
+                      </option>
+                  @endforeach
+              </select>
+
+                <input type="text" name="staff_id" value="{{ $staff->id }}" hidden>
+            </form>
             </div>
           </div>
         </div>
@@ -322,4 +341,8 @@
     </div>
 </div>
 <!-- Row ends -->
+
+<script>
+  
+</script>
  @endsection

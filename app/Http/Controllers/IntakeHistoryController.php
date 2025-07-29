@@ -26,9 +26,9 @@ class IntakeHistoryController extends Controller
         // Aggregate summary counts
         $stats = [
             'totalEnrolled'   => Student::where('session_programme_id', $selectedSessionId)->get(),
-            'currentStudents' => Student::where('session_programme_id', $selectedSessionId)->where('status', 'active')->get(),
-            'dismissed'       => Student::where('session_programme_id', $selectedSessionId)->where('status', 'dismissed')->get(),
-            'verified'        => Student::where('session_programme_id', $selectedSessionId)->where('status', 'verified')->get(),
+            'currentStudents' => Student::where('session_programme_id', $selectedSessionId)->where('enrollment_status', 1)->get(),
+            'dismissed'       => Student::where('session_programme_id', $selectedSessionId)->where('enrollment_status', 0)->get(),
+            'verified'        => Student::where('session_programme_id', $selectedSessionId)->where('status', 'approved')->get(),
         ];
 
         $students = Student::where('session_programme_id', $selectedSessionId)->paginate(10);
@@ -52,15 +52,15 @@ class IntakeHistoryController extends Controller
 
         switch ($type) {
             case 'currentStudents':
-                $query->where('status', 'active');
+                $query->where('enrollment_status', 1);
                 break;
 
             case 'dismissed':
-                $query->where('status', 'dismissed');
+                $query->where('enrollment_status', 0);
                 break;
 
             case 'verified':
-                $query->where('status', 'verified');
+                $query->where('status', 'approved');
                 break;
 
             case 'totalEnrolled':

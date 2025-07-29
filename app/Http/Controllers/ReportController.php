@@ -36,6 +36,7 @@ class ReportController extends Controller
      */
     public function index(Request $request)
 {
+    
     $user = Auth::user();
     $selectedSessionId = session('selected_session') ?: 1;
 
@@ -56,7 +57,6 @@ class ReportController extends Controller
     // Parse optional date range filters
     $startDate = $request->filled('start_date') ? Carbon::parse($request->input('start_date')) : null;
     $endDate = $request->filled('end_date') ? Carbon::parse($request->input('end_date')) : null;
-
     // Call data helper only with dates if both are provided
     if ($startDate && $endDate) {
         $data = $this->getAttendanceData($companyIds, $startDate, $endDate);
@@ -70,7 +70,7 @@ class ReportController extends Controller
         'weeklyCounts' => $data['weeklyCounts'],
         'monthlyCounts' => $data['monthlyCounts'],
         'mostAbsentStudent' => $data['mostAbsentStudent'],
-        'graphData' => $this->graphDataService->getGraphData(),
+        'graphData' => $this->graphDataService->getGraphData($startDate, $endDate),
     ]);
 }
 
@@ -404,9 +404,17 @@ $sick_student_ids = [];
             ));
     }
 
-    public function leaves()
+    public function leaves(Request $request)
     {
-        $data          = $this->getLeavesData();
+            $startDate = $request->input('start_date');
+            $endDate   = $request->input('end_date');
+
+            // Conditionally call with or without parameters
+            if ($startDate && $endDate) {
+                $data = $this->getLeavesData($startDate, $endDate);
+            } else {
+                $data = $this->getLeavesData(); // default 7 days, 5 weeks, 3 months
+            }
         $leaveRequests = $data['leaveRequests'];
         $dailyCounts   = $data['dailyCounts'];
 
@@ -440,10 +448,15 @@ $sick_student_ids = [];
         ));
     }
 
-    public function mps()
+    public function mps(Request $request)
     {
 
-        $data        = $this->getMPSData();
+    // Get optional start and end dates from request
+    $startDate = $request->input('start_date');
+    $endDate   = $request->input('end_date');
+
+    // Pass the dates to getMPSData
+    $data = $this->getMPSData($startDate, $endDate);
         $dailyCounts = [
             'labels'         => array_column($data['dailyCounts'], 'date'),
             'mps_counts'     => array_column($data['dailyCounts'], 'mps_count'),
@@ -707,8 +720,165 @@ $sick_student_ids = [];
             'monthlyCounts'        => $monthlyCounts,
         ];
     }
+private function getLeavesData($start_date = null, $end_date = null)
+{
+    $user = Auth::user();
+    $company_ids = [];
 
-    private function getLeavesData()
+    if ($user->hasRole(['Sir Major', 'Instructor', 'OC Coy'])) {
+        $company_ids = [$user->staff->company_id];
+    } else {
+        $company_ids = Company::pluck('id')->toArray();
+    }
+
+    $selectedSessionId = session('selected_session') ?: 1;
+
+    // Handle date range
+    $today = Carbon::today();
+    $defaultStart = $today->copy()->subDays(6)->startOfDay(); // last 7 days
+    $defaultEnd   = $today->copy()->endOfDay();
+
+    $start = $start_date ? Carbon::parse($start_date)->startOfDay() : $defaultStart;
+    $end   = $end_date ? Carbon::parse($end_date)->endOfDay() : $defaultEnd;
+
+    // ======================== DAILY ========================
+    $rawDaily = LeaveRequest::whereBetween('created_at', [$start, $end])
+        ->whereIn('company_id', $company_ids)
+        ->selectRaw("
+            DATE(created_at) AS date,
+            COUNT(CASE WHEN return_date IS NOT NULL AND return_date < end_date THEN 1 END) AS returned,
+            COUNT(CASE WHEN return_date IS NULL AND end_date > NOW() THEN 1 END) AS on_leave,
+            COUNT(CASE WHEN return_date IS NULL AND end_date <= NOW() THEN 1 END) AS late
+        ")
+        ->groupBy(DB::raw('DATE(created_at)'))
+        ->orderBy('date')
+        ->get()
+        ->keyBy('date');
+
+    $dailyCounts = [];
+    $current = $start->copy();
+    while ($current->lte($end)) {
+        $dateStr = $current->toDateString();
+        $raw = $rawDaily[$dateStr] ?? null;
+
+        $dailyCounts[] = [
+            'date'     => $dateStr,
+            'returned' => $raw->returned ?? 0,
+            'on_leave' => $raw->on_leave ?? 0,
+            'late'     => $raw->late ?? 0,
+        ];
+
+        $current->addDay();
+    }
+
+    // ======================== WEEKLY ========================
+    // If no custom dates, use last 5 full weeks
+    if (!$start_date && !$end_date) {
+        $startOfFirstWeek = $today->copy()->subWeeks(4)->startOfWeek();
+        $endOfLastWeek    = $today->copy()->endOfWeek();
+    } else {
+        $startOfFirstWeek = $start->copy()->startOfWeek();
+        $endOfLastWeek    = $end->copy()->endOfWeek();
+    }
+
+    $rawWeekly = LeaveRequest::whereBetween('created_at', [$startOfFirstWeek, $endOfLastWeek])
+        ->whereIn('company_id', $company_ids)
+        ->selectRaw("
+            YEARWEEK(created_at, 1) AS year_week,
+            MIN(DATE(created_at)) AS created_at,
+            COUNT(CASE WHEN return_date IS NOT NULL AND return_date < end_date THEN 1 END) AS returned,
+            COUNT(CASE WHEN return_date IS NULL AND end_date > NOW() THEN 1 END) AS on_leave,
+            COUNT(CASE WHEN return_date IS NULL AND end_date <= NOW() THEN 1 END) AS late
+        ")
+        ->groupBy(DB::raw("YEARWEEK(created_at, 1)"))
+        ->orderBy('year_week')
+        ->get()
+        ->keyBy(fn ($row) => Carbon::parse($row->created_at)->format('oW'));
+
+    $weeklyCounts = [];
+    $week = $startOfFirstWeek->copy();
+    while ($week->lte($endOfLastWeek)) {
+        $weekKey = $week->format('oW');
+        $raw = $rawWeekly[$weekKey] ?? null;
+
+        $weeklyCounts[] = [
+            'week_start_date' => 'Week ' . $week->isoWeek,
+            'returned'        => $raw->returned ?? 0,
+            'on_leave'        => $raw->on_leave ?? 0,
+            'late'            => $raw->late ?? 0,
+        ];
+
+        $week->addWeek();
+    }
+
+    // ======================== MONTHLY ========================
+    // Default: current month + 2 previous
+    if (!$start_date && !$end_date) {
+        $startOfFirstMonth = $today->copy()->subMonths(2)->startOfMonth();
+        $endOfLastMonth    = $today->copy()->endOfMonth();
+    } else {
+        $startOfFirstMonth = $start->copy()->startOfMonth();
+        $endOfLastMonth    = $end->copy()->endOfMonth();
+    }
+
+    $rawMonthly = LeaveRequest::whereBetween('created_at', [$startOfFirstMonth, $endOfLastMonth])
+        ->whereIn('company_id', $company_ids)
+        ->selectRaw("
+            DATE_FORMAT(created_at, '%Y-%m-01') AS month_start_date,
+            COUNT(CASE WHEN return_date IS NOT NULL AND return_date < end_date THEN 1 END) AS returned,
+            COUNT(CASE WHEN return_date IS NULL AND end_date > NOW() THEN 1 END) AS on_leave,
+            COUNT(CASE WHEN return_date IS NULL AND end_date <= NOW() THEN 1 END) AS late
+        ")
+        ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-01')"))
+        ->orderBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-01')"))
+        ->get()
+        ->keyBy('month_start_date');
+
+    $monthlyCounts = [];
+    $month = $startOfFirstMonth->copy();
+    while ($month->lte($endOfLastMonth)) {
+        $monthKey = $month->format('Y-m-01');
+        $raw = $rawMonthly[$monthKey] ?? null;
+
+        $monthlyCounts[] = [
+            'month_start_date' => $month->format('F Y'),
+            'returned'         => $raw->returned ?? 0,
+            'on_leave'         => $raw->on_leave ?? 0,
+            'late'             => $raw->late ?? 0,
+        ];
+
+        $month->addMonth();
+    }
+
+    // ======================== TOP 10 STUDENTS ========================
+    $leaveRequests = LeaveRequest::whereBetween('created_at', [$start, $end])
+        ->whereHas('student', function ($query) use ($selectedSessionId, $company_ids) {
+            $query->where('session_programme_id', $selectedSessionId)
+                ->whereIn('company_id', $company_ids);
+        })
+        ->select('student_id', DB::raw('COUNT(*) as occurrence_count'))
+        ->groupBy('student_id')
+        ->orderByDesc('occurrence_count')
+        ->limit(10)
+        ->get()
+        ->map(function ($item) {
+            $student = $item->student;
+            return [
+                'student_id' => $student->id,
+                'student'    => $student,
+                'count'      => $item->occurrence_count,
+            ];
+        });
+
+    return [
+        'leaveRequests' => $leaveRequests,
+        'dailyCounts'   => $dailyCounts,
+        'weeklyCounts'  => $weeklyCounts,
+        'monthlyCounts' => $monthlyCounts,
+    ];
+}
+
+    private function getLeavesData2()
     {
         $user = Auth::user();
         $company_ids = [];
@@ -859,135 +1029,128 @@ $sick_student_ids = [];
             'monthlyCounts' => $monthlyCounts,
         ];
     }
+private function getMPSData($start_date = null, $end_date = null)
+{
+    $user = Auth::user();
+    $company_ids = [];
 
-    private function getMPSData()
-    {
-        $sevenDaysAgo = Carbon::now()->subDays(6)->toDateString();
-                $user = Auth::user();
-        $company_ids = [];
-        if($user->hasRole(['Sir Major','Instructor','OC Coy'])){
-            $company_ids = [$user->staff->company_id];
-        }else{
-            $company_ids = Company::pluck('id');
-        }
-        // Fetch daily counts from both tables
+    if ($user->hasRole(['Sir Major','Instructor','OC Coy'])) {
+        $company_ids = [$user->staff->company_id];
+    } else {
+        $company_ids = Company::pluck('id');
+    }
 
-$mpsCounts = DB::table('m_p_s as mps')
-    ->join('students as s', 'mps.student_id', '=', 's.id')
-    ->selectRaw('DATE(mps.arrested_at) as date, COUNT(DISTINCT mps.student_id) as mps_count')
-    ->where('mps.arrested_at', '>=', $sevenDaysAgo)
-    ->whereIn('s.company_id', $company_ids)
-    ->groupByRaw('DATE(mps.arrested_at)')
-    ->orderByRaw('DATE(mps.arrested_at)')
-    ->get()
-    ->keyBy('date');
+    // Set chart-specific date ranges
+    $dailyStart   = $start_date ? Carbon::parse($start_date)->startOfDay() : Carbon::now()->subDays(6)->startOfDay();
+    $dailyEnd     = $end_date   ? Carbon::parse($end_date)->endOfDay()     : Carbon::now()->endOfDay();
 
+    $weeklyStart  = $start_date ? Carbon::parse($start_date)->startOfWeek() : Carbon::now()->startOfWeek()->subWeeks(4);
+    $weeklyEnd    = $end_date   ? Carbon::parse($end_date)->endOfWeek()     : Carbon::now()->endOfWeek();
 
-$mpsVisitorCounts = DB::table('m_p_s_visitors as v')
-    ->join('students as s', 'v.student_id', '=', 's.id')
-    ->selectRaw('DATE(v.visited_at) as date, COUNT(DISTINCT v.student_id) as visitor_count')
-    ->where('v.visited_at', '>=', $sevenDaysAgo)
-    ->whereIn('s.company_id', $company_ids)
-    ->groupByRaw('DATE(v.visited_at)')
-    ->orderByRaw('DATE(v.visited_at)')
-    ->get()
-    ->keyBy('date');
+    $monthlyStart = $start_date ? Carbon::parse($start_date)->startOfMonth() : Carbon::now()->startOfMonth()->subMonths(2);
+    $monthlyEnd   = $end_date   ? Carbon::parse($end_date)->endOfMonth()     : Carbon::now()->endOfMonth();
 
-        // Merge counts from both tables
-        $dailyCounts = [];
-        for ($i = 0; $i < 7; $i++) {
-            $date          = Carbon::now()->subDays(6 - $i)->toDateString();
-            $dailyCounts[] = [
-                'date'          => $date,
-                'mps_count'     => $mpsCounts[$date]->mps_count ?? 0,
-                'visitor_count' => $mpsVisitorCounts[$date]->visitor_count ?? 0,
-            ];
-        }
+    // ========== DAILY ==========
+    $mpsCounts = DB::table('m_p_s as mps')
+        ->join('students as s', 'mps.student_id', '=', 's.id')
+        ->selectRaw('DATE(mps.arrested_at) as date, COUNT(DISTINCT mps.student_id) as mps_count')
+        ->whereBetween('mps.arrested_at', [$dailyStart, $dailyEnd])
+        ->whereIn('s.company_id', $company_ids)
+        ->groupByRaw('DATE(mps.arrested_at)')
+        ->orderByRaw('DATE(mps.arrested_at)')
+        ->get()
+        ->keyBy('date');
 
-        // ---------- WEEKLY COUNTS: LAST 5 WEEKS ----------
-        $startOfFiveWeeksAgo = Carbon::now()->startOfWeek()->subWeeks(4);
+    $mpsVisitorCounts = DB::table('m_p_s_visitors as v')
+        ->join('students as s', 'v.student_id', '=', 's.id')
+        ->selectRaw('DATE(v.visited_at) as date, COUNT(DISTINCT v.student_id) as visitor_count')
+        ->whereBetween('v.visited_at', [$dailyStart, $dailyEnd])
+        ->whereIn('s.company_id', $company_ids)
+        ->groupByRaw('DATE(v.visited_at)')
+        ->orderByRaw('DATE(v.visited_at)')
+        ->get()
+        ->keyBy('date');
 
-        // Fetch weekly counts from both tables
-        $weeklyRaw = DB::table('m_p_s')
-            ->selectRaw("YEARWEEK(arrested_at, 1) as year_week, COUNT(DISTINCT student_id) as mps_count")
-            ->whereDate('arrested_at', '>=', $startOfFiveWeeksAgo->toDateString())
-            ->groupBy(DB::raw('YEARWEEK(arrested_at, 1)'))
-            ->orderBy(DB::raw('YEARWEEK(arrested_at, 1)'))
-            ->get()
-            ->keyBy('year_week');
+    $dailyCounts = [];
+    $period = Carbon::parse($dailyStart)->toPeriod(Carbon::parse($dailyEnd));
+    foreach ($period as $date) {
+        $key = $date->toDateString();
+        $dailyCounts[] = [
+            'date'          => $key,
+            'mps_count'     => $mpsCounts[$key]->mps_count ?? 0,
+            'visitor_count' => $mpsVisitorCounts[$key]->visitor_count ?? 0,
+        ];
+    }
 
-        $weeklyVisitorRaw = DB::table('m_p_s_visitors') // Changed table name here
-            ->selectRaw("YEARWEEK(visited_at, 1) as year_week, COUNT(DISTINCT student_id) as visitor_count")
-            ->whereDate('visited_at', '>=', $startOfFiveWeeksAgo->toDateString())
-            ->groupBy(DB::raw('YEARWEEK(visited_at, 1)'))
-            ->orderBy(DB::raw('YEARWEEK(visited_at, 1)'))
-            ->get()
-            ->keyBy('year_week');
+    // ========== WEEKLY ==========
+    $weeklyRaw = DB::table('m_p_s')
+        ->selectRaw("YEARWEEK(arrested_at, 1) as year_week, COUNT(DISTINCT student_id) as mps_count")
+        ->whereBetween('arrested_at', [$weeklyStart, $weeklyEnd])
+        ->groupBy(DB::raw('YEARWEEK(arrested_at, 1)'))
+        ->orderBy(DB::raw('YEARWEEK(arrested_at, 1)'))
+        ->get()
+        ->keyBy('year_week');
 
-        // Merge counts from both tables
-        $weeklyCounts = [];
-        for ($i = 0; $i < 5; $i++) {
-            $weekStart   = Carbon::now()->startOfWeek()->subWeeks(4 - $i);
-            $yearWeekKey = intval($weekStart->format('oW')); // ISO week key
-            $label       = 'Week of ' . $weekStart->format('M d');
+    $weeklyVisitorRaw = DB::table('m_p_s_visitors')
+        ->selectRaw("YEARWEEK(visited_at, 1) as year_week, COUNT(DISTINCT student_id) as visitor_count")
+        ->whereBetween('visited_at', [$weeklyStart, $weeklyEnd])
+        ->groupBy(DB::raw('YEARWEEK(visited_at, 1)'))
+        ->orderBy(DB::raw('YEARWEEK(visited_at, 1)'))
+        ->get()
+        ->keyBy('year_week');
 
-            $weeklyCounts[] = [
-                'week_start'    => $label,
-                'mps_count'     => $weeklyRaw[$yearWeekKey]->mps_count ?? 0,
-                'visitor_count' => $weeklyVisitorRaw[$yearWeekKey]->visitor_count ?? 0,
-            ];
-        }
+    $weeklyCounts = [];
+    $weekCursor = Carbon::parse($weeklyStart);
+    while ($weekCursor->lte($weeklyEnd)) {
+        $yearWeekKey = intval($weekCursor->format('oW'));
+        $label = 'Week of ' . $weekCursor->format('M d');
 
-        // ---------- MONTHLY COUNTS: LAST 3 MONTHS ----------
-        $startOfThreeMonthsAgo = Carbon::now()->startOfMonth()->subMonths(2);
+        $weeklyCounts[] = [
+            'week_start'    => $label,
+            'mps_count'     => $weeklyRaw[$yearWeekKey]->mps_count ?? 0,
+            'visitor_count' => $weeklyVisitorRaw[$yearWeekKey]->visitor_count ?? 0,
+        ];
+        $weekCursor->addWeek();
+    }
 
-        // Fetch monthly counts from both tables
-        $monthlyRaw = DB::table('m_p_s')
-            ->selectRaw('YEAR(arrested_at) as year, MONTH(arrested_at) as month, COUNT(DISTINCT student_id) as mps_count')
-            ->whereDate('arrested_at', '>=', $startOfThreeMonthsAgo->toDateString())
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                $key = sprintf('%04d-%02d', $item->year, $item->month);
-                return [$key => $item->mps_count];
-            });
+    // ========== MONTHLY ==========
+    $monthlyRaw = DB::table('m_p_s as mps')
+        ->join('students as s', 'mps.student_id', '=', 's.id')
+        ->selectRaw('YEAR(mps.arrested_at) as year, MONTH(mps.arrested_at) as month, COUNT(DISTINCT mps.student_id) as mps_count')
+        ->whereBetween('mps.arrested_at', [$monthlyStart, $monthlyEnd])
+        ->whereIn('s.company_id', $company_ids)
+        ->groupByRaw('YEAR(mps.arrested_at), MONTH(mps.arrested_at)')
+        ->orderByRaw('YEAR(mps.arrested_at), MONTH(mps.arrested_at)')
+        ->get()
+        ->mapWithKeys(fn($item) => [sprintf('%04d-%02d', $item->year, $item->month) => $item->mps_count]);
 
-$monthlyRaw = DB::table('m_p_s as mps')
-    ->join('students as s', 'mps.student_id', '=', 's.id')
-    ->selectRaw('YEAR(mps.arrested_at) as year, MONTH(mps.arrested_at) as month, COUNT(DISTINCT mps.student_id) as mps_count')
-    ->whereDate('mps.arrested_at', '>=', $startOfThreeMonthsAgo->toDateString())
-    ->whereIn('s.company_id', $company_ids) // Filter by one or more company IDs
-    ->groupByRaw('YEAR(mps.arrested_at), MONTH(mps.arrested_at)')
-    ->orderByRaw('YEAR(mps.arrested_at), MONTH(mps.arrested_at)')
-    ->get()
-    ->mapWithKeys(function ($item) {
-        $key = sprintf('%04d-%02d', $item->year, $item->month);
-        return [$key => $item->mps_count];
-    });
+    $monthlyVisitorRaw = DB::table('m_p_s_visitors as v')
+        ->join('students as s', 'v.student_id', '=', 's.id')
+        ->selectRaw('YEAR(v.visited_at) as year, MONTH(v.visited_at) as month, COUNT(DISTINCT v.student_id) as visitor_count')
+        ->whereBetween('v.visited_at', [$monthlyStart, $monthlyEnd])
+        ->whereIn('s.company_id', $company_ids)
+        ->groupByRaw('YEAR(v.visited_at), MONTH(v.visited_at)')
+        ->orderByRaw('YEAR(v.visited_at), MONTH(v.visited_at)')
+        ->get()
+        ->mapWithKeys(fn($item) => [sprintf('%04d-%02d', $item->year, $item->month) => $item->visitor_count]);
 
+    $monthlyCounts = [];
+    $monthCursor = Carbon::parse($monthlyStart);
+    while ($monthCursor->lte($monthlyEnd)) {
+        $monthKey = $monthCursor->format('Y-m');
+        $monthlyCounts[] = [
+            'month_label'   => $monthCursor->format('F Y'),
+            'mps_count'     => $monthlyRaw[$monthKey] ?? 0,
+            'visitor_count' => $monthlyVisitorRaw[$monthKey] ?? 0,
+        ];
+        $monthCursor->addMonth();
+    }
 
-        // Merge counts from both tables
-        $monthlyCounts = [];
-        for ($i = 0; $i < 3; $i++) {
-            $month    = Carbon::now()->startOfMonth()->subMonths(2 - $i);
-            $monthKey = $month->format('Y-m');
-
-            $monthlyCounts[] = [
-                'month_label'   => $month->format('F Y'),
-                'mps_count'     => $monthlyRaw[$monthKey] ?? 0,
-                'visitor_count' => $monthlyVisitorRaw[$monthKey] ?? 0,
-            ];
-        }
-
-$currentLockedUpStudents = Mps::whereNull('released_at')
-    ->whereHas('student', function($query) use ($company_ids) {
-        $query->whereIn('company_id', $company_ids);
-    })
-    ->with('student')
-    ->get();
-
+    // ========== CURRENT + TOP STUDENTS ==========
+    $currentLockedUpStudents = Mps::whereNull('released_at')
+        ->whereHas('student', fn($q) => $q->whereIn('company_id', $company_ids))
+        ->with('student')
+        ->get();
 
 $topLockedUpStudents = Mps::select(
         'student_id',
@@ -997,11 +1160,15 @@ $topLockedUpStudents = Mps::select(
         'students.company_id'
     )
     ->join('students', 'm_p_s.student_id', '=', 'students.id')
+    ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
+        $query->whereBetween('arrested_at', [$start_date, $end_date]);
+    })
     ->whereIn('students.company_id', $company_ids)
     ->groupBy('student_id', 'students.first_name', 'students.last_name', 'students.company_id')
     ->orderByDesc('count')
     ->take(10)
     ->get();
+
 
 $topVisitedStudents = MpsVisitor::select(
         'student_id',
@@ -1011,19 +1178,24 @@ $topVisitedStudents = MpsVisitor::select(
         'students.company_id'
     )
     ->join('students', 'm_p_s_visitors.student_id', '=', 'students.id')
+    ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
+        $query->whereBetween('visited_at', [$start_date, $end_date]);
+    })
     ->whereIn('students.company_id', $company_ids)
     ->groupBy('student_id', 'students.first_name', 'students.last_name', 'students.company_id')
     ->orderByDesc('count')
     ->take(10)
     ->get();
 
-        return [
-            'dailyCounts'             => $dailyCounts,
-            'weeklyCounts'            => $weeklyCounts,
-            'monthlyCounts'           => $monthlyCounts,
-            'currentLockedUpStudents' => $currentLockedUpStudents,
-            'topLockedUpStudents'     => $topLockedUpStudents,
-            'topVisitedStudents'      => $topVisitedStudents,
-        ];
-    }
+
+    return [
+        'dailyCounts'             => $dailyCounts,
+        'weeklyCounts'            => $weeklyCounts,
+        'monthlyCounts'           => $monthlyCounts,
+        'currentLockedUpStudents' => $currentLockedUpStudents,
+        'topLockedUpStudents'     => $topLockedUpStudents,
+        'topVisitedStudents'      => $topVisitedStudents,
+    ];
+}
+   
 }

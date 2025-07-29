@@ -138,6 +138,9 @@
                                         <li>
                                             <a href="{{ route('staffs.create') }}">Staff Registration</a>
                                         </li>
+                                        <li>
+                                            <a href="{{ route('staffs.summary.index') }}">Staff Summary</a>
+                                        </li>
                                         @can('timesheet-list')
                                             <li>
                                                 <a href="{{ route('timesheets.index') }}">
@@ -173,6 +176,11 @@
                                 <li>
                                     <a href="/tps-smis/attendences/type/3">Night</a>
                                 </li>
+                                @if(auth()->user()->hasRole(['CRO','Super Administrator','Admin']))
+                                    <li>
+                                        <a href="{{ route('attendance.show.request') }}">Requests</a>
+                                    </li>
+                                @endif
                             </ul>
                         </li>
             @endcan()
@@ -463,7 +471,7 @@
                             <a href="{{ route('excuse_types.index') }}">Excuse Type Settings</a>
                         </li>
                         <li>
-                            <a href="{{ route('termination_reasons.index') }}">Termination Reason Settings</a>
+                            <a href="{{ route('termination_reasons.index') }}">Termination Reasons</a>
                         </li>
                         <li>
                             <a href="{{ route('campuses.index') }}">Campus Settings</a>

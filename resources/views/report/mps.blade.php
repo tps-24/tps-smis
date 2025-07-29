@@ -57,16 +57,45 @@
 <!-- Scrumb ends -->
 @endsection
 @section('content')
-<div class="d-flex justify-content-end">
-    <a href="{{route('reports.generateMPSReport')}}" title="Download report" class="btn btn-sm btn-success"><i class="gap 2 bi bi-download"></i>
-        Report</a>
+
+<div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+
+    <!-- Left: Filter Group Buttons -->
+    <div class="btn-group" id="filterButtons" role="group" aria-label="Filter options">
+        <button type="button" class="btn btn-primary" onclick="showDaily()">Daily</button>
+        <button type="button" class="btn btn-secondary" onclick="showWeekly()">Weekly</button>
+        <button type="button" class="btn btn-success" onclick="showMonthly()">Monthly</button>
+    </div>
+
+    <!-- Center: Filter Form (inline) -->
+    <form method="GET" action="{{ route('reports.mps') }}" class="d-flex  gap-2 ">
+        <!-- Start Date -->
+        <div class="input-group">
+            <span class="input-group-text">Start Date</span>
+            <input type="date" class="form-control" name="start_date"
+                   value="{{ request('start_date') }}"
+                   max="{{ \Carbon\Carbon::yesterday()->toDateString() }}">
+        </div>
+
+        <!-- End Date -->
+        <div class="input-group">
+            <span class="input-group-text">End Date</span>
+            <input type="date" class="form-control" name="end_date"
+                   value="{{ request('end_date') }}"
+                   max="{{ \Carbon\Carbon::today()->toDateString() }}">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    <!-- Right: Report Download Button -->
+    <a href="{{ route('reports.generateMPSReport') }}" title="Download report" class="btn btn-sm btn-success">
+        <i class="bi bi-download me-1"></i> Report
+    </a>
 </div>
 
-<div class="btn-group mb-3" role="group" aria-label="Filter options">
-    <button type="button" class="btn btn-primary" onclick="showDaily()">Daily</button>
-    <button type="button" class="btn btn-secondary" onclick="showWeekly()">Weekly</button>
-    <button type="button" class="btn btn-success" onclick="showMonthly()">Monthly</button>
-</div>
+
 <h3>Locked Up and Visited Graph</h3>
 <div class="chart-container" style=" padding: 0 10% 0 10%">
     <canvas id="groupedBarChart"></canvas>
@@ -195,7 +224,8 @@ const dailyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(161, 190, 28, 0.63)',
-            tension: 0.1
+            tension: 0.1,
+            hidden: true
         },
 
     ]
@@ -228,7 +258,8 @@ const weeklyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(161, 190, 28, 0.63)',
-            tension: 0.1
+            tension: 0.1,
+            hidden:true
         },
     ]
 };
@@ -260,7 +291,8 @@ const monthlyData = {
             type: 'line',
             fill: false,
             borderColor: 'rgba(161, 190, 28, 0.63)',
-            tension: 0.1
+            tension: 0.1,
+            hidden: true
         },
     ]
 };

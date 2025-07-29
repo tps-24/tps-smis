@@ -16,9 +16,9 @@ class Student extends Model
         'dob', 'education_level', 'profession', 'home_region', 'entry_region', 'company_id', 'programme_id', 'session_programme_id',
         'height', 'weight', 'platoon', 'next_kin_names', 'next_kin_phone',
         'next_kin_relationship', 'next_kin_address', 'next_of_kin', 'profile_complete', 'photo',
-        'status', 'approved_at', 'rejected_at', 'reject_reason', 'approved_by',
+        'status', 'enrollment_status', 'approved_at', 'rejected_at', 'reject_reason', 'approved_by',
         'rejected_by', 'transcript_printed', 'certificate_printed', 'printed_by',
-        'reprint_reason', 'beat_exclusion_vitengo_id', 'beat_emergency', 'bank_name', 'account_number', 'study_level_id',
+        'reprint_reason', 'beat_exclusion_vitengo_id', 'beat_emergency', 'bank_name', 'account_number', 'study_level_id', 'dismissed_by'
     ];
 
     public function user()
