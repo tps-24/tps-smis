@@ -1,7 +1,14 @@
 @extends('layouts.main')
 
 @section('style')
+</head>
+  <!-- Choices.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
   <style>
+    /* Optional: Make Choices.js input full width */
+    .choices__inner {
+      min-height: 38px; /* align with Bootstrap input height */
+    }
     .bscrumb {
       background-color: #f8f9fa;
       margin-right: 25px;
@@ -15,7 +22,13 @@
       padding: 20px;
     }
 
+    .filter-container{
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    
   </style>
+
 @endsection
 
 @section('scrumb')
@@ -65,17 +78,57 @@
   <!-- Result Section -->
    
   <div class="row gx-4" style="margin-right: -25px;">
-    <div class="col-sm-12">
-      <div class="card-body">
-        <center>Filtering</center> 
+    <center>
+    <div class="col-sm-10">
+        <div class="form-group">
+          <div class="container filter-container">
+              <h5 class="card-title">Filter Students</h5>
+              <p class="card-text">Use the filters below to narrow down the student intake history.</p>
+              <form id="enrolled-filters" class="row g-3">
+                <div class="col-md-4">
+                  <label for="entry_region" class="form-label">Entry Region</label>
+                  <select id="mySelect" class="form-select" name="entry_region" multiple>
+                    <option value="">All</option>
+                    <option value="ARUSHA">ARUSHA</option>
+                    <option value="DODOMA">DODOMA</option>
+                    <option value="MBEYA">MBEYA</option>
+                    <option value="MOROGORO">MOROGORO</option>
+                    <option value="MWANZA">MWANZA</option>
+                    <option value="KATAVI">KATAVI</option>
+                    <option value="MAKAO MAKUU">MAKAO MAKUU</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="study_level" class="form-label">Study Level</label>
+                  <select name="study_level" class="form-select select2">
+                    <option value="">All</option>
+                    <option value="1">Diploma</option>
+                    <option value="2">Certificate</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="age_range" class="form-label">Age Range</label>
+                  <select name="age_range" class="form-select select2">
+                    <option value="">All</option>
+                    <option value="0-20">01–20</option>
+                    <option value="21-25">21–25</option>
+                    <option value="26-30">26–30</option>
+                    <option value="31-45">31–45</option>
+                    <option value="46-60">46–60</option>
+                  </select>
+                </div>
+              </form>
+          </div>
+        </div>
+    </div>
+    </center>
+
+    <div class="col-sm-4" style="margin-left:-10px">
+      <div class="card-body" style="margin-right: 0px;">
+        <span>Trend and Analysis Pattern</span>
       </div>
     </div>
-    <div class="col-sm-4">
-      <div class="card-body" style="background-color:blue; margin-right: 0px;">
-        <span>Blah</span>
-      </div>
-    </div>
-    <div class="col-sm-8" style="margin-right:-2000px">
+    <div class="col-sm-8" style="margin-right:-20px">
       <div class="card-body" style="padding-right: -20px !important; ">
       <div id="studentTableContainer" class="mt-1" style="display: none;">
         <h4 id="studentTableTitle" class="mb-3"></h4>
@@ -111,6 +164,25 @@
 @endsection
 
 @section('scripts')
+
+<!-- Choices.js -->
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const element = document.getElementById('mySelect');
+    if (element) {
+      new Choices(element, {
+        removeItemButton: true,
+        searchEnabled: true,
+        placeholderValue: 'Select some states',
+        searchPlaceholderValue: 'Search states',
+        shouldSort: false,
+      });
+    }
+  });
+</script>
+
 <script>
   let currentFilterType = 'totalEnrolled';
 
@@ -125,69 +197,65 @@
     currentFilterType = type;
 
     const sessionId = document.getElementById('programmeSession')?.value || '';
+    const formData = new FormData(document.getElementById('enrolled-filters'));
+    const params = new URLSearchParams(formData).toString();
     const baseUrl = "{{ url('students/filter') }}";
 
-    fetch(`${baseUrl}?type=${type}&page=${page}&session_id=${sessionId}`)
-      .then(response => response.json())
+    fetch(`${baseUrl}?type=${type}&page=${page}&session_id=${sessionId}&${params}`)
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
       .then(data => {
+        // 🧾 Update Table
         const students = data.students.data;
-        const container = document.getElementById('studentTableContainer');
         const title = document.getElementById('studentTableTitle');
         const body = document.getElementById('studentTableBody');
+        const container = document.getElementById('studentTableContainer');
 
         title.textContent = labels[type] ?? "Students";
         body.innerHTML = '';
+        container.style.display = 'block';
 
         let startIndex = (data.students.current_page - 1) * data.students.per_page;
         students.forEach((student, index) => {
           const serialNumber = startIndex + index + 1;
 
-        let statusBadge = '';
-        if (student.status === 'approved') {
-          statusBadge = `<span class="badge bg-success">✅ Verified</span>`;
-        } else if (student.status === 'pending') {
-          statusBadge = `<span class="badge bg-warning text-dark">⏳ Pending</span>`;
-        } else {
-          statusBadge = `<span class="badge bg-secondary">❔ Unknown</span>`;
-        }
+          let statusBadge = student.status === 'approved'
+            ? `<span class="badge bg-success">✅ Verified</span>`
+            : student.status === 'pending'
+            ? `<span class="badge bg-warning text-dark">⏳ Pending</span>`
+            : `<span class="badge bg-secondary">❔ Unknown</span>`;
 
-        body.innerHTML += `
-          <tr>
-            <td>${serialNumber}</td>
-            <td>${student.force_number ?? '-'}</td>
-            <td>${student.first_name} ${student.middle_name} ${student.last_name}</td>
-            <td>${student.entry_region}</td>
-            <td>${statusBadge}</td>
-            <td>
-              <a href="{{ url('students') }}/${student.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
-            </td>
-          </tr>`;
-
+          body.innerHTML += `
+            <tr>
+              <td>${serialNumber}</td>
+              <td>${student.force_number ?? '-'}</td>
+              <td>${student.first_name} ${student.middle_name} ${student.last_name}</td>
+              <td>${student.entry_region}</td>
+              <td>${statusBadge}</td>
+              <td>
+                <a href="{{ url('students') }}/${student.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
+              </td>
+            </tr>`;
         });
 
-        renderPagination(data, type);
-        container.style.display = 'block';
+        renderPagination(data.students, type);
+        updateChart(data.summary);
       })
-      .catch(() => {
-        alert("Could not load student data.");
-      });
+      .catch(() => alert("Could not load student data."));
   }
 
-  function renderPagination(data, type) {
+  function renderPagination(paginator, type) {
     const paginationContainer = document.getElementById('pagination-container');
-    if (!paginationContainer) {
-      console.error('Pagination container not found.');
-      return;
-    }
+    if (!paginationContainer) return;
 
     paginationContainer.innerHTML = `
       <nav aria-label="Student pagination">
         <ul class="pagination justify-content-end flex-wrap mb-0">
-          ${data.students.links.map(link => {
+          ${paginator.links.map(link => {
             const page = link.url ? new URL(link.url, window.location.origin).searchParams.get('page') : null;
-            const label = link.label
-              .replace(/&laquo;/g, '«')
-              .replace(/&raquo;/g, '»');
+            const label = link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»');
 
             return `
               <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
@@ -208,6 +276,23 @@
     });
   }
 
+  function updateChart(summary) {
+    if (typeof studentChart !== 'undefined') {
+      studentChart.data.datasets[0].data = [
+        summary.active,
+        summary.dismissed,
+        summary.verified
+      ];
+      studentChart.update();
+    }
+  }
+
+  // Trigger filter changes
+  document.querySelectorAll('#enrolled-filters select').forEach(select => {
+    select.addEventListener('change', () => showStudents(currentFilterType, 1));
+  });
+
+  // Initial load
   document.addEventListener('DOMContentLoaded', () => {
     showStudents(currentFilterType);
   });

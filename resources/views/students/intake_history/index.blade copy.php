@@ -1,5 +1,29 @@
 @extends('layouts.main')
 
+@section('style')
+  <style>
+    .bscrumb {
+      background-color: #f8f9fa;
+      margin-right: 25px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .card-header {
+      /* background-color: #007bff; */
+      /* color: white; */
+    }
+    .card-body {
+      padding: 20px;
+    }
+
+    .filter-container{
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    
+  </style>
+
+@endsection
+
 @section('scrumb')
 <nav class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
   <div class="container-fluid">
@@ -11,17 +35,18 @@
       </ol>
     </nav>
   </div>
-</nav>
+  </nav>
 @endsection
 
 @section('content')
+<div class="card mb-4" style="margin-right: 0px;">
 <div class="card-header">
   <h5 class="card-title">Intake Management Summary</h5>
   <p class="card-text">This page provides a summary of the intake history of students.</p>
 </div>
 
-<div class="card-body" style="margin-right: -25px;">
-  <div class="row">
+<div class="card-body" style="margin-right: 0px;">
+  <div class="row" style="margin-right: -10px;">
     @php
       $cardTypes = [
         ['key' => 'totalEnrolled', 'label' => 'Enrolled Students', 'color' => 'primary'],
@@ -42,33 +67,117 @@
     </div>
     @endforeach
   </div>
+
+  <!-- Result Section -->
+   
+  <div class="row gx-4" style="margin-right: -25px;">
+    <center>
+    <div class="col-sm-10">
+        <div class="form-group">
+          <div class="container filter-container">
+              <h5 class="card-title">Filter Students</h5>
+              <p class="card-text">Use the filters below to narrow down the student intake history.</p>
+              <form id="enrolled-filters" class="row g-3">
+                <div class="col-md-4">
+                  <label for="entry_region" class="form-label">Entry Region</label>
+                  <select name="entry_region" class="form-select select2">
+                    <option value="">All</option>
+                    <option value="Central">Central</option>
+                    <option value="Northern">Northern</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="study_level" class="form-label">Study Level</label>
+                  <select name="study_level" class="form-select select2">
+                    <option value="">All</option>
+                    <option value="1">Diploma</option>
+                    <option value="2">Certificate</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="age_range" class="form-label">Age Range</label>
+                  <select name="age_range" class="form-select select2">
+                    <option value="">All</option>
+                    <option value="0-20">01–20</option>
+                    <option value="21-25">21–25</option>
+                    <option value="26-30">26–30</option>
+                    <option value="31-45">31–45</option>
+                    <option value="46-60">46–60</option>
+                  </select>
+                </div>
+              </form>
+          </div>
+        </div>
+    </div>
+    </center>
+
+    <div class="col-sm-4" style="margin-left:-10px">
+      <div class="card-body" style="margin-right: 0px;">
+        <span>Trend and Analysis Pattern</span>
+      </div>
+    </div>
+    <div class="col-sm-8" style="margin-right:-20px">
+      <div class="card-body" style="padding-right: -20px !important; ">
+      <div id="studentTableContainer" class="mt-1" style="display: none;">
+        <h4 id="studentTableTitle" class="mb-3"></h4>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered text-center align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>SNo</th>
+                <th>Force No.</th>
+                <th>Name</th>
+                <th>Region</th>
+                <th>Status</th>
+                <th>View</th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-end mt-3" id="pagination-container">
+            <!-- Pagination links will render here -->
+        </div>
+    </div>
+    </div>
+  </div>
 </div>
 
-<!-- Result Section -->
-<div id="studentTableContainer" class="mt-4" style="display: none;">
-  <h4 id="studentTableTitle" class="mb-3"></h4>
-
-  <div class="table-responsive">
-    <table class="table table-striped table-bordered text-center align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>Name</th>
-          <th>Force No.</th>
-          <th>Region</th>
-          <th>Status</th>
-          <th>Verified</th>
-        </tr>
-      </thead>
-      <tbody id="studentTableBody"></tbody>
-    </table>
-  </div>
-
-  <div id="studentPagination" class="mt-3"></div>
+</div>
 </div>
 
 @endsection
 
 @section('scripts')
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('.select2').select2({
+      theme: 'bootstrap4',
+      width: '100%'
+    });
+  });
+</script>
+
+<script>
+  // Handle form submission
+  $('#enrolled-filters').on('change', function () {
+    const entryRegion = $(this).find('select[name="entry_region"]').val();
+    const studyLevel = $(this).find('select[name="study_level"]').val();
+    const ageRange = $(this).find('select[name="age_range"]').val();
+
+    // Update the student list based on the filters
+    showStudents(currentFilterType, 1);
+  });
+</script>
+
 <script>
   let currentFilterType = 'totalEnrolled';
 
@@ -96,15 +205,31 @@
         title.textContent = labels[type] ?? "Students";
         body.innerHTML = '';
 
-        students.forEach(student => {
-          body.innerHTML += `
-            <tr>
-              <td>${student.first_name}</td>
-              <td>${student.force_number ?? '-'}</td>
-              <td>${student.entry_region}</td>
-              <td>${student.status}</td>
-              <td>${student.is_verified ? 'Yes' : 'No'}</td>
-            </tr>`;
+        let startIndex = (data.students.current_page - 1) * data.students.per_page;
+        students.forEach((student, index) => {
+          const serialNumber = startIndex + index + 1;
+
+        let statusBadge = '';
+        if (student.status === 'approved') {
+          statusBadge = `<span class="badge bg-success">✅ Verified</span>`;
+        } else if (student.status === 'pending') {
+          statusBadge = `<span class="badge bg-warning text-dark">⏳ Pending</span>`;
+        } else {
+          statusBadge = `<span class="badge bg-secondary">❔ Unknown</span>`;
+        }
+
+        body.innerHTML += `
+          <tr>
+            <td>${serialNumber}</td>
+            <td>${student.force_number ?? '-'}</td>
+            <td>${student.first_name} ${student.middle_name} ${student.last_name}</td>
+            <td>${student.entry_region}</td>
+            <td>${statusBadge}</td>
+            <td>
+              <a href="{{ url('students') }}/${student.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
+            </td>
+          </tr>`;
+
         });
 
         renderPagination(data, type);
@@ -116,64 +241,42 @@
   }
 
   function renderPagination(data, type) {
-  const pagination = document.getElementById('studentPagination');
-  const current = data.students.current_page;
-  const last = data.students.last_page;
-
-  let html = `<nav><ul class="pagination justify-content-center flex-wrap">`;
-
-  // ← Previous
-  html += `
-    <li class="page-item ${current === 1 ? 'disabled' : ''}">
-      <button class="page-link" onclick="showStudents('${type}', ${current - 1})">«</button>
-    </li>`;
-
-  const pages = [];
-
-  // Always show first page
-  pages.push(1);
-
-  // Add dots if current is far from start
-  if (current > 4) pages.push('...');
-
-  // Add pages around current
-  for (let i = current - 1; i <= current + 1; i++) {
-    if (i > 1 && i < last) pages.push(i);
-  }
-
-  // Add dots if current is far from end
-  if (current < last - 3) pages.push('...');
-
-  // Always show last page
-  if (last > 1) pages.push(last);
-
-  // Render page buttons
-  pages.forEach(p => {
-    if (p === '...') {
-      html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
-    } else {
-      html += `
-        <li class="page-item ${p === current ? 'active' : ''}">
-          <button class="page-link" onclick="showStudents('${type}', ${p})">${p}</button>
-        </li>`;
+    const paginationContainer = document.getElementById('pagination-container');
+    if (!paginationContainer) {
+      console.error('Pagination container not found.');
+      return;
     }
-  });
 
-  // → Next
-  html += `
-    <li class="page-item ${current === last ? 'disabled' : ''}">
-      <button class="page-link" onclick="showStudents('${type}', ${current + 1})">»</button>
-    </li>`;
+    paginationContainer.innerHTML = `
+      <nav aria-label="Student pagination">
+        <ul class="pagination justify-content-end flex-wrap mb-0">
+          ${data.students.links.map(link => {
+            const page = link.url ? new URL(link.url, window.location.origin).searchParams.get('page') : null;
+            const label = link.label
+              .replace(/&laquo;/g, '«')
+              .replace(/&raquo;/g, '»');
 
-  html += `</ul></nav>`;
-  pagination.innerHTML = html;
-}
+            return `
+              <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${page}">${label}</a>
+              </li>
+            `;
+          }).join('')}
+        </ul>
+      </nav>
+    `;
 
-
+    paginationContainer.querySelectorAll('.page-link').forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const page = this.getAttribute('data-page');
+        if (page) showStudents(type, parseInt(page));
+      });
+    });
+  }
 
   document.addEventListener('DOMContentLoaded', () => {
     showStudents(currentFilterType);
   });
 </script>
-
 @endsection
