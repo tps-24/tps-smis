@@ -111,17 +111,17 @@ class GraphDataService
             foreach ($company->platoons as $platoon) {
                 $attendances = $platoon->attendences()
                     ->where('session_programme_id', $selectedSessionId)
-                    ->whereBetween('created_at', [$start, $end])
+                    ->whereBetween('date', [$start, $end])
                     ->get();
 
                 foreach ($attendances as $attendance) {
-                    $attendanceDate = Carbon::parse($attendance->created_at)->format('Y-m-d');
+                    $attendanceDate = Carbon::parse($attendance->date)->format('Y-m-d');
                     if (isset($dateKeys[$attendanceDate])) {
                         $index = $dateKeys[$attendanceDate];
                         $attendanceData['absents'][$index] += (int) $attendance->absent;
 
                         if ($attendanceData['sick'][$index] == 0) {
-                            $date                           = $attendance->created_at;
+                            $date                           = $attendance->date;
                             $attendanceData['sick'][$index] = (int) Patient::whereDate('created_at', '<=', $date)
                                 ->where(function ($query) use ($date) {
                                     $query->where(function ($subQuery) use ($date) {
@@ -156,7 +156,7 @@ class GraphDataService
                         }
                     }
 
-                    $attendanceWeek = Carbon::parse($attendance->created_at)->startOfWeek()->format('Y-m-d');
+                    $attendanceWeek = Carbon::parse($attendance->date)->startOfWeek()->format('Y-m-d');
                     if (isset($weekKeys[$attendanceWeek])) {
                         $weekIndex = $weekKeys[$attendanceWeek];
                         $weeklyData['absents'][$weekIndex]  += (int) $attendance->absent;
@@ -220,6 +220,7 @@ $attendances = Attendence::whereBetween('date', [$start, $end])->get();
                                 $monthlyData['sick'][$monthIndex] = (int) Patient::whereMonth('created_at', $month)->whereYear('created_at', $year)->where(function ($query) use ($month) {
                                 $query->where(function ($subQuery) use ($month) {
                                     $subQuery->where('excuse_type_id', 1)
+                                    ->whereNotNull('rest_days') 
                                         ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [$month]);
                                 })
                                     ->orWhere(function ($subQuery) use ($month) {
@@ -248,7 +249,6 @@ $attendances = Attendence::whereBetween('date', [$start, $end])->get();
                                 })->count();
                         }
                     }
-
 // Step 4: Fill in sick, lockUps, and leaves for each of the 3 months
 foreach ($monthKeys as $monthLabel => $index) {
     $carbonDate = Carbon::createFromFormat('F Y', $monthLabel);
@@ -256,17 +256,27 @@ foreach ($monthKeys as $monthLabel => $index) {
     $year  = $carbonDate->year;
 
     // Sick (patients with excuse_type_id 1 or 3)
-    $monthlyData['sick'][$index] = Patient::whereMonth('created_at', $month)
-        ->whereYear('created_at', $year)
-        ->where(function ($query) {
-            $query->where('excuse_type_id', 1)
-                  ->orWhere('excuse_type_id', 3);
-        })->count();
+                                $monthlyData['sick'][$monthIndex] = (int) Patient::whereMonth('created_at', $month)->whereYear('created_at', $year)->where(function ($query) use ($month) {
+                                $query->where(function ($subQuery) use ($month) {
+                                    $subQuery->where('excuse_type_id', 1)
+                                    ->whereNotNull('rest_days') 
+                                        ->whereRaw('DATE_ADD(created_at, INTERVAL rest_days DAY) >= ?', [$month]);
+                                })
+                                    ->orWhere(function ($subQuery) use ($month) {
+                                        $subQuery->where('excuse_type_id', 3)
+                                            ->where(function ($q) use ($month) {
+                                                $q->whereNull('released_at')
+                                                    ->orWhereMonth('released_at', '>=', $month);
+                                            });
+                                    });
+                            })->count();
 
     // LockUps
-    $monthlyData['lockUps'][$index] = MPS::whereMonth('arrested_at', $month)
-        ->whereYear('arrested_at', $year)
-        ->count();
+                            $monthlyData['lockUps'][$monthIndex] = (int) MPS::whereMonth('arrested_at', $month)->whereYear('arrested_at', $year)
+                                ->where(function ($query) use ($month) {
+                                    $query->whereNull('released_at')
+                                        ->orWhereMonth('released_at', '>=', $month);
+                                })->count();
 
     // Leave Requests
     $monthlyData['leaves'][$index] = LeaveRequest::whereMonth('created_at', $month)
@@ -846,14 +856,7 @@ foreach ($monthKeys as $monthLabel => $index) {
         $leaves_weekly_count  = array_values($weeklyCounts);
         $leaves_daily_count   = array_column($weeklyCounts, 'total');
         $leaves_monthly_count = array_column($merged, 'total');
-        // dd([
-        //     'dailyData'   => $attendanceData,
-        //     'weeklyData'  => $weeklyData,
-        //     'monthlyData' => $monthlyData,
-        //     'daily'       => array_column($dailyCounts, 'total'),
-        //     'weekly'      => array_column($weekly, 'total'),
-        //     'monthly'     => $leaves_monthly_count,
-        // ]);
+
         // Combine all three sets of data into the final response
         return [
             'dailyData'   => $attendanceData,

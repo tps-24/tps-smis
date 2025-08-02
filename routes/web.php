@@ -477,7 +477,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}', [NotificationController::class, 'show']);
-    Route::get('notifications/showNotifications/{notificationIds}', [NotificationController::class, 'showNotifications'])->name('notifications.showNotifications');
+    Route::get('notifications/showNotifications/{notificationIds}/{category}', [NotificationController::class, 'showNotifications'])->name('notifications.showNotifications');
 
     Route::get('announcement/download/file/{documentPath}', [AnnouncementController::class, 'downloadFile'])->name('download.file');
 

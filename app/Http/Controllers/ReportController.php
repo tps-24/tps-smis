@@ -96,12 +96,12 @@ class ReportController extends Controller
         ->whereIn('platoons.company_id', $companyIds);
 
     if ($hasDateFilter) {
-        $dailyQuery->whereBetween('attendences.created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()]);
+        $dailyQuery->whereBetween('attendences.date', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()]);
     }
 
     $rawDaily = $dailyQuery
         ->select(
-            DB::raw('DATE(attendences.created_at) as date'),
+            DB::raw('DATE(attendences.date) as date'),
             DB::raw('SUM(attendences.absent) as total_absent'),
             DB::raw('SUM(attendences.kazini) as total_kazini')
         )
@@ -135,17 +135,17 @@ class ReportController extends Controller
         ->whereIn('companies.id', $companyIds);
 
     if ($hasDateFilter) {
-        $weeklyQuery->whereBetween('attendences.created_at', [$startDate, $endDate]);
+        $weeklyQuery->whereBetween('attendences.date', [$startDate, $endDate]);
     }
 
     $rawWeekly = $weeklyQuery
         ->select(
-            DB::raw('YEARWEEK(attendences.created_at, 1) as year_week'),
-            DB::raw('MIN(DATE(attendences.created_at)) as week_start'),
+            DB::raw('YEARWEEK(attendences.date, 1) as year_week'),
+            DB::raw('MIN(DATE(attendences.date)) as week_start'),
             DB::raw('SUM(attendences.absent) as total_absent'),
             DB::raw('SUM(attendences.kazini) as total_kazini'),
         )
-        ->groupBy(DB::raw('YEARWEEK(attendences.created_at, 1)'))
+        ->groupBy(DB::raw('YEARWEEK(attendences.date, 1)'))
         ->orderBy('year_week')
         ->get()
         ->keyBy('year_week');
@@ -182,18 +182,18 @@ class ReportController extends Controller
         ->whereIn('companies.id', $companyIds);
 
     if ($hasDateFilter) {
-        $monthlyQuery->whereBetween('attendences.created_at', [$startDate, $endDate]);
+        $monthlyQuery->whereBetween('attendences.date', [$startDate, $endDate]);
     }
 
     $rawMonthly = $monthlyQuery
         ->select(
-            DB::raw('YEAR(attendences.created_at) as year'),
-            DB::raw('MONTH(attendences.created_at) as month'),
+            DB::raw('YEAR(attendences.date) as year'),
+            DB::raw('MONTH(attendences.date) as month'),
             DB::raw('SUM(attendences.absent) as total_absent'),
             DB::raw('SUM(attendences.kazini) as total_kazini')
         )
-        ->groupBy(DB::raw('YEAR(attendences.created_at)'), DB::raw('MONTH(attendences.created_at)'))
-        ->orderByRaw('YEAR(attendences.created_at), MONTH(attendences.created_at)')
+        ->groupBy(DB::raw('YEAR(attendences.date)'), DB::raw('MONTH(attendences.date)'))
+        ->orderByRaw('YEAR(attendences.date), MONTH(attendences.date)')
         ->get()
         ->mapWithKeys(fn ($item) => [
             $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT) => $item,
