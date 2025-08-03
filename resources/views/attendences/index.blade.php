@@ -146,6 +146,12 @@
                                             data-bs-target="#statusModal{{ $companyId }}">
                                             Request
                                         </button>
+                                    @else
+                                        <button class="btn btn-success btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#statusModal{{ $companyId }}">
+                                            Request
+                                        </button>  
                                 @endif
                                 </div>
                                     <div class="modal fade" id="statusModal{{  $statistics[$j]['company']->id ?? '' }}" tabindex="-1"

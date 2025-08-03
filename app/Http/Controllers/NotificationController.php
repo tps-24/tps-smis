@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Announcement;
+use App\Models\SharedNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
@@ -47,11 +48,12 @@ class NotificationController extends Controller
      * Show the form for editing the specified resource.
      */
 
-     public function showNotifications($announcementIds)
+     public function showNotifications($Ids, $category)
      {
-         $notification = Announcement::whereIn('id',[$announcementIds])->get()[0];
-         //return $announcement;
-         return view('notifications.view', compact('notification'));
+
+           $notification = SharedNotification::whereIn('id',[$Ids])->get()[0]; 
+
+         return view('notifications.view', compact('notification','category'));
      }
     public function edit(string $id)
     {

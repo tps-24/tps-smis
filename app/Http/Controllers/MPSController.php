@@ -3,6 +3,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\MPS;
+use App\Events\NotificationEvent;
+use App\Models\NotificationAudience;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -100,6 +102,19 @@ class MPSController extends Controller
 
         $student->beat_status = 6;
         $student->save();
+        $audience = NotificationAudience::find(1);
+        $student->title ="Locked in.";
+        $student->category ="mps";
+
+        broadcast(new NotificationEvent(
+            $student->id,   // ID from announcement
+            $audience,                // Audience object or instance
+            1,  // Notification type
+            2,                        // Category (ensure 1 is a valid category ID)
+            "Locked in.", // Title of the notification
+            $student,           // Full announcements object
+            "body"  // Body of the notification
+        ));
         return redirect()->route('mps.index')->with('success', 'Student recorded successfully.');
     }
 
