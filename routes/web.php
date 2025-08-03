@@ -50,10 +50,16 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\IntakeHistoryController;
 use App\Http\Controllers\StaffSummaryController;
 use App\Http\Controllers\CompanyController;
+
+ use App\Http\Controllers\WeaponController;
+use App\Http\Controllers\OfficerController;
+use App\Http\Controllers\MovementController;
+use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Http\Request;
+
 
 require __DIR__ . '/auth.php';
 
@@ -619,5 +625,8 @@ Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->n
     // Store leave request
     Route::post('/leave-request', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
 
-
-    
+// RESTful resource routes
+Route::resource('weapons', WeaponController::class);
+Route::resource('officers', OfficerController::class);
+Route::resource('movements', MovementController::class);
+Route::resource('shifts', ShiftController::class);
