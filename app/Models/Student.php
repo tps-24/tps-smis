@@ -133,6 +133,8 @@ class Student extends Model
     {
         return $this->hasMany(Patient::class);
     }
+
+    
     public function leaves()
     {
         return $this->hasMany(LeaveRequest::class);
