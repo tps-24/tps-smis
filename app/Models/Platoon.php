@@ -59,23 +59,32 @@ public function today_attendence($attendanceType_id = null, $date = null)
         return $this->sick();
     }
 
-    public function today_admitted(){
+    public function today_admitted($date = null){
         $selectedSessionId = session('selected_session');
         if (!$selectedSessionId)
             $selectedSessionId = 1;
-       return $this->sick()->where('session_programme_id', $selectedSessionId)->where('excuse_type_id',3)->whereNull('released_at');
+                $_date = $date == null? Carbon::today() : Carbon::parse($date)->format('Y-m-d');
+            return $this->sick()
+                ->where('session_programme_id', $selectedSessionId)
+                ->where('excuse_type_id', 3) // Admitted
+                ->where(function ($query) use ($_date) {
+                $query->whereNull('released_at')
+                    ->orWhereDate('released_at', '<=', $_date);
+            });
     }
 
-        public function todayEd(){
+        public function todayEd($date = null){
         $selectedSessionId = session('selected_session');
         if (!$selectedSessionId)
             $selectedSessionId = 1;
-         $today = Carbon::today();
+        $_date = $date == null? Carbon::today() : Carbon::parse($date)->format('Y-m-d');
             return $this->sick()
                 ->where('session_programme_id', $selectedSessionId)
                 ->where('excuse_type_id', 1) // ED
-                ->whereNull('released_at');
-                // ->whereDate('patients.created_at', '<=', $today)
+                ->where(function ($query) use ($_date) {
+                  $query->whereNull('released_at')
+                    ->orWhereDate('released_at', '<=', $_date);
+                });
                 // ->whereRaw("DATE_ADD(patients.created_at, INTERVAL rest_days DAY) >= ?", [$today]);
     }
 

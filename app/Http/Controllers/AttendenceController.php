@@ -12,6 +12,8 @@ use App\Models\AttendanceRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Events\NotificationEvent;
+use App\Models\NotificationAudience;
 use Illuminate\Support\Facades\Auth;
 
 class AttendenceController extends Controller
@@ -69,9 +71,9 @@ class AttendenceController extends Controller
         $platoon        = Platoon::find($request->platoon);
         $students       = $platoon->students()->where('session_programme_id', $selectedSessionId)
             ->where('company_id', $platoon->company_id)
-            ->whereNotIn('id', $this->getSafariStudentIds($platoon))
+            ->whereNotIn('id', $this->getSafariStudentIds($platoon, $request->date))
             ->whereNotIn('id', $this->getSickStudentIds($platoon))
-            ->whereNotIn('id', $this->getKaziniStudentsIds($platoon))->get();
+            ->whereNotIn('id', $this->getKaziniStudentsIds($platoon, $date))->get();
         //return count($students);
         // $students = Student::where('company_id', $platoon->company_id)
         //             ->where('session_programme_id',$this->selectedSessionId)
@@ -431,14 +433,27 @@ class AttendenceController extends Controller
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
         }
+        $platoon         = Platoon::find($platoon_id);
+        if ($request->date != Carbon::today()->format('Y-m-d')) {
+            $requestAttendances = AttendanceRequest::where('company_id', $platoon->company_id)
+                ->where('date', $request->date)
+                ->get();
 
+            if ($requestAttendances->isEmpty()) {
+                return redirect()->back()->with('info', "No requested attendance for the specified date.");
+            }
+
+            if ($requestAttendances->contains('status', 'pending')) {
+                return redirect()->back()->with('info', "At least one request is still pending.");
+            }
+        }
         $ids = $request->input('student_ids');
         if ($ids == null) {
             return redirect()->to('attendences/type/' . $type)->with('error', "Students must be selected.");
         }
         $attendenceType  = AttendenceType::find($type);
         $present         = count($ids);
-        $platoon         = Platoon::find($platoon_id);
+        
         $platoonStudents = Student::where('company_id', $platoon->company_id)
             ->where('session_programme_id', $selectedSessionId)
             ->where('platoon', $platoon->name);
@@ -452,7 +467,7 @@ class AttendenceController extends Controller
             ->where('platoon', $platoon->name)
             ->where('gender', 'M')->count();
 
-        $absent_ids = array_values(array_diff($students, $ids, $this->getKaziniStudentsIds($platoon), $this->getSickStudentIds($platoon), $this->getSafariStudentIds($platoon)));
+        $absent_ids = array_values(array_diff($students, $ids, $this->getKaziniStudentsIds($platoon, $request->date), $this->getSickStudentIds($platoon), $this->getSafariStudentIds($platoon, $request->date)));
         $total      = count($students);
 
         $todayRecords = Attendence::leftJoin('platoons', 'attendences.platoon_id', 'platoons.id')
@@ -477,15 +492,15 @@ class AttendenceController extends Controller
 
         $type       = AttendenceType::find($type);
         $lockUp     = $this->getLockUpStudentsIds($platoon);
-        $kazini     = $this->kaziniPlatoonStudents($platoon);
+        $kazini     = $this->kaziniPlatoonStudents($platoon, $request->date);
         $sick_ids   = $this->getSickStudentIds($platoon);
         $adm        = $this->getAdmStudentIds($platoon);
         $ed         = $this->getEdStudentIds($platoon);
-        $safari_ids = $this->getSafariStudentIds($platoon);
+        $safari_ids = $this->getSafariStudentIds($platoon, $request->date);
         $attendence = Attendence::create([
             'attendenceType_id'     => $type->id,
             'platoon_id'            => $platoon_id,
-            'present'               => $present - count($lockUp),
+            'present'               => $present - count($lockUp) - count($safari_ids),
             'sentry'                => 0,
             'absent'                => count($absent_ids),
             'adm'                   => count($adm),
@@ -639,7 +654,7 @@ class AttendenceController extends Controller
                     ->from('platoons')
                     ->where('company_id', $companyId);
             })
-            ->whereDate('created_at', $date)
+            ->whereDate('date', $date)
             ->get()
             ->groupBy('session_programme_id');
 
@@ -667,20 +682,20 @@ class AttendenceController extends Controller
         if ($date != Carbon::today()->toDateString()) {
             $platoons = $company->platoons()
                 ->whereHas('attendences', function ($query) use ($date) {
-                    $query->whereDate('created_at', $date);
+                    $query->whereDate('date', $date);
                 })
                 ->get();
         } else {
             $platoons = $company->platoons()
                 ->whereHas('attendences', function ($query) {
-                    $query->whereDate('created_at', Carbon::today());
+                    $query->whereDate('date', Carbon::today());
                 })
                 ->get();
         }
         $ids = [];
         foreach ($platoons as $platoon) {
             if ($date != Carbon::today()->toDateString()) {
-                $attendence = $platoon->attendences->where('created_at', $date)->first();
+                $attendence = $platoon->attendences->where('date', $date)->first();
             } else {
                 $attendence = $platoon->today_attendence()->first();
             }
@@ -705,7 +720,7 @@ class AttendenceController extends Controller
     {
         $attendence       = Attendence::find($attendenceId);
         $platoon          = $attendence->platoon;
-        $kaziniStudentsId = $this->getKaziniStudentsIds($platoon);
+        $kaziniStudentsId = $this->getKaziniStudentsIds($platoon, $attendence->date);
         //     return Student::whereIn('id', $kaziniStudentsId)->get();
         //    return count($kaziniStudentsId);
         $absent = $attendence->absent_student_ids != null ? explode(",", $attendence->absent_student_ids) : [];
@@ -783,15 +798,15 @@ class AttendenceController extends Controller
         return $students_ids;
     }
 
-    private function kaziniPlatoonStudents($platoon)
+    private function kaziniPlatoonStudents($platoon, $date = null)
     {
         // Fetch students based on the collected student IDs and platoon name
 
         //return $students->pluck('platoon');
-        return count($this->getKaziniStudentsIds($platoon));
+        return count($this->getKaziniStudentsIds($platoon, $date = null));
     }
 
-    private function getKaziniStudentsIds($platoon)
+    private function getKaziniStudentsIds($platoon, $date = null)
     {
         // Check if a session ID has been submitted
         if (request()->has('session_id')) {
@@ -804,7 +819,7 @@ class AttendenceController extends Controller
             $selectedSessionId = 1;
         }
 
-        $date        = Carbon::yesterday()->format('Y-m-d');
+        $date        = $date != null? Carbon::parse($date)->subDays(1)->format('Y-m-d') : Carbon::yesterday()->format('Y-m-d');
         $guardAreas  = $platoon->company->guardAreas;
         $patrolAreas = $platoon->company->patrolAreas;
         $beats       = collect();
@@ -836,7 +851,7 @@ class AttendenceController extends Controller
         return $studentIds;
     }
 
-    private function getSickStudentIds($platoon)
+    private function getSickStudentIds($platoon, $date = null)
     {
         // Check if a session ID has been submitted
         if (request()->has('session_id')) {
@@ -851,9 +866,9 @@ class AttendenceController extends Controller
 
         $sick_ids      = [];
         $sick_students = $platoon->today_sick->where('company_id', $platoon->company_id)->where('session_programme_id', $selectedSessionId);
-
+        $_date = $date == null? Carbon::today() : Carbon::parse($date)->format('Y-m-d');
         foreach ($sick_students as $sick_student) {
-            if ($sick_student->created_at->copy()->addDays($sick_student->rest_days) >= (Carbon::now())) {
+            if ($sick_student->created_at->copy()->addDays($sick_student->rest_days) >= $_date) {
                 if ($sick_student->excuse_type_id == 1 || $sick_student->excuse_type_id == 3) {
                     $sick_ids = array_merge($sick_ids, [$sick_student->student->id]);
                 }
@@ -862,12 +877,13 @@ class AttendenceController extends Controller
         return $sick_ids;
     }
 
-    private function getEdStudentIds($platoon)
+    private function getEdStudentIds($platoon, $date = null)
     {
         $ed_ids      = [];
-        $ed_students = $platoon->todayEd()->where('patients.company_id', $platoon->company_id)->get();
+        $_date = $date == null? Carbon::today() : Carbon::parse($date)->format('Y-m-d');
+        $ed_students = $platoon->todayEd($_date)->where('patients.company_id', $platoon->company_id)->get();
         foreach ($ed_students as $ed_student) {
-            if ($ed_student->created_at->copy()->addDays($ed_student->rest_days) >= (Carbon::now())) {
+            if ($ed_student->created_at->copy()->addDays($ed_student->rest_days) >= $_date) {
                 $ed_ids = array_merge($ed_ids, [$ed_student->student->id]);
             }
         }
@@ -883,13 +899,23 @@ class AttendenceController extends Controller
         }
         return $adm_ids;
     }
-    private function getSafariStudentIds($platoon)
+    private function getSafariStudentIds($platoon, $date =null)
     {$selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
         }
-
-        return $platoon->leaves()->where('students.company_id', $platoon->company_id)->where('session_programme_id', $selectedSessionId)->whereNull('leave_requests.return_date')->pluck('student_id')->toArray();}
+        $_date = $date == null? Carbon::today()->format('Y-m-d') : $date;
+        return $platoon->leaves()
+            ->where('students.company_id', $platoon->company_id)
+            ->where('session_programme_id', $selectedSessionId)
+            ->where(function ($query) use ($_date) {
+                $query->whereNull('leave_requests.return_date')
+                    ->orWhere('leave_requests.return_date', '<=', $_date);
+            })
+            ->where('leave_requests.created_at', '<=', $_date)
+            ->pluck('student_id')
+            ->toArray();
+        }
 
     public function requestAttendance(Request $request){
         $request->validate([
@@ -913,18 +939,39 @@ class AttendenceController extends Controller
             if ($alreadyPending) {
                 return redirect()->back()->with('info', 'You have already made a pending attendance request for this company and date.');
             }
-            AttendanceRequest::create([
+            $attendanceRequest = AttendanceRequest::create([
                 'date' => $request->date,
                 'company_id' => $request->company_id,
                 'requested_by' => $request->user()->id,
                 'attendenceType_id' =>$request->attendenceType_id,
                 'reason' => $request->reason,
             ]);
+             $audience = NotificationAudience::find(1);
+            broadcast(new NotificationEvent(
+                $attendanceRequest->id,   // ID from announcement
+                $audience,                // Audience object or instance
+                1,  // Notification type
+                3,                        // Category (ensure 1 is a valid category ID)
+                "Attendance request created", // Title of the notification
+                $attendanceRequest,           // Full announcements object
+                "body"  // Body of the notification
+            ));
             return redirect()->back()->with('success', 'Attendance request submitted successfully.');
     }
 
     public function createAttendanceRequests(){
         $requests = AttendanceRequest::orderBy('created_at','desc')->paginate(15);
+            //          $audience = NotificationAudience::find(1);
+
+            // broadcast(new NotificationEvent(
+            //     $requests[0]->id,   // ID from announcement
+            //     $audience,                // Audience object or instance
+            //     1,  // Notification type
+            //     3,                        // Category (ensure 1 is a valid category ID)
+            //     "Attendance request created", // Title of the notification
+            //     $requests[0],           // Full announcements object
+            //     "body"  // Body of the notification
+            // ));
         return view('attendences.request', compact('requests'));
     }
 

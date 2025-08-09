@@ -1051,15 +1051,20 @@ private function getMPSData($start_date = null, $end_date = null)
     $monthlyEnd   = $end_date   ? Carbon::parse($end_date)->endOfMonth()     : Carbon::now()->endOfMonth();
 
     // ========== DAILY ==========
-    $mpsCounts = DB::table('m_p_s as mps')
-        ->join('students as s', 'mps.student_id', '=', 's.id')
-        ->selectRaw('DATE(mps.arrested_at) as date, COUNT(DISTINCT mps.student_id) as mps_count')
-        ->whereBetween('mps.arrested_at', [$dailyStart, $dailyEnd])
-        ->whereIn('s.company_id', $company_ids)
-        ->groupByRaw('DATE(mps.arrested_at)')
-        ->orderByRaw('DATE(mps.arrested_at)')
-        ->get()
-        ->keyBy('date');
+$mpsCounts = DB::table('m_p_s as mps')
+    ->join('students as s', 'mps.student_id', '=', 's.id')
+    ->selectRaw('DATE(mps.arrested_at) as date, COUNT(DISTINCT mps.student_id) as mps_count')
+    //->whereBetween('mps.arrested_at', [$dailyStart, $dailyEnd])
+    ->whereIn('s.company_id', $company_ids)
+    ->where(function ($query) use ($dailyEnd) {
+        $query->whereNull('mps.released_at')
+              ->orWhere('mps.released_at', '<=', $dailyEnd);
+    })
+    ->groupByRaw('DATE(mps.arrested_at)')
+    ->orderByRaw('DATE(mps.arrested_at)')
+    ->get()
+    ->keyBy('date');
+
 
     $mpsVisitorCounts = DB::table('m_p_s_visitors as v')
         ->join('students as s', 'v.student_id', '=', 's.id')
@@ -1085,7 +1090,11 @@ private function getMPSData($start_date = null, $end_date = null)
     // ========== WEEKLY ==========
     $weeklyRaw = DB::table('m_p_s')
         ->selectRaw("YEARWEEK(arrested_at, 1) as year_week, COUNT(DISTINCT student_id) as mps_count")
-        ->whereBetween('arrested_at', [$weeklyStart, $weeklyEnd])
+        //->whereBetween('arrested_at', [$weeklyStart, $weeklyEnd])
+        ->where(function ($query) use ($weeklyEnd) {
+            $query->whereNull('released_at')
+              ->orWhere('released_at', '<=', $weeklyEnd);
+        })
         ->groupBy(DB::raw('YEARWEEK(arrested_at, 1)'))
         ->orderBy(DB::raw('YEARWEEK(arrested_at, 1)'))
         ->get()

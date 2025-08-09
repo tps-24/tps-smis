@@ -28,16 +28,16 @@ class AnnouncementController extends Controller
     {
         //$announcements = Announcement::where('expires_at', '>', Carbon::now())->orderBy('created_at', 'desc')->get();
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
-       /* $audience = NotificationAudience::find(1);
-        broadcast(new NotificationEvent(
-            $announcements[1]->id,   // ID from announcement
-            $audience,                // Audience object or instance
-            1,  // Notification type
-            1,                        // Category (ensure 1 is a valid category ID)
-            $announcements[1]->title, // Title of the notification
-            $announcements[1],           // Full announcements object
-            "body"  // Body of the notification
-        ));*/
+        // $audience = NotificationAudience::find(1);
+        // broadcast(new NotificationEvent(
+        //     $announcements[1]->id,   // ID from announcement
+        //     $audience,                // Audience object or instance
+        //     1,  // Notification type
+        //     1,                        // Category (ensure 1 is a valid category ID)
+        //     $announcements[1]->title, // Title of the notification
+        //     $announcements[1],           // Full announcements object
+        //     "body"  // Body of the notification
+        // ));
         return view('announcements.index', compact('announcements'));
     }
 

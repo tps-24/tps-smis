@@ -127,9 +127,9 @@ public function getGraphData($start_date = null, $end_date = null)
         }
     } elseif ($type === 'week') {
         $period = CarbonPeriod::create($start, '1 week', $end);
-        foreach ($period as $i => $startOfWeek) {
-            $key = $startOfWeek->format('Y-m-d');
-            $data['labels'][] = 'Week ' .$this->getWeekNumber($startOfWeek);
+        foreach ($period as $i => $endOfWeek) {
+            $key = $endOfWeek->format('Y-m-d');
+            $data['labels'][] = 'Week ' .$this->getWeekNumber($endOfWeek);
             $data['keys'][$key] = $i;
         }
     } elseif ($type === 'month') {
@@ -238,9 +238,8 @@ public function getGraphData($start_date = null, $end_date = null)
                                       //dd($date);
                                       // Define the target date for which you want to calculate the week number
         $date = Carbon::parse($date); // This could be the current date, or any specific date
-
-                                                          // Calculate the difference in weeks between the start date and the target date
-        $weekNumber = $startDate->diffInWeeks($date) + 1; // Adding 1 to make it 1-based (Week 1, Week 2, ...)
+        // Calculate the difference in weeks between the start date and the target date
+        $weekNumber = (int) ceil($startDate->diffInDays($date) / 7) + 1; // Adding 1 to make it 1-based (Week 1, Week 2, ...)
         return (int) $weekNumber;
     }
 

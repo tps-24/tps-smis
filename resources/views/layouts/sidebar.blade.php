@@ -181,6 +181,11 @@
                                         <a href="{{ route('attendance.show.request') }}">Requests</a>
                                     </li>
                                 @endif
+                                @can('report-list')
+                                    <li>
+                                        <a href="{{ route('reports.index') }}">Summary</a>
+                                    </li>                                    
+                                @endcan
                             </ul>
                         </li>
             @endcan()
@@ -330,9 +335,11 @@
                             <li>
                                 <a href="{{ route('visitors.index') }}">Visitors</a>
                             </li>
-                            <!-- <li>
-                <a href="">Report</a>
-                </li> -->
+                        @can('report-list')
+                        <li>
+                            <a href="{{ route('reports.mps') }}">Summary</a>
+                        </li>                            
+                        @endcan
                         </ul>
                     </li>
             @endcan()
@@ -432,15 +439,11 @@
                         <span class="menu-text">Reports</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
-                            <a href="{{ route('reports.index') }}">Attendances</a>
-                        </li>
+
                         <li>
                             <a href="{{ route('reports.hospital') }}">Hospital</a>
                         </li>
-                        <li>
-                            <a href="{{ route('reports.mps') }}">MPS</a>
-                        </li>
+                                                                                                                                                                
                         <li>
                             <a href="{{ route('reports.leaves') }}">Leaves</a>
                         </li>
