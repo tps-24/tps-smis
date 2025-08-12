@@ -18,14 +18,147 @@
 @endsection
 
 @section('content')
+@include('layouts.sweet_alerts.index')
 @if (count($attendences) == 0)
     <h1>No attendence recorded today.</h1>
 @else
-<h4>Attendances for {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}.</h4>
-    <div class="d-flex  justify-content-end">
+<h4>Attendances for {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}.</h4><br>
+    <div class="d-flex @if(auth()->user()->hasRole(['CRO','Admin','Super Administrator'])) justify-content-between @else justify-content-end @endif">
+@php
+    $attendanceCompany = $company->company_attendance($date);
+    $attendanceStatus = $attendanceCompany->status;
+    $hoursSinceUpdate = \Carbon\Carbon::parse($attendanceCompany->updated_at)->diffInHours(\Carbon\Carbon::now());
+@endphp
+@if(auth()->user()->hasRole(['CRO','Admin','Super Administrator']))
+<form id="UpdateStatusForm" action="{{ route('attendance.updateCompanyAttendance', [$company->id, $date]) }}" method="POST" style="display:inline;">
+    @csrf
+    @method('PATCH')
+    <input type="hidden" name="status" id="statusInput" value="{{ $attendanceStatus }}" />
+    <input type="hidden" name="falsified_reason" id="reasonInput" />
+
+    <div class="dropdown d-inline">
+        {{-- Main button with current status style --}}
+        @if($attendanceStatus === 'unverified')
+            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" title="Current status: Unverified">
+                <i class="bi bi-hourglass-split"></i> Unverified
+            </button>
+        @elseif($attendanceStatus === 'verified')
+            @if($hoursSinceUpdate < 2)
+                <button class="btn btn-sm btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" title="Current status: Verified (editable)">
+                    <i class="bi bi-check2-circle"></i> Verified
+                </button>
+            @else
+                <button class="btn btn-sm btn-success" disabled title="Verified and locked">
+                    <i class="bi bi-check2-circle"></i> Verified
+                </button>
+            @endif
+        @elseif($attendanceStatus === 'falsified')
+            @if($hoursSinceUpdate < 2)
+                <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" title="Current status: Falsified (editable)">
+                    <i class="bi bi-exclamation-octagon"></i> Falsified
+                </button>
+            @else
+                <button class="btn btn-sm btn-danger" disabled title="Falsified and locked">
+                    <i class="bi bi-exclamation-octagon"></i> Falsified
+                </button>
+            @endif
+        @endif
+
+        {{-- Dropdown menu (only if editable) --}}
+        @if(
+            ($attendanceStatus === 'unverified') ||
+            ($attendanceStatus === 'verified' && $hoursSinceUpdate < 2) ||
+            ($attendanceStatus === 'falsified' && $hoursSinceUpdate < 2)
+        )
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                @if($attendanceStatus === 'unverified')
+                    <li>
+                        <a href="#" class="dropdown-item text-primary" onclick="confirmStatusChange(event, 'verified', 'Verify Company Attendance?')">
+                            <i class="bi bi-check"></i> Verify
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-item text-danger" onclick="confirmStatusChange(event, 'falsified', 'Falsify Company Attendance?')">
+                            <i class="bi bi-exclamation-octagon"></i> Falsify
+                        </a>
+                    </li>
+                @elseif($attendanceStatus === 'verified')
+                    <li>
+                        <a href="#" class="dropdown-item text-warning" onclick="confirmStatusChange(event, 'unverified', 'Unverify Company Attendance?')">
+                            <i class="bi bi-x-circle"></i> Unverify
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-item text-danger" onclick="confirmStatusChange(event, 'falsified', 'Falsify Company Attendance?')">
+                            <i class="bi bi-exclamation-octagon"></i> Falsify
+                        </a>
+                    </li>
+                @elseif($attendanceStatus === 'falsified')
+                    <li>
+                        <a href="#" class="dropdown-item text-warning" onclick="confirmStatusChange(event, 'unverified', 'Unfalsify Company Attendance?')">
+                            <i class="bi bi-arrow-counterclockwise"></i> Unfalsify
+                        </a>
+                    </li>
+                @endif
+            </ul>
+        @endif
+    </div>
+</form>
+@endif
+<script>
+function confirmStatusChange(event, status, message) {
+    event.preventDefault();
+
+    if (status === 'falsified') {
+        Swal.fire({
+            title: 'Falsify Attendance',
+            text: message,
+            input: 'textarea',
+            inputPlaceholder: 'Enter reason for falsifying...',
+            inputAttributes: {
+                'aria-label': 'Enter reason for falsifying'
+            },
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            inputValidator: (value) => {
+                if (!value.trim()) {
+                    return 'You must provide a reason!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('statusInput').value = status;
+                document.getElementById('reasonInput').value = result.value.trim();
+                document.getElementById('UpdateStatusForm').submit();
+            }
+        });
+    } else {
+        Swal.fire({
+            title: 'Confirm',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('statusInput').value = status;
+                document.getElementById('UpdateStatusForm').submit();
+            }
+        });
+    }
+}
+</script>
+
+
         <a href="{{ route('attendences.generatePdf',['companyId'=>$company->id,'date'=>$date, 'attendenceTypeId' => $attendenceType->id]) }}">
             <button title="Download report" class="btn btn-sm btn-success"><i class="gap 2 bi bi-download"></i> Report</button>
         </a>
+
     </div>
     <div class="table-responsive">
         <table class="table table-striped truncate m-0">

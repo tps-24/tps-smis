@@ -401,6 +401,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('storeMchanganuo/{attendenceId}/', 'storeMchanganuo')->name('attendences.storeMchanganuo');
 
         Route::get('today/{company_id}/{type}/{date}/{attendenceTypeId}', 'today')->name('today');
+        Route::patch('/companies/{company}/attendance/{date}',  'updateCompanyAttendance')->name('attendance.updateCompanyAttendance');
     });
 
     Route::controller(ReportController::class)->prefix('reports')->group(function () {

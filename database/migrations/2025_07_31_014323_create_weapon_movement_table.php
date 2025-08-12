@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('weapon_movement', function (Blueprint $table) {
+        Schema::create('weapon_movements', function (Blueprint $table) {
             $table->id();
             $table->string('movement_id')->unique(); // e.g., MVT001
             $table->unsignedBigInteger('weapon_id');

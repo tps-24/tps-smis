@@ -51,6 +51,12 @@ public function getGraphData($start_date = null, $end_date = null)
         $dayKey = $date->format('Y-m-d');
 
         if (isset($dailyData['keys'][$dayKey])) {
+            $companyAttendance = $attendance->platoon->company?->company_attendance($date);
+
+            if ($companyAttendance && $companyAttendance->status != "verified") {
+                continue; // Only skip if attendance exists AND is not verified
+            }
+
             $i = $dailyData['keys'][$dayKey];
             $dailyData['absents'][$i] += (int) $attendance->absent;
             $dailyData['sick'][$i] = $this->getSickCount($date);
@@ -267,6 +273,7 @@ public function getGraphData($start_date = null, $end_date = null)
 
         // Aggregate absents from attendances
         foreach ($attendances as $attendance) {
+
             $attendanceWeek = Carbon::parse($attendance->date)->endOfWeek()->toDateString();
             if (isset($weekKeys[$attendanceWeek])) {
                 $weekIndex = $weekKeys[$attendanceWeek];

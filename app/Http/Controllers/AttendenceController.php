@@ -9,6 +9,7 @@ use App\Models\Patient;
 use App\Models\Platoon;
 use App\Models\Student;
 use App\Models\AttendanceRequest;
+use App\Models\CompanyAttendance;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -527,6 +528,12 @@ class AttendenceController extends Controller
 
         $attendence->session_programme_id = $selectedSessionId;
         $attendence->save();
+        CompanyAttendance::updateOrCreate(
+            [
+            'company_id' => $platoon->company_id,  // unique condition
+            'date'       => $request->date,       // unique condition
+            ]      
+        );
         $companyId = $platoon->company_id;
 
         return redirect()
@@ -982,5 +989,48 @@ class AttendenceController extends Controller
         $attendanceRequest->save();
 
         return redirect()->back()->with('success', 'Attendance request status updated successfully.');
+    }
+    public function updateCompanyAttendance(Request $request, Company $company, $date)
+    {
+        // Validate the incoming status input
+        $request->validate([
+            'status' => ['required', 'in:unverified,verified,falsified'],
+        ]);
+
+        // Retrieve the attendance record for the company on the given date
+        $attendance = $company->company_attendance($date);
+
+        if (! $attendance) {
+            return redirect()->back()->withErrors('Attendance record not found.');
+        }
+
+        $newStatus = $request->input('status');
+        $hoursSinceUpdate = Carbon::parse($attendance->updated_at)->diffInHours(now());
+        
+        // Business logic based on current status and requested status
+        switch ($newStatus) {
+            case 'verified':
+                    $attendance->status = 'verified';
+                break;
+            case 'unverified':
+                if ($hoursSinceUpdate >= 2) {
+                    return redirect()->back()->with('error','Attendance is locked and cannot be changed.');
+                }
+                    $attendance->status = 'unverified';
+                break;
+            case 'falsified':
+                if ($hoursSinceUpdate >= 2) {
+                    return redirect()->back()->with('error','Attendance is locked and cannot be changed.');
+                }             
+                    $attendance->status = 'falsified';
+                    $attendance->falsified_reason = $request->falsified_reason;
+                break;
+            default:
+                return redirect()->back()->with('error','Invalid attendance status.');
+        }
+
+        $attendance->save();
+
+        return redirect()->back()->with('success', 'Attendance status updated successfully.');
     }
     }
