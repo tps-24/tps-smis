@@ -273,7 +273,11 @@ public function getGraphData($start_date = null, $end_date = null)
 
         // Aggregate absents from attendances
         foreach ($attendances as $attendance) {
+            $companyAttendance = $attendance->platoon->company?->company_attendance($attendance->date);
 
+            if ($companyAttendance && $companyAttendance->status != "verified") {
+                continue; // Only skip if attendance exists AND is not verified
+            }
             $attendanceWeek = Carbon::parse($attendance->date)->endOfWeek()->toDateString();
             if (isset($weekKeys[$attendanceWeek])) {
                 $weekIndex = $weekKeys[$attendanceWeek];
