@@ -1,86 +1,67 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\ArmoryShift;
-use App\Models\Officer;
+use App\Models\Armory;
+use App\Models\Shift;
 use Illuminate\Http\Request;
 
 class ShiftController extends Controller
 {
-   
-   // public function index()
-    //{
-      //  $shifts = ArmoryShift::latest()->paginate(10);
-        //return view('shifts.index', compact('shifts'));
-   // }
-public function index()
-{
-    $shifts = ArmoryShift::with('officerInCharge')->get();
-
-    $events = $shifts->map(function ($shift) {
-        return [
-            'title' => $shift->officerInCharge->full_name ?? 'Shift',
-            'start' => $shift->shift_date . 'T' . $shift->shift_start_time,
-            'end' => $shift->shift_date . 'T' . $shift->shift_end_time,
-            'url' => route('shifts.show', $shift->id),
-        ];
-    });
-
-    return view('shifts.index', compact('shifts', 'events'));
-}
-
-
+    public function index()
+    {
+        $shifts = Shift::with('staff', 'secondarystaff')->latest()->paginate(10);
+        return view('shifts.index', compact('shifts'));
+    }
 
     public function create()
     {
-        $officers = Officer::where('status', 'Active')->get();
-        return view('shifts.create', compact('officers'));
+        $staff = Armory::all();
+        return view('shifts.create', compact('staff'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'shift_id' => 'required|unique:armory_shifts',
             'shift_date' => 'required|date',
-            'shift_start_time' => 'required',
-            'shift_end_time' => 'required',
-            'officer_in_charge_id' => 'required|exists:officers,id',
+            'start_time' => 'required',
+            'staff_id' => 'required|exists:armories,id',
+            'secondary_staff_id' => 'nullable|exists:armories,id',
         ]);
 
-        ArmoryShift::create($request->all());
+        Shift::create([
+            'shift_date' => $request->shift_date,
+            'start_time' => $request->start_time,
+            'end_time' => date("H:i:s", strtotime($request->start_time) + 8 * 3600),
+            'staff_id' => $request->staff_id,
+            'secondary_staff_id' => $request->secondary_staff_id
+        ]);
 
-        return redirect()->route('shifts.index')->with('success', 'Shift scheduled.');
+        return redirect()->route('shifts.index')->with('success', 'Shift scheduled successfully.');
     }
 
-    public function show(ArmoryShift $shift)
+    public function edit(Shift $shift)
     {
-        return view('shifts.show', compact('shift'));
+        $staff = Armory::all();
+        return view('shifts.edit', compact('shift', 'staff'));
     }
 
-    public function edit(ArmoryShift $shift)
-    {
-        $officers = Officer::where('status', 'Active')->get();
-        return view('shifts.edit', compact('shift', 'officers'));
-    }
-
-    public function update(Request $request, ArmoryShift $shift)
+    public function update(Request $request, Shift $shift)
     {
         $request->validate([
             'shift_date' => 'required|date',
-            'shift_start_time' => 'required',
-            'shift_end_time' => 'required',
-            'officer_in_charge_id' => 'required|exists:officers,id',
+            'start_time' => 'required',
+            'staff_id' => 'required|exists:armories,id',
+            'secondary_staff_id' => 'nullable|exists:armories,id',
         ]);
 
-        $shift->update($request->all());
+        $shift->update([
+            'shift_date' => $request->shift_date,
+            'start_time' => $request->start_time,
+            'end_time' => date("H:i:s", strtotime($request->start_time) + 8 * 3600),
+            'staff_id' => $request->staff_id,
+            'secondary_staff_id' => $request->secondary_staff_id
+        ]);
 
-        return redirect()->route('shifts.index')->with('success', 'Shift updated.');
-    }
-
-    public function destroy(ArmoryShift $shift)
-    {
-        $shift->delete();
-        return redirect()->route('shifts.index')->with('success', 'Shift deleted.');
+        return redirect()->route('shifts.index')->with('success', 'Shift updated successfully.');
     }
 }

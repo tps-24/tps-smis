@@ -12,9 +12,6 @@ class Weapon extends Model
         'condition', 'current_status', 'location', 'remarks',
     ];
 
-    public function movements() {
-        return $this->hasMany(WeaponMovement::class);
-    }
-
+  
     
 }
