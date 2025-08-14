@@ -1,19 +1,28 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Weapon extends Model
 {
-    protected $fillable = [
-        'weapon_id', 'serial_number', 'weapon_type', 'category',
-        'make_model', 'caliber_gauge', 'acquisition_date',
-        'condition', 'current_status', 'location', 'remarks',
+    //protected $fillable = ['serial_number', 'specification', 'weapon_model_id'];
+
+     protected $fillable = [
+        'serial_number',
+        'specification',
+        'category',
+        'weapon_model'
     ];
 
-    public function movements() {
-        return $this->hasMany(WeaponMovement::class);
+    public function model()
+    {
+        return $this->belongsTo(WeaponModel::class, 'weapon_model_id');
     }
+
+    public function handovers()
+    {
+        return $this->hasMany(WeaponHandover::class);
+    }
+
+    
 }
