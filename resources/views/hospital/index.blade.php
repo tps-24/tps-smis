@@ -104,7 +104,7 @@
 
 
 
-                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            
 
                             <button class="btn btn-primary"
                                 onclick="sendForApproval({{ $student->id }}, '{{ $student->first_name }}', '{{ $student->last_name }}')">

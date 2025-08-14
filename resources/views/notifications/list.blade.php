@@ -38,8 +38,7 @@
 </div>
 
 <!-- Laravel Echo -->
-<script src="https://cdn.jsdelivr.net/npm/laravel-echo/dist/echo.iife.js"></script>
-
+     <script src="/tps-smis/resources/assets/js/echo.iife.js"></script>
 <script>
   @php
     $notifications = \App\Models\SharedNotification::unreadBy(auth()->id())->get();
@@ -47,8 +46,8 @@
   @endphp
 
   const notifications = @json($notifications);
+  console.log(notifications)
   let counts = {!! json_encode($unreadCount) !!};
-
   updateNotificationCount(counts);
   notifications.forEach(appendNotification);
 
@@ -223,7 +222,7 @@
       },
     },
     appKey: 'local',
-    host: '192.168.16.201'                                                                                                                   -----------01',
+    host: '192.168.16.208',
     port: 6001,
     scheme: 'ws',
     client: 'js',
@@ -257,15 +256,14 @@
   }
 
   function appendNotification(notification) {
-
-    const title = '';
+    const title = notification.title;
     const type = '';
     const id = '';
     const created_at = '';
-    const category = '';
+    const category = notification.notification_category_id;
     const shared_id = JSON.stringify(notification.id);
         const url = notification.notification_category_id
-      ? `/tps-smis/notifications/showNotifications/${JSON.stringify(notification.data.id)}`
+      ? `/tps-smis/notifications/showNotifications/${JSON.stringify(notification.data.id)}/${category}`
       : '#';
 if (typeof notification.data !== 'undefined') {
   notification = notification.data; // extract the real object, not stringify yet
@@ -276,6 +274,8 @@ if (typeof notification.data !== 'undefined') {
 
     const div = document.createElement('div');
     div.className = 'notification-item';
+    const date = new Date(notification.created_at);
+    const formatted_date = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} ${date.getDate()} ${date.toLocaleString('default', { month: 'long' })}, ${date.getFullYear()}`;
 
     div.innerHTML = `
       <div
@@ -285,9 +285,9 @@ if (typeof notification.data !== 'undefined') {
         onclick="markNotificationAsRead(this)"
       >
         <div class="dropdown-item text-${notification.type ?? 'primary'} d-flex align-items-center">
-          ${notification.title}
+          ${title}
         </div>
-        <p class="small m-0 text-muted">${notification.created_at}</p>
+        <p class="small m-0 text-muted">${formatted_date}</p>
       </div>
     `;
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Announcement;
+use App\Models\MPS;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
@@ -47,11 +48,16 @@ class NotificationController extends Controller
      * Show the form for editing the specified resource.
      */
 
-     public function showNotifications($announcementIds)
+     public function showNotifications($Ids, $category)
      {
-         $notification = Announcement::whereIn('id',[$announcementIds])->get()[0];
-         //return $announcement;
-         return view('notifications.view', compact('notification'));
+            if($category == 1)
+                $notification = Announcement::find($Ids); 
+            else if($category == 2)
+                $notification = MPS::find($Ids);
+              if (!$notification) {
+                return redirect()->back()->with('error', 'Notification not found.');
+              }
+         return view('notifications.view', compact('notification','category'));
      }
     public function edit(string $id)
     {

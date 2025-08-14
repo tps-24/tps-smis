@@ -143,11 +143,11 @@
             datasets: [
                 { label: 'Absents', data: monthly.absents, backgroundColor: '#1E4093' },
                 { label: 'Sick', data: monthly.sick, backgroundColor: 'rgba(255, 0, 0, 0.7)' },
-                { label: 'Leaves', data: leaves_monthly_count, backgroundColor: 'rgba(12, 165, 106, 0.7)' },
+                { label: 'Leaves', data: monthly.leaves, backgroundColor: 'rgba(12, 165, 106, 0.7)' },
                 { label: 'Locked up', data: monthly.lockUps, backgroundColor: 'orange' },
                 { label: 'Absents Trends', data: monthly.absents, type: 'line', fill: false, borderColor: 'rgba(2, 11, 131, 0.7)', tension: 0.1 },
                 { label: 'Sick Trends', data: monthly.sick, type: 'line', fill: false, borderColor: 'rgba(187, 91, 91, 0.7)', tension: 0.1, hidden: true },
-                { label: 'Leaves Trend', data: leaves_monthly_count, type: 'line', fill: false, borderColor: 'rgba(2, 131, 82, 0.7)', tension: 0.1, hidden:true},
+                { label: 'Leaves Trend', data: monthly.leaves, type: 'line', fill: false, borderColor: 'rgba(2, 131, 82, 0.7)', tension: 0.1, hidden:true},
                 { label: 'Lock Up Trends', data: monthly.lockUps, type: 'line', fill: false, borderColor: 'rgba(152, 94, 18, 0.7)', tension: 0.1, hidden: true }
             ]
         };
@@ -181,7 +181,7 @@
                             }
                         },
                         // Dynamically set the max value of the y-axis to be higher than the highest bar
-                         suggestedMax: Math.max(...daily.absents, ...daily.sick, ...daily.lockUps) * 1.2, // 20% more than the highest value
+                         suggestedMax: Math.max(...daily.absents, ...daily.sick, ...daily.lockUps, ...daily.leaves) * 1.2, // 20% more than the highest value
                     }
                 },
                 layout: {

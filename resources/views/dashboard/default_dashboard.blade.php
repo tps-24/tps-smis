@@ -85,7 +85,7 @@
         </table>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script src="/tps-smis/resources/assets/js/cdns.cloudflare.js"></script>
     <script>
         var ctx = document.getElementById('weeklyAttendanceChart').getContext('2d');
         var weeklyData = @json($weeklyAttendance);

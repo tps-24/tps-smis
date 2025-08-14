@@ -31,6 +31,7 @@
                 <tr>
                     <th>S/N</th>
                     <th>Student Name</th>
+                    <th>Company</th>
                     <th>Reason</th>
                     <th>Action</th>
                 </tr>
@@ -40,6 +41,7 @@
                     <tr>
                         <td>{{$loop->iteration}}.</td>
                         <td>{{ $request->student->first_name }} {{ $request->student->last_name }}</td>
+                        <td>{{$request->student->company->name}} {{$request->student->platoon}}</td>
                         <td>{{ $request->reason }}</td>
                         <td class="d-flex gap-2">
                             <!-- Approve Button -->

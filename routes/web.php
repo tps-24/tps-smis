@@ -130,9 +130,12 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/student/intake_summary', [IntakeHistoryController::class, 'index']);
     Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
+    Route::get('/regions/by-session', [StudentController::class, 'getRegionsBySession'])->name('regions.bySession');
+
 
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/print-certificates', [FinalResultController::class, 'studentList'])->name('studentList');
+    Route::get('/print-certificates/summary', [FinalResultController::class, 'summary'])->name('studentList');
     Route::get('/students', [StudentController::class, 'index'])->name(name: 'students.index');
     Route::post('students/search', [StudentController::class, 'search'])->name('students.search');
     Route::get('students/search_certificate/{companyId}', [FinalResultController::class, 'search'])->name('students.search_certificate');
@@ -371,6 +374,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('campanies/{campusId}', [GuardAreaController::class, 'get_companies']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
+        Route::post('store/request',  'requestAttendance')->name('attendance.store.request');
+        Route::get('show/request',  'createAttendanceRequests')->name('attendance.show.request');
+        Route::post('request/update-status',  'updateRequestStatus')->name('attendance.request.update-status');
+        
         Route::get('type-test/{type_id}', 'attendence');
         Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
         // Route::post('create/{type_id}', 'create');
@@ -469,7 +476,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::get('notifications/{notification_category}/{notification_type}/{notification_id}/{ids}', [NotificationController::class, 'show']);
-    Route::get('notifications/showNotifications/{notificationIds}', [NotificationController::class, 'showNotifications'])->name('notifications.showNotifications');
+    Route::get('notifications/showNotifications/{notificationIds}/{category}', [NotificationController::class, 'showNotifications'])->name('notifications.showNotifications');
 
     Route::get('announcement/download/file/{documentPath}', [AnnouncementController::class, 'downloadFile'])->name('download.file');
 

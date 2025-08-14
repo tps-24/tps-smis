@@ -16,15 +16,32 @@
 
 @section('content')
 @include('layouts.sweet_alerts.index')
+
+<style>
+  .status-card.active-card {
+    border: 3px solid yellow !important;
+  }
+  .badge-status {
+    padding: 0.4em 0.75em;
+    border-radius: 1em;
+    font-size: 0.9em;
+  }
+  .badge-leave { background-color: #ffc107; color: #000; }
+  .badge-study { background-color: #17a2b8; color: #fff; }
+  .badge-trip { background-color: #6610f2; color: #fff; }
+  .badge-dismissed { background-color: #dc3545; color: #fff; }
+  .badge-active { background-color: #28a745; color: #fff; }
+</style>
+
 <div class="card-header">
   <h5 class="card-title">Staff Summary</h5>
-  <p class="card-text">This page provides a summary of the staff summary.</p>
+  <p class="card-text">This page provides the staff summary.</p>
 </div>
 
 <div class="card-body" style="margin-right: -25px;">
   <div class="row">
     @php
-      $cardTypes = [       
+      $cardTypes = [
         ['key' => 'active', 'label' => 'Active', 'color' => 'primary'],
         ['key' => 'leave', 'label' => 'Leave', 'color' => 'success'],
         ['key' => 'study', 'label' => 'Study', 'color' => 'info'],
@@ -34,14 +51,35 @@
 
     @foreach ($cardTypes as $type)
     <div class="col-md-3 mb-3">
-      <button class="card bg-{{ $type['color'] }} text-white w-100" onclick="showStaffs('{{ $type['key'] }}')">
-        <div class="card-body">
+      <button class="card bg-{{ $type['color'] }} text-white w-100 status-card"
+        data-status="{{ $type['key'] }}"
+        onclick="showStaffs('{{ $type['key'] }}')">
+        <div class="card-body text-center">
           <h5>{{ $type['label'] }}</h5>
           <p class="fs-4">{{ $stats[$type['key']]->count() ?? 0 }}</p>
         </div>
       </button>
     </div>
     @endforeach
+  </div>
+</div>
+
+<!-- Filter Form -->
+<div class="d-flex justify-content-center my-3">
+  <form id="staffFilterForm" class="d-flex flex-nowrap gap-2 align-items-center col-12 col-md-8 col-lg-6">
+    <div class="input-group">
+      <span class="input-group-text">Name</span>
+      <input type="text" class="form-control" name="staff_name" placeholder="Enter staff name">
+    </div>
+    <input type="hidden" name="status" id="filterStatus" value="">
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </form>
+</div>
+
+<!-- Loader -->
+<div class="text-center my-3" id="loading" style="display: none;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
   </div>
 </div>
 
@@ -57,6 +95,7 @@
           <th>Force Number</th>
           <th>Name</th>
           <th>Designation</th>
+          <th>Status</th>
           <th>View</th>
         </tr>
       </thead>
@@ -64,36 +103,51 @@
     </table>
   </div>
 
-<!-- Pagination -->
-<div class="d-flex justify-content-end mt-3" id="pagination-container">
-    <!-- Pagination links will render here -->
+  <div class="d-flex justify-content-end mt-3" id="pagination-container"></div>
 </div>
-
-</div>
-
 @endsection
 
 @section('scripts')
 <script>
-  let currentFilterType = 'totalEnrolled';
+  let currentFilterType = 'active';
 
   const labels = {
-    totalEnrolled: "Total Staff",
-    currentStudents: "Active Staff",
-    dismissed: "Dismissed Staff",
-    active: "Active Students",
-    study: "",
-    leave: "",
-    verified: "Verified Students"
+    total: "Total Staff",
+    active: "Active Staff",
+    leave: "Staff on Leave",
+    study: "Staff on Study",
+    dismissed: "Dismissed Staff"
   };
 
-  function showStaffs(type, page = 1) {
+  const statusIcons = {
+    active: `<span class="badge badge-active">✔ Active</span>`,
+    leave: `<span class="badge badge-leave">🏖 On Leave</span>`,
+    study: `<span class="badge badge-study">📘 Study</span>`,
+    trip: `<span class="badge badge-trip">✈ Trip</span>`,
+    dismissed: `<span class="badge badge-dismissed">❌ Dismissed</span>`
+  };
+
+  function showStaffs(type = 'total', page = 1) {
     currentFilterType = type;
+    document.getElementById('filterStatus').value = type;
 
-    const sessionId = document.getElementById('programmeSession')?.value || '';
-    const baseUrl = "{{ url('staff/filter') }}";
+    // Highlight active card
+    document.querySelectorAll('.status-card').forEach(card => {
+      card.classList.remove('active-card');
+    });
+    document.querySelector(`.status-card[data-status="${type}"]`)?.classList.add('active-card');
 
-    fetch(`${baseUrl}?type=${type}&page=${page}&session_id=${sessionId}`)
+    const form = document.getElementById('staffFilterForm');
+    const formData = new FormData(form);
+    formData.append('type', type);
+
+    const params = new URLSearchParams(formData).toString();
+    const url = `{{ url('staff/filter') }}?${params}&page=${page}`;
+
+    // Show loader
+    document.getElementById('loading').style.display = 'block';
+
+    fetch(url)
       .then(response => response.json())
       .then(data => {
         const staffs = data.staffs.data;
@@ -101,48 +155,53 @@
         const title = document.getElementById('studentTableTitle');
         const body = document.getElementById('studentTableBody');
 
-        title.textContent = labels[type] ?? "Students";
+        title.textContent = labels[type] ?? "Staff";
         body.innerHTML = '';
-        
+
         let startIndex = (data.staffs.current_page - 1) * data.staffs.per_page;
-        
-        staffs.forEach((staff, index) => {
-          const serialNumber = startIndex + index + 1;
-          body.innerHTML += `
+
+        if (staffs.length === 0) {
+          body.innerHTML = `
             <tr>
-              <td>${serialNumber}</td>
-              <td>${staff.forceNumber ?? '-'}</td>
-              <td>${staff.rank ?? '-'} ${staff.firstName} ${staff.lastName}</td>
-              <td>${staff.designation?? ''}</td>
-              <td>
-              <a href="{{ url('staffs') }}/${staff.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
-              </td>
-            </tr>`;
-        });
+              <td colspan="6" class="text-center text-danger">No staff found</td>
+            </tr>
+          `;
+        } else {
+          staffs.forEach((staff, index) => {
+            const serialNumber = startIndex + index + 1;
+            body.innerHTML += `
+              <tr>
+                <td>${serialNumber}</td>
+                <td>${staff.forceNumber ?? '-'}</td>
+                <td>${staff.rank ?? '-'} ${staff.firstName} ${staff.lastName}</td>
+                <td>${staff.designation ?? '-'}</td>
+                <td>${statusIcons[staff.status] ?? staff.status}</td>
+                <td>
+                  <a href="/tps-smis/staffs/${staff.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
+                </td>
+              </tr>
+            `;
+          });
+        }
 
         renderPagination(data, type);
         container.style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
       })
-      .catch((e) => {
-        alert("Could not load student data."+e);
+      .catch(err => {
+        alert("Failed to load staff data: " + err);
+        document.getElementById('loading').style.display = 'none';
       });
   }
 
   function renderPagination(data, type) {
     const paginationContainer = document.getElementById('pagination-container');
-    if (!paginationContainer) {
-      console.error('Pagination container not found.');
-      return;
-    }
-
     paginationContainer.innerHTML = `
-      <nav aria-label="Student pagination">
+      <nav>
         <ul class="pagination justify-content-end flex-wrap mb-0">
           ${data.staffs.links.map(link => {
-            const page = link.url ? new URL(link.url, window.location.origin).searchParams.get('page') : null;
-            const label = link.label
-              .replace(/&laquo;/g, '«')
-              .replace(/&raquo;/g, '»');
+            const page = link.url ? new URL(link.url).searchParams.get('page') : null;
+            const label = link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»');
 
             return `
               <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
@@ -158,14 +217,18 @@
       link.addEventListener('click', function (e) {
         e.preventDefault();
         const page = this.getAttribute('data-page');
-        if (page) showStaffs(type, parseInt(page));
+        if (page) showStaffs(currentFilterType, parseInt(page));
       });
     });
   }
+
+  document.getElementById('staffFilterForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    showStaffs(currentFilterType);
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     showStaffs(currentFilterType);
   });
 </script>
-
 @endsection

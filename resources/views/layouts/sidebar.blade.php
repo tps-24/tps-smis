@@ -176,6 +176,11 @@
                                 <li>
                                     <a href="/tps-smis/attendences/type/3">Night</a>
                                 </li>
+                                @if(auth()->user()->hasRole(['CRO','Super Administrator','Admin']))
+                                    <li>
+                                        <a href="{{ route('attendance.show.request') }}">Requests</a>
+                                    </li>
+                                @endif
                             </ul>
                         </li>
             @endcan()

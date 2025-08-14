@@ -29,8 +29,15 @@ class Attendence extends Model
       'ed_student_ids',
       'session_programme_id',
       'created_at',
-      'updated_at'
+      'updated_at',
+      'recorded_by',
+      'date'
    ];
+
+   public function recordedBy()
+   {
+      return $this->belongsTo(User::class, 'recorded_by', 'id');
+   }
    public function platoon()
    {
       return $this->belongsTo(Platoon::class, 'platoon_id', 'id');
@@ -49,4 +56,9 @@ class Attendence extends Model
     return $this->belongsTo(SessionProgramme::class);
 }
 
+      public function requests()
+      {
+         return $this->hasMany(AttendanceRequest::class, 'company_id', 'company_id');     
+      }
+      
 }

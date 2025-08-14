@@ -179,7 +179,7 @@ const onlyDailyAvailable = isEmptyLabels(weekly) && isEmptyLabels(monthly);
                             return value.toFixed(0);
                         }
                     },
-                    suggestedMax: Math.max(...daily.absents, 1) * 1.2
+                         suggestedMax: Math.max(...daily.absents, ...daily.sick, ...daily.lockUps, ...daily.leaves) * 1.2, // 20% more than the highest value
                 }
             },
             layout: {

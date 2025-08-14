@@ -66,7 +66,7 @@
                         <td>{{$attendence->total}}</td>
                         <td>
                             <button class="btn  btn-info btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#MoreAbsent{{$attendence->id}}">Absents</button>
+                                data-bs-target="#MoreAbsent{{$attendence->id}}">More</button>
                                 @if ($attendence->created_at->diffInHours(\Carbon\Carbon::now()) < 2 )
                                  <a href="{{ route('attendences.changanua',['attendenceId'=> $attendence->id]) }}"> <button class="btn  btn-info btn-sm" >Mchanganuo</button></a>                               
                                 @endif
@@ -86,7 +86,8 @@
                                             @if (count($attendence->absent_students) < 1)
                                                 <p>No absent students recorded</p>
                                             @endif
-                                            <ol>
+                                            
+                                            <ol class="mb-3">
                                                 @foreach($attendence->absent_students as $student)
                                                     @if ($student != NULL)
                                                         <li>{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
@@ -95,7 +96,7 @@
 
                                                 @endforeach
                                             </ol>
-
+                                            <span>Recorded by:  <strong class="text-success">{{ $attendence->recordedBy?->name }}</strong></span>
                                         </div>
                                         <!-- <div class="modal-footer">
                                             <a
