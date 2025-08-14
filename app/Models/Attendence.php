@@ -61,4 +61,5 @@ class Attendence extends Model
          return $this->hasMany(AttendanceRequest::class, 'company_id', 'company_id');     
       }
       
+
 }

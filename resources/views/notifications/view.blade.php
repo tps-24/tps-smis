@@ -16,27 +16,25 @@
 @endsection
 
 @section('content')
+@include('layouts.sweet_alerts.index')
   @if($category == 1)
     @php
-@endphp
-
-@if($notification)
-    <div class="mb-4 d-flex gap-2">
-        @if ($notification->expires_at > \Carbon\Carbon::now())
-            <img style="width: 50px; margin-top: -10px;" 
-                 src="{{ asset('resources/assets/images/new_blinking.gif') }}" 
-                 alt="new gif">
-        @endif
-        <h4 class="text-{{ $notification->type }}">{{ $notification->title }}</h4>
+    $notification = \App\Models\Announcement::find($notification->data['id']);
+    @endphp
+    <div class="mb-4 d-flex">
+    @if ($notification->expires_at > \Carbon\Carbon::now())
+    <img style="width: 50px; margin-top: -10px;" src="{{ asset('resources/assets/images/new_blinking.gif') }}"
+    alt="new gif">
+    @endif
+    <h4 class="text-{{ $notification->type }}">{{ $notification->title }}</h4>
     </div>
 
     <p class="ms-3">{{ $notification->message }}</p>
 
     @if($notification->document_path)
-        <a style="text-decoration: underline; color:blue; font-style:italic"
-           href="{{ route('download.file', ['documentPath' => $announcement->id]) }}">
-            <small>Download Attachment</small>
-        </a>
+    <a style="text-decoration: underline; color:blue; font-style:italic"
+    href="{{route('download.file', ['documentPath' => $notification->id]) }}"><small>Download
+    Attachment</small></a>
     @endif
 
     <p>
@@ -45,10 +43,8 @@
             <i>{{ $notification->poster?->staff?->rank }} {{ $notification->poster?->name }}</i>
         </small>
     </p>
-
-    <small>
-        Posted At: {{ $notification->created_at?->format('d-m-Y H:i') ?? 'N/A' }}
-    </small><br>
+    <small>Posted At:
+    {{ $notification->created_at ? $notification->created_at->format('d-m-Y H:i') : 'N/A' }}</small><br>
 
     @if ($notification->expires_at < \Carbon\Carbon::now())
         <small>
@@ -59,6 +55,24 @@
             Expires At: {{ $notification->expires_at?->format('d-m-Y H:i') ?? 'N/A' }}
         </small>
     @endif
+    </div>
+    @can('announcement-create')
+    @if($notification->created_at->gt(\Carbon\Carbon::now()->subHours(2)))
+    <div class="btn-group">
+    <a style="margin-right: 10px;" href="{{ route('announcements.edit', $notification->id) }}"><button
+      class="btn btn-sm btn-primary">Edit</button></a>
+    <form id="deleteForm{{ $notification->id }}" action="{{ route('announcements.destroy', $notification->id) }}"
+    method="POST" style="display:inline;">
+    @csrf
+    @method('DELETE')
+    <button onclick="confirmDelete('deleteForm{{ $notification->id }}','notification')" type="button"
+      class="btn btn-sm btn-danger">Delete</button>
+    </form>
+    </div>
+    @include('layouts.sweet_alerts.confirm_delete')
+    @endif
+    @endcan
+    </li>
 
     @can('notification-create')
         @if($notification->created_at->gt(\Carbon\Carbon::now()->subHours(2)))
@@ -117,6 +131,88 @@
     </p>
     @endif
     </div>
+  @elseif ($category == 3)
+    @php
+    $user = \App\Models\User::find($notification->data['requested_by']);
+    $company = \App\Models\Company::find($notification->data['company_id']);
+    $notification = \App\Models\AttendanceRequest::find($notification->data['id'])
+    @endphp
+    <div>
+    <h3 class="text-{{ $notification->type ?? 'primary' }}">
+    {{ $notification->title }}
+    </h3><br><br>
 
-  @endif
-@endsection
+    <p>
+    <strong>Requester :</strong> {{ $user->staff?->force_number ?? '' }} {{ $user->staff?->rank ?? '' }}
+    {{ $user->name }}
+    </p>
+    <p>
+    <strong>Requested Date:</strong> {{ $notification->date ?? '' }}
+    </p>
+    <p>
+    <strong>Requested at:</strong>
+    {{ \Carbon\Carbon::parse($notification->created_at)->format('h:s, d F, Y') ?? '' }}
+    </p>
+    <p>
+    <strong>Company:</strong> {{ $company->description ?? '' }}
+    </p>
+    <p>
+    <strong>Reason</strong> <br>{{ $notification->reason ?? '' }}
+    </p>
+    <p>
+    <strong>Status: </strong> {{ ucfirst($notification->status) ?? '' }}
+    </p>
+    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#statusModal{{ $notification->id ?? ''}}">
+      More
+    </button>
+
+
+    <div class="modal fade" id="statusModal{{  $notification->id ?? '' }}" tabindex="-1"
+    aria-labelledby="statusModalLabel{{  $notification->id  ?? '' }}" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      <div class="modal-header">
+      <h5 class="modal-title text-info" id="statusModalLabel{{  $notification->id  ?? ''}}">
+      Requested by {{ $user->name }}
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <div>
+      <div class="mb-2">Request Reason</div>
+      <small> {{ $notification->reason  }}</small><br>
+      <p>Status: <strong>{{ ucfirst($notification->status ) }}</strong></p>
+      </div>
+      </div>
+      @if($notification->status  != 'closed')
+      <div class="modal-footer">
+      <div class="d-flex gap-2">
+      <form action="{{ route('attendance.request.update-status') }}" method="POST">
+      @csrf
+      <input type="text" name="attendanceRequestId" value="{{ $notification->id  }}" hidden>
+      <input type="text" name="status" value="approved" hidden>
+      <button @if($notification->data['status']  == 'approved' || $notification->status  == 'rejected') disabled @endif
+      class="btn btn-sm btn-primary">Approve</button>
+      </form>
+      <form action="{{ route('attendance.request.update-status') }}" method="POST">
+      @csrf
+      <input type="text" name="attendanceRequestId" value="{{ $notification->id  }}" hidden>
+      <input type="text" name="status" value="rejected" hidden>
+      <button @if($notification->status  == 'approved' || $notification->status  == 'rejected') disabled @endif
+      class="btn btn-sm btn-danger">Reject</button>
+      </form>
+      <form action="{{ route('attendance.request.update-status') }}" method="POST">
+      @csrf
+      <input type="text" name="attendanceRequestId" value="{{ $notification->id  }}" hidden>
+      <input type="text" name="status" value="closed" hidden>
+      <button @if($notification->data['status']  == 'rejected') disabled @endif class="btn btn-sm btn-danger">Close</button>
+      </form>
+      </div>
+      @endif
+      </div>
+      </div>
+    </div>
+    </div>
+    @endif
+
+  @endsection

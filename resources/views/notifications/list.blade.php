@@ -222,7 +222,7 @@
       },
     },
     appKey: 'local',
-    host: '192.168.16.208',
+    host: '192.168.16.106',
     port: 6001,
     scheme: 'ws',
     client: 'js',
@@ -256,6 +256,7 @@
   }
 
   function appendNotification(notification) {
+    console.log(notification.id)
     const title = notification.title;
     const type = '';
     const id = '';

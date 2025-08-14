@@ -202,16 +202,19 @@
                     chart.data = dailyData;
                     chart.options.scales.x.title.text = 'Dates';  // X-axis label for daily data
                     chart.options.scales.y.title.text = 'Counts';  // Y-axis label for daily data
+                    chart.options.scales.y.suggestedMax = getSuggestedMax(daily);
                     break;
                 case 'weekly':
                     chart.data = weeklyData;
                     chart.options.scales.x.title.text = 'Weeks';  // X-axis label for weekly data
                     chart.options.scales.y.title.text = 'Counts';  // Y-axis label for weekly data
+                    chart.options.scales.y.suggestedMax = getSuggestedMax(weekly);
                     break;
                 case 'monthly':
                     chart.data = monthlyData;
                     chart.options.scales.x.title.text = 'Months';  // X-axis label for monthly data
                     chart.options.scales.y.title.text = 'Counts';  // Y-axis label for monthly data
+                    chart.options.scales.y.suggestedMax = getSuggestedMax(monthly);
                     break;
                 default:
                     break;
@@ -231,5 +234,10 @@
             chart.data = monthlyData;
             updateAxisLabels('monthly');
         }
+
+        function getSuggestedMax(data) {
+            return Math.max(...data.absents, ...data.sick, ...data.lockUps, ...data.leaves) * 1.2;
+        }
+
     </script>
 @endsection

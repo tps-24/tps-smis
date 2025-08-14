@@ -50,10 +50,16 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\IntakeHistoryController;
 use App\Http\Controllers\StaffSummaryController;
 use App\Http\Controllers\CompanyController;
+
+ use App\Http\Controllers\WeaponController;
+use App\Http\Controllers\OfficerController;
+use App\Http\Controllers\MovementController;
+use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Http\Request;
+
 
 require __DIR__ . '/auth.php';
 
@@ -395,6 +401,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('storeMchanganuo/{attendenceId}/', 'storeMchanganuo')->name('attendences.storeMchanganuo');
 
         Route::get('today/{company_id}/{type}/{date}/{attendenceTypeId}', 'today')->name('today');
+        Route::patch('/companies/{company}/attendance/{date}',  'updateCompanyAttendance')->name('attendance.updateCompanyAttendance');
     });
 
     Route::controller(ReportController::class)->prefix('reports')->group(function () {
@@ -611,3 +618,15 @@ Route::get('/leave-requests/rejected', [LeaveRequestController::class, 'rejected
 Route::get('/leave-requests/{id}/rejected-pdf', [LeaveRequestController::class, 'downloadRejectedPdf'])->name('leave-requests.rejected.pdf');
 
 Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->name('staffs.resume');
+
+  // Show the form to students
+    Route::get('/leave-request', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
+
+    // Store leave request
+    Route::post('/leave-request', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+
+// RESTful resource routes
+Route::resource('weapons', WeaponController::class);
+Route::resource('officers', OfficerController::class);
+Route::resource('movements', MovementController::class);
+Route::resource('shifts', ShiftController::class);

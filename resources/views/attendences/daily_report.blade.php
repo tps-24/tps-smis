@@ -231,6 +231,9 @@
                         <div>ZAHANATI</div>
                     </th>
                     <th class="vertical">
+                        <div>LEAVES</div>
+                    </th>
+                    <th class="vertical">
                         <div>KAZINI</div>
                     </th>
                     <th class="vertical">
@@ -304,6 +307,7 @@
                     <td>{{ $attendance->course === 0 ? '' : $attendance->course }}</td>
                     <td>{{ $attendance->mess === 0 ? '' : $attendance->mess }}</td>
                     <td>{{ $attendance->sick === 0 ? '' : $attendance->sick }}</td>
+                    <td>{{ $attendance->safari === 0 ? '' : $attendance->safari }}</td>
                     <td>{{ $attendance->kazini === 0 ? '' : $attendance->kazini }}</td>
                     <td>{{ $attendance->lockUp === 0 ? '' : $attendance->lockUp }}</td>
                     <td>{{ $attendance->it === 0 ? '' : $attendance->it }}</td>
@@ -380,6 +384,7 @@
                     <th>{{ $totals['course'] }}</th>
                     <th>{{ $totals['mess'] }}</th>
                     <th>{{ $totals['sick'] }}</th>
+                    <th>{{ $totals['safari'] }}</th>
                     <th>{{ $totals['kazini'] }}</th>
                     <th>{{ $totals['lockUp'] }}</th>
                     <th>{{ $totals['it'] }}</th>
@@ -439,6 +444,9 @@
                         <div>ZAHANATI</div>
                     </th>
                     <th class="vertical">
+                        <div>LEAVES</div>
+                    </th>
+                    <th class="vertical">
                         <div>KAZINI</div>
                     </th>
                     <th class="vertical">
@@ -483,6 +491,7 @@
                     <td>{{ $grandTotals['course'] }}</td>
                     <td>{{ $grandTotals['mess'] }}</td>
                     <td>{{ $grandTotals['sick'] }}</td>
+                    <td>{{ $grandTotals['safari'] }}</td>
                     <td>{{ $grandTotals['kazini'] }}</td>
                     <td>{{ $grandTotals['lockUp'] }}</td>
                     <td>{{ $grandTotals['it'] }}</td>
