@@ -14,6 +14,7 @@ class TerminationReason extends Model
 
     protected $fillable = [
         'reason',
+        'category',
         'description',
         'created_by',
         'updated_by',

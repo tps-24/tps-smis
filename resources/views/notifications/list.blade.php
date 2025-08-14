@@ -222,7 +222,7 @@
       },
     },
     appKey: 'local',
-    host: '192.168.0.102',
+    host: '192.168.16.106',
     port: 6001,
     scheme: 'ws',
     client: 'js',
@@ -256,14 +256,15 @@
   }
 
   function appendNotification(notification) {
-    const title = '';
+    console.log(notification.id)
+    const title = notification.title;
     const type = '';
     const id = '';
     const created_at = '';
-    const category = JSON.stringify(notification.notification_category_id);
+    const category = notification.notification_category_id;
     const shared_id = JSON.stringify(notification.id);
         const url = notification.notification_category_id
-      ? `/tps-smis/notifications/showNotifications/${JSON.stringify(notification.id)}/${category}`
+      ? `/tps-smis/notifications/showNotifications/${JSON.stringify(notification.data.id)}/${category}`
       : '#';
 if (typeof notification.data !== 'undefined') {
   notification = notification.data; // extract the real object, not stringify yet
@@ -285,7 +286,7 @@ if (typeof notification.data !== 'undefined') {
         onclick="markNotificationAsRead(this)"
       >
         <div class="dropdown-item text-${notification.type ?? 'primary'} d-flex align-items-center">
-          ${notification.title}
+          ${title}
         </div>
         <p class="small m-0 text-muted">${formatted_date}</p>
       </div>

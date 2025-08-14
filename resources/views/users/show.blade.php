@@ -49,7 +49,7 @@
         @if ($user->hasRole('Student')) 
           <img src="{{ url('storage/app/public/' . $user->student->photo) }}" alt="{{ $user->student->first_name }}'s Photo">
         @else
-          <img src="{{ url('storage/app/public/' . $user->staff->photo) }}" alt="{{ $user->staff->firstName }}'s Photo">
+          <img src="{{ url('storage/app/public/' . $user->staff?->photo) }}" alt="{{ $user->staff?->firstName }}'s Photo">
         @endif
             </div>
 

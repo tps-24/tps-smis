@@ -38,7 +38,20 @@ class MPSController extends Controller
                 $query->where('session_programme_id', $selectedSessionId);
             })
             ->get();
+        $student = $mpsStudents->first();
+        $audience = NotificationAudience::find(1);
+        $student->title ="Locked in.";
+        $student->category ="mps";
 
+        broadcast(new NotificationEvent(
+            $student->id,   // ID from announcement
+            $audience,                // Audience object or instance
+            1,  // Notification type
+            2,                        // Category (ensure 1 is a valid category ID)
+            "Locked in.", // Title of the notification
+            $student,           // Full announcements object
+            "body"  // Body of the notification
+        ))->toOthers();
         return view('mps.index', compact('mpsStudents'));
     }
 
@@ -103,7 +116,7 @@ class MPSController extends Controller
         $student->beat_status = 6;
         $student->save();
         $audience = NotificationAudience::find(1);
-        $student->title ="Locked in.";
+        $student->title ="Student Locked in.";
         $student->category ="mps";
 
         broadcast(new NotificationEvent(
@@ -111,7 +124,7 @@ class MPSController extends Controller
             $audience,                // Audience object or instance
             1,  // Notification type
             2,                        // Category (ensure 1 is a valid category ID)
-            "Locked in.", // Title of the notification
+            "Student Locked in.", // Title of the notification
             $student,           // Full announcements object
             "body"  // Body of the notification
         ));
@@ -218,6 +231,19 @@ class MPSController extends Controller
         $student->beat_status       = $mPSstudent->previous_beat_status;
         $student->save();
         $mPSstudent->save();
+        $audience = NotificationAudience::find(1);
+        $student->title ="Student released form lockup.";
+        $student->category ="mps";
+
+        broadcast(new NotificationEvent(
+            $student->id,   // ID from announcement
+            $audience,                // Audience object or instance
+            1,  // Notification type
+            2,                        // Category (ensure 1 is a valid category ID)
+            "Student released form lockup.", // Title of the notification
+            $student,           // Full announcements object
+            "body"  // Body of the notification
+        ));
         return redirect()->back()->with('success', 'Student released successfuly.');
     }
 

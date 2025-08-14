@@ -101,91 +101,79 @@
                                                     //->where('status', 'pending')
                                                     ->first();
                                 @endphp
-                            @if(Carbon\Carbon::parse("$date") == \Carbon\Carbon::today() || $request && $request->status == 'approved')
+                            @if (Carbon\Carbon::parse($date)->isToday() || ($request && $request->status == 'approved'))
                                 <div class="justify-content-end">
-                                        <form action="{{ route('attendences.create',['attendenceType' => $attendenceType->id]) }}" method="POST">
+                                    <form action="{{ route('attendences.create', ['attendenceType' => $attendenceType->id]) }}" method="POST">
                                         @csrf
                                         @method('POST')
-                                            <div class=" d-flex gap-2 justify-content-end">
-                                                <input type="text" name="date" value="{{ $date }}" hidden>
-                                                <div class=""> <label class="form-label" for="abc4">Platoon</label>
-                                                    <select style="height:60%" class="form-select" name="platoon" required id="platoons"
-                                                        aria-label="Default select example">
-
-                                                        <option value="" disabled selected>Select a platoon</option>
-                                                        @foreach($statistics[$j]['company']->platoons as $platoon)
-                                                               @if ($platoon->today_attendence($attendenceType->id, $date)->isEmpty())
-                                                                    <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
-                                                                 @endif
-
-                                                            @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <button type="submit" class="btn btn-success ">New
-                                                    </button>
-                                                </div>
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <input type="text" name="date" value="{{ $date }}" hidden>
+                                            <div>
+                                                <label class="form-label" for="abc4">Platoon</label>
+                                                <select style="height:60%" class="form-select" name="platoon" required id="platoons">
+                                                    <option value="" disabled selected>Select a platoon</option>
+                                                    @foreach ($statistics[$j]['company']->platoons as $platoon)
+                                                        @if ($platoon->today_attendence($attendenceType->id, $date)->isEmpty())
+                                                            <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
                                             </div>
-                                            <!-- </div> -->
-                                        </form>
+                                            <div class="mt-4">
+                                                <button type="submit" class="btn btn-success">New</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             @else
-                            
-                                    <div class=" d-flex gap-2 justify-content-end">
+                                <div class="d-flex gap-2 justify-content-end">
                                     @if ($request && $request->status == 'pending')
                                         <button class="btn btn-info btn-sm" disabled style="color:white">
                                             Requested
                                         </button>
-                                    @elseif ($request && $request->status == 'approved')
+                                    @elseif ($request && $request->status == 'approved' && $request->requested_by == auth()->user()->id)
                                         <button class="btn btn-info btn-sm" disabled style="color:white">
-                                            Request Approved                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                        </button>
-                                    @elseif($request && $request->status != 'closed')
-                                        <button class="btn btn-success btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#statusModal{{ $companyId }}">
-                                            Request
+                                            Request Approved
                                         </button>
                                     @else
-                                        <button class="btn btn-success btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#statusModal{{ $companyId }}">
+                                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#statusModal{{ $companyId }}">
                                             Request
-                                        </button>  
-                                @endif
+                                        </button>
+                                    @endif
                                 </div>
-                                    <div class="modal fade" id="statusModal{{  $statistics[$j]['company']->id ?? '' }}" tabindex="-1"
-                                            aria-labelledby="statusModalLabel{{  $statistics[$j]['company']->id ?? '' }}" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title text-info" id="statusModalLabel{{  $timesheet->id ?? ''}}">
-                                                            Request Attendance Record for {{ $statistics[$j]['company']->description }}
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
+
+                                <div class="modal fade" id="statusModal{{ $statistics[$j]['company']->id ?? '' }}" tabindex="-1"
+                                    aria-labelledby="statusModalLabel{{ $statistics[$j]['company']->id ?? '' }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title text-info" id="statusModalLabel{{ $statistics[$j]['company']->id ?? '' }}">
+                                                    Request Attendance Record for {{ $statistics[$j]['company']->description }}
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="requestForm" method="POST" action="{{ route('attendance.store.request') }}">
+                                                    @csrf
+                                                    <input type="text" name="company_id" value="{{ $statistics[$j]['company']->id }}" hidden>
+                                                    <input type="text" name="date" value="{{ $date }}" hidden>
+                                                    <input type="text" name="attendenceType_id" value="{{ $attendenceType->id }}" hidden>
+                                                    <div class="mb-3">
+                                                        <label for="reason{{ $statistics[$j]['company']->id }}" class="form-label fw-semibold">Reason</label>
+                                                        <textarea name="reason" id="reason{{ $statistics[$j]['company']->id }}" rows="4"
+                                                            class="form-control" placeholder="Enter reason..."></textarea>
                                                     </div>
-                                                    <div class="modal-body ">
-                                                    <form id="requestForm"  method="POST" action="{{ route('attendance.store.request') }}">
-                                                        @csrf
-                                                        <input type="text" name="company_id" id="" value="{{ $statistics[$j]['company']->id }}" hidden>
-                                                        <input type="text" name="date" id="" value="{{ $date }}" hidden>
-                                                        <input type="text" name="attendenceType_id" id="" value="{{ $attendenceType->id }}" hidden>
-                                                                <div class="mb-3">
-                                                                    <label for="reason{{ $statistics[$j]['company']->id }}" class="form-label fw-semibold">Reason </label>
-                                                                    <textarea name="reason" id="reason{{ $statistics[$j]['company']->id }}" rows="4"
-                                                                            class="form-control" placeholder="Enter reason..."></textarea>
-                                                                </div>
-                                                        <div class="d-flex gap-2 justify-content-end">
-                                                            <button type="submit"  class="btn btn-sm btn-primary">Send Request</button>
-                                                        </div>
-                                                    </form>
+                                                    <div class="d-flex gap-2 justify-content-end">
+                                                        <button type="submit" class="btn btn-sm btn-primary">Send Request</button>
                                                     </div>
-                                                </div>
+                                                </form>
                                             </div>
                                         </div>
-
+                                    </div>
+                                </div>
                             @endif
+
                             <!-- Row starts -->
                             <div class="row gx-4">
                                 <div class="col-sm-12 col-12">

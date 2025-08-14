@@ -9,7 +9,7 @@ use App\Models\PatrolArea;
 use App\Models\Beat;
 use App\Models\Company;
 use App\Models\BeatReserve;
-use App\Models\BeatLeaderOnDuty;
+use App\Models\BeatLeaderonDuty;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -717,7 +717,7 @@ class BeatController extends Controller
             ->flatten()
             ->toArray();
 
-        $assignedLeaderIds = BeatLeaderOnDuty::where('beat_date', $date)
+        $assignedLeaderIds = BeatLeaderonDuty::where('beat_date', $date)
             ->where('company_id', $companyId)
             ->pluck('student_id')
             ->toArray();

@@ -17,6 +17,11 @@
 @endsection
 @section('content')
 @include('layouts.sweet_alerts.index')
+@if ($requests->isEmpty())
+    <div class="alert alert-info">
+        No attendance requests found.
+    </div>
+@else
     <div class="table-responsive">
 
                         <table class="table table-striped truncate m-0">
@@ -100,5 +105,6 @@
                             </tbody>
                         </table>
                         {!! $requests->appends(request()->query())->links('pagination::bootstrap-5') !!}
+                    @endif
                     </div>
 @endsection

@@ -39,7 +39,7 @@ class NotificationEvent implements ShouldBroadcast
         $this->data = $data;
         $this->body = $body;
 
-       $notification = SharedNotification::create([
+       $this->notification = SharedNotification::create([
             'notification_audience_id' => $this->audience->id,
             'notification_type_id'=> $this->type,
             'notification_category_id' => $this->category,
@@ -47,9 +47,9 @@ class NotificationEvent implements ShouldBroadcast
             'body' => $this->body,
             'data' => $this->data
         ]);
-        AttachUsersToNotification::dispatch($notification->id);
+        AttachUsersToNotification::dispatch($this->notification->id);
         //$notification->users()->attach([1]);
-
+        $this->dontBroadcastToCurrentUser();
     }
 
     /**
@@ -75,6 +75,7 @@ class NotificationEvent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
+            'id' =>$this->notification->id,
             'notification_audience_id' => $this->audience->id,
             'notification_type_id'=> $this->type,
             'notification_category_id' => $this->category,

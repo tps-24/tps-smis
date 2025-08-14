@@ -327,8 +327,12 @@ class DashboardController extends Controller
         $platoons = Platoon::all();
 
         foreach ($platoons as $platoon) {
-            $attendance = $platoon->today_attendence()->first();
+            //dd($platoon->company->company_attendance('12-8-2025')->status);
+            if ($platoon->company?->company_attendance(now())?->status != "verified") {
+                continue;
+            }
 
+            $attendance = $platoon->today_attendence()->first();
             if ($attendance) {
                 $present += $attendance->present + $attendance->kazini + $attendance->sentry + $attendance->messy;
                 $absent += $attendance->absent;

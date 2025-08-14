@@ -27,16 +27,16 @@
     <link rel="stylesheet" href="/tps-smis/resources/assets/css/main.min.css" />
     <link rel="stylesheet" href="/tps-smis/resources/assets/css/custom.css" />
     <link rel="stylesheet" href="/tps-smis/resources/assets/css/mine.css" />
+
     <!-- Select2 CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-<script src="/tps-smis/resources/assets/js/sweet_alert.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="/tps-smis/resources/assets/js/sweet_alert.js"></script>
     <!-- *************
 			************ Vendor Css Files *************
 		************ -->
 
     <!-- Scrollbar CSS -->
     <link rel="stylesheet" href="/tps-smis/resources/assets/vendor/overlay-scroll/OverlayScrollbars.min.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
       .error{
         color: red;

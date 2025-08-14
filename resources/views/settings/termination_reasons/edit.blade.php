@@ -24,7 +24,7 @@
                 <div class="row">
                     <div class="col-lg-12 margin-tb">
                         <div class="pull-left">
-                            <h2>Edit Excuse Type</h2>
+                            <h2>Edit Termination Reason</h2>
                         </div>
                         <div class="pull-right">
                             <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('termination_reasons.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
@@ -42,7 +42,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('termination_reasons.update', $excuseType->id) }}">
+                <form method="POST" action="{{ route('termination_reasons.update', $terminationReason->id) }}">
                     @csrf
                     @method('PUT')
 
@@ -50,13 +50,25 @@
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
                                 <strong>Reason for Termination:</strong>
-                                <input type="text" name="reason" placeholder="Enter reason name" class="form-control" value="{{ $excuseType->reason }}">
+                                <input type="text" name="reason" placeholder="Enter reason name" class="form-control" value="{{ $terminationReason->reason }}">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                                <strong>Reason Category:</strong>
+                                <select name="category" class="form-control">
+                                    <option value="" disabled {{ old('category', $terminationReason->category) ? '' : 'selected' }}>-- Select a Category for the Reason --</option>
+                                    <option value="Nidhamu" {{ old('category', $terminationReason->category) == 'Nidhamu' ? 'selected' : '' }}>Nidhamu</option>
+                                    <option value="Maradhi/Ulemavu" {{ old('category', $terminationReason->category) == 'Maradhi/Ulemavu' ? 'selected' : '' }}>Maradhi/Ulemavu</option>
+                                    <option value="Entry Disqualification" {{ old('category', $terminationReason->category) == 'Entry Disqualification' ? 'selected' : '' }}>Entry Disqualification (Kutostahili)</option>
+                                    <option value="Hiari" {{ old('category', $terminationReason->category) == 'Hiari' ? 'selected' : '' }}>Hiari (Maombi Binafsi)</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
                                 <strong>Descriptions:</strong>
-                                <input type="textarea" name="description" placeholder="Enter Descriptions for this Excuse Type" class="form-control" value="{{ $excuseType->description }}">
+                                <input type="textarea" name="description" placeholder="Enter Descriptions for this Termination Reason" class="form-control" value="{{ $terminationReason->description }}">
                             </div>
                         </div>
                         <input type="number" name="updated_by" value="{{ Auth::user()->id }}" class="form-control" hidden>

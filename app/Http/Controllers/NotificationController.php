@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Announcement;
-use App\Models\SharedNotification;
+use App\Models\MPS;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
@@ -50,9 +50,13 @@ class NotificationController extends Controller
 
      public function showNotifications($Ids, $category)
      {
-
-           $notification = SharedNotification::whereIn('id',[$Ids])->get()[0]; 
-
+            if($category == 1)
+                $notification = Announcement::find($Ids); 
+            else if($category == 2)
+                $notification = MPS::find($Ids);
+              if (!$notification) {
+                return redirect()->back()->with('error', 'Notification not found.');
+              }
          return view('notifications.view', compact('notification','category'));
      }
     public function edit(string $id)

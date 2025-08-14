@@ -24,22 +24,40 @@ public function handle()
 {
     $notification = SharedNotification::find($this->notificationId);
     if (!$notification) {
-        Log::error("Notification with ID {$notification->id} not found.");
+        //Log::error("Notification with ID {$notification->id} not found.");
         return;
     }
 
-Staff::whereNotNull('user_id')
-    ->where('user_id', '!=', auth()->id()) // Exclude current user
-    ->select('user_id')
-    ->chunk(500, function ($users) use ($notification) {
-        $ids = $users->pluck('user_id')->toArray();
+if ($notification->notification_category_id == 3) {
+    $notificatified_user = $notification->data['requested_by'];
 
-        if (!empty($ids)) {
-            $notification->users()->syncWithoutDetaching($ids);
-            Log::info('Attached ' . count($ids) . ' users (excluding current) to notification ID ' . $notification->id);
-        }
-    });
-
+    Staff::whereNotNull('user_id')
+        ->where('user_id', '!=', auth()->id()) // Exclude current user
+        ->where(function ($query) use ($notificatified_user) {
+            $query->whereHas('user.roles', function ($q) {
+                $q->whereIn('name', ['Admin', 'CRO', 'Super Administrator']);
+            })
+            ->orWhere('user_id', $notificatified_user);
+        })
+        ->select('user_id')
+        ->chunk(100, function ($users) use ($notification) {
+            $ids = $users->pluck('user_id')->toArray();
+            if (!empty($ids)) {
+                $notification->users()->syncWithoutDetaching($ids);
+            }
+        });
+    }else{
+        Staff::whereNotNull('user_id')
+            ->where('user_id', '!=', auth()->id()) // Exclude current user
+            ->select('user_id')
+            ->chunk(500, function ($users) use ($notification) {
+                $ids = $users->pluck('user_id')->toArray();
+                if (!empty($ids)) {
+                    $notification->users()->syncWithoutDetaching($ids);
+                    //Log::info('Attached ' . count($ids) . ' users (excluding current) to notification ID ' . $notification->id);
+                }
+            });        
+    }
 }
 
 }

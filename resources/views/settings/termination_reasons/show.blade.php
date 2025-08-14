@@ -37,6 +37,12 @@
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
+                            <strong>Reason Category:</strong>
+                            {{ $terminationReason->category }}
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="form-group">
                             <strong>Description:</strong>
                             {{ $terminationReason->description }}
                         </div>

@@ -51,99 +51,95 @@ class IntakeHistoryController extends Controller
 
     
     public function filterStudents(Request $request)
-{
-    $selectedSessionId = session('selected_session') ?? 1;
-    $type = $request->get('type');
+    {
+        $selectedSessionId = session('selected_session') ?? 1;
+        $type = $request->get('type');
 
-    if (! in_array($type, ['totalEnrolled', 'currentStudents', 'dismissed', 'verified'])) {
-        $type = 'totalEnrolled';
-    }
-
-    $query = Student::where('session_programme_id', $selectedSessionId);
-
-    // 🎯 Card-specific base filters
-    switch ($type) {
-        case 'currentStudents':
-            $query->where('enrollment_status', 1);
-            break;
-        case 'dismissed':
-            $query->where('enrollment_status', 0);
-            break;
-        case 'verified':
-            $query->where('status', 'approved');
-            break;
-        case 'totalEnrolled':
-        default:
-            // No extra filter
-            break;
-    }
-
-    // 🔍 Apply shared filters
-    if ($request->filled('entry_region')) {
-        $regions = $request->input('entry_region');
-        $regions = is_array($regions) ? array_filter($regions) : [$regions];
-        if (count($regions)) {
-            $query->whereIn('entry_region', $regions);
+        // 🧠 Normalize type
+        if (! in_array($type, ['totalEnrolled', 'currentStudents', 'dismissed', 'verified'])) {
+            $type = 'totalEnrolled';
         }
+
+        // 🛠️ Base Query
+        $query = Student::where('session_programme_id', $selectedSessionId);
+
+        switch ($type) {
+            case 'currentStudents':
+                $query->where('enrollment_status', 1);
+                break;
+            case 'dismissed':
+                $query->where('enrollment_status', 0);
+                break;
+            case 'verified':
+                $query->where('status', 'approved');
+                break;
+            case 'totalEnrolled':
+            default:
+                // No extra filter for total
+                break;
+        }
+
+        // 🔍 Apply filters
+        if ($request->filled('entry_region')) {
+            $regions = $request->input('entry_region');
+
+            if (is_array($regions)) {
+                $regions = array_filter($regions); // Remove empty strings
+                if (count($regions)) {
+                    $query->whereIn('entry_region', $regions);
+                }
+            } else {
+                $query->where('entry_region', $regions);
+            }
+        }
+
+        if ($request->filled('study_level')) {
+            $query->where('study_level_id', $request->study_level);
+        }
+
+        if ($request->filled('age_range')) {
+            [$minAge, $maxAge] = explode('-', $request->age_range);
+            $query->whereBetween('age', [(int) $minAge, (int) $maxAge]);
+        }
+
+        // 📊 Summary counts scoped to current type
+        $baseQuery = clone $query;
+
+        $summary = match ($type) {
+            'currentStudents' => [
+                'total'     => $baseQuery->count(),
+                'active'    => $baseQuery->count(),
+                'dismissed' => 0,
+                'verified'  => (clone $baseQuery)->where('status', 'approved')->count(),
+            ],
+            'dismissed' => [
+                'total'     => $baseQuery->count(),
+                'active'    => 0,
+                'dismissed' => $baseQuery->count(),
+                'verified'  => (clone $baseQuery)->where('status', 'approved')->count(),
+            ],
+            'verified' => [
+                'total'     => $baseQuery->count(),
+                'active'    => (clone $baseQuery)->where('enrollment_status', 1)->count(),
+                'dismissed' => (clone $baseQuery)->where('enrollment_status', 0)->count(),
+                'verified'  => $baseQuery->count(),
+            ],
+            default => [
+                'total'     => $baseQuery->count(),
+                'active'    => (clone $baseQuery)->where('enrollment_status', 1)->count(),
+                'dismissed' => (clone $baseQuery)->where('enrollment_status', 0)->count(),
+                'verified'  => (clone $baseQuery)->where('status', 'approved')->count(),
+            ],
+        };
+
+        // 📋 Paginated data
+        $students = $query->paginate(10);
+
+        return response()->json([
+            'students' => $students,
+            'summary'  => $summary,
+        ]);
     }
-
-    if ($request->filled('study_level')) {
-        $query->where('study_level_id', $request->study_level);
-    }
-
-    if ($request->filled('age_range')) {
-        [$minAge, $maxAge] = explode('-', $request->age_range);
-        $query->whereBetween(DB::raw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE())'), [(int)$minAge, (int)$maxAge]);
-    }
-
-    // 🏢 Company filter (for current, dismissed, verified)
-    if (in_array($type, ['currentStudents', 'dismissed', 'verified']) && $request->filled('company_id')) {
-        $query->where('company_id', $request->company_id);
-    }
-
-    // 📄 Dismissal reason (only for dismissed)
-    if ($type === 'dismissed' && $request->filled('dismissal_reason')) {
-        $query->where('termination_reason_id', $request->dismissal_reason);
-    }
-
-    // 📊 Summary counts scoped to current type
-    $baseQuery = clone $query;
-
-    $summary = match ($type) {
-        'currentStudents' => [
-            'total'     => $baseQuery->count(),
-            'active'    => $baseQuery->count(),
-            'dismissed' => 0,
-            'verified'  => (clone $baseQuery)->where('status', 'approved')->count(),
-        ],
-        'dismissed' => [
-            'total'     => $baseQuery->count(),
-            'active'    => 0,
-            'dismissed' => $baseQuery->count(),
-            'verified'  => (clone $baseQuery)->where('status', 'approved')->count(),
-        ],
-        'verified' => [
-            'total'     => $baseQuery->count(),
-            'active'    => (clone $baseQuery)->where('enrollment_status', 1)->count(),
-            'dismissed' => (clone $baseQuery)->where('enrollment_status', 0)->count(),
-            'verified'  => $baseQuery->count(),
-        ],
-        default => [
-            'total'     => $baseQuery->count(),
-            'active'    => (clone $baseQuery)->where('enrollment_status', 1)->count(),
-            'dismissed' => (clone $baseQuery)->where('enrollment_status', 0)->count(),
-            'verified'  => (clone $baseQuery)->where('status', 'approved')->count(),
-        ],
-    };
-
-    $students = $query->paginate(10);
-
-    return response()->json([
-        'students' => $students,
-        'summary'  => $summary,
-    ]);
-}
-
 
 
     public function getRegionsBySession(Request $request)

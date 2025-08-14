@@ -69,5 +69,8 @@ class Company extends Model
     {
         return $this->hasMany(TeacherOnDuty::class);
     }
-
+      public function company_attendance($date)
+      {
+         return $this->hasMany(CompanyAttendance::class, 'company_id', 'id')->whereDate('date', \Carbon\Carbon::parse($date)->format('Y-m-d'))->first();     
+      }
 }
