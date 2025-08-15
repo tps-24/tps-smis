@@ -174,6 +174,7 @@
         'mess' => 0,
         'sick' => 0,
         'kazini' => 0,
+        'lockUp' => 0,
         'it' => 0,
         'msikitini' => 0,
         'field' => 0,
@@ -236,6 +237,9 @@
                         <div>KAZINI</div>
                     </th>
                     <th class="vertical">
+                        <div>MAHABUSU</div>
+                    </th>
+                    <th class="vertical">
                         <div>IT</div>
                     </th>
                     <th class="vertical">
@@ -276,6 +280,7 @@
                 'mess' => 0,
                 'sick' => 0,
                 'kazini' => 0,
+                'lockUp' => 0,
                 'it' => 0,
                 'msikitini' => 0,
                 'field' => 0,
@@ -304,6 +309,7 @@
                     <td>{{ $attendance->sick === 0 ? '' : $attendance->sick }}</td>
                     <td>{{ $attendance->safari === 0 ? '' : $attendance->safari }}</td>
                     <td>{{ $attendance->kazini === 0 ? '' : $attendance->kazini }}</td>
+                    <td>{{ $attendance->lockUp === 0 ? '' : $attendance->lockUp }}</td>
                     <td>{{ $attendance->it === 0 ? '' : $attendance->it }}</td>
                     <td>{{ $attendance->msikitini === 0 ? '' : $attendance->msikitini }}</td>
                     <td>{{ $attendance->field === 0 ? '' : $attendance->field }}</td>
@@ -329,6 +335,7 @@
                 $totals['mess'] += $attendance->mess;
                 $totals['sick'] += $attendance->sick ?? 0;
                 $totals['kazini'] += $attendance->kazini;
+                $totals['lockUp'] += $attendance->lockUp;
                 $totals['it'] += $attendance->it ?? 0;
                 $totals['msikitini'] += $attendance->msikitini ?? 0;
                 $totals['field'] += $attendance->field ?? 0;
@@ -352,6 +359,7 @@
                 $grandTotals['mess'] += $attendance->mess;
                 $grandTotals['sick'] += $attendance->sick ?? 0;
                 $grandTotals['kazini'] += $attendance->kazini;
+                $grandTotals['lockUp'] += $attendance->lockUp;
                 $grandTotals['it'] += $attendance->it ?? 0;
                 $grandTotals['msikitini'] += $attendance->msikitini ?? 0;
                 $grandTotals['field'] += $attendance->field ?? 0;
@@ -378,6 +386,7 @@
                     <th>{{ $totals['sick'] }}</th>
                     <th>{{ $totals['safari'] }}</th>
                     <th>{{ $totals['kazini'] }}</th>
+                    <th>{{ $totals['lockUp'] }}</th>
                     <th>{{ $totals['it'] }}</th>
                     <th>{{ $totals['msikitini'] }}</th>
                     <th>{{ $totals['field'] }}</th>
@@ -441,6 +450,9 @@
                         <div>KAZINI</div>
                     </th>
                     <th class="vertical">
+                        <div>MAHABUSU</div>
+                    </th>
+                    <th class="vertical">
                         <div>IT</div>
                     </th>
                     <th class="vertical">
@@ -481,6 +493,7 @@
                     <td>{{ $grandTotals['sick'] }}</td>
                     <td>{{ $grandTotals['safari'] }}</td>
                     <td>{{ $grandTotals['kazini'] }}</td>
+                    <td>{{ $grandTotals['lockUp'] }}</td>
                     <td>{{ $grandTotals['it'] }}</td>
                     <td>{{ $grandTotals['msikitini'] }}</td>
                     <td>{{ $grandTotals['field'] }}</td>

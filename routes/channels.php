@@ -24,6 +24,8 @@ Broadcast::channel('notifications.all', function ($user) {
 
 
 Broadcast::channel('notifications.company', function ($user) {
+    if($user->hasRole(['Super Administrator','Admin','CRO',])){
+            return true;}
     if(!is_null($user->staff)){
         if($user->staff->company_id == 1) return true;
         return false;

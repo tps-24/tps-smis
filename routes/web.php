@@ -136,6 +136,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/student/intake_summary', [IntakeHistoryController::class, 'index']);
     Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
+    Route::get('/regions/by-session', [StudentController::class, 'getRegionsBySession'])->name('regions.bySession');
+
 
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/print-certificates', [FinalResultController::class, 'studentList'])->name('studentList');
@@ -373,9 +375,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //End of notification routes
 
-    // routes/web.php
-    Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
-    
+    // routes/web.php    
     Route::get('platoons/{companyName}', [AttendenceController::class, 'getPlatoons']);
     Route::get('campanies/{campusId}', [GuardAreaController::class, 'get_companies']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
@@ -441,7 +441,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('attendences', AttendenceController::class);
-    Route::resource('/students/intake_summary', IntakeHistoryController::class);
 
     Route::controller(RefereeController::class)->prefix('referee')->group(function () {
         Route::get('/referee/delete/{refereeId}', 'destroy')->name('referees.delete');

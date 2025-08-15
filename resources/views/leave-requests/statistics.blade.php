@@ -24,6 +24,7 @@
                 <tr>
                     <th>S/N</th>
                     <th> Student Name</th>
+                    <th>Company</th>
                     <!-- <th> Reason</th> -->
                     <th> Start date</th>
                     <th> End date</th>
@@ -40,7 +41,7 @@
                     <td>
                         {{ $request->student->first_name ?? '' }} {{ $request->student->last_name ?? '' }}
                     </td>
-
+                    <td>{{$request->student->company->name}} {{$request->student->platoon}}</td>
                     <td>
                         {{ \Carbon\Carbon::parse($request->start_date)->format('d M Y') }}
                     </td>

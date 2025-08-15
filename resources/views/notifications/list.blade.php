@@ -264,7 +264,7 @@
     const category = notification.notification_category_id;
     const shared_id = JSON.stringify(notification.id);
         const url = notification.notification_category_id
-      ? `/tps-smis/notifications/showNotifications/${JSON.stringify(notification.id)}/${category}`
+      ? `/tps-smis/notifications/showNotifications/${JSON.stringify(notification.data.id)}/${category}`
       : '#';
 if (typeof notification.data !== 'undefined') {
   notification = notification.data; // extract the real object, not stringify yet

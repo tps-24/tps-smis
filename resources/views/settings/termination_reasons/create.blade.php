@@ -50,6 +50,18 @@
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
+                            <strong>Reason Category:</strong>
+                            <select name="category" class="form-control">
+                                <option value="" disabled selected>-- Select a Category for the Reason --</option>
+                                <option value="Nidhamu">Nidhamu</option>
+                                <option value="Maradhi/Ulemavu">Maradhi/Ulemavu</option>
+                                <option value="Entry Disqualification">Entry Disqualification (Kutostahili)</option>
+                                <option value="Hiari">Hiari (Maombi Binafsi)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="form-group">
                             <strong>Descriptions:</strong>
                             <input type="textarea" name="description" placeholder="Enter Descriptions for this Reason" class="form-control">
                         </div>

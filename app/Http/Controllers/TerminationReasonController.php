@@ -20,7 +20,7 @@ class TerminationReasonController extends Controller
      */
     public function index()
     {
-        $terminationReasons = TerminationReason::get();
+        $terminationReasons = TerminationReason::orderBy('category')->get();
         return view('settings.termination_reasons.index',compact('terminationReasons'));
     }
 
@@ -72,12 +72,12 @@ class TerminationReasonController extends Controller
     {
         if($request->reason == $terminationReason->reason){
                 request()->validate([
-                    'reason' => 'required|unique:termination_reasons,reason',
+                    'reason' => 'required|unique:termination_reasons,reason,' . $terminationReason->id,
                     'description' => 'required',
                ]);
             }else{
                 request()->validate([
-                    'reason' => 'required|unique:termination_reasons,reason',
+                    'reason' => 'required|unique:termination_reasons,reason,' . $terminationReason->id,
                     'description' => 'required',
                 ]);
             }

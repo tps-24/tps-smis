@@ -49,7 +49,7 @@ class NotificationEvent implements ShouldBroadcast
         ]);
         AttachUsersToNotification::dispatch($this->notification->id);
         //$notification->users()->attach([1]);
-
+        $this->dontBroadcastToCurrentUser();
     }
 
     /**
