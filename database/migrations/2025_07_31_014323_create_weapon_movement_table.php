@@ -28,9 +28,6 @@ return new class extends Migration {
 
             // Foreign key constraints
             $table->foreign('weapon_id')->references('id')->on('weapons')->onDelete('cascade');
-            $table->foreign('issued_by_officer_id')->references('id')->on('officers')->onDelete('cascade');
-            $table->foreign('issued_to_officer_id')->references('id')->on('officers')->onDelete('cascade');
-            $table->foreign('returned_by_officer_id')->references('id')->on('officers')->onDelete('set null');
         });
     }
 
