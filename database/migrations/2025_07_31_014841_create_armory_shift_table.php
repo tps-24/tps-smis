@@ -13,14 +13,8 @@ return new class extends Migration {
             $table->date('shift_date');
             $table->time('shift_start_time');
             $table->time('shift_end_time');
-            $table->unsignedBigInteger('officer_in_charge_id');
-            $table->unsignedBigInteger('secondary_officer_id')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamps();
-
-            // Foreign keys
-            $table->foreign('officer_in_charge_id')->references('id')->on('officers')->onDelete('cascade');
-            $table->foreign('secondary_officer_id')->references('id')->on('officers')->onDelete('set null');
         });
     }
 

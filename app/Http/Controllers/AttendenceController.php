@@ -74,13 +74,7 @@ class AttendenceController extends Controller
             ->where('company_id', $platoon->company_id)
             ->whereNotIn('id', $this->getSafariStudentIds($platoon, $request->date))
             ->whereNotIn('id', $this->getSickStudentIds($platoon))
-<<<<<<< HEAD
-            ->whereNotIn('id', $this->getKaziniStudentsIds($platoon))->get();
-
-          // return $this->getSafariStudentIds($platoon);
-=======
             ->whereNotIn('id', $this->getKaziniStudentsIds($platoon, $date))->get();
->>>>>>> 60a41d3786adf30c6a7cbeace1478356148d3609
         //return count($students);
         // $students = Student::where('company_id', $platoon->company_id)
         //             ->where('session_programme_id',$this->selectedSessionId)
@@ -917,13 +911,6 @@ class AttendenceController extends Controller
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
         }
-<<<<<<< HEAD
-
-        return $platoon->leaves()->where('students.company_id', $platoon->company_id)->where('session_programme_id', $selectedSessionId)->where('leave_requests.created_at', '<=', $date?? Carbon::today())->where(function ($query) use ($date) {
-                                    $query->whereNull('leave_requests.return_date')
-                                        ->orWhereDate('leave_requests.return_date', '>=', $date?? Carbon::today());
-                                })->pluck('student_id')->toArray();}
-=======
         $_date = $date == null? Carbon::today()->format('Y-m-d') : $date;
         return $platoon->leaves()
             ->where('students.company_id', $platoon->company_id)
@@ -936,7 +923,6 @@ class AttendenceController extends Controller
             ->pluck('student_id')
             ->toArray();
         }
->>>>>>> 60a41d3786adf30c6a7cbeace1478356148d3609
 
     public function requestAttendance(Request $request){
         $request->validate([
