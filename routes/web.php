@@ -52,14 +52,14 @@ use App\Http\Controllers\StaffSummaryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\StudentPostController;
 use App\Http\Controllers\PostController;
- use App\Http\Controllers\WeaponController;
-use App\Http\Controllers\OfficerController;
-use App\Http\Controllers\MovementController;
+use App\Http\Controllers\WeaponController;
 use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Http\Request;
+use App\Http\Controllers\WeaponHandoverController;
+
 
 
 require __DIR__ . '/auth.php';
@@ -631,7 +631,24 @@ Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->n
     Route::post('/leave-request', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
 
 // RESTful resource routes
+//Route::resource('weapons', WeaponController::class);
+//Route::resource('officers', OfficerController::class);
+//Route::resource('movements', MovementController::class);
+//Route::resource('shifts', ShiftController::class);
+
+
 Route::resource('weapons', WeaponController::class);
-Route::resource('officers', OfficerController::class);
-Route::resource('movements', MovementController::class);
+
+// Weapon Handover
+Route::get('/weapons/{weapon}/handover', [WeaponHandoverController::class, 'create'])->name('weapons.handover');
+Route::post('/weapons/{weapon}/handover', [WeaponHandoverController::class, 'store']);
+Route::post('/handover/{handover}/return', [WeaponHandoverController::class, 'returnWeapon'])->name('handover.return');
+
+// Shifts
 Route::resource('shifts', ShiftController::class);
+//Route::get('/weapons/{id}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
+
+Route::get('/weapons/{id}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
+Route::post('/weapons/{weapon}/handover', [WeaponController::class, 'handoverStore'])->name('weapons.handover.store');
+Route::post('/handover/{id}/return', [WeaponController::class, 'markAsReturned'])
+    ->name('handover.return');
