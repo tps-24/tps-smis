@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained();
             $table->foreignId('reason_id')->constrained('termination_reasons');
+            $table->string('specified_reason');
             $table->date('dismissed_at');
             $table->timestamps();
         });

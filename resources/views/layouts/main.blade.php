@@ -51,7 +51,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/tps-smis/resources/assets/js/jquery.min.js"></script>
     <script src="/tps-smis/resources/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="/tps-smis/assets/js/moment.min.js"></script>
+    <script src="/tps-smis/resources/assets/js/moment.min.js"></script>
     <!-- Custom JS files -->
     <script src="/tps-smis/resources/assets/js/custom.js"></script>
 

@@ -131,12 +131,12 @@
                             @endif
                             @endcan
                             <!-- Trigger Button -->
-                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#dismissStudentModal">
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#dismissStudentModal{{ $student->id }}">
                             🛑Dismiss
                             </button>
                         </td>
                         <!-- Modal -->
-                        <div class="modal fade" id="dismissStudentModal" tabindex="-1" aria-labelledby="dismissStudentModalLabel" aria-hidden="true">
+                        <div class="modal fade" id="dismissStudentModal{{ $student->id }}" tabindex="-1" aria-labelledby="dismissStudentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="margin-top: -12%";>
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content border-danger">
                             <div class="modal-header bg-danger text-white">
@@ -149,25 +149,35 @@
                                 @method('PUT')
 
                                 <div class="modal-body">
-                                <div class="mb-3">
+                                    <div class="mb-3">
                                     <label for="reason_id" class="form-label">Dismissal Reason</label>
-                                    <select name="reason_id" id="reason_id" class="form-select" required>
-                                    <option value="">-- Select Reason --</option>
-                                    @foreach ($terminationReasons as $reason)
-                                        <option value="{{ $reason->id }}">{{ $reason->reason }}</option>
-                                    @endforeach
+                                    <select name="reason_id" id="reason_id_{{ $student->id }}" class="form-select reason-select" required>
+                                        <option value="">-- Select Reason --</option>
+                                         @foreach ($terminationReasons as $category => $reasons)
+                                                <optgroup label="{{ ucfirst($category) }}">
+                                                @foreach ($reasons as $reason)
+                                                    <option value="{{ $reason->id }}" data-code="{{ strtolower($reason->category) }}">{{ $reason->reason }}</option>
+                                                @endforeach
+                                                </optgroup>
+                                            @endforeach
                                     </select>
-                                </div>
+                                    </div>
+                                    <div class="mb-3 d-none" id="customReasonWrapper_{{ $student->id }}">
+                                        <label for="custom_reason_{{ $student->id }}" class="form-label">Specify Reason</label>
+                                        <textarea type="text" name="custom_reason" id="custom_reason_{{ $student->id }}" class="form-control" placeholder="Enter reason here"> </textarea>
+                                    </div>
+                                    @php
+                                        $today = \Carbon\Carbon::now()->format('Y-m-d');
+                                    @endphp
 
-                                <div class="mb-3">
-                                    <label for="dismissed_at" class="form-label">Dismissal Date</label>
-                                    <input type="date" name="dismissed_at" id="dismissed_at" class="form-control" required>
+                                    <div class="mb-3">
+                                        <label for="dismissed_at" class="form-label">Dismissal Date</label>
+                                        <input type="date" name="dismissed_at" id="dismissed_at" class="form-control" required max="{{ $today }}">
+                                    </div>
                                 </div>
-                                </div>
-
                                 <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-danger">Confirm Dismissal</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger">Confirm Dismissal</button>
                                 </div>
                             </form>
                             </div>
@@ -254,4 +264,25 @@
 {!! $students->appends(request()->query())->links('pagination::bootstrap-5') !!}
 
 
+@endsection
+
+
+@section('scripts')
+<script>
+    document.querySelectorAll('.reason-select').forEach(select => {
+    select.addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+        const code = selectedOption.getAttribute('data-code');
+        const studentId = this.id.split('_').pop(); // Extract student ID from select ID
+
+        const wrapper = document.getElementById(`customReasonWrapper_${studentId}`);
+        if (code === 'hiari') {
+        wrapper.classList.remove('d-none');
+        } else {
+        wrapper.classList.add('d-none');
+        wrapper.querySelector('input').value = '';
+        }
+    });
+    });
+</script>
 @endsection
