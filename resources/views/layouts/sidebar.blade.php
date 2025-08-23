@@ -115,6 +115,11 @@
                         <a href="/tps-smis/students/create">Student Registration</a>
                     </li>
                     @endcan()
+                    @can('post-view')
+                    <!-- <li>
+                        <a href="{{ route('students-post.index') }}">Students Post</a>
+                    </li> -->
+                    @endcan()
                     @can('student-create')
                     <li>
                         <a href="/tps-smis/intake_history">Intake Summary</a>
@@ -475,6 +480,9 @@
                         </li>
                         <li>
                             <a href="{{ route('termination_reasons.index') }}">Termination Reasons</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('posts.index') }}">Posts Settings</a>
                         </li>
                         <li>
                             <a href="{{ route('campuses.index') }}">Campus Settings</a>

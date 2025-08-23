@@ -881,6 +881,5 @@ class StudentController extends Controller
         $pdf->set_option('isHtml5ParserEnabled', true);
         $pdf->set_option('isPhpEnabled', true);
         return $pdf->stream($platoon->name . ".pdf");
-        return $students;
     }
 }

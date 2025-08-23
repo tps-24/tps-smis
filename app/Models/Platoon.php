@@ -69,7 +69,7 @@ public function today_attendence($attendanceType_id = null, $date = null)
                 ->where('excuse_type_id', 3) // Admitted
                 ->where(function ($query) use ($_date) {
                 $query->whereNull('released_at')
-                    ->orWhereDate('released_at', '<=', $_date);
+                    ->orWhereDate('released_at', '>=', $_date);
             });
     }
 

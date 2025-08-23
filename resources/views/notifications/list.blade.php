@@ -153,7 +153,7 @@
                 auth: authData.auth || authData,
               },
             }));
-            //console.log(`🔐 Subscribed to private channel: ${channel}`);
+            console.log(`🔐 Subscribed to private channel: ${channel}`);
           })
           .catch(err => console.error('❌ Auth error:', err));
       } else {
@@ -222,7 +222,7 @@
       },
     },
     appKey: 'local',
-    host: '192.168.16.106',
+    host: '192.168.16.227',
     port: 6001,
     scheme: 'ws',
     client: 'js',

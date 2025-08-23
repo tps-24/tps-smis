@@ -39,10 +39,7 @@ class DashboardController extends Controller
             session(['selected_session' => request()->session_id]);
         }
         // Get the selected session ID from the session
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 1;
-        }
+        $selectedSessionId = session('selected_session',1);
         $pending_message = session('pending_message');
 
         $dailyCount = $weeklyCount = $monthlyCount = 0;
@@ -140,7 +137,10 @@ class DashboardController extends Controller
         } else {
             $todayStudentReport = $this->todayStudentReport();
 
-            $denttotalCount   = Student::where('session_programme_id', $selectedSessionId ?? 1)->count();
+            $denttotalCount = Student::where('session_programme_id', $selectedSessionId ?? 1)
+            ->whereDoesntHave('dismissal') // exclude dismissed students
+            ->count();
+
             $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)->where('beat_status', 1)->count();
             $beats            = Beat::where('date', Carbon::today()->toDateString())->get();
             $filteredBeats    = $beats->filter(function ($beat) use ($selectedSessionId) {

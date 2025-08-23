@@ -17,8 +17,10 @@
 
 @section('content')
 @include('layouts.sweet_alerts.index')
+
   @if($category == 1)
     @php
+     if (isset($notification->data))
     $notification = \App\Models\Announcement::find($notification->data['id']);
     @endphp
     <div class="mb-4 d-flex">
@@ -97,7 +99,7 @@
     @endcan
 @endif
 
-  @elseif($category == 2)
+  @if($category == 2)
 
     <div class="notification-card">
     <h3 class="text-{{ $notification->type ?? 'primary' }}">
@@ -133,9 +135,12 @@
     </div>
   @elseif ($category == 3)
     @php
-    $user = \App\Models\User::find($notification->data['requested_by']);
-    $company = \App\Models\Company::find($notification->data['company_id']);
-    $notification = \App\Models\AttendanceRequest::find($notification->data['id'])
+    if (isset($notification->data)){
+      $user = \App\Models\User::find($notification->data['requested_by']);
+      $company = \App\Models\Company::find($notification->data['company_id']);
+      $notification = \App\Models\AttendanceRequest::find($notification->data['id'])    ;
+    }
+
     @endphp
     <div>
     <h3 class="text-{{ $notification->type ?? 'primary' }}">
@@ -143,8 +148,13 @@
     </h3><br><br>
 
     <p>
+      @if (isset($notification->data))
     <strong>Requester :</strong> {{ $user->staff?->force_number ?? '' }} {{ $user->staff?->rank ?? '' }}
     {{ $user->name }}
+      @else
+      <strong>Requester :</strong> {{ $notification->requester->staff?->force_number ?? '' }} {{ $notification->requester->staff?->rank ?? '' }}
+      {{ $notification->requester->name  }}
+    @endif
     </p>
     <p>
     <strong>Requested Date:</strong> {{ $notification->date ?? '' }}
@@ -154,7 +164,11 @@
     {{ \Carbon\Carbon::parse($notification->created_at)->format('h:s, d F, Y') ?? '' }}
     </p>
     <p>
-    <strong>Company:</strong> {{ $company->description ?? '' }}
+    <strong>Company:</strong>@if (isset($notification->data)) 
+    {{ $company->description ?? '' }}
+    @else
+      {{ $notification->company->description }}
+    @endif
     </p>
     <p>
     <strong>Reason</strong> <br>{{ $notification->reason ?? '' }}
@@ -173,7 +187,12 @@
       <div class="modal-content">
       <div class="modal-header">
       <h5 class="modal-title text-info" id="statusModalLabel{{  $notification->id  ?? ''}}">
-      Requested by {{ $user->name }}
+      Requested by 
+      @if (isset($notification->data))
+      {{ $user->name }}
+      @else
+      {{ $notification->requester->name  }}
+      @endif
       </h5>
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>

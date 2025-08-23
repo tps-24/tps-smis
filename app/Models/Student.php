@@ -217,5 +217,9 @@ public function hasActiveLeaveRecord()
                 ->exists();
 }
 
+public function dismissal()
+{
+    return $this->hasOne(StudentDismissal::class, 'student_id');
+}
 
 }

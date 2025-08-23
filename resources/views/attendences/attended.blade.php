@@ -170,7 +170,8 @@ function confirmStatusChange(event, status, message) {
                     <th>Sentry</th>
                     <th>Mess</th>
                     <th>Off</th>
-                    <th>Sick</th>
+                    <th>E.D</th>
+                    <th>Admitted</th>
                     <th>Leave</th>
                     <th>Lock Up</th>
                     <th>Kazini</th>
@@ -190,7 +191,8 @@ function confirmStatusChange(event, status, message) {
                         <td>{{$attendence->sentry}}</td>
                         <td>{{$attendence->mess}}</td>
                         <td>{{$attendence->off}}</td>
-                        <td>{{$attendence->sick}}</td>
+                        <td>{{$attendence->ed}}</td>
+                        <td>{{$attendence->adm}}</td>
                         <td>{{$attendence->safari}}</td>
                         <td>{{$attendence->lockUp?? ''}}</td>
                         <td>{{$attendence->kazini?? ''}}</td>

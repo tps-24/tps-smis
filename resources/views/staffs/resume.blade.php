@@ -321,7 +321,7 @@ body {
     </table>
 
     <h3>(C) OTHER COURSES, PROFESSIONAL EXAMINATION AND WORKSHOP ATTENDED</h3><br><br>
-    <h4>CURRENT TITLE / CHEO CHAKO KWA SASA {{$staff->rank}}</h4>
+    <h4>CURRENT TITLE / CHEO CHAKO KWA SASA <strong>{{$staff->rank}}</strong></h4><br><br>
     <table class="table table-sm table-bordered">
         <thead>
             <tr>
@@ -351,47 +351,7 @@ body {
     </table>
 
     <h3>(D) WORK AND EXPERIENCE</h3><br><br>
-    <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <td>S/N</td>
-                <td>Year</td>
-                <td>Organization</td>
-                <td>Location</td>
-                <td>Title</td>
-                <td>Duties</td>
-            </tr>
 
-        </thead>
-        <tbody>
-            @php
-            $i = 0;
-            @endphp
-            @if ($staff->work_experiences)
-            @foreach ($staff->work_experiences as $work_experience)
-            <tr>
-                <td>{{++$i}}</td>
-                <td>{{ substr($work_experience->start_date, 0, 4)}} - {{ substr($work_experience->end_date, 0, 4)}}</td>
-                <td>{{ $work_experience->institution }}</td>
-                <td>{{ $work_experience->address }}</td>
-                <td>{{ $work_experience->job_title }}</td>
-                <td>
-                    @php
-                    $duties = $work_experience->duties == null? null :
-                    json_decode($work_experience->duties);
-                    @endphp
-                    <ul>
-                        @foreach ($duties as $duty)
-                        <li>{{ $duty }}</li>
-                        @endforeach
-                    </ul>
-                </td>
-            </tr>
-            @endforeach
-            @endif
-        </tbody>
-    </table>
-    <br>
     <table class="table table-sm table-bordered">
         <thead>
             <tr>

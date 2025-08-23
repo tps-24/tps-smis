@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Announcement;
 use App\Models\MPS;
+use App\Models\AttendanceRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
@@ -54,6 +55,8 @@ class NotificationController extends Controller
                 $notification = Announcement::find($Ids); 
             else if($category == 2)
                 $notification = MPS::find($Ids);
+            else if($category == 3)
+                $notification = AttendanceRequest::find($Ids);
               if (!$notification) {
                 return redirect()->back()->with('error', 'Notification not found.');
               }
