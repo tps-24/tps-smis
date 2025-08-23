@@ -129,11 +129,16 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'student-courses', 'description' => 'View Courses as Student'],        
             ['name' => 'student-coursework-list', 'description' => 'View Courseworks as Student'],        
             ['name' => 'staff-view', 'description' => 'View staff profile'],
-            /*/
+            /
             ['name' => 'teacher_on_duty-view', 'description' => 'View Teacher On duty'], 
             ['name' => 'teacher_on_duty-create', 'description' => 'Create new Teacher On duty'], 
             ['name' => 'teacher_on_duty-edit', 'description' => 'Edit Teacher on duty'],
-            ['name' => 'teacher_on_duty-delete', 'description' => 'Delete Teacher on duty'],         
+            ['name' => 'teacher_on_duty-delete', 'description' => 'Delete Teacher on duty'],      
+            */
+            ['name' => 'post-view', 'description' => 'View Post'], 
+            ['name' => 'post-create', 'description' => 'Create new Post'], 
+            ['name' => 'post-edit', 'description' => 'Edit Post'],
+            ['name' => 'post-delete', 'description' => 'Delete Post'],   
             // Add other permissions here with descriptions 
             ]; 
 

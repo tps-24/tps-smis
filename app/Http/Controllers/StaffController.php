@@ -383,7 +383,8 @@ public function search(Request $request)
             $request-> parentsRegion,
         ];
         $staff->save();
-        return view('staffs.create_cv', compact('staff', 'education_levels'));
+        return redirect()->back()->with('success', 'CV updated successfully.');
+        //return view('staffs.create_cv', compact('staff', 'education_levels'));
     }
 
     public function update_school_cv(Request $request, $staff_id){
@@ -391,22 +392,34 @@ public function search(Request $request)
         $staff = Staff::find($staff_id);
         if($request->primary_school_name){
             $message = 'Primary';
-            $school = School::create([
-                'staff_id' => $staff_id,
-                'name' =>$request->primary_school_name,
-                'education_level_id' =>1,
-                'admission_year' =>$request->primary_school_YoA,
-                'graduation_year' =>$request->primary_school_YoG,
-                'award' =>$request->primary_school_ward,
-                'village' =>$request->primary_school_village,
-                'district' =>$request->primary_school_district,
-                'region' =>$request->primary_school_region
-            ] );            
+$school = School::updateOrCreate(
+    // 👇 These are the "uniqueness" conditions
+    [
+        'staff_id' => $staff_id,
+        'education_level_id' => 1,
+    ],
+    // 👇 These are the values that will be inserted/updated
+    [
+        'name' => $request->primary_school_name,
+        'admission_year' => $request->primary_school_YoA,
+        'graduation_year' => $request->primary_school_YoG,
+        'ward' => $request->primary_school_ward,
+        'village' => $request->primary_school_village,
+        'district' => $request->primary_school_district,
+        'region' => $request->primary_school_region,
+    ]
+);
+          
         }
 
         if($request->secondary_school_name){
             $message = $request->secondary_school_type == 2? 'O-Level': 'A-Level';
-            $school = School::create([
+            $school = School::updateOrCreate(
+                [
+                'staff_id' => $staff_id,
+                'education_level_id' => 2,                  
+                ],
+                [
                 'staff_id' => $staff_id,
                 'name' =>$request->secondary_school_name,
                 'education_level_id' =>$request->secondary_school_type,
@@ -419,20 +432,57 @@ public function search(Request $request)
             ] );            
         }
 
-        if($request->colleges_name){
-            $message = 'College';
-            $school = School::create([
+        if($request->advanced_secondary_school_name){
+            $message = $request->advanced_secondary_school_type == 2? 'O-Level': 'A-Level';
+            $school = School::updateOrCreate(
+                [
                 'staff_id' => $staff_id,
-                'name' =>$request->colleges_name,
-                'education_level_id' =>4,
-                'admission_year' =>$request->colleges_YoA,
-                'graduation_year' =>$request->colleges_YoG,
-                'duration' =>$request->duration,
-                'country' =>$request->colleges_name_region,
-                'award' =>$request->colleges_award,
-                'region' =>$request->colleges_name_region,
+                'education_level_id' => 3,                  
+                ],
+                [
+                'staff_id' => $staff_id,
+                'name' =>$request->advanced_secondary_school_name,
+                'education_level_id' =>$request->advanced_secondary_school_type,
+                'admission_year' =>$request->advanced_secondary_school_YoA,
+                'graduation_year' =>$request->advanced_secondary_school_YoG,
+                'award' =>$request->advanced_secondary_school_ward,
+                'village' =>$request->advanced_secondary_school_village,
+                'district' =>$request->advanced_secondary_school_district,
+                'region' =>$request->advanced_secondary_school_region
             ] );            
         }
+
+        if ($request->has('colleges_name')) {
+    $submittedNames = array_filter($request->colleges_name); // remove empty
+
+    // 1. Update or create submitted records
+    foreach ($submittedNames as $index => $name) {
+        School::updateOrCreate(
+            [
+                'staff_id'           => $staff_id,
+                'education_level_id' => 4,
+                'name'               => $name,
+            ],
+            [
+                'admission_year'  => $request->colleges_YoA[$index] ?? null,
+                'graduation_year' => $request->colleges_YoG[$index] ?? null,
+                'duration'        => $request->duration[$index] ?? null,
+                'country'         => $request->colleges_name_region[$index] ?? null,
+                'award'           => $request->colleges_award[$index] ?? null,
+                'region'          => $request->colleges_name_region[$index] ?? null,
+            ]
+        );
+    }
+
+    // 2. Delete old records that were not resubmitted
+    School::where('staff_id', $staff_id)
+        ->where('education_level_id', 4)
+        ->whereNotIn('name', $submittedNames)
+        ->delete();
+
+    $message = 'Colleges';
+}
+
 
         if($request->venue){
             $message = 'Other';

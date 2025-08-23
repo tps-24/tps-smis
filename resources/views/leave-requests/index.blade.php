@@ -15,7 +15,7 @@
     </div>
     @endif
 
-    <!-- Patient Details Table -->
+    <!-- Student Details Table -->
     <div class="card mb-3">
         <div class="card-header">
             <h5 class="card-title">Fetch Students Details here ...</h5>

@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Weapon extends Model
@@ -14,7 +12,6 @@ class Weapon extends Model
         'condition', 'current_status', 'location', 'remarks',
     ];
 
-    public function movements() {
-        return $this->hasMany(WeaponMovement::class);
-    }
+  
+    
 }

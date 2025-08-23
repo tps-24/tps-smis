@@ -15,67 +15,90 @@ class LeaveRequestController extends Controller
     // Display all Students leave requests
 
     public function index(Request $request)
-{
-    $user = auth()->user();
-    $leaves = collect(); // Default empty
-
-    // Default nulls
-    $staff = $user->staff;
-    $assignedCompany = null;
-    $companies = collect();
-
-    // 🧠 For staff users like Sir Major, get assigned company
-    if ($staff) {
-        $assignedCompany = Company::find($staff->company_id);
-    }
-
-    if ($user->hasRole('Student')) {
-        // 🎓 Show student's own leave requests
-        $student = Student::where('user_id', $user->id)->first();
-        if (!$student) {
-            return redirect()->back()->with('error', 'Student profile not found.');
-        }
-
-        $leaves = $student->leaves()->orderBy('created_at', 'desc')->paginate(10);
-        $companies = Company::all(); // optional for form
-    }
-
-    elseif ($user->hasRole(['Super Administrator', 'Admin', 'MPS Officer'])) {
-        // 🛡 Admins can see all
-        $companies = Company::all();
-        $leaves = LeaveRequest::orderBy('created_at', 'desc')->paginate(10);
-    }
-
-    elseif ($user->hasRole('Sir Major')) {
-        if (! $assignedCompany) {
-            return redirect()->back()->with('error', 'Your assigned company was not found.');
-        }
-
-        $companies = collect([$assignedCompany]);
-
-        // Only get leave requests for this company
-        $leaves = LeaveRequest::whereHas('student', function ($q) use ($assignedCompany) {
-            $q->where('company_id', $assignedCompany->id);
-        })->orderBy('created_at', 'desc')->paginate(10);
-    }
-
-    return view('leave-requests.index', compact('user', 'assignedCompany', 'companies', 'leaves'));
-}
-
-
-    public function search(Request $request){
-        
+    {
         $user = auth()->user();
-        $staff  = $user->staff;
+        $leaves = collect(); // Default empty
+
+        // Default nulls
+        $staff = $user->staff;
+        $assignedCompany = null;
+        $companies = collect();
+
+        // 🧠 For staff users like Sir Major, get assigned company
+        if ($staff) {
+            $assignedCompany = Company::find($staff->company_id);
+        }
+
+        if ($user->hasRole('Student')) {
+            // 🎓 Show student's own leave requests
+            $student = Student::where('user_id', $user->id)->first();
+            if (!$student) {
+                return redirect()->back()->with('error', 'Student profile not found.');
+            }
+
+            $leaves = $student->leaves()->orderBy('created_at', 'desc')->paginate(10);
+            $companies = Company::all(); // optional for form
+        } elseif ($user->hasRole(['Super Administrator', 'Admin', 'MPS Officer'])) {
+            // 🛡 Admins can see all
+            $companies = Company::all();
+            $leaves = LeaveRequest::orderBy('created_at', 'desc')->paginate(10);
+        } elseif ($user->hasRole('Sir Major')) {
+            if (!$assignedCompany) {
+                return redirect()->back()->with('error', 'Your assigned company was not found.');
+            }
+
+            $companies = collect([$assignedCompany]);
+
+            // Only get leave requests for this company
+            $leaves = LeaveRequest::whereHas('student', function ($q) use ($assignedCompany) {
+                $q->where('company_id', $assignedCompany->id);
+            })->orderBy('created_at', 'desc')->paginate(10);
+        }
+
+        return view('leave-requests.index', compact('user', 'assignedCompany', 'companies', 'leaves'));
+    }
+
+
+    public function search(Request $request)
+    {
+        $selectedSessionId = session('selected_session');
+        $user = auth()->user();
+        $staff = $user->staff;
         // Get company_id from staff table
         $assignedCompany = $staff ? Company::find($staff->company_id) : null;
         if ($user->hasRole(['Super Administrator', 'Admin', 'MPS Officer'])) {
             $companies = Company::all();
-            $query     = Student::query();
+            $query = Student::query();
         } else {
             // Sir Major can only see students from their assigned company
             $companies = collect([$assignedCompany]);
-            $query     = Student::where('company_id', $staff->company_id);
+            $query = Student::where('company_id', $staff->company_id)
+                ->where('session_programme_id', $selectedSessionId)
+
+                // Exclude students still in MPS (no release date)
+                ->whereNotIn('id', function ($q) use ($request) {
+                    $q->select('student_id')
+                        ->from('m_p_s')
+                        ->where('platoon', $request->platoon)
+                        ->whereNull('released_at'); // ✅ fixed
+                })
+
+                // Exclude students still on leave (active leave + not returned)
+                ->whereNotIn('id', function ($q) use ($request) {
+                    $q->select('student_id')
+                        ->from('leave_requests')
+                        ->where('platoon', $request->platoon)
+                        ->whereDate('start_date', '<=', $request->date)
+                        ->whereDate('end_date', '>=', $request->date)
+                        ->whereNull('return_date'); // still on leave
+                })
+
+                // Optional: search by name
+                ->where(function ($q) use ($request) {
+                    $q->where('first_name', 'like', "%{$request->search}%")
+                        ->orWhere('last_name', 'like', "%{$request->search}%")
+                        ->orWhere('middle_name', 'like', "%{$request->search}%");
+                });
         }
         if ($request->filled('company_id')) {
             $query->where('company_id', $request->company_id);
@@ -97,10 +120,10 @@ class LeaveRequestController extends Controller
         }
         $studentDetails = $query->paginate(15);
         $studentDetails->appends($request->only(['company_id', 'platoon', 'fullname']));
-        $message        = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
+        $message = $studentDetails->isNotEmpty() ? '' : 'No student details found for the provided search criteria';
         return view('leave-requests.index', compact('message', 'user', 'assignedCompany', 'companies', 'studentDetails'));
     }
-// Show all leave requests submitted to OC
+    // Show all leave requests submitted to OC
     public function ocLeaveRequests()
     {
         // OC sees only Pending
@@ -110,7 +133,7 @@ class LeaveRequestController extends Controller
 
     public function forwardToChiefInstructor($id)
     {
-        $leaveRequest         = LeaveRequest::findOrFail($id);
+        $leaveRequest = LeaveRequest::findOrFail($id);
         $leaveRequest->status = 'forwarded_to_chief_instructor'; // status changed
         $leaveRequest->save();
 
@@ -120,23 +143,23 @@ class LeaveRequestController extends Controller
     public function store1(Request $request)
     {
         $validated = $request->validate([
-            'student_id'   => 'required|exists:students,id',
+            'student_id' => 'required|exists:students,id',
             // 'staff_id' => 'nullable',
-            'company_id'   => 'required|exists:companies,id',
-            'platoon'      => 'required|integer',
+            'company_id' => 'required|exists:companies,id',
+            'platoon' => 'required|integer',
 
             'phone_number' => 'nullable|string|max:15',
-            'location'     => 'required|string|max:255',
-            'reason'       => 'required|string',
-            'attachments'  => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:1548',
+            'location' => 'required|string|max:255',
+            'reason' => 'required|string',
+            'attachments' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:1548',
         ]);
 
         $hasActiveLeave = LeaveRequest::where('student_id', $request->student_id)
             ->whereNull('return_date')
             ->exists();
-            if($hasActiveLeave){
-                return redirect()->back()->with('info', 'Student has active Leave');
-            }
+        if ($hasActiveLeave) {
+            return redirect()->back()->with('info', 'Student has active Leave');
+        }
 
         if ($request->hasFile('attachments')) {
             $validated['attachments'] = $request->file('attachments')->store('leave_attachments', 'public');
@@ -154,7 +177,7 @@ class LeaveRequestController extends Controller
         $leaveRequests = LeaveRequest::where('status', 'forwarded_to_chief_instructor')
             ->with('student')
             ->paginate(10);
-//return $leaveRequests;
+        //return $leaveRequests;
         return view('leave-requests.chief_instructor', compact('leaveRequests'));
     }
 
@@ -162,19 +185,19 @@ class LeaveRequestController extends Controller
     {
         $request->validate([
             'start_date' => 'required|date',
-            'end_date'   => 'required|date|after_or_equal:start_date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
-        $leaveRequest                               = LeaveRequest::findOrFail($id);
-        $leaveRequest->start_date                   = $request->start_date;
-        $leaveRequest->end_date                     = $request->end_date;
+        $leaveRequest = LeaveRequest::findOrFail($id);
+        $leaveRequest->start_date = $request->start_date;
+        $leaveRequest->end_date = $request->end_date;
         $leaveRequest->approved_by_chief_instructor = true;
         return $leaveRequest;
         $safari->create([
-            'student_id'           => $student->id,
-            'description'          => $leaveRequest->reason,
+            'student_id' => $student->id,
+            'description' => $leaveRequest->reason,
             'previous_beat_status' => $student->beat_status,
-            'current_beat_status'  => 4,
-            'created_by'           => $request->user()->id,
+            'current_beat_status' => 4,
+            'created_by' => $request->user()->id,
         ]);
         $leaveRequest->student->beat_status = 4;
         $leaveRequest->save();
@@ -186,13 +209,13 @@ class LeaveRequestController extends Controller
 
     public function approve(Request $request, $id)
     {
-        $leaveRequest                       = LeaveRequest::findOrFail($id);
-        $leaveRequest->start_date           = $request->start_date;
-        $leaveRequest->end_date             = $request->end_date;
-        $leaveRequest->status               = 'approved';
-        $leaveRequest->approved_at               = now();
+        $leaveRequest = LeaveRequest::findOrFail($id);
+        $leaveRequest->start_date = $request->start_date;
+        $leaveRequest->end_date = $request->end_date;
+        $leaveRequest->status = 'approved';
+        $leaveRequest->approved_at = now();
         $leaveRequest->previous_beat_status = $leaveRequest->student->beat_status;
-        $leaveRequest->current_beat_status  = 4;
+        $leaveRequest->current_beat_status = 4;
         // SafariStudent::create([
         //     'student_id' => $leaveRequest->student->id,
         //     'description' => $leaveRequest->reason,
@@ -214,10 +237,10 @@ class LeaveRequestController extends Controller
             'rejection_reason' => 'required|string|max:1000',
         ]);
 
-        $leaveRequest                   = LeaveRequest::findOrFail($id);
-        $leaveRequest->status           = 'rejected';
+        $leaveRequest = LeaveRequest::findOrFail($id);
+        $leaveRequest->status = 'rejected';
         $leaveRequest->rejection_reason = $request->input('rejection_reason');
-        $leaveRequest->rejected_at      = now(); // optional
+        $leaveRequest->rejected_at = now(); // optional
         $leaveRequest->save();
 
         return redirect()->back()->with('success', 'Leave request rejected successfully.');
@@ -231,7 +254,7 @@ class LeaveRequestController extends Controller
             ->paginate(15);
 
         $totalRequests = $approvedRequests->count();
-        $totalDays     = $approvedRequests->sum(function ($request) {
+        $totalDays = $approvedRequests->sum(function ($request) {
             return \Carbon\Carbon::parse($request->start_date)->diffInDays(\Carbon\Carbon::parse($request->end_date)) + 1;
         });
 
@@ -279,17 +302,17 @@ class LeaveRequestController extends Controller
     public function destroy($leaveId)
     {
         $leave = LeaveRequest::find($leaveId);
-        if (! $leave) {
+        if (!$leave) {
             abort(404);
         }
         $leave->delete();
         return redirect()->back()->with('success', 'Leave student record deleted succesfully.');
     }
 
-    public function return ($leaveId)
+    public function return($leaveId)
     {
-        $leaveRequest                       = LeaveRequest::findOrFail($leaveId);
-        $leaveRequest->return_date          = Carbon::today();
+        $leaveRequest = LeaveRequest::findOrFail($leaveId);
+        $leaveRequest->return_date = Carbon::today();
         $leaveRequest->student->beat_status = $leaveRequest->previous_beat_status;
         $leaveRequest->save();
         $leaveRequest->student->save();
@@ -305,46 +328,46 @@ class LeaveRequestController extends Controller
         return view('leave-requests.show', compact('leaveRequests'));
     }
 
-public function create()
-{
-    return view('leave-requests.create');
-}
-
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'student_id'   => 'required|exists:students,id', // if your students are in the users table
-        'company_id'   => 'required|exists:companies,id',
-        'platoon'      => 'required|integer',
-        'phone_number' => 'nullable|string|max:15',
-        'location'     => 'required|string|max:255',
-        'reason'       => 'required|string',
-        'attachments'  => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
-    ]);
-
-    // Check if student has active leave (no return date)
-   // $hasActiveLeave = LeaveRequest::where('student_id', $request->student_id)
-      //  ->whereNull('return_date')
-      //  ->exists();
-
-  $hasActiveLeave = LeaveRequest::where('student_id', $validated['student_id'])
-        ->whereNull('return_date')
-        ->exists();
-
-
-    if ($hasActiveLeave) {
-        return redirect()->back()->with('info', 'You already have an active leave.');
+    public function create()
+    {
+        return view('leave-requests.create');
     }
 
-    if ($request->hasFile('attachments')) {
-        $validated['attachments'] = $request->file('attachments')->store('leave_attachments', 'public');
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id', // if your students are in the users table
+            'company_id' => 'required|exists:companies,id',
+            'platoon' => 'required|integer',
+            'phone_number' => 'nullable|string|max:15',
+            'location' => 'required|string|max:255',
+            'reason' => 'required|string',
+            'attachments' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+        ]);
+
+        // Check if student has active leave (no return date)
+        // $hasActiveLeave = LeaveRequest::where('student_id', $request->student_id)
+        //  ->whereNull('return_date')
+        //  ->exists();
+
+        $hasActiveLeave = LeaveRequest::where('student_id', $validated['student_id'])
+            ->whereNull('return_date')
+            ->exists();
+
+
+        if ($hasActiveLeave) {
+            return redirect()->back()->with('info', 'You already have an active leave.');
+        }
+
+        if ($request->hasFile('attachments')) {
+            $validated['attachments'] = $request->file('attachments')->store('leave_attachments', 'public');
+        }
+
+        $validated['status'] = 'pending';
+
+        LeaveRequest::create($validated);
+
+        return redirect()->back()->with('success', 'Leave request submitted successfully.');
     }
-
-    $validated['status'] = 'pending';
-
-    LeaveRequest::create($validated);
-
-    return redirect()->back()->with('success', 'Leave request submitted successfully.');
-}
 
 }

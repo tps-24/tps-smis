@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         
 
         $this->call([
-            // PermissionTableSeeder::class,
+             PermissionTableSeeder::class,
             // CreateAdminUserSeeder::class,
             // BeatTypeSeeder::class,
             // AreaSeeder::class,
@@ -29,8 +29,8 @@ class DatabaseSeeder extends Seeder
             // PatientsTableSeeder::class,
             //SafariTypeSeeder::class,
             //EducationLevelSeeder::class
-            NotificationAudienceSeeder::class,
-            NotificationTypeSeeder::class
+            //NotificationAudienceSeeder::class,
+            //NotificationTypeSeeder::class
         ]);
 
         // User::factory(10)->create();

@@ -67,7 +67,7 @@ class BulkImportStudents implements ToCollection, ToModel
                 // Save student record first
                 $student->save();
 
-                Log::info("Student created: ID=" . $student->id . ", Name=" . $student->first_name . " " . $student->last_name);
+                // Log::info("Student created: ID=" . $student->id . ", Name=" . $student->first_name . " " . $student->last_name);
 
                 // **Only create a user account if session_programme_id is NOT 1 or 5**
                 if ($student->session_programme_id != 1 && $student->session_programme_id != 5) {
