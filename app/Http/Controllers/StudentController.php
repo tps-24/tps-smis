@@ -59,12 +59,17 @@ class StudentController extends Controller
             ->where('enrollment_status', 1)
             ->count();
     
-        $terminationReasons = TerminationReason::orderBy('reason')->get();
+        $terminationReasons = TerminationReason::all()
+                                ->filter(fn($r) => $r->category && is_string($r->category))
+                                ->groupBy('category');
+
+        
 
         $students  = Student::where('session_programme_id', $selectedSessionId)->where('enrollment_status', 1)->orderBy('company_id')->orderBy('platoon')->paginate(20);
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId); // Filter students by session
         })->get();
+
         return view('students.index', compact('students', 'companies', 'approvedCount', 'terminationReasons'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
     }
@@ -104,7 +109,9 @@ class StudentController extends Controller
         // Clone the query before pagination to get approved count
         $approvedCount = (clone $students)->where('enrollment_status', 1)->where('status', 'approved')->count();
         
-        $terminationReasons = TerminationReason::orderBy('reason')->get();
+        $terminationReasons = TerminationReason::all()
+                                ->filter(fn($r) => $r->category && is_string($r->category))
+                                ->groupBy('category');
 
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId);
@@ -119,15 +126,18 @@ class StudentController extends Controller
 
     public function dismiss(Request $request, $id)
     {
-        $request->validate([
-            'reason_id' => 'required|exists:termination_reasons,id',
-            'dismissed_at' => 'required|date',
+       $request->validate([
+            'reason_id'     => 'required|exists:termination_reasons,id',
+            'dismissed_at'  => 'required|date|before_or_equal:today',
+        ], [
+            'dismissed_at.before_or_equal' => 'Dismissal date cannot be in the future.',
         ]);
 
         $student = Student::findOrFail($id);
         StudentDismissal::create([
             'student_id'   => $student->id,
             'reason_id'    => $request->reason_id,
+            'custom_reason'    => $request->custom_reason ?? 'null',
             'dismissed_at' => $request->dismissed_at,
         ]);
 

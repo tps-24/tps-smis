@@ -156,6 +156,7 @@
                       <option value="26-30">26–30</option>
                       <option value="31-45">31–45</option>
                       <option value="46-60">46–60</option>
+                      <option value="60+">60+</option>
                     </select>
                   </div>
                   <div class="col-md-4" data-filter-group="dismissal_reason">
