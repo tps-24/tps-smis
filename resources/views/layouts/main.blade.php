@@ -21,10 +21,10 @@
                 <div class="card mb-4" style="margin-right: -26px;">
                   <div class="card-header" >
                     <h5 class="card-title">
-                    
+                    @yield('content')
                   </div>
                   <div class="card-body">
-                    @yield('content')
+                    
                   </div>
                 </div>
               </div>
