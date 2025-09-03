@@ -6,7 +6,9 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/tps-smis/" id="home">Home</a></li>
-                    <li class="breadcrumb-item active"><a href="#">Announcements</a>
+                    <li class="breadcrumb-item "><a href="#">Announcements</a>
+                    </li>
+                    <li class="breadcrumb-item active"><a href="#">Create</a>
                     </li>
                 </ol>
             </nav>

@@ -24,7 +24,7 @@ class StudentPostController extends Controller
      */
     public function index(Request $request)
     {
-        $selectedSessionId = session('selected_session');
+        $selectedSessionId = session('selected_session',1);
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId); // Filter students by session
         })->get();
@@ -105,55 +105,51 @@ class StudentPostController extends Controller
     }
 
     public function search(Request $request)
-    {
-        // Check if a session ID has been submitted
-        if (request()->has('session_id')) {
-            // Store the selected session ID in the session
-            session(['selected_session' => request()->session_id]);
-        }
-        
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 1;
-        }
+{
+    // Check if a session ID has been submitted
+    if ($request->has('session_id')) {
+        session(['selected_session' => $request->session_id]);
+    }
 
-        // Build the student query
-        $students = Student::where('session_programme_id', $selectedSessionId);
+    $selectedSessionId = session('selected_session', 1);
 
-        if ($request->company_id) {
-            $students->where('company_id', $request->company_id);
-
-            if ($request->platoon) {
-                $students->where('platoon', $request->platoon);
-            }
-        }
-
-        if ($request->name) {
-            $students->where(function ($query) use ($request) {
-                $query->where('first_name', 'like', '%' . $request->name . '%')
-                    ->orWhere('last_name', 'like', '%' . $request->name . '%')
-                    ->orWhere('force_number', 'like', '%' . $request->name . '%')
-                    ->orWhere('middle_name', 'like', '%' . $request->name . '%');
+    // Build student query
+    $students = Student::where('session_programme_id', $selectedSessionId)
+        ->when($request->company_id, fn($q) => $q->where('company_id', $request->company_id))
+        ->when($request->platoon, fn($q) => $q->where('platoon', $request->platoon))
+        ->when($request->name, function ($q, $name) {
+            $q->where(function ($sub) use ($name) {
+                $sub->where('first_name', 'like', "%{$name}%")
+                    ->orWhere('last_name', 'like', "%{$name}%")
+                    ->orWhere('middle_name', 'like', "%{$name}%")
+                    ->orWhere('force_number', 'like', "%{$name}%");
             });
+        });
+
+    // Get matching student IDs
+    $studentIds = $students->pluck('id');
+
+    // Fetch posts for these students (use pagination)
+    $posts = StudentPost::whereIn('student_id', $studentIds)
+        ->paginate(90)
+        ->withQueryString();
+
+    // Get companies for dropdown
+    $companies = Company::whereHas('students', function ($q) use ($selectedSessionId) {
+        $q->where('session_programme_id', $selectedSessionId);
+    })->get();
+
+return view('students.posts.index', compact('posts', 'companies'))
+    ->with('i', ($request->input('page', 1) - 1) * 90);
+
+}
+
+    public function downloadSample()
+    {
+        $path = storage_path('app/public/sample/students_post.csv');
+        if (file_exists($path)) {
+            return response()->download($path);
         }
-
-        // Get the IDs of the matching students
-        $studentIds = $students->pluck('id');
-
-        // Now fetch posts for these students
-        $posts = Post::whereIn('student_id', $studentIds)->get();
-
-
-        // Clone the query before pagination to get approved count
-        
-
-        $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId);
-        })->get();
-
-
-        return view('students-post.index', compact('posts', 'companies'))
-            ->with('i', ($request->input('page', 1) - 1) * 90);
-
+        abort(404);
     }
 }

@@ -2,14 +2,17 @@
 
 @section('content')
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2 class="fw-bold text-primary">📂 Download Center</h2>
-        
-        <!-- Upload Floating Button -->
-        <a href="{{ route('downloads.upload.page') }}" class="btn btn-primary shadow-sm">
-            <i class="fas fa-upload"></i> Upload Document
-        </a>
-    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap flex-md-nowrap">
+    <h2 class="fw-bold text-primary mb-0">
+        📂 Download Center
+    </h2>
+    
+    <!-- Smaller Upload Button -->
+    <a href="{{ route('downloads.upload.page') }}" class="btn btn-primary btn-sm shadow-sm mt-2 mt-md-0">
+        <i class="fas fa-upload me-1"></i> Upload
+    </a>
+</div>
+
 
     @if(session('success'))
         <div class="alert alert-success mt-3">{{ session('success') }}</div>

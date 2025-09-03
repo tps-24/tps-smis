@@ -40,15 +40,16 @@
                         <li class="mb-3">
                             <div class="card shadow-lg border-0 rounded-lg w-100">
                                 <div class="card-body">
-                                    <div class="d-flex mb-3 align-items-start">
-                                        @if ($announcement->expires_at > \Carbon\Carbon::now())
-                                            <img src="{{ asset('resources/assets/images/new_blinking.gif') }}"
-                                                 alt="new gif" style="width: 50px; margin-right: 10px; margin-top: -5px;">
-                                        @endif
-                                        <h4 class="card-title text-{{ $announcement->type }} mb-0">
-                                            {{ $announcement->title }}
-                                        </h4>
-                                    </div>
+<div class="d-flex mb-3">
+    @if ($announcement->expires_at > \Carbon\Carbon::now())
+        <img src="{{ asset('resources/assets/images/new_blinking.gif') }}"
+             alt="new gif" class="me-2 mt-1" style="width: 40px; height:auto;">
+    @endif
+    <h4 class="card-title text-{{ $announcement->type }} mb-0 lh-sm">
+        {{ $announcement->title }}
+    </h4>
+</div>
+
 
                                     <div class="card-text ms-4">
                                         <span id="preview-{{ $announcement->id }}">{{ $preview }}</span>

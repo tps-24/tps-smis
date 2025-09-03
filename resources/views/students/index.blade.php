@@ -18,65 +18,53 @@
 
 @section('content')
 @include('layouts.sweet_alerts.index')
-<div class="row">
-    @can('student-create')
-    <div class="col-2">
-        <a href="{{ route('uploadStudents') }}" class="btn btn-sm btn-primary">Upload Students</a>
+<div class="row flex-nowrap overflow-auto align-items-center g-2 justify-content-between">
+    <!-- Left: Upload / Update -->
+    <div class="d-flex col-auto gap-2">
+        @can('student-create')
+        <a href="{{ route('uploadStudents') }}" class="btn btn-sm btn-primary">Upload students</a>
+        @endcan
+        @can('student-edit')
+        <a href="{{ route('updateStudents') }}" class="btn btn-sm btn-secondary">Update students</a>
+        @endcan
     </div>
-    @endcan
-    @can('student-edit')
-    <div class="col-2">
-        <a href="{{ route('updateStudents') }}" class="btn btn-sm btn-secondary">Update Students</a>
-    </div>
-    @endcan
-    <div class="col-5 " style="float: right;">
-        <form class="d-flex" action="{{route('students.search')}}" method="GET">
+
+    <!-- Center: Search / Filter -->
+    <div class="col-auto mx-auto">
+        <form class="d-flex flex-nowrap gap-2 overflow-auto" action="{{ route('students.search') }}" method="GET" style="white-space: nowrap;">
             @csrf
             @method("POST")
-            <div class="d-flex">
-                <!-- Name Search -->
-                <input type="text" value="{{ request('name')}}" class="form-control me-2" name="name"
-                    placeholder="name(option)">
-                <!-- Company Dropdown -->
-                <select onchange="this.form.submit()" class="form-select me-2" name="company_id">
-                    <option value="" selected disabled>Select Company</option>
-                    @foreach ($companies as $company)
-                    <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                        {{ $company->name }}
-                    </option>
-                    @endforeach
-                </select>
-                <!-- Platoon Dropdown -->
-                <select onchange="this.form.submit()" class="form-select me-2" name="platoon">
-                    <option value="" selected disabled>Select Platoon</option>
-                    @for ($i = 1; $i < 15; $i++) <option value="{{ $i }}"
-                        {{ request('platoon') == $i ? 'selected' : '' }}> {{ $i }}</option>
-                        @endfor
-                </select>
-            </div>
+            <input type="text" name="name" value="{{ request('name') }}" class="form-control form-control-sm flex-shrink-0" style="width: 120px;" placeholder="Name">
+            <select name="company_id" onchange="this.form.submit()" class="form-select form-select-sm flex-shrink-0" style="width: 140px;">
+                <option value="" disabled {{ !request('company_id') ? 'selected' : '' }}>Company</option>
+                @foreach ($companies as $company)
+                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
+                @endforeach
+            </select>
+            <select name="platoon" onchange="this.form.submit()" class="form-select form-select-sm flex-shrink-0" style="width: 110px;">
+                <option value="" disabled {{ !request('platoon') ? 'selected' : '' }}>Platoon</option>
+                @for ($i = 1; $i < 15; $i++)
+                <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                @endfor
+            </select>
         </form>
     </div>
 
-
-
-    <!-- <div class="col col-lg-2">
-      <a class="btn btn-success btn-sm mb-2" href="{{url('students/create')}}">Create Student</a>
-    </div> -->
-    @can('student-create')
-    <div class="d-flex justify-content-end gap-2 col-3">
-        @if(request()->has('platoon'))
-        <a class="btn btn-success btn-sm mb-2"
-            href="{{ route('students.generatePdf', [request('platoon'),request('company_id')]) }}">
-            <i class="gap 2 bi bi-download"></i> Sheet
-        </a>
-        @endif
-        <a class="btn btn-success btn-sm mb-2" href="{{ url('students/create') }}">
-            <i class="fa fa-plus"></i> Create New Student
-        </a>
+    <!-- Right: Create / Sheet -->
+    <div class="d-flex col-auto gap-2 justify-content-end">
+        @can('student-create')
+            @if(request()->has('platoon'))
+            <a class="btn btn-success btn-sm flex-shrink-0" href="{{ route('students.generatePdf', [request('platoon'),request('company_id')]) }}">
+                <i class="bi bi-download"></i> Sheet
+            </a>
+            @endif
+            <a class="btn btn-success btn-sm flex-shrink-0" href="{{ url('students/create') }}">
+                <i class="fa fa-plus"></i> Create students
+            </a>
+        @endcan
     </div>
-
-    @endcan
 </div>
+
 <br>
 <center><span>Waliohakikiwa: {{ $approvedCount }}</span><center>
 </div>

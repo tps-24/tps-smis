@@ -79,4 +79,16 @@ class PostController extends Controller
     // Redirect back with a success message
     return redirect()->back() ->with('success', 'Post deleted successfully.');
     }
+
+    public function publish(Request $request, Post $post)
+    {
+
+        $post->status = $post->status == "published"? "pending": "published";
+        $post->published_by = $post->status == "published"? $request->user()->id: null;
+        $post->published_at = \Carbon\Carbon::now();
+        $post->save();
+
+        // Redirect back with a success message
+        return redirect()->back() ->with('success', 'Post '.$post->status.' successfully.');
+    }
 }

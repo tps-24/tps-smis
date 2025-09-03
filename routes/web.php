@@ -338,15 +338,21 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('safari-students', SafariStudentController::class);
     Route::resource('certificates', CertificateController::class);
     Route::resource('intake_history', IntakeHistoryController::class);
-    Route::resource('students-post', StudentPostController::class);
     Route::resource('posts', PostController::class);
+    
     Route::resource('companies', CompanyController::class);
     
 
     Route::prefix('students-post')->controller(StudentPostController::class)->group(function(){
         Route::post('bulkimport','import')->name('students-post.bulkimport');
         Route::get('search','search')->name('students-post.search');
+        Route::get('downloadSample','downloadSample')->name('students-post.downloadSample');
     });
+        Route::prefix('posts')->controller(PostController::class)->group(function(){
+        Route::post('publish/{post}','publish')->name('post.publish');
+    });
+    Route::resource('students-post', StudentPostController::class);
+    
     // Define the custom route first
 
     Route::prefix('companies')->controller(CompanyController::class)->group(function () {

@@ -28,46 +28,42 @@ $i = 0;
 <!-- Row starts -->
 <div class="row gx-4">
     <div class="col-sm-12">
-            <div class="row">
-                @can('student-create')
-                <div class="col-3">
-                    <a href="{{ route('uploadStaff') }}" class="btn btn-sm btn-primary">Upload Staff</a>
-                </div>
-                @endcan
-                @if (Auth::user()->hasPermissionTo('student-create'))
-                <div class="col-6 d-flex justify-content-center">
-                    @else
-                    <div class="d-flex justify-content-center">
-                        @endif
-                        <form class="d-flex" action="{{route('staff.search')}}" method="GET">
-                            @csrf
-                            @method("GET")
-                            <div class="d-flex gap-2">
-                              <label for="">Filter </label>
-                                <!-- Name Search -->
-                                <input type="text" name="name" value="{{ old('name', request('name')) }}" class="form-control me-2" placeholder="Name (optional)" autocapitalize="on">
-                                <!-- Company Dropdown -->
-                                <select onchange="this.form.submit()" class="form-select me-2" name="company_id"
-                                    >
-                                    <option value="" selected disabled>Select Company</option>
-                                    @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}"
-                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                        {{ $company->name }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                @can('student-create')
-                <div class="col" >
-                    <a class="btn btn-success mb-2 btn-sm" href="{{ route('staffs.create') }}"
-                        style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New Staff</a>
-                </div>
-                @endcan
-            </div>
+            <div class="row flex-nowrap overflow-auto align-items-center g-2 justify-content-between">
+    <!-- Left: Upload Staff -->
+    <div class="d-flex col-auto gap-2">
+        @can('student-create')
+        <a href="{{ route('uploadStaff') }}" class="btn btn-sm btn-primary">Upload Staff</a>
+        @endcan
+    </div>
+
+    <!-- Center: Filter Form -->
+    <div class="col-auto mx-auto">
+        <form class="d-flex flex-nowrap gap-2 overflow-auto" action="{{ route('staff.search') }}" method="GET" style="white-space: nowrap;">
+            @csrf
+            @method("GET")
+            <label class="d-flex align-items-center m-0">Filter</label>
+            <input type="text" name="name" value="{{ old('name', request('name')) }}" class="form-control form-control-sm flex-shrink-0" style="width: 120px;" placeholder="Name (optional)" autocapitalize="on">
+            <select name="company_id" onchange="this.form.submit()" class="form-select form-select-sm flex-shrink-0" style="width: 140px;">
+                <option value="" selected disabled>Select Company</option>
+                @foreach ($companies as $company)
+                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                    {{ $company->name }}
+                </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+
+    <!-- Right: Create New Staff -->
+    <div class="d-flex col-auto gap-2 justify-content-end">
+        @can('student-create')
+        <a class="btn btn-success btn-sm flex-shrink-0" href="{{ route('staffs.create') }}">
+            <i class="fa fa-plus"></i> Create New Staff
+        </a>
+        @endcan
+    </div>
+</div>
+
 
             <!-- Search container -->
 

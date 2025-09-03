@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('session_programme_id')->unique();
             $table->enum('status',['pending',['published']])->default('pending');
             $table->unsignedBigInteger('published_by')->nullable();
+            $table->timestamp('published_at');
             $table->timestamps();
 
             $table->foreign('published_by')->references('id')->on('users')->onupdate('update')->ondelete('null');

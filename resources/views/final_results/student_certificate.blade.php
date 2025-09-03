@@ -25,30 +25,34 @@
             </div>
         @endsession
 
-        <ul class="nav nav-tabs" id="companyTabs" role="tablist">
-            @php
-                $foundActiveTab = false;
-            @endphp
-            @foreach($companies as $company)
-                @php
-                    $hasStudents = $company->students->isNotEmpty();
-                    $isActive = !$foundActiveTab && $hasStudents;
-                @endphp
+        <ul class="nav nav-tabs d-flex flex-nowrap" id="companyTabs" role="tablist">
+    @php
+        $foundActiveTab = false;
+    @endphp
+    @foreach($companies as $company)
+        @php
+            $hasStudents = $company->students->isNotEmpty();
+            $isActive = !$foundActiveTab && $hasStudents;
+        @endphp
 
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $isActive ? 'active' : '' }}" id="tab-{{ $company->id }}" data-bs-toggle="tab"
-                        data-bs-target="#company-{{ $company->id }}" type="button" role="tab"
-                        aria-controls="company-{{ $company->id }}" aria-selected="{{ $isActive ? 'true' : 'false' }}">
-                        {{ $company->description }}
-                    </button>
-                </li>
+        <li class="nav-item" role="presentation" style="flex: 0 0 auto;">
+            <button class="nav-link {{ $isActive ? 'active' : '' }}"
+                id="tab-{{ $company->id }}" 
+                data-bs-toggle="tab"
+                data-bs-target="#company-{{ $company->id }}" 
+                type="button" role="tab"
+                aria-controls="company-{{ $company->id }}" 
+                aria-selected="{{ $isActive ? 'true' : 'false' }}">
+                {{ $company->description }}
+            </button>
+        </li>
 
-                @php
-                    if ($isActive)
-                        $foundActiveTab = true;
-                @endphp
-            @endforeach
-        </ul>
+        @php
+            if ($isActive) $foundActiveTab = true;
+        @endphp
+    @endforeach
+</ul>
+
 
         <div class="tab-content" id="companyTabContent">
             @php
@@ -65,26 +69,25 @@
                     aria-labelledby="tab-{{ $company->id }}">
 
                     <div class="card my-3">
-                        <div class="col-6" style="float: right;">
-                            <form action="{{ route('students.search_certificate', $company->id) }}" method="GET">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-4">
-                                        <label>Filter by Platoon</label>
-                                    </div>
-                                    <div class="col-6">
-                                        <select onchange="this.form.submit()" class="form-select me-2" name="platoon" required>
-                                            <option value="" selected disabled>Select Platoon</option>
-                                            @for ($i = 1; $i < 15; $i++)
-                                                <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
-                                                    {{ $i }}
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                        <div class="col-12 col-md-3">
+    <form action="{{ route('students.search_certificate', $company->id) }}" method="GET">
+        @csrf
+        <div class="row align-items-center">
+            <label class="col-auto mb-0">Filter by Platoon</label>
+            <div class="col">
+                <select onchange="this.form.submit()" class="form-select" name="platoon" required>
+                    <option value="" selected disabled>Select Platoon</option>
+                    @for ($i = 1; $i < 15; $i++)
+                        <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
+                            {{ $i }}
+                        </option>
+                    @endfor
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
 
                         @php $selectedSession = session('selected_session'); @endphp
 

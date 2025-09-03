@@ -37,27 +37,33 @@
 
 @section('content')
     <div class="container">
-    @include('layouts.sweet_alerts.index')
+        @include('layouts.sweet_alerts.index')
         @php
             $i = 1;
             $j = 1;
         @endphp
         <h2>Beats for {{ $date }}</h2>
 
-        <div class="form-container">
+        <div class="row form-container g-2 align-items-center">
             @can('beat-create')
-            <form id="generateBeatsForm" method="POST" action="{{ route('beats.fillBeats') }}" class="form-inline my-3 pull-right">
-                @csrf
-                <input type="date" name="date" min="{{ Carbon\Carbon::today()->format('Y-m-d') }}" class="form-control"
-                    required>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Generate Beats</button>
-            </form>
+                <div class="col-12 col-md-3">
+                    <form id="generateBeatsForm" method="POST" action="{{ route('beats.fillBeats') }}" class="d-flex gap-2">
+                        @csrf
+                        <input type="date" name="date" min="{{ Carbon\Carbon::today()->format('Y-m-d') }}" class="form-control"
+                            required>
+                        <button type="submit" class="btn btn-primary flex-grow-1">Generate</button>
+                    </form>
+                </div>
             @endcan
-            <form action="{{ route('beats.byDate') }}" method="GET" class="form-inline mb-4">
-                <input type="date" name="date" class="form-control" value="{{ $date }}">
-                <button type="submit" class="btn btn-primary">Filter</button>
-            </form>
+
+            <div class="col-12 col-md-3 ms-md-auto">
+                <form action="{{ route('beats.byDate') }}" method="GET" class="d-flex gap-2">
+                    <input type="date" name="date" class="form-control" value="{{ $date }}">
+                    <button type="submit" class="btn btn-primary btn-sm px-3">Filter</button>
+                </form>
+            </div>
         </div>
+
 
         <div id="responseMessage" class="mt-4"></div>
 
@@ -94,7 +100,7 @@
                             </div>
 
                         </div>
-                        <div class="card-body">
+                        <div class="card-body table-responsive">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -110,42 +116,42 @@
                                 </thead>
                                 <tbody>
                                     @foreach($company->guardAreas as $area)
-                                                        @foreach($area->beats as $beat)
-                                                                            <tr>
-                                                                                <td>{{ $i++ }}</td>
-                                                                                <td>{{ $beat->beatType->name }}</td>
-                                                                                <td>
-                                                                                    @if($beat->guardArea_id)
-                                                                                        {{ $beat->guardArea->name ?? '' }}
-                                                                                    @elseif($beat->patrolArea_id)
-                                                                                        {{ $beat->patrolArea->start_area ?? '' }} - {{ $beat->patrolArea->end_area ?? '' }}
-                                                                                    @endif
-                                                                                </td>
-                                                                                <td>
-                                                                                    @php
-                                                                                        $studentIds = is_array($beat->student_ids) ? $beat->student_ids : json_decode($beat->student_ids, true);
-                                                                                        $students = \App\Models\Student::whereIn('id', $studentIds)->get();
-                                                                                    @endphp
-                                                                                    @foreach($students as $student)
-                                                                                        {{ $student->first_name }} {{ $student->last_name }} (PLT {{ $student->platoon }})
-                                                                                        (Gender: {{ $student->gender }})<br>
-                                                                                    @endforeach
-                                                                                </td>
-                                                                                <td>{{ $beat->date }}</td>
-                                                                                <td>{{ $beat->start_at }}</td>
-                                                                                <td>{{ $beat->end_at }}</td>
-                                                                                <td class="d-flex gap-2">
-                                                                                    <a href="{{route('beats.create-exchange', $beat)}}"><button
-                                                                                            class="btn btn-secondary btn-sm">Exchange</button></a>
-                                                                                    <a href="{{route('beats.edit', $beat->id)}}"><button
-                                                                                            class="btn btn-primary btn-sm">Edit</button></a>
-                                                                                    <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
-                                                                                                                                                        @csrf @method('DELETE')
-                                                                                                                                                        <button class="btn btn-danger btn-sm">Delete</button>
-                                                                                                                                                    </form> -->
-                                                                                </td>
-                                                                            </tr>
-                                                        @endforeach
+                                        @foreach($area->beats as $beat)
+                                            <tr>
+                                                <td>{{ $i++ }}</td>
+                                                <td>{{ $beat->beatType->name }}</td>
+                                                <td>
+                                                    @if($beat->guardArea_id)
+                                                        {{ $beat->guardArea->name ?? '' }}
+                                                    @elseif($beat->patrolArea_id)
+                                                        {{ $beat->patrolArea->start_area ?? '' }} - {{ $beat->patrolArea->end_area ?? '' }}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $studentIds = is_array($beat->student_ids) ? $beat->student_ids : json_decode($beat->student_ids, true);
+                                                        $students = \App\Models\Student::whereIn('id', $studentIds)->get();
+                                                    @endphp
+                                                    @foreach($students as $student)
+                                                        {{ $student->first_name }} {{ $student->last_name }} (PLT {{ $student->platoon }})
+                                                        (Gender: {{ $student->gender }})<br>
+                                                    @endforeach
+                                                </td>
+                                                <td>{{ $beat->date }}</td>
+                                                <td>{{ $beat->start_at }}</td>
+                                                <td>{{ $beat->end_at }}</td>
+                                                <td class="d-flex gap-2">
+                                                    <a href="{{route('beats.create-exchange', $beat)}}"><button
+                                                            class="btn btn-secondary btn-sm">Exchange</button></a>
+                                                    <a href="{{route('beats.edit', $beat->id)}}"><button
+                                                            class="btn btn-primary btn-sm">Edit</button></a>
+                                                    <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
+                                                                                                                                                                        @csrf @method('DELETE')
+                                                                                                                                                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                                                                                                                                                    </form> -->
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     @endforeach
                                 </tbody>
                             </table>
@@ -156,7 +162,7 @@
                         <div class="card-header">
                             <h3>Patrol Areas</h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body table-responsive">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -172,42 +178,42 @@
                                 </thead>
                                 <tbody>
                                     @foreach($company->patrolAreas as $area)
-                                                        @foreach($area->beats as $beat)
-                                                                            <tr>
-                                                                                <td>{{ $j++ }}</td>
-                                                                                <td>{{ $beat->beatType->name }}</td>
-                                                                                <td>
-                                                                                    @if($beat->guardArea_id)
-                                                                                        {{ $beat->guardArea->name ?? '' }}
-                                                                                    @elseif($beat->patrolArea_id)
-                                                                                        {{ $beat->patrolArea->start_area ?? '' }} - {{ $beat->patrolArea->end_area ?? '' }}
-                                                                                    @endif
-                                                                                </td>
-                                                                                <td>
-                                                                                    @php
-                                                                                        $studentIds = is_array($beat->student_ids) ? $beat->student_ids : json_decode($beat->student_ids, true);
-                                                                                        $students = \App\Models\Student::whereIn('id', $studentIds)->get();
-                                                                                    @endphp
-                                                                                    @foreach($students as $student)
-                                                                                        {{ $student->first_name }} {{ $student->last_name }} (PLT {{ $student->platoon }})
-                                                                                        (Gender: {{ $student->gender }})<br>
-                                                                                    @endforeach
-                                                                                </td>
-                                                                                <td>{{ $beat->date }}</td>
-                                                                                <td>{{ $beat->start_at }}</td>
-                                                                                <td>{{ $beat->end_at }}</td>
-                                                                                <td class="d-flex gap-2">
-                                                                                    <a href="{{route('beats.create-exchange', $beat)}}"><button
-                                                                                            class="btn btn-secondary btn-sm">Exchange</button></a>
-                                                                                    <a href="{{route('beats.edit', $beat->id)}}"><button
-                                                                                            class="btn btn-primary btn-sm">Edit</button></a>
-                                                                                    <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
-                                                                                                                                                        @csrf @method('DELETE')
-                                                                                                                                                        <button class="btn btn-danger btn-sm">Delete</button>
-                                                                                                                                                    </form> -->
-                                                                                </td>
-                                                                            </tr>
-                                                        @endforeach
+                                        @foreach($area->beats as $beat)
+                                            <tr>
+                                                <td>{{ $j++ }}</td>
+                                                <td>{{ $beat->beatType->name }}</td>
+                                                <td>
+                                                    @if($beat->guardArea_id)
+                                                        {{ $beat->guardArea->name ?? '' }}
+                                                    @elseif($beat->patrolArea_id)
+                                                        {{ $beat->patrolArea->start_area ?? '' }} - {{ $beat->patrolArea->end_area ?? '' }}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $studentIds = is_array($beat->student_ids) ? $beat->student_ids : json_decode($beat->student_ids, true);
+                                                        $students = \App\Models\Student::whereIn('id', $studentIds)->get();
+                                                    @endphp
+                                                    @foreach($students as $student)
+                                                        {{ $student->first_name }} {{ $student->last_name }} (PLT {{ $student->platoon }})
+                                                        (Gender: {{ $student->gender }})<br>
+                                                    @endforeach
+                                                </td>
+                                                <td>{{ $beat->date }}</td>
+                                                <td>{{ $beat->start_at }}</td>
+                                                <td>{{ $beat->end_at }}</td>
+                                                <td class="d-flex gap-2">
+                                                    <a href="{{route('beats.create-exchange', $beat)}}"><button
+                                                            class="btn btn-secondary btn-sm">Exchange</button></a>
+                                                    <a href="{{route('beats.edit', $beat->id)}}"><button
+                                                            class="btn btn-primary btn-sm">Edit</button></a>
+                                                    <!-- <form action="{{ route('beats.destroy', $beat->id) }}" method="POST">
+                                                                                                                                                                        @csrf @method('DELETE')
+                                                                                                                                                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                                                                                                                                                    </form> -->
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     @endforeach
                                 </tbody>
                             </table>

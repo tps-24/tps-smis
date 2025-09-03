@@ -19,7 +19,7 @@
 @section('content')
     @include('layouts.sweet_alerts.index')
     <div class="d-flex justify-content-between">
-        <a href="{{ route('studentDownloadSample') }}"><button style="height: 30px;" class="btn btn-sm btn-success"><i
+        <a href="{{ route('students-post.downloadSample') }}"><button style="height: 30px;" class="btn btn-sm btn-success"><i
                     class="bi bi-download"></i>&nbsp&nbspDownload sample for Uploading posts</button></a>
     </div>
     <div class="mt-3">

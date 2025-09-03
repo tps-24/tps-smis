@@ -22,23 +22,29 @@
         $i = 0;
         use Carbon\Carbon;
     @endphp
-    <div style="display: flex; justify-content: end;">
-        <a href="{{ route('timesheets.create') }}"><button class="btn btn-sm btn-success">New Time Sheet</button></a>
-    </div>
-    <div class="card">
-        <div class="card-body">
-        <form action="{{ route('timesheets.filter') }}" method="POST" class="form-inline mb-4">
-            @csrf
-            @method('POST')
-            <div style="width: 50%;" class="d-flex gap-2">
-                    <label for="">Start </label>
-                    <input style="width: 50%;" max="{{Carbon::today()->format('Y-m-d') }}" type="date" @if(isset($start_date)) value="{{ Carbon::parse($start_date)->format('Y-m-d') }}" @endif name="start_date" class="form-control" value="">
-                    <label for="">End </label>
-                    <input style="width: 50%;" max="{{Carbon::today()->format('Y-m-d') }}" type="date" @if(isset($start_date)) value="{{ Carbon::parse($end_date)->format('Y-m-d') }}" @endif name="end_date" class="form-control" value="">
-                <button  type="submit" class="btn btn-primary">Filter</button>                
-            </div>
+            <form action="{{ route('timesheets.filter') }}" method="POST" class="d-flex flex-nowrap align-items-center gap-2 overflow-auto">
+                @csrf
+                @method('POST')
 
+                <!-- Start Date -->
+                <label class="d-flex align-items-center m-0">Start</label>
+                <input type="date" name="start_date" max="{{ Carbon::today()->format('Y-m-d') }}" 
+                    @if(isset($start_date)) value="{{ Carbon::parse($start_date)->format('Y-m-d') }}" @endif
+                    class="form-control form-control-sm flex-shrink-0" style="width: 130px;">
+
+                <!-- End Date -->
+                <label class="d-flex align-items-center m-0">End</label>
+                <input type="date" name="end_date" max="{{ Carbon::today()->format('Y-m-d') }}" 
+                    @if(isset($end_date)) value="{{ Carbon::parse($end_date)->format('Y-m-d') }}" @endif
+                    class="form-control form-control-sm flex-shrink-0" style="width: 130px;">
+
+                <!-- Filter Button -->
+                <button type="submit" class="btn btn-primary btn-sm flex-shrink-0">Filter</button>
+
+                <!-- Push New Time Sheet Button to the end -->
+                <a href="{{ route('timesheets.create') }}" class="btn btn-success btn-sm flex-shrink-0 ms-auto">New Time Sheet</a>
             </form>
+
             @if (count($timesheets) > 0)
                 <div class="table-outer">
                     <div class="table-responsive">
@@ -131,9 +137,6 @@
                                 @endforeach
                             </tbody>
                         </table>
-
-                    </div>
-                </div>
             @else
                 No time Sheets available.
             @endif

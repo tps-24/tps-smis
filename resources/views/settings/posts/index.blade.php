@@ -22,7 +22,7 @@
       <div class="card-header"></div>
       <div class="pull-right">
 <button id="addPlatoonBtn" 
-        class="btn btn-success mb-3" 
+        class="btn btn-success btn-sm mb-3" 
         style="float:right !important; margin-right:1%"
         data-bs-toggle="modal" 
         data-bs-target="#platoonModal">
@@ -60,13 +60,23 @@
                           {{ ucfirst($post->status) }}
                       </span>
                     </td>
-                    <td>{{ $post->publisher }}</td>
+                    <td>{{ $post->publisher?->name }}</td>
                     <td class="d-flex gap-2">
+                    <form id="publishForm{{ $post->id }}" action="{{ route('post.publish', $post->id) }}" method="post">
+                        @csrf
+                        @if($post->status == 'pending')
+                          <button class="btn btn-sm btn-primary" type="button" onclick="confirmAction('publishForm{{ $post->id }}', 'Publish Post','Post','Publish')">Publish</button>
+                        @else
+                          <button class="btn btn-sm btn-warning" type="button" onclick="confirmAction('publishForm{{ $post->id }}', 'Unpublish Post','Post','Unpublish')">Unpublish</button>
+                        @endif
+                      </form>
+                    @if($post->status == 'pending')
                     <form id="deleteForm{{ $post->id }}" action="{{ route('posts.destroy', $post->id) }}" method="post">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-danger" type="button" onclick="confirmAction('deleteForm{{ $post->id }}', 'Delete Post','Post','Delete')">Delete</button>
                     </form>
+                    @endif
                     </td>
                   </tr>
                   @endforeach

@@ -86,7 +86,7 @@
                 @endif
 
                 <div class="mb-3">
-                    <label for="location" class="form-label fw-semibold">📍 Location</label>
+                    <label for="location" class="form-label fw-semibold">📌 Location</label>
                     <input type="text" name="location" id="location" class="form-control" required>
                 </div>
 
@@ -105,9 +105,9 @@
                     <input type="file" name="attachments" id="attachments" class="form-control">
                 </div>
 
-                <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        ✅ Submit Leave Request
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-success btn-sm">
+                        Request
                     </button>
                 </div>
             </form>

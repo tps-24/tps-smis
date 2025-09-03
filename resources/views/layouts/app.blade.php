@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <!-- Bootstrap JS (ensure this is included) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -15,18 +15,27 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
-    <link href="../resources/sass/app.scss" rel="stylesheet">
 
-    <!-- Scripts -->
+    <!-- Styles -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-    
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <style>
+        /* Prevent horizontal scroll */
+        body {
+            overflow-x: hidden;
+        }
+        .card, .card-body, .form-control, .form-select {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
+            <div class="container-fluid"><!-- use fluid container to avoid overflow -->
                 <a class="navbar-brand" href="{{ url('/') }}">
                     Laravel 11 User Roles and Permissions - TPS RMS
                 </a>
@@ -36,13 +45,10 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-
-                    </ul>
+                    <ul class="navbar-nav me-auto"></ul>
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">
@@ -63,14 +69,12 @@
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}
                                 </a>
-
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
+                                                 document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
-
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
@@ -82,12 +86,14 @@
             </div>
         </nav>
 
+        <!-- Main content -->
         <main class="py-4">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-md-12">
+            <div class="container-fluid"><!-- fluid to take full width -->
+                <div class="row justify-content-center mx-0"><!-- remove negative margin -->
+                    <div class="col-12"><!-- full width on all screens -->
                         <div class="card">
                             <div class="card-body">
+                                @yield('scrumb')
                                 @yield('content')
                             </div>
                         </div>
@@ -95,7 +101,7 @@
                 </div>
             </div>
         </main>
-        
+
     </div>
 </body>
 </html>

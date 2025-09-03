@@ -10,31 +10,32 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-4">
-                    <h6>Daily Count</h6>
-                    <p>{{ $dailyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'daily', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
-                        class="btn btn-info">
-                        View Daily Patients
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <h6>Weekly Count</h6>
-                    <p>{{ $weeklyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'weekly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
-                        class="btn btn-info">
-                        View Weekly Patients
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <h6>Monthly Count</h6>
-                    <p>{{ $monthlyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'monthly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
-                        class="btn btn-info">
-                        View Monthly Patients
-                    </a>
-                </div>
-            </div>
+    <div class="col-4 col-md-4">
+        <h6>Daily </h6>
+        <p>{{ $dailyCount }} </p>
+        <a href="{{ route('hospital.viewDetails', ['timeframe' => 'daily', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+            class="btn btn-info btn-sm">
+            View  
+        </a>
+    </div>
+    <div class="col-4 col-md-4">
+        <h6>Weekly </h6>
+        <p>{{ $weeklyCount }} </p>
+        <a href="{{ route('hospital.viewDetails', ['timeframe' => 'weekly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+            class="btn btn-info btn-sm">
+            View  
+        </a>
+    </div>
+    <div class="col-4 col-md-4">
+        <h6>Monthly </h6>
+        <p>{{ $monthlyCount }} </p>
+        <a href="{{ route('hospital.viewDetails', ['timeframe' => 'monthly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+            class="btn btn-info btn-sm">
+            View  
+        </a>
+    </div>
+</div>
+
         </div>
     </div>
 
@@ -101,14 +102,9 @@
                         <td>{{ $student->platoon ?? 'N/A' }}</td>
                         <td>{{ $student->company->name ?? 'N/A' }}</td>
                         <td>
-
-
-
-                            
-
                             <button class="btn btn-primary"
                                 onclick="sendForApproval({{ $student->id }}, '{{ $student->first_name }}', '{{ $student->last_name }}')">
-                                Send for Approval
+                                Send
                             </button>
 
                             <script>

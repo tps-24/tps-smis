@@ -77,7 +77,7 @@
                                             @can('teacher_on_duty-assign')
                                             <div class="text-end">
                                                 <button type="submit" class="btn btn-primary btn-sm">
-                                                    <i class="fa-solid fa-plus"></i> Assign
+                                                    <i class="fa-solid fa-plus"></i> Unassign
                                                 </button>
                                             </div>
                                             @endcan

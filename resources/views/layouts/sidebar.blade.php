@@ -116,9 +116,9 @@
                     </li>
                     @endcan()
                     @can('post-view')
-                    <!-- <li>
+                     <li>
                         <a href="{{ route('students-post.index') }}">Students Post</a>
-                    </li> -->
+                    </li> 
                     @endcan()
                     @can('student-create')
                     <li>

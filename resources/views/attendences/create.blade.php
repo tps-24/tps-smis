@@ -19,29 +19,27 @@
 @section('content')
     <h5>Please check present students.</h5>
     <form action="
-        @if(isset($attendence))
-            {{url('attendences/' . $attendence->id . '/update')}}
-        @else
-            {{url('attendences/' . $attendenceType->id . '/' . $platoon->id . '/store')}}
-        @endif
+            @if(isset($attendence))
+                {{url('attendences/' . $attendence->id . '/update')}}
+            @else
+                {{url('attendences/' . $attendenceType->id . '/' . $platoon->id . '/store')}}
+            @endif
 
-    " method="POST">
+        " method="POST">
         @csrf
         @method('POST')
         <div class="row">
             @foreach($students as $student)
-                <div class="col-6">
+                <div class="col-12 col-sm-6 mb-2">
                     <div class="form-check">
                         <input class="form-check-input" onclick="updateSelectAll()" type="checkbox" name="student_ids[]"
-                            value="{{$student->id}}" id="">
-                        <label class="form-check-label" for="flexCheckDefault">
+                            value="{{$student->id}}" id="student-{{$student->id}}">
+                        <label class="form-check-label" for="student-{{$student->id}}">
                             {{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
                         </label>
                     </div>
                 </div>
-
             @endforeach
-
         </div>
         <input type="text" name="date" value="{{ $date }}" hidden>
         <div class=" mt-4">
@@ -56,7 +54,19 @@
             <button id="submit_btn" disabled type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
+    <style>
+        /* Optional: shrink checkbox and label on mobile */
+        @media (max-width: 576px) {
+            .form-check-input {
+                width: 1rem;
+                height: 1rem;
+            }
 
+            .form-check-label {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
     <script>
         // JavaScript function to toggle the state of checkboxes
         function toggleSelectAll(source) {

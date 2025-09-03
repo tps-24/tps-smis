@@ -14,15 +14,6 @@
                 </option>
             @endforeach
         </select>
-        <!-- <select name="platoon" class="form-select me-2">
-            <option value="">Select Platoon</option>
-            @for ($i = 1; $i <= 15; $i++)
-                <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
-                    {{ $i }}
-                </option>
-            @endfor
-        </select> -->
-
         <button type="submit" class="btn btn-primary">Filter</button>
     </form>
 </div>
@@ -32,32 +23,33 @@
             <h5 class="card-title">Statistics</h5>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <h6>Daily Count</h6>
-                    <p>{{ $dailyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'daily', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
-                        class="btn btn-info">
-                        View Daily Patients
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <h6>Weekly Count</h6>
-                    <p>{{ $weeklyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'weekly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
-                        class="btn btn-info">
-                        View Weekly Patients
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <h6>Monthly Count</h6>
-                    <p>{{ $monthlyCount }} Patients</p>
-                    <a href="{{ route('hospital.viewDetails', ['timeframe' => 'monthly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
-                        class="btn btn-info">
-                        View Monthly Patients
-                    </a>
-                </div>
-            </div>
+<div class="row">
+    <div class="col-4 col-md-4">
+        <h6>Daily </h6>
+        <p>{{ $dailyCount }} </p>
+        <a href="{{ route('hospital.viewDetails', ['timeframe' => 'daily', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+            class="btn btn-info btn-sm">
+            View  
+        </a>
+    </div>
+    <div class="col-4 col-md-4">
+        <h6>Weekly </h6>
+        <p>{{ $weeklyCount }} </p>
+        <a href="{{ route('hospital.viewDetails', ['timeframe' => 'weekly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+            class="btn btn-info btn-sm">
+            View  
+        </a>
+    </div>
+    <div class="col-4 col-md-4">
+        <h6>Monthly </h6>
+        <p>{{ $monthlyCount }} </p>
+        <a href="{{ route('hospital.viewDetails', ['timeframe' => 'monthly', 'company_id' => request('company_id'), 'platoon' => request('platoon')]) }}"
+            class="btn btn-info btn-sm">
+            View  
+        </a>
+    </div>
+</div>
+
         </div>
     </div>
 
@@ -68,7 +60,7 @@
     <div class="card-header">
         <h5 class="card-title mb-3">
             {{ $date }}
-             Patient Distribution</h5>
+              Distribution</h5>
             <form action="{{route('dispensary.page')}}" method="get" class="col-sm-4 d-flex gap-2">
                 <label for="" class="form-label">Monthly</label>
                 <div class="col-sm-6">
