@@ -5,9 +5,11 @@
     <h2>Weapon Details</h2>
 
     <p><strong>Serial Number:</strong> {{ $weapon->serial_number }}</p>
-    <p><strong>Model:</strong> {{ $weapon->weapon_model }}</p>
-    <p><strong>Category:</strong> {{ $weapon->category }}</p>
-    <p><strong>Specification:</strong> {{ $weapon->specification }}</p>
+  <p><strong>Model:</strong> {{ $weapon->model->name ?? 'N/A' }}</p>
+<p><strong>Weapon Type:</strong> {{ $weapon->model->type->name ?? 'N/A' }}</p>
+<p><strong>Category:</strong> {{ $weapon->model->category->name ?? 'N/A' }}</p>
+
+   
 
 @php
     $latestHandover = $weapon->handovers->sortByDesc('handover_date')->first();
@@ -45,9 +47,8 @@
                 <th>Status</th>
                 <th>Handover Date</th>
                 <th>Return Date</th>
-                <th>Purpose (Staff)</th>
-               
-                <th>Condition on Return</th>
+                <th>Purpose </th>
+        
                 <th>Action</th>
             </tr>
         </thead>
@@ -58,15 +59,19 @@
                 <td>{{ ucfirst($handover->status) }}</td>
                 <td>{{ $handover->handover_date }}</td>
                 <td>{{ $handover->return_date ?? 'N/A' }}</td>
-                <td>{{ $handover->purpose_staff ?? 'N/A' }}</td>
+                <td>{{ $handover->purpose?? 'N/A' }}</td>
                
-                <td>{{ $handover->condition_on_return ?? 'N/A' }}</td>
+          
                 <td>
                     @if($handover->status == 'assigned')
-                        <form method="POST" action="{{ route('handover.return', $handover) }}">
-                            @csrf
-                            <button class="btn btn-sm btn-danger">Mark as Returned</button>
-                        </form>
+                       
+                        <form action="{{ route('handovers.return', $handover->id) }}" method="POST" style="display:inline;">
+    @csrf
+    <button type="submit" class="btn btn-success btn-sm">
+        Mark as Returned
+    </button>
+</form>
+
                     @else
                         <span class="badge bg-success">Returned</span>
                     @endif
