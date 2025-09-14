@@ -11,7 +11,6 @@ class Handover extends Model
     'staff_id',
     'handover_date',
     'return_date',
-    //'actual_return_date',
     'purpose',
     'remarks',
     'status',

@@ -11,17 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('weapon_handovers', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('weapon_id')->constrained()->onDelete('cascade');
-    $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
+        Schema::create('weapon_handovers', function (Blueprint $table) {
+            $table->id();
+            
+            $table->foreignId('weapon_id')
+                ->constrained('weapons') 
+                ->onDelete('cascade');
+            
+            $table->unsignedBigInteger('staff_id'); 
+            $table->foreign('staff_id')
+                ->references('id')
+                ->on('staff') 
+                ->onDelete('cascade');
 
-   // $table->foreignId('staff_id')->constrained('armories')->onDelete('cascade'); // who received
-    $table->enum('status', ['assigned', 'returned'])->default('assigned');
-    $table->text('remarks')->nullable();
-    $table->timestamp('handover_date');
-    $table->timestamp('return_date')->nullable();
-    $table->timestamps();
+            $table->enum('status', ['assigned', 'returned'])->default('assigned');
+            $table->text('remarks')->nullable();
+            $table->timestamp('handover_date');
+            $table->timestamp('return_date')->nullable(); 
+            $table->text('purpose')->nullable();
+            $table->timestamps();
         });
     }
 

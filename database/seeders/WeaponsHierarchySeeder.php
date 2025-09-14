@@ -11,9 +11,7 @@ class WeaponsHierarchySeeder extends Seeder
 {
     public function run()
     {
-        // Wipe old data (optional for testing)
-      
-        
+       
 
         // 1️⃣ Categories
         $categories = [

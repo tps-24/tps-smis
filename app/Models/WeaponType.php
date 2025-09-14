@@ -9,23 +9,15 @@ class WeaponType extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'description',
-    ];
+    protected $fillable = ['name', 'category_id'];
 
-    /**
-     * A weapon type can have many weapon models.
-     */
-   
+    
+
     public function models()
-{
-    return $this->hasMany(WeaponModel::class, 'weapon_type_id');
-}
-
-
-
-public function category()
+    {
+        return $this->hasMany(WeaponModel::class);
+    }
+    public function category()
 {
     return $this->belongsTo(Category::class, 'category_id');
 }

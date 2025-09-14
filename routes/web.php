@@ -636,25 +636,17 @@ Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->n
     // Store leave request
     Route::post('/leave-request', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
 
-// RESTful resource routes
-//Route::resource('weapons', WeaponController::class);
-//Route::resource('officers', OfficerController::class);
-//Route::resource('movements', MovementController::class);
-//Route::resource('shifts', ShiftController::class);
-
 
 Route::resource('weapons', WeaponController::class);
+Route::get('/weapons/{weapon}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
+Route::post('/weapons/{weapon}/handover', [WeaponController::class, 'storeHandover'])->name('weapons.handover.store');
 
-// Weapon Handover
-Route::get('/weapons/{weapon}/handover', [WeaponHandoverController::class, 'create'])->name('weapons.handover');
-Route::post('/weapons/{weapon}/handover', [WeaponHandoverController::class, 'store']);
-Route::post('/handover/{handover}/return', [WeaponHandoverController::class, 'returnWeapon'])->name('handover.return');
-
-// Shifts
-Route::resource('shifts', ShiftController::class);
-//Route::get('/weapons/{id}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
+// Mark as returned
+Route::post('/handovers/{handover}/return', [WeaponController::class, 'returnWeapon'])->name('handovers.return');
 
 Route::get('/weapons/{id}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
-Route::post('/weapons/{weapon}/handover', [WeaponController::class, 'handoverStore'])->name('weapons.handover.store');
-Route::post('/handover/{id}/return', [WeaponController::class, 'markAsReturned'])
-    ->name('handover.return');
+Route::post('/handover/{id}/return', [WeaponController::class, 'markAsReturned']) ->name('handover.return');
+    
+Route::get('weapons/create', [WeaponController::class, 'create'])->name('weapons.create');
+Route::post('weapons', [WeaponController::class, 'store'])->name('weapons.store');
+

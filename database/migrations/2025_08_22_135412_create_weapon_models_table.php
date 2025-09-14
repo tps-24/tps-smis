@@ -11,7 +11,6 @@ return new class extends Migration
         Schema::create('weapon_models', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Example: AK-47, Glock 17, M4A1
-            $table->text('description')->nullable();
 
             // Foreign key to weapon_types
             $table->unsignedBigInteger('weapon_type_id')->nullable();

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('weapon_types', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();   // e.g. "Rifle", "Pistol", "Machine Gun"
-            $table->text('description')->nullable();
+           // $table->text('description')->nullable();
          $table->unsignedBigInteger('category_id')->nullable();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
 
