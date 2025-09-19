@@ -1,6 +1,8 @@
 @extends('layouts.main')
 
 @section('content')
+<div class="card mb-3">
+  
 <div class="container">
     <h2>All Weapons</h2>
     
@@ -43,8 +45,8 @@
             <tr>
                 <th>Serial Number</th>
                 <th>Model</th>
+                <th>Weapon Type</th>
                 <th>Category</th>
-                <th>Specification</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -52,9 +54,10 @@
             @forelse($weapons as $weapon)
                 <tr>
                     <td>{{ $weapon->serial_number }}</td>
-                    <td>{{ $weapon->weapon_model }}</td>
-                    <td>{{ $weapon->category }}</td>
-                    <td>{{ $weapon->specification }}</td>
+                   <td>{{ $weapon->model->name ?? 'N/A' }}</td>
+                   <td>{{ $weapon->model->type->name ?? 'N/A' }}</td>
+                   <td>{{ $weapon->model->category->name ?? 'N/A' }}</td>
+
                     <td>
                         <a href="{{ route('weapons.edit', $weapon) }}" class="btn btn-warning btn-sm">Edit</a>
                         <a href="{{ route('weapons.show', $weapon) }}" class="btn btn-info btn-sm">View</a>

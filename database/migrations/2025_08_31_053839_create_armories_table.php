@@ -9,15 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-       Schema::create('armories', function (Blueprint $table) {
-    $table->id();
-    $table->string('staff_id');
-   
-    $table->timestamps();
-        });
-    }
+    public function up()
+{
+    Schema::create('armories', function (Blueprint $table) {
+        $table->id();
+        $table->string('location');
+        $table->string('staff_id');
+        $table->timestamps();
+    });
+}
+
 
     /**
      * Reverse the migrations.
