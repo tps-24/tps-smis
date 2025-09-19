@@ -8,6 +8,7 @@ use App\Models\FinalResult;
 use App\Models\Programme;
 use App\Models\Semester;
 use App\Models\SemesterExam;
+use App\Models\SessionProgramme;
 use App\Models\Student;
 use App\Services\FinalResultService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -436,4 +437,50 @@ class FinalResultController extends Controller
         ]);
     }
 
+     public function generateAll()
+    {
+        
+        $sessionId =  session('selected_session',1);
+
+        $session = SessionProgramme::with(['programmeCourseSemesters.course', 'programmeCourseSemesters.programme'])
+        ->findOrFail($sessionId);
+    $courses = $session->programmeCourseSemesters->map(function ($pcs) {
+        return [
+            'course_id'   => $pcs->course->id,
+            'courseCode'  => $pcs->course->courseCode,
+            'courseName'  => $pcs->course->courseName,
+            'programmeId' => $pcs->programme->id,
+            'programme'   => $pcs->programme->programmeName,
+            'semesterId'  => $pcs->semester_id,
+            'courseType'  => $pcs->course_type,
+            'creditWeight'=> $pcs->credit_weight,
+        ];
+    });
+        return $courses;
+        $enrollments = Enrollment::all();
+
+        foreach ($enrollments as $enrollment) {
+            $resultData = $this->finalResultService->calculateFinalResult(
+                $enrollment->student_id,
+                $enrollment->semester_id,
+                $enrollment->course_id
+            );
+
+            $resultData['student_id'] = $enrollment->student_id;
+            $resultData['semester_id'] = $enrollment->semester_id;
+            $resultData['course_id'] = $enrollment->course_id;
+
+            $finalResult = FinalResult::updateOrCreate(
+                [
+                    'student_id' => $enrollment->student_id,
+                    'semester_id' => $enrollment->semester_id,
+                    'course_id' => $enrollment->course_id,
+                ],
+                $resultData
+            );
+        }
+
+        return redirect()->route('final_results.index')
+                         ->with('success', 'Final results generated successfully.');
+    }
 }

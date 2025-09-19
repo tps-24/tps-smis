@@ -79,7 +79,7 @@ class CourseWorkController extends Controller
      */
     public function show(CourseWork $courseWork)
     {
-        //
+        return $courseWork;
     }
 
     /**
@@ -103,7 +103,7 @@ class CourseWorkController extends Controller
      */
     public function destroy(CourseWork $courseWork)
     {
-        //
+        return $courseWork;
     }
 
     public function getCourseworksxx($semesterId){

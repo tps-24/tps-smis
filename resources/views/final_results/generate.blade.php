@@ -28,7 +28,7 @@
             <div class="pull-right">
                 <!-- <a class="btn btn-success mb-2" href="{{ route('final_results.create') }}" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New course</a> -->
 
-                <form action="{{ route('final_results.generate') }}" method="POST" class="mb-3">
+                <form action="{{ route('final_results.generate.all') }}" method="GET" class="mb-3">
                     @csrf
                     <button type="submit" class="btn btn-primary"
                         style="float:right !important; margin-right:1%">Generate Final Results</button>

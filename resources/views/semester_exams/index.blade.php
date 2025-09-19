@@ -215,100 +215,83 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Function to fetch and render coursework results
-    function fetchCourseworkResults(courseId,semesterId, page = 1) {
-        const apiUrl = `/tps-smis/semester_exams/course_results/course/${courseId}/${semesterId}/?page=${page}`;
-        const headingsContainer = document.getElementById('coursework-headings');
-        const resultsContainer = document.getElementById('coursework-results');
-        const paginationContainer = document.getElementById('pagination-container');
+    // Function to fetch and render coursework results
+function fetchCourseworkResults(courseId, semesterId, page = 1) {
+    const apiUrl = `/tps-smis/semester_exams/course_results/course/${courseId}/${semesterId}/?page=${page}`;
+    const headingsContainer = document.getElementById('coursework-headings');
+    const resultsContainer = document.getElementById('coursework-results');
+    const paginationContainer = document.getElementById('pagination-container');
 
-        if (!headingsContainer || !resultsContainer || !paginationContainer) {
-            console.error('Error: Necessary DOM elements are missing');
-            return;
-        }
-        fetch(apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Fetched Data:', data.results.data.data);
-                const addButton = document.getElementById('add_btn');   
-                if (!data.hasFinalResults) {
-                    addButton.disabled = false;
-                } else {
-                    addButton.disabled = true;
-                }
-                // Handle cases where no results are found
-                if (!data.results || !data.results.data || Object.keys(data.results.data).length === 0) {
-                    headingsContainer.innerHTML = '';
-                    resultsContainer.innerHTML = `
+    if (!headingsContainer || !resultsContainer || !paginationContainer) {
+        console.error('Error: Necessary DOM elements are missing');
+        return;
+    }
+
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Fetched Data:', data);
+
+            const addButton = document.getElementById('add_btn');
+            if (!data.hasFinalResults) {
+                addButton.disabled = false;
+            } else {
+                addButton.disabled = true;
+            }
+
+            // Handle cases where no results are found
+            if (!data.results || !data.results.data || data.results.data.length === 0) {
+                headingsContainer.innerHTML = '';
+                resultsContainer.innerHTML = `
                     <tr>
                         <td colspan="7" class="text-muted text-center">No results found for this course.</td>
                     </tr>
                 `;
-                    paginationContainer.innerHTML = '';
-                    return;
-                }
+                paginationContainer.innerHTML = '';
+                return;
+            }
 
-                // Clear previous content
-                headingsContainer.innerHTML = `
+            // Clear previous content
+            headingsContainer.innerHTML = `
                 <th>#</th>
                 <th>Force Number</th>
                 <th>Student Name</th>
+                <th>Score</th>
+                <th>Actions</th>
             `;
-                resultsContainer.innerHTML = '';
+            resultsContainer.innerHTML = '';
 
-                // Add dynamic coursework headings
-                // data.courses.forEach(course => {
-                //     const heading = document.createElement('th');
-                //     heading.style.textAlign = 'center';
-                //     heading.innerText = course.id;
-                //     headingsContainer.appendChild(heading);
-                // });
+            // Render results
+            data.results.data.forEach((result, i) => {
+                const student = result.student;
+                const score = result.score;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="text-align: center;">${i + 1}</td>
+                    <td style="text-align: center;">${student.force_number}</td>
+                    <td>${student.first_name} ${student.middle_name || ''} ${student.last_name}</td>
+                    <td style="text-align: center;">${score}</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-info btn-sm">View</button>
+                        <button class="btn btn-primary btn-sm">Edit</button>
+                    </td>
+                `;
+                resultsContainer.appendChild(row);
+            });
 
-                const totalHeading = document.createElement('th');
-                totalHeading.style.textAlign = 'center';
-                totalHeading.innerText = 'Score';
-                headingsContainer.appendChild(totalHeading);
-                
-                const actionsHeading = document.createElement('th');
-                actionsHeading.style.textAlign = 'center';
-                actionsHeading.innerText = 'Actions';
-                headingsContainer.appendChild(actionsHeading);
-                let index = 0;
-
-                Object.entries(data.results.data.data).forEach(([index, result]) => {
-                     const student = result.student;
-                    const score = result.score;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td style="text-align: center;">${parseInt(index) + 1}</td>
-                        <td style="text-align: center;">${student.force_number}</td>
-                        <td>${student.first_name} ${student.middle_name || ''} ${student.last_name}</td>
-                    `;
-
-                    // Since there's only one course in this response, directly add its score
-                    row.innerHTML += `<td style="text-align: center;">${score}</td>
-                        <td style="text-align: center;">
-                            <button class="btn btn-info btn-sm">View</button>
-                            <button class="btn btn-primary btn-sm">Edit</button>
-                        </td>
-                        `;
-
-
-                    resultsContainer.appendChild(row);
-                });
-
-
-                // Render pagination links dynamically
-                paginationContainer.innerHTML = `
+            // Render pagination links dynamically
+            paginationContainer.innerHTML = `
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-end">
                         ${data.results.links.map(link => {
-                            const page = link.url ? new URL(link.url, window.location.origin).searchParams.get('page') : null;
-
+                            const page = link.url
+                                ? new URL(link.url, window.location.origin).searchParams.get('page')
+                                : null;
                             return `
                                 <li class="page-item ${link.active ? 'active' : ''}">
                                     <a class="page-link" href="#" ${page ? `data-page="${page}"` : ''}>
@@ -321,25 +304,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 </nav>
             `;
 
-                // Attach event listeners for pagination links
-                document.querySelectorAll('.page-link').forEach(link => {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const page = this.getAttribute('data-page');
-                        if (page) fetchCourseworkResults(courseId, page);
-                    });
+            // Attach event listeners for pagination links (pass semesterId properly)
+            paginationContainer.querySelectorAll('.page-link').forEach(linkEl => {
+                linkEl.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    if (page) {
+                        fetchCourseworkResults(courseId, semesterId, page);
+                    }
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching results:', error);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching results:', error);
 
-                resultsContainer.innerHTML = `
+            resultsContainer.innerHTML = `
                 <tr>
-                    <td colspan="7" class="text-danger text-center">Failed to load results. Please try again later.</td>
+                    <td colspan="7" class="text-danger text-center">
+                        Failed to load results. Please try again later.
+                    </td>
                 </tr>
             `;
-            });
-    }
+        });
+}
+
 
 });
 </script>

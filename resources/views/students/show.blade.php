@@ -1,7 +1,6 @@
 @extends('layouts.main')
 
 @section('style')
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .back {
             border-radius: 30% !important;
@@ -56,7 +55,11 @@
             <div class="card mb-4">
                 <div class="card-body back">
                     <div class="profile-header">
+                        @if($student->photo)
+                        <img src="{{ url('storage/app/public/' . $student->photo) }}" alt="{{ $student->name }}'s Photo">
+                        @else
                         <img src="/tps-smis/resources/assets/images/profile/avatar.jpg" alt="Profile Picture" />
+                        @endif
                     </div>
 
                     <div class="d-flex justify-content-end mt-3 gap-2">

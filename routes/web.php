@@ -291,7 +291,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('final_results/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'getResults'])->name('final_results');
     Route::get('final_results/create-generate', [FinalResultController::class, 'createGenerate'])->name('final_results.createGenerate');
     Route::get('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
-    Route::post('final_results/generate/{sessionId}', [FinalResultController::class, 'generate'])->name('final_results.session.generate');
+    Route::get('final_results/generate-all', [FinalResultController::class, 'generateAll'])->name('final_results.generate.all');
+    Route::post('final_results/generate/{sessionId}', [FinalResultController::class, 'generateAll'])->name('final_results.session.generate');
     Route::get('final_results/return/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'returnResults'])->name('final_results.return');
     Route::get('final_results/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'getResults'])->name('final_results');
     Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
@@ -436,7 +437,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('enrollments/sessions/delete/{id}', [EnrollmentController::class, 'destroy'])->name('enrollments.session.delete');
     // Route::get('course/courseworks/create/{courseId}',[SemesterExamController::class,'create'])->name('course.coursework.create');
     // Route::get('course/courseworks/{courseId}',[SemesterExamController::class,'getCourse'])->name('course.coursework');
-    // Route::post('course/courseworks/store/{courseId}',[SemesterExamController::class,'store'])->name('course.coursework.store');
+    Route::post('course/semester_exams/store/{courseId}',[SemesterExamController::class,'store'])->name('course.semester_exams.store');
+    
+
     Route::resource('grading_systems', GradingSystemController::class);
     Route::resource('grade_mappings', GradeMappingController::class);
     Route::resource('semesters', SemesterController::class);
@@ -445,7 +448,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('course_works', CourseWorkController::class);
     Route::resource('coursework_results', CourseworkResultController::class);
     Route::resource('semester_exams_config', SemesterExamController::class);
-    Route::resource('semester_exams', SemesterExamResultController::class);
+    Route::resource('semester_exams', SemesterExamController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
     Route::resource('/settings/termination_reasons', TerminationReasonController::class);
@@ -460,11 +463,19 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('referees', RefereeController::class);
 
     Route::controller(SemesterExamResultController::class)->prefix('semester_exams')->group(function () {
+        // Route::get('/upload_explanation/{courseId}/{semesterId}', 'getUploadExplanation')->name('exam.upload_explanation');
+        // Route::post('/course_results/upload/{courseId}', 'uploadResults')->name('course_exam_results.upload');
+        // Route::get('/course_results/configure/{courseId}', 'configure')->name('exam.configure');
+        // Route::post('/course_results/store/{courseId}', 'store')->name('course.exam_result.store');
+        Route::get('/course_results/course/{courseId}/{semesterId}', 'getExamResultsByCourse')->name('course.getExamResults');
+    });
+
+    Route::controller(SemesterExamController::class)->prefix('semester_exams')->group(function () {
         Route::get('/upload_explanation/{courseId}/{semesterId}', 'getUploadExplanation')->name('exam.upload_explanation');
         Route::post('/course_results/upload/{courseId}', 'uploadResults')->name('course_exam_results.upload');
         Route::get('/course_results/configure/{courseId}', 'configure')->name('exam.configure');
         Route::post('/course_results/store/{courseId}', 'store')->name('course.exam_result.store');
-        Route::get('/course_results/course/{courseId}/{semesterId}', 'getExamResultsByCourse')->name('course.getExamResults');
+
     });
     // Route::resource('beats', BeatController::class);
 

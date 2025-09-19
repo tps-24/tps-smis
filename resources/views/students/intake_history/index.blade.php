@@ -75,7 +75,7 @@
 @section('content')
 <div class="card mb-4" style="margin-right: 0px;">
   <div class="card-header">
-    <h5 class="card-title">Intake Management Summary</h5>
+    <h5 class="card-title">Intake Management Summary - {{ $active_session }}</h5>
     <p class="card-text">This page provides a summary of the intake history of students.</p>
   </div>
 
