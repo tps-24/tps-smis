@@ -33,7 +33,7 @@
           </div>
           <!-- App body ends -->
 
-          @include('layouts.footer')
+          @include('layouts.footer')       
             <!-- footer ends-->
 
         </div>
