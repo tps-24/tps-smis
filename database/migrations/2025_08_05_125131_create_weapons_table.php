@@ -14,7 +14,7 @@ return new class extends Migration
    Schema::create('weapons', function (Blueprint $table) {
     $table->id();
     $table->string('serial_number')->unique();
-    $table->foreignId('weapon_model_id')->constrained()->onDelete('cascade');
+    $table->foreignId('weapon_model_id');
     $table->timestamps();
 });
 

@@ -15,6 +15,7 @@ use App\Models\StudentDismissal;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Hash;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -329,10 +330,22 @@ class StudentController extends Controller
 
     public function show($id)
     {
-        $student      = Student::find($id);
+        $student      = Student::findOrFail($id);
         $safari_types = SafariType::all();
         $vitengo = Vitengo::all(); // or ->pluck('name', 'id') if you prefer
-        return view('students.show', compact('student', 'safari_types', 'vitengo'));
+
+        $lockups = DB::table('m_p_s')
+            ->where('student_id', $student->id)
+            ->orderByDesc('arrested_at')
+            ->get();
+
+        $dismissal = DB::table('student_dismissals')
+                        ->join('termination_reasons', 'termination_reasons.id', '=', 'student_dismissals.reason_id')
+                        ->select('student_dismissals.*', 'termination_reasons.reason as reason_label', 'termination_reasons.category')
+                        ->where('student_dismissals.student_id', $student->id)
+                        ->latest('dismissed_at')
+                        ->first();
+        return view('students.show', compact('student', 'safari_types', 'vitengo', 'lockups', 'dismissal'));
     }
     /**
      * Show the form for editing the specified resource.

@@ -144,6 +144,11 @@
                                     aria-controls="fourA" aria-selected="false"><i class="bi bi-eye-slash me-2"></i>Change
                                     Password</a>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="tab-fiveA" data-bs-toggle="tab" href="#fiveA" role="tab"
+                                    aria-controls="fiveA" aria-selected="false"><i
+                                        class="bi bi-credit-card-2-front me-2"></i>Behavior Trend</a>
+                            </li>
                         </ul>
                         <!-- Nav tabs end -->
 
@@ -480,11 +485,16 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-4 col-12">
-
                                         <!-- List 2 group start -->
-
+                                            <div class="row">
+                                                <div class="col-sm-2 col-12">
+                                                    <!-- Form field start -->
+                                                    <div class="mb-3">
+                                                    </div>
+                                                    <!-- Form field end -->
+                                                </div>
+                                            </div>
                                         <!-- List 2 group end -->
-
                                     </div>
 
                                 </div>
@@ -559,6 +569,186 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <!-- Row ends -->
+
+                            </div>
+                            
+                            <div class="tab-pane fade" id="fiveA" role="tabpanel">
+
+                                <!-- Row starts -->
+                                
+                                <div class="row gx-4">
+                                    <div class="col-sm-12 col-12">
+                                        <div class="card border mb-3">
+                                            <div class="card-body">
+                                                <!-- Row starts -->
+                                                <form id="studentUpdateForm" method="POST" action="{{ route('students.update', $student->id) }}" onsubmit="return validateFullNameBeforeSubmit();" enctype="multipart/form-data">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <!-- Editable fields go here -->
+                                                    <div class="row gx-4">
+                                                            <div class="col-sm-2 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="forceNumber" class="form-label">Force Number</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-person"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control static-field" id="forceNumber" value="{{$student->force_number}}" Disabled>
+                                                                        <input type="text" name="force_number" class="form-control editable-field d-none" id="forceNumber" value="{{$student->force_number}}">
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-sm-3 col-12">
+                                                                <!-- Form field start -->
+                                                                 <div class="mb-3">
+                                                                    <label for="fullNameEdit" class="form-label">Full Name</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-person"></i>
+                                                                        </span>
+
+                                                                        {{-- Static field --}}
+                                                                        <input type="text"
+                                                                            class="form-control static-field"
+                                                                            id="fullNameStatic"
+                                                                            value="{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}"
+                                                                            disabled>
+
+                                                                        {{-- Editable field --}}
+                                                                        <input type="text"
+                                                                            name="full_name"
+                                                                            class="form-control editable-field d-none"
+                                                                            id="fullNameEdit"
+                                                                            value="{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}"
+                                                                            placeholder="Enter first, middle, and last name">
+
+                                                                    </div>
+                                                                    @if ($errors->has('full_name'))
+                                                                        <div class="text-danger small">
+                                                                            ⚠️ {{ $errors->first('full_name') }}
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-sm-3 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="yourEmail" class="form-label">Company</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-builiding"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control static-field" id="yourCompany" value=" {{ $student->company->name ?? '-' }} - {{ $student->platoon ?? '-' }}" Disabled>
+                                                                    </div>
+                                                                </div>
+                                                                @if ($errors->has('email'))
+                                                                    <div class="text-danger small">
+                                                                        ⚠️ {{ $errors->first('email') }}
+                                                                    </div>
+                                                                @endif
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-sm-2 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="contactNumber" class="form-label">Contact</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-phone"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control static-field" id="contactNumber" value="{{$student->phone}}" Disabled>
+                                                                        <input type="text" name="phone" class="form-control editable-field d-none" id="contactNumber" value="{{$student->phone}}">
+                                                                    </div>
+                                                                    @if ($errors->has('phone'))
+                                                                        <div class="text-danger small">
+                                                                            ⚠️ {{ $errors->first('phone') }}
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-sm-2 col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="mb-3">
+                                                                    <label for="birthDay" class="form-label">Date of Birth</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <i class="bi bi-calendar4"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control static-field" id="birthDay" value="{{$student->dob}}" Disabled>
+                                                                        <input type="date" name="dob" class="form-control editable-field d-none" id="birthDay" value="{{$student->dob}}">
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <!-- Form field start -->
+                                                                <div class="m-0">
+                                                                    <div class="card mt-4">
+                                                                        <div class="card-header bg-warning text-dark">
+                                                                            <strong>Lockup History</strong>
+                                                                        </div>
+                                                                        <div class="card-body" style="background-color: rgb(209, 209, 214);">
+                                                                            @if ($lockups->count())
+                                                                            @foreach ($lockups as $lockup)
+                                                                                <div class="mb-3 p-3 bg-light border rounded">
+                                                                                <p class="mb-1"><strong>Arrested:</strong> {{ \Carbon\Carbon::parse($lockup->arrested_at)->format('d M Y') }}</p>
+                                                                                <p class="mb-1"><strong>Days Held:</strong> {{ $lockup->days }}</p>
+                                                                                <p class="mb-1"><strong>Released:</strong> {{ $lockup->released_at ? \Carbon\Carbon::parse($lockup->released_at)->format('d M Y') : 'Not yet released' }}</p>
+                                                                                <p class="mb-0"><strong>Description:</strong> {{ $lockup->description }}</p>
+                                                                                </div>
+                                                                            @endforeach
+                                                                            @else
+                                                                            <p class="text-muted">No lockup records found for this student.</p>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                    @if ($dismissal)
+                                                                    <div class="card mt-4 border-danger">
+                                                                        <div class="card-header bg-danger text-white">
+                                                                        <strong>This student is Dismissed</strong>
+                                                                        </div>
+                                                                        <div class="card-body" style="background-color: rgb(248, 222, 222);">
+                                                                        <p class="mb-1"><strong>Dismissed At:</strong> {{ \Carbon\Carbon::parse($dismissal->dismissed_at)->format('d M Y') }}</p>
+                                                                        <p class="mb-1"><strong>Reason:</strong> {{ $dismissal->reason_label }} ({{ $dismissal->category }})</p>
+                                                                        @if ($dismissal->custom_reason && $dismissal->custom_reason !== 'null')
+                                                                            <p class="mb-1"><strong>Specified Reason:</strong> {{ $dismissal->custom_reason }}</p>
+                                                                        @endif
+                                                                        <p class="mb-0 text-muted"><em>Recorded by system on {{ \Carbon\Carbon::parse($dismissal->created_at)->format('d M Y, H:i') }}</em></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    @endif
+
+
+                                                                    <div class="card-body" style="background-color: rgb(209, 209, 214);">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div class="p-3 me-3 w-100">
+                                                                                <div class="row">
+
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Form field end -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                                <!-- Row ends -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if ($student->status  == 'approved')
+                                        <div class="d-flex justify-content-end" style="margin-left:-5px">
+                                            <p class="mb-0">Verified By: <span class="text-success">{{ $student->verifier->name ?? '-' }}</span></p>
+                                        </div>
+                                    @endif
                                 </div>
                                 <!-- Row ends -->
 

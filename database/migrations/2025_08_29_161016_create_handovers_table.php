@@ -8,12 +8,11 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('handovers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('weapon_id')->constrained()->onDelete('cascade');
-            $table->foreignId('staff_id')->constrained()->onDelete('cascade');
+            $table->foreignId('weapon_id')->constrained();
+            $table->foreignId('staff_id');
             $table->foreign('staff_id')
       ->references('id')
-      ->on('staff')   
-      ->onDelete('cascade');
+      ->on('staff');
             $table->dateTime('handover_date');
             $table->dateTime('return_date');
           
@@ -21,8 +20,6 @@ return new class extends Migration {
             $table->text('remarks')->nullable();
             $table->timestamps();
             $table->enum('status', ['assigned', 'returned'])->default('assigned');
-
-
         });
     }
 
