@@ -1,163 +1,165 @@
 <?php
 
-
 namespace App\Services;
 
+use App\Models\Attendence;
 use App\Models\LeaveRequest;
 use App\Models\MPS;
 use App\Models\Patient;
 use App\Models\SessionProgramme;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
+
 class GraphDataService
 {
     private $selectedSessionId;
 
-  
     public function getGraphData($start_date = null, $end_date = null)
     {
-            $sessionId = session('selected_session') ?: 1;
-            $today = Carbon::today();
-    
-            // --- Define start/end for daily, weekly, monthly ---
+        $sessionId = session('selected_session') ?: 1;
+        $today = Carbon::today();
+
+        // --- Define start/end for daily, weekly, monthly ---
         $dailyStart = $start_date ? Carbon::parse($start_date)->startOfDay() : $today->copy()->subDays(6);
-            $dailyEnd = $end_date ? Carbon::parse($end_date)->endOfDay() : $today->copy()->endOfDay();
-    
-            $weekStart = $sta_date ? Carbon::parse($start_date)->staOfWeek() : $today->copy()->subWeeks(4)->startOfWeek();
+        $dailyEnd = $end_date ? Carbon::parse($end_date)->endOfDay() : $today->copy()->endOfDay();
+
+        $weeklyStart = $start_date ? Carbon::parse($start_date)->startOfWeek() : $today->copy()->subWeeks(4)->startOfWeek();
         $weeklyEnd = $end_date ? Carbon::parse($end_date)->endOfWeek() : $today->copy()->endOfWeek();
-    
-            $monthStart = $sta_date ? Carbon::parse($start_date)->starfMonth() : $today->copy()->subMonths(2)->startOfMonth();
+
+        $monthlyStart = $start_date ? Carbon::parse($start_date)->startOfMonth() : $today->copy()->subMonths(2)->startOfMonth();
         $monthlyEnd = $end_date ? Carbon::parse($end_date)->endOfMonth() : $today->copy()->endOfMonth();
-    
-            // --- nerate blankata structures ---
+
+        // --- Generate blank data structures ---
         $dailyData = $this->generateEmptyData($dailyStart, $dailyEnd, 'day');
-            $weeklyData = $this->generateEmptyData($weeklyStart, $weeklyEnd, 'week');
-            $monthlyData = $this->generateEmptyData($monthlyStart, $monthlyEnd, 'month');
-    
-            // --- Fetch all attendances for the full range ---
+        $weeklyData = $this->generateEmptyData($weeklyStart, $weeklyEnd, 'week');
+        $monthlyData = $this->generateEmptyData($monthlyStart, $monthlyEnd, 'month');
+
+        // --- Fetch all attendances for the full range ---
         $minStart = min($dailyStart, $weeklyStart, $monthlyStart);
-            $maxEnd = max($dailyEnd, $weeklyEnd, $monthlyEnd);
-    
-            $atndances = Attendence::where('session_programme_id', $sessionId)
+        $maxEnd = max($dailyEnd, $weeklyEnd, $monthlyEnd);
+
+        $attendances = Attendence::where('session_programme_id', $sessionId)
             ->whereBetween('date', [$minStart, $maxEnd])
-                ->get();
-    
-            // ---------------- DAILY LOOP ----------------
+            ->get();
+
+        // ---------------- DAILY LOOP ----------------
         foreach ($attendances as $attendance) {
-                $date = Carbon::parse($attendance->date);
-                $dayKey = $date->format('Y-m-d');
-    
-                if (isset($dailyData['keys'][$dayKey])) {
+            $date = Carbon::parse($attendance->date);
+            $dayKey = $date->format('Y-m-d');
+
+            if (isset($dailyData['keys'][$dayKey])) {
                 $companyAttendance = $attendance->platoon->company?->company_attendance($date, 1);
-    
-                    if ($companyAttendance && $companyAttendance->status != 'verified') { 
+
+                if ($companyAttendance && $companyAttendance->status != 'verified') {
                     continue; // Only skip if attendance exists AND is not verified
-                    }''
-    
-                    $i = $dailyData['keys'][$dayKey];
-                $dailyData['absents'][$i] += (int) $attendance->absent;
-                    $dailyData['sick'][$i] = $this->getSickCount($date);
-                    $dailyData['lockUps'][$i] = $this->getLockUpCount($date);
-                    $dailyData['leaves'][$i] = $this->getLeaveCount($date);
                 }
-           } 
-    
-            // ---------------- WEEKLY LOOP ----------------
+
+                $i = $dailyData['keys'][$dayKey];
+                $dailyData['absents'][$i] += (int) $attendance->absent;
+                $dailyData['sick'][$i] = $this->getSickCount($date);
+                $dailyData['lockUps'][$i] = $this->getLockUpCount($date);
+                $dailyData['leaves'][$i] = $this->getLeaveCount($date);
+            }
+        }
+
+        // ---------------- WEEKLY LOOP ----------------
         $groupedByWeek = $attendances->groupBy(function ($attendance) {
-                return Carbon::parse($attendance->date)->startOfWeek()->format('Y-m-d');
-            });
-    
-            foreach ($groupedByWeek as $weekKey => $records) {
+            return Carbon::parse($attendance->date)->startOfWeek()->format('Y-m-d');
+        });
+
+        foreach ($groupedByWeek as $weekKey => $records) {
             if (! isset($weeklyData['keys'][$weekKey])) {
-                    continue;
-                }  {
-               
+                continue;
             }
 
-                $i = $weeklyData['keys'][$weekKey];
-                $weeklyData['absents'][$i] = $records->sum('absent');
+            $i = $weeklyData['keys'][$weekKey];
+            $weeklyData['absents'][$i] = $records->sum('absent');
 
-                $weekEnd = Carbon::parse($weekKey)->endOfWeek();
-                $weeklyData['sick'][$i] = $this->getSickCount($weekEnd);
-                $weeklyData['lockUps'][$i] = $this->getLockUpCount($weekEnd);
-                $weeklyData['leaves'][$i] = $this->getLeaveCount($weekEnd);
-            }
+            $weekEnd = Carbon::parse($weekKey)->endOfWeek();
+            $weeklyData['sick'][$i] = $this->getSickCount($weekEnd);
+            $weeklyData['lockUps'][$i] = $this->getLockUpCount($weekEnd);
+            $weeklyData['leaves'][$i] = $this->getLeaveCount($weekEnd);
+        }
 
-            // ---------------- MONTHLY LOOP ----------------
-            foreach ($monthlyData['labels'] as $i => $label) {
-                $carbon = Carbon::createFromFormat('F Y', $label);
-                $month = $carbon->month;
-                $year = $carbon->year;
+        // ---------------- MONTHLY LOOP ----------------
+        foreach ($monthlyData['labels'] as $i => $label) {
+            $carbon = Carbon::createFromFormat('F Y', $label);
+            $month = $carbon->month;
+            $year = $carbon->year;
 
-                $monthlyData['absents'][$i] = Attendence::where('session_programme_id', $sessionId)
-                    ->whereMonth('date', $month)
-                    ->whereYear('date', $year)
-                    ->sum('absent');
+            $monthlyData['absents'][$i] = Attendence::where('session_programme_id', $sessionId)
+                ->whereMonth('date', $month)
+                ->whereYear('date', $year)
+                ->sum('absent');
 
-                $monthlyData['sick'][$i] = $this->getSickCountForMonth($month, $year);
-                $monthlyData['lockUps'][$i] = $this->getLockUpCountForMonth($month, $year);
-                $monthlyData['leaves'][$i] = $this->getLeaveCountForMonth($month, $year);
-            }
+            $monthlyData['sick'][$i] = $this->getSickCountForMonth($month, $year);
+            $monthlyData['lockUps'][$i] = $this->getLockUpCountForMonth($month, $year);
+            $monthlyData['leaves'][$i] = $this->getLeaveCountForMonth($month, $year);
+        }
 
-            // --- Clean up keys ---
-            unset($dailyData['keys'], $weeklyData['keys']);
+        // --- Clean up keys ---
+        unset($dailyData['keys'], $weeklyData['keys']);
 
-            // --- Return final structured output ---
-            return [
-                'dailyDa' => $dailyData,
-                'weeklyDaa' => $weeklyData,
-                'monthlyData' => $monthlyData,
-                'day $dailyData['leaves'],
-                'week> $weeklyData['leaves'],
-                'month=> $monthlyData['leaves'],
-            ];
-     
+        // --- Return final structured output ---
+        return [
+            'dailyData' => $dailyData,
+            'weeklyData' => $weeklyData,
+            'monthlyData' => $monthlyData,
+            'daily' => $dailyData['leaves'],
+            'weekly' => $weeklyData['leaves'],
+            'monthly' => $monthlyData['leaves'],
+        ];
+    }
+
     public function generateEmptyData($start, $end, $type = 'day')
     {
-            $data = [
-                'labels' => [],
-                'keys' => [],
-                'absents' => [],
-                'sick' => [],
-                'lockUps' => [],
-                'leaves' => [],
-            ];
-    
+        $data = [
+            'labels' => [],
+            'keys' => [],
+            'absents' => [],
+            'sick' => [],
+            'lockUps' => [],
+            'leaves' => [],
+        ];
+
         if ($type === 'day') {
-                $period = CarbonPeriod::create($start, $end);
-                foreach ($period as $i => $date) {
-                    $key = $date->format('Y-m-d');
-                    $data['labels'][] = $key;
-                    $data['keys'][$key] = $i;
-                }
-            } elseif ($type === 'week') {
-                $period = CarbonPeriod::create($start, '1 week', $end);
-                foreach ($period as $i => $endOfWeek) {
-                    $key = $endOfWeek->format('Y-m-d');
-                    $data['labels'][] = 'Week '.$this->getWeekNumber($endOfWeek);
-                    $data['keys'][$key] = $;
-                }
-            } elseif ($type === 'month') {
-                $period = CarbonPeriod::create($start, '1 month', $end);
-                foreach ($period as $i => $startOfMonth) {
-                    $key = $startOfMonth->format('F Y');
-                    $data['labels'][] = $key;
-                    $data['keys'][$key] = $i;
-                }
+            $period = CarbonPeriod::create($start, $end);
+            foreach ($period as $i => $date) {
+                $key = $date->format('Y-m-d');
+                $data['labels'][] = $key;
+                $data['keys'][$key] = $i;
             }
-    
-        // Fill values
-            $count = count($data['labels']);
-            $data['absents'] = array_fill(0, $count, 0);
-            $data['sick'] = array_fill(0, $count, 0);
-            $data['lockUps'] = array_fill(0, $count, 0);
-            $data['leaves'] = array_fill(0, $count, 0);
-    
-        return $data;
+        } elseif ($type === 'week') {
+            $period = CarbonPeriod::create($start, '1 week', $end);
+            foreach ($period as $i => $endOfWeek) {
+                $key = $endOfWeek->format('Y-m-d');
+                $data['labels'][] = 'Week '.$this->getWeekNumber($endOfWeek);
+                $data['keys'][$key] = $i;
+            }
+        } elseif ($type === 'month') {
+            $period = CarbonPeriod::create($start, '1 month', $end);
+            foreach ($period as $i => $startOfMonth) {
+                $key = $startOfMonth->format('F Y');
+                $data['labels'][] = $key;
+                $data['keys'][$key] = $i;
+            }
         }
-    
+
+        // Fill values
+        $count = count($data['labels']);
+        $data['absents'] = array_fill(0, $count, 0);
+        $data['sick'] = array_fill(0, $count, 0);
+        $data['lockUps'] = array_fill(0, $count, 0);
+        $data['leaves'] = array_fill(0, $count, 0);
+
+        return $data;
+    }
+
     private function getSickCount(Carbon $date): int
+    {
+        return Patient::whereDate('created_at', '<=', $date)
+            ->where(function ($query) use ($date) {
                 $query->where(function ($q) use ($date) {
                     $q->where('excuse_type_id', 1)
                         ->whereNotNull('rest_days')
@@ -183,14 +185,10 @@ class GraphDataService
 
     private function getLeaveCount(Carbon $date): int
     {
-        return LeaveRequest::whereNull('rejected_at') // Not rejected
-            ->where(function ($query) use ($date) {
-                $query->whereNull('return_date') // No return yet
-                    ->orWhereDate('return_date', '>=', $date); // Or returning in future
-            })
-            ->whereNotNull('approved_at') // Approved
-            ->count();
-
+        return LeaveRequest::where(function ($q) use ($date) {
+            $q->whereNull('return_date')
+                ->orWhereDate('return_date', '>=', $date);
+        })->count();
     }
 
     private function getSickCountForMonth($month, $year): int
@@ -233,6 +231,7 @@ class GraphDataService
     {
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
+            $selectedSessionId = 1;
         }
         $sessionProgramme = SessionProgramme::find($selectedSessionId);
         // Define the specified start date (September 30, 2024)
@@ -242,23 +241,23 @@ class GraphDataService
         $date = Carbon::parse($date); // This could be the current date, or any specific date
         // Calculate the difference in weeks between the start date and the target date
         $weekNumber = (int) ceil($startDate->diffInDays($date) / 7) + 1; // Adding 1 to make it 1-based (Week 1, Week 2, ...)
- 
-   retur
+
+        return (int) $weekNumber;
     }
 
     public function getWeeklyData(Collection $attendances, int $weeks = 5): array
-
     {
-             $weeklyData = [
-          'absents' => [],
+        $weekKeys = [];
+        $weeklyData = [
+            'absents' => [],
             'sick' => [],
             'lockUps' => [],
             'leaves' => [],
         ];
 
-        // Initialweek keys and zeroed data arrays
-        for ($i = 0; i < $weeks; $i++) {
-            $startOfek = Carbon::now()->startOfWeek()->subWeeks($i)->toDateString();
+        // Initialize week keys and zeroed data arrays
+        for ($i = 0; $i < $weeks; $i++) {
+            $startOfWeek = Carbon::now()->startOfWeek()->subWeeks($i)->toDateString();
             $weekKeys[$startOfWeek] = $i;
 
             $weeklyData['absents'][$i] = 0;
@@ -276,7 +275,7 @@ class GraphDataService
             }
             $attendanceWeek = Carbon::parse($attendance->date)->endOfWeek()->toDateString();
             if (isset($weekKeys[$attendanceWeek])) {
-                $weekIndex = $weekKeys[$attendanceWeek];''
+                $weekIndex = $weekKeys[$attendanceWeek];
                 $weeklyData['absents'][$weekIndex] += (int) $attendance->absent;
             }
         }
@@ -317,4 +316,3 @@ class GraphDataService
         return $weeklyData;
     }
 }
-
