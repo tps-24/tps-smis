@@ -357,7 +357,7 @@ class DashboardController extends Controller
 
         foreach ($platoons as $platoon) {
             // dd($platoon->company->company_attendance('12-8-2025')->status);
-            if ($platoon->company?->company_attendance(now())?->status != 'verified') {
+            if ($platoon->company?->company_attendance(now(), 1)?->status != 'verified') {
                 continue;
             }
 
