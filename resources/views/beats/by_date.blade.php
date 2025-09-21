@@ -89,7 +89,11 @@
                                     <h3>Guard Areas</h3><br><br>
                                     <!-- <a href="{{ route('beats.generatePDF', $company->id) }}" class="btn btn-secondary"> PDF</a> -->
                                     <form action="{{ route('beats.generatePDF', $company->id) }}" method="GET"
+<<<<<<< HEAD
                                         class="form-inline mb-4">
+=======
+                                        class="form-inline mb-4" target="_blank">
+>>>>>>> ecb3bfd (Jogging as attendance type.)
                                         <input type="hidden" name="date"
                                             value="{{ $date ?? \Carbon\Carbon::today()->toDateString() }}">
                                         <button type="submit" class="btn btn-secondary">Download PDF</button>

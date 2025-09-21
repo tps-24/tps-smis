@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Auth;
@@ -18,17 +19,19 @@ class Student extends Model
         'next_kin_relationship', 'next_kin_address', 'next_of_kin', 'profile_complete', 'photo',
         'status', 'enrollment_status', 'approved_at', 'rejected_at', 'reject_reason', 'approved_by',
         'rejected_by', 'transcript_printed', 'certificate_printed', 'printed_by',
-        'reprint_reason', 'beat_exclusion_vitengo_id', 'beat_emergency', 'bank_name', 'account_number', 'study_level_id', 'dismissed_by'
+        'reprint_reason', 'beat_exclusion_vitengo_id', 'beat_emergency', 'bank_name', 'account_number', 'study_level_id', 'dismissed_by',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
     public function admittedStudent()
     {
         return $this->hasOne(AdmittedStudent::class);
     }
+
     public function studyLevel()
     {
         return $this->belongsTo(studyLevel::class, 'studyLevel_id');
@@ -38,6 +41,7 @@ class Student extends Model
     {
         return $this->hasMany(FinalResult::class);
     }
+
     public function programme()
     {
         return $this->belongsTo(Programme::class);
@@ -52,6 +56,7 @@ class Student extends Model
     {
         return $this->hasMany(MPS::class, 'student_id', 'id');
     }
+
     public function platoons()
     {
         return $this->hasMany(Platoon::class, 'name', 'id');
@@ -78,7 +83,7 @@ class Student extends Model
 
     public function optionalCourseEnrollments()
     {
-        return $this->hasMany(OptionalCourseEnrollment::class); //Optional enrollments
+        return $this->hasMany(OptionalCourseEnrollment::class); // Optional enrollments
     }
 
     public function optionalCourses()
@@ -89,14 +94,15 @@ class Student extends Model
     public function courses()
     {
         $programmeCourses = $this->programme->courses(); // Fixed here
-        $optionalCourses  = $this->optionalCourseEnrollments();
-        //return $programmeCourses->merge($optionalCourses);
+        $optionalCourses = $this->optionalCourseEnrollments();
+
+        // return $programmeCourses->merge($optionalCourses);
         return $programmeCourses;
     }
 
     public function approve()
     {
-        $this->status      = 'approved';
+        $this->status = 'approved';
         $this->approved_at = now();
         $this->approved_by = Auth::user()->id;
         $this->save();
@@ -106,7 +112,6 @@ class Student extends Model
     {
         return $this->belongsTo(User::class, 'approved_by')->withDefault();
     }
-
 
     public function beats()
     {
@@ -134,24 +139,24 @@ class Student extends Model
         return $this->hasMany(Patient::class);
     }
 
-    
     public function leaves()
     {
         return $this->hasMany(LeaveRequest::class);
     }
+
     public function getGPAAttribute()
     {
         $results = $this->finalResults;
 
-        $courses                          = $this->courses; // Retrieve ALL courses
+        $courses = $this->courses; // Retrieve ALL courses
         $semester_one_total_credit_weight = 0;
-        $semester_one_total_grade_credit  = 0;
+        $semester_one_total_grade_credit = 0;
         $semester_two_total_credit_weight = 0;
-        $semester_two_total_grade_credit  = 0;
+        $semester_two_total_grade_credit = 0;
         foreach ($results as $result) {
             if ($result->semester_id == 1) {
                 $semester_one_total_credit_weight += $this->getGradePoint($result->grade) * $result->course->programmes->first()->pivot->credit_weight;
-            } else if ($result->semester_id == 2) {
+            } elseif ($result->semester_id == 2) {
                 $semester_two_total_credit_weight += $this->getGradePoint($result->grade) * $result->course->programmes->first()->pivot->credit_weight;
             }
 
@@ -161,23 +166,25 @@ class Student extends Model
                 $semester_one_total_grade_credit += $course->pivot->credit_weight;
             }
             // Ensure no null error
-            else if ($course->semesters->first()->pivot->semester_id == 2) {
+            elseif ($course->semesters->first()->pivot->semester_id == 2) {
                 $semester_two_total_grade_credit += $course->pivot->credit_weight;
             }
 
         }
 
-        //Calculation of gpa for each semester
+        // Calculation of gpa for each semester
         $semesterOneGPA = $semester_one_total_grade_credit == 0 ? 0 : $semester_one_total_credit_weight / $semester_one_total_grade_credit;
         $semesterTwoGPA = $semester_two_total_grade_credit == 0 ? 0 : $semester_two_total_credit_weight / $semester_two_total_grade_credit;
 
         $overallGPA = round(($semesterOneGPA + $semesterTwoGPA) / 2, 1);
+
         return collect([
             'semesterOneGPA' => round($semesterOneGPA, 1),
             'semesterTwoGPA' => round($semesterTwoGPA, 1),
-            'overallGPA'     => $overallGPA,
-            'classAwarded'   => $this->getClass($overallGPA),
+            'overallGPA' => $overallGPA,
+            'classAwarded' => $this->getClass($overallGPA),
         ]);
+
         return $total_credit > 0 ? round($total_grade_credit / $total_credit, 1) : null; // Avoid division by zero
     }
 
@@ -185,14 +192,15 @@ class Student extends Model
     {
         if ($gpa >= 3.5 && $gpa <= 4) {
             return ' First Class';
-        } else if ($gpa >= 3.0 && $gpa <= 3.4) {
+        } elseif ($gpa >= 3.0 && $gpa <= 3.4) {
             return 'Second Class';
-        } else if ($gpa >= 2.0 && $gpa <= 2.9) {
+        } elseif ($gpa >= 2.0 && $gpa <= 2.9) {
             return 'Pass';
         } else {
             return 'Failed';
         }
     }
+
     public function getGradePoint($grade)
     {
         switch ($grade) {
@@ -204,22 +212,27 @@ class Student extends Model
             default:return 0;
         }
     }
+
     /**
      * Check if the student has an active leave (end_date is null).
      *
      * @return bool
      */
-public function hasActiveLeaveRecord()
-{
-    return $this->leaves()
-                ->whereNull('return_date')
-                ->where('status', 'approved')
-                ->exists();
-}
+    public function hasActiveLeaveRecord()
+    {
+        return $this->leaves()
+            ->whereNull('return_date')
+            ->where('status', 'approved')
+            ->exists();
+    }
 
-public function dismissal()
-{
-    return $this->hasOne(StudentDismissal::class, 'student_id');
-}
+    public function dismissal()
+    {
+        return $this->hasOne(StudentDismissal::class, 'student_id');
+    }
 
+    public function platoonRelation()
+    {
+        return $this->belongsTo(Platoon::class, 'platoon', 'name');
+    }
 }

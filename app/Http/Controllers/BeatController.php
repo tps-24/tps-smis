@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Beat;
+use App\Models\BeatLeaderonDuty;
+use App\Models\BeatReserve;
 use App\Models\BeatRound;
-use App\Models\Student;
+use App\Models\Company;
 use App\Models\GuardArea;
 use App\Models\PatrolArea;
-use App\Models\Beat;
-use App\Models\Company;
-use App\Models\BeatReserve;
-use App\Models\BeatLeaderonDuty;
+use App\Models\Student;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class BeatController extends Controller
 {
     protected $usedStudentIds = [];
+
     public function beatsByDate(Request $request)
     {
         $date = $request->input('date', Carbon::today()->toDateString());
@@ -35,14 +35,12 @@ class BeatController extends Controller
                 },
                 'patrolAreas.beats' => function ($query) use ($date) {
                     $query->where('date', $date);
-                }
+                },
             ])
             ->get();
 
         return view('beats.by_date', compact('companies', 'date'));
     }
-
-
 
     // public function showBeats()
     // {
@@ -57,12 +55,14 @@ class BeatController extends Controller
     public function index()
     {
         $beats = Beat::with(['guardArea', 'patrolArea'])->orderBy('date', 'desc')->get();
+
         return view('beats.index', compact('beats'));
     }
 
     public function beatCreate()
     {
         $beats = Beat::with(['guardArea', 'patrolArea'])->orderBy('date', 'desc')->get();
+
         return view('beats.beat_create', compact('beats'));
     }
 
@@ -71,7 +71,8 @@ class BeatController extends Controller
         $beat = Beat::find($beat_id);
         $beats = Beat::where('id', $beat_id)->get();
         $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
-        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [1,2,3,4,5,6,7])->where('beat_round','<', 15)->where('beat_status', 1)->where('gender', "M")->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [1, 2, 3, 4, 5, 6, 7])->where('beat_round', '<', 15)->where('beat_status', 1)->where('gender', 'M')->get();
+
         return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
     }
 
@@ -81,19 +82,19 @@ class BeatController extends Controller
             $company = $beat->guardArea->company;
             $beatsToExchange = $company->guardBeats()->where('date', $beat->date)->get();
             $beatsToExchange = $beatsToExchange->merge($company->patrolBeats()->where('date', $beat->date)->get());
-        } else if ($beat->patrolArea) {
+        } elseif ($beat->patrolArea) {
             $company = $beat->patrolArea->company;
             $beatsToExchange = $company->patrolBeats()->where('date', $beat->date)->get();
             $beatsToExchange = $beatsToExchange->merge($company->guardBeats()->where('date', $beat->date)->get());
         }
         $beat_students = Student::whereIn('id', json_decode($beat->student_ids))->orderBy('platoon')->get();
-        //$beatsToExchange = Beat::where('date', $beat->created_at->format('Y-m-d'))->get();
+        // $beatsToExchange = Beat::where('date', $beat->created_at->format('Y-m-d'))->get();
         $beatsToExchange = $beatsToExchange->map(function ($_beat) use ($beat) {
             // Decode the JSON-encoded student_ids to an array
             $studentIds = json_decode($_beat->student_ids);
             // Fetch the students associated with these IDs (assuming you have a Student model)
             $students = Student::whereIn('id', $studentIds)
-                        ->whereNotIn('id',json_decode($beat->student_ids))->get();
+                ->whereNotIn('id', json_decode($beat->student_ids))->get();
 
             // Return an array with students and the specific beat they belong to
             return $students->map(function ($student) use ($_beat) {
@@ -103,10 +104,11 @@ class BeatController extends Controller
                 ];
             });
         })->flatten(1) // Flatten the array so each entry is a single student-beat pair
-        ->sortBy(function ($item) {
-            // Sort by the 'platoon' of each student in ascending order
-            return $item['student']->platoon;
-        });
+            ->sortBy(function ($item) {
+                // Sort by the 'platoon' of each student in ascending order
+                return $item['student']->platoon;
+            });
+
         return view('beats.exchange', compact('beat', 'beatsToExchange', 'beat_students'));
     }
 
@@ -119,15 +121,15 @@ class BeatController extends Controller
         $beat = Beat::where('id', $beat_id)->first();
         $assignedStudentIds = json_decode($beat->student_ids);
 
-
-        //$array = array_diff($assignedStudentIds, $replace_student); 
+        // $array = array_diff($assignedStudentIds, $replace_student);
 
         $newArray = array_map(function ($value) use ($replace_student, $student) {
             $key = array_search($value, $replace_student);
+
             return ($key !== false) ? $student[$key] : $value;
         }, $assignedStudentIds);
 
-        if (!empty($replace_student)) {
+        if (! empty($replace_student)) {
             Student::whereIn('id', $replace_student)
                 ->where('beat_round', '>', 0) // Prevent negative values
                 ->decrement('beat_round');
@@ -135,11 +137,10 @@ class BeatController extends Controller
 
         if ($beat) {
             $beat->update([
-                'student_ids' => json_encode($newArray)
+                'student_ids' => json_encode($newArray),
             ]);
 
-
-            if (!empty($student)) {
+            if (! empty($student)) {
                 Student::whereIn('id', $student)->increment('beat_round');
                 Student::whereIn('id', $student)->update(['beat_status' => 14]);
             }
@@ -147,6 +148,7 @@ class BeatController extends Controller
 
         return redirect()->route('beats.byDate')->with('success', 'Beat updated successfully.');
     }
+
     public function exchange(Request $request, Beat $beat)
     {
         // Retrieve current and exchange student IDs from the request
@@ -177,8 +179,6 @@ class BeatController extends Controller
                 // Find the Beat object for the exchange student (the "exchange_beat")
                 $exchange_beat = Beat::find($exchange_student->beat->id);
 
-
-
                 // Update the exchange_students array with the current student ID at the corresponding index
                 $exchange_students[$index] = $student_ids[$key];
 
@@ -205,7 +205,6 @@ class BeatController extends Controller
             }
         }
 
-
         // Update the original Beat's student_ids with the new student_ids array (encoded as JSON)
         $beat->student_ids = json_encode($student_ids);
 
@@ -215,23 +214,18 @@ class BeatController extends Controller
         return redirect()->route('beats.byDate', ['date' => $beat->date])->with('success', 'Students beat exchanged successfully.');
     }
 
-
-
-
-
-
     public function exchange1(Request $request, Beat $beat)
     {
         $exchange_students = $request->input('exchange_students');
         $current_students = $request->input('current_students');
-        //change current student
+        // change current student
         foreach ($beat->students as $student) {
-            for ($i = 0; $i < count($exchange_students); ++$i) {
+            for ($i = 0; $i < count($exchange_students); $i++) {
                 $exchange_student = json_decode($exchange_students[$i])->student;
-                //return $exchange_student->id;
+                // return $exchange_student->id;
 
             }
-            for ($i = 0; $i < count($current_students); ++$i) {
+            for ($i = 0; $i < count($current_students); $i++) {
                 if ($student->id == $current_students[$i]) {
                     $student->id = $current_students[$i];
                 }
@@ -256,13 +250,13 @@ class BeatController extends Controller
                     });
             })
             ->with([
-                    'guardAreas.beats' => function ($query) use ($date) {
-                        $query->where('date', $date);
-                    },
-                    'patrolAreas.beats' => function ($query) use ($date) {
-                        $query->where('date', $date);
-                    }
-                ])
+                'guardAreas.beats' => function ($query) use ($date) {
+                    $query->where('date', $date);
+                },
+                'patrolAreas.beats' => function ($query) use ($date) {
+                    $query->where('date', $date);
+                },
+            ])
             ->firstOrFail();
 
         $summary = [];
@@ -286,7 +280,7 @@ class BeatController extends Controller
         $pdf = Pdf::loadView('beats.pdf', compact('company', 'date', 'summary', 'totalPlatoonCount'))
             ->setPaper('a4', 'landscape');
 
-        return $pdf->download('beats_' . $company->name . '_' . $date . '.pdf');
+        return $pdf->stream('beats_'.$company->name.'_'.$date.'.pdf');
     }
 
     /**
@@ -294,24 +288,24 @@ class BeatController extends Controller
      */
     private function updateSummary(&$summary, &$totalPlatoonCount, $beat)
     {
-        $timeSlot = $beat->start_at . " - " . $beat->end_at;
+        $timeSlot = $beat->start_at.' - '.$beat->end_at;
         $studentIds = json_decode($beat->student_ids, true);
         $students = Student::whereIn('id', $studentIds)->get();
 
-        if (!isset($summary[$timeSlot])) {
+        if (! isset($summary[$timeSlot])) {
             $summary[$timeSlot] = [];
         }
 
         foreach ($students as $student) {
             $platoon = $student->platoon;
 
-            if (!isset($summary[$timeSlot][$platoon])) {
+            if (! isset($summary[$timeSlot][$platoon])) {
                 $summary[$timeSlot][$platoon] = 0;
             }
 
             $summary[$timeSlot][$platoon]++;
 
-            if (!isset($totalPlatoonCount[$platoon])) {
+            if (! isset($totalPlatoonCount[$platoon])) {
                 $totalPlatoonCount[$platoon] = 0;
             }
 
@@ -319,8 +313,7 @@ class BeatController extends Controller
         }
     }
 
-
-    function generateBeats($areas, $studentsByCompany, $studentsByPlatoon, $beatType, $date, &$usedStudentIds)
+    public function generateBeats($areas, $studentsByCompany, $studentsByPlatoon, $beatType, $date, &$usedStudentIds)
     {
         $beats = [];
 
@@ -329,9 +322,9 @@ class BeatController extends Controller
         $mid = floor($totalPlatoons->count() / 2);
         $groupA = $totalPlatoons->slice(0, $mid)->values();
         $groupB = $totalPlatoons->slice($mid)->values();
-        
+
         // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
-        $groupBx = [1,2,3,4,5,6,7];
+        $groupBx = [1, 2, 3, 4, 5, 6, 7];
 
         // Convert array into a Laravel Collection
         $currentGroup = collect($groupBx);
@@ -374,7 +367,6 @@ class BeatController extends Controller
             // $platoonNoFemales = ceil((137 *$EligibleFemalesPercentage)/7);
             // $platoonNoMales = floor((137 *(1-$EligibleFemalesPercentage))/7);
 
-
             // $total =($platoonNoFemales+ $platoonNoMales) *7;
             // foreach ($currentGroup as $platoon) {
             //     $platoonStudents = $companyStudents->where('platoon', $platoon);
@@ -384,9 +376,8 @@ class BeatController extends Controller
             //     $selectedStudents = $selectedStudents->merge($females)->merge($males);
             // }
 
-
             // Apply Gender Restrictions
-            if (!empty($area->beat_exception_ids)) {
+            if (! empty($area->beat_exception_ids)) {
                 $exceptions = json_decode($area->beat_exception_ids, true);
                 if (in_array(1, $exceptions)) {
                     $companyStudents = $companyStudents->where('gender', 'F')->values();
@@ -418,7 +409,6 @@ class BeatController extends Controller
                     $preferredStudents = $companyStudents->where('gender', 'M');
                 }
 
-
                 // Prioritize muislims who fasted ... during morning and mid night
                 // if ($startAt === '06:00' || $startAt === '00:00') {
                 //     $preferredStudents = $companyStudents->where('fast_status', 1);
@@ -436,6 +426,7 @@ class BeatController extends Controller
                 if ($a->beat_round == $b->beat_round) {
                     return $a->id <=> $b->id;
                 }
+
                 return $a->beat_round <=> $b->beat_round;
             })->values();
 
@@ -481,14 +472,12 @@ class BeatController extends Controller
                     $usedStudentIds = array_merge($usedStudentIds, $additionalStudents);
                 }
 
-
-
                 // Increment beat_round for assigned students
                 Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
                 Student::whereIn('id', $assignedStudentIds)->update(['beat_status' => 14]);
             }
 
-            if (!empty($assignedStudentIds)) {
+            if (! empty($assignedStudentIds)) {
                 $beats[] = [
                     'beatType_id' => ($beatType === 'guards') ? 1 : 2,
                     'guardArea_id' => ($beatType === 'guards') ? $area->id : null,
@@ -511,8 +500,8 @@ class BeatController extends Controller
     {
         $date = $request->input('date', Carbon::today()->toDateString());
         if (Beat::where('date', $date)->exists()) {
-            return redirect()->back()->with('info', 'Beats already generated for ' . $date);
-            //return response()->json(['message' => 'Beats already generated for ' . $date], 200);
+            return redirect()->back()->with('info', 'Beats already generated for '.$date);
+            // return response()->json(['message' => 'Beats already generated for ' . $date], 200);
         }
 
         // Fetch active students (only those eligible for beats)
@@ -570,20 +559,19 @@ class BeatController extends Controller
                 BeatLeaderOnDuty::create($leader);
             }
         });
-        return redirect()->back()->with('success','Beats generated successfully for ' . $date);
-        //return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
+
+        return redirect()->back()->with('success', 'Beats generated successfully for '.$date);
+        // return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
     }
 
-
-
-    function filterAreasByTimeExceptions($areas)
+    public function filterAreasByTimeExceptions($areas)
     {
         $filteredAreas = [];
         $timeRanges = [
             1 => ['start' => '06:00', 'end' => '12:00'],
             2 => ['start' => '12:00', 'end' => '18:00'],
             3 => ['start' => '18:00', 'end' => '00:00'],
-            4 => ['start' => '00:00', 'end' => '06:00']
+            4 => ['start' => '00:00', 'end' => '06:00'],
         ];
 
         foreach ($areas as $area) {
@@ -595,7 +583,7 @@ class BeatController extends Controller
                     $filteredAreas[] = [
                         'area' => $area,
                         'start_at' => $range['start'],
-                        'end_at' => $range['end']
+                        'end_at' => $range['end'],
                     ];
                 }
             } else {
@@ -605,7 +593,7 @@ class BeatController extends Controller
                         $filteredAreas[] = [
                             'area' => $area,
                             'start_at' => $timeRanges[$exception]['start'],
-                            'end_at' => $timeRanges[$exception]['end']
+                            'end_at' => $timeRanges[$exception]['end'],
                         ];
                     }
                 }
@@ -615,12 +603,10 @@ class BeatController extends Controller
         return $filteredAreas;
     }
 
-
     /**
      * Function to Assign Leaders on Duty
      */
-
-    function assignLeadersOnDuty($companyId, $date, &$usedStudentIds)
+    public function assignLeadersOnDuty($companyId, $date, &$usedStudentIds)
     {
         // Check if leaders on duty have already been assigned for the given date
         $existingLeadersOnDuty = BeatLeaderOnDuty::where('beat_date', $date)
@@ -641,7 +627,7 @@ class BeatController extends Controller
                 $query->where('company_id', $companyId);
             })
             ->pluck('student_ids')
-            ->map(fn($ids) => json_decode($ids, true))
+            ->map(fn ($ids) => json_decode($ids, true))
             ->flatten()
             ->toArray();
 
@@ -675,7 +661,7 @@ class BeatController extends Controller
             return [
                 'student_id' => $leader->id,
                 'company_id' => $companyId,
-                'beat_date' => $date
+                'beat_date' => $date,
             ];
         })->toArray();
 
@@ -687,12 +673,10 @@ class BeatController extends Controller
         return $leaders; // Always return an array
     }
 
-
     /**
      * Function to Assign Reserves (6 Males, 4 Females, One Per Platoon)
      */
-
-    function assignReserves($companyId, $date, &$usedStudentIds)
+    public function assignReserves($companyId, $date, &$usedStudentIds)
     {
         // Check if reserves have already been assigned for the given date
         $existingReserves = BeatReserve::where('beat_date', $date)
@@ -713,7 +697,7 @@ class BeatController extends Controller
                 $query->where('company_id', $companyId);
             })
             ->pluck('student_ids')
-            ->map(fn($ids) => json_decode($ids, true))
+            ->map(fn ($ids) => json_decode($ids, true))
             ->flatten()
             ->toArray();
 
@@ -743,9 +727,8 @@ class BeatController extends Controller
         $groupB = $totalPlatoons->slice($mid)->values();
         // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
         // $currentGroup = $groupB;
-        $groupBx = [1,2,3,4,5,6,7];
+        $groupBx = [1, 2, 3, 4, 5, 6, 7];
 
-        
         // Convert array into a Laravel Collection
         $currentGroup = collect($groupBx);
 
@@ -808,7 +791,6 @@ class BeatController extends Controller
             ->take($remainingReservesNeeded)
             ->values();
 
-
         $reserves = $reserves->merge($additionalReserves)->map(function ($student) use ($companyId, $date, &$usedStudentIds) {
             // Mark student as used
             $usedStudentIds[] = $student->id;
@@ -817,7 +799,7 @@ class BeatController extends Controller
                 'student_id' => $student->id,
                 'company_id' => $companyId,
                 'beat_date' => $date,
-                'beat_round' => BeatRound::where('company_id', $companyId)->get()[0]->current_round ?? 0
+                'beat_round' => BeatRound::where('company_id', $companyId)->get()[0]->current_round ?? 0,
             ];
         })->toArray();
 
@@ -827,8 +809,7 @@ class BeatController extends Controller
         return $reserves; // Always return an array
     }
 
-
-    //Beat Report
+    // Beat Report
     // public function showReport(Request $request)
     // {
     //     $companies = Company::all();
@@ -839,25 +820,27 @@ class BeatController extends Controller
     //     return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
     // }
     public function showReport(Request $request)
-{
-    $selectedSessionId = session('selected_session');
-        if (!$selectedSessionId)
+    {
+        $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
             $selectedSessionId = 1;
+        }
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId); // Filter students by session
         })->get();
-    $report = $companies->map(fn($company) => $this->beatHistory($company));
+        $report = $companies->map(fn ($company) => $this->beatHistory($company));
 
-    return view('beats.beat_report', compact('report', 'companies'));
-}
+        return view('beats.beat_report', compact('report', 'companies'));
+    }
 
     public function downloadHistoryPdf($companyId)
     {
         $company = Company::find($companyId);
         $report = $this->beatHistory($company);
-        //return view('beats.historyPdf', compact('report'));
+        // return view('beats.historyPdf', compact('report'));
         $pdf = Pdf::loadView('beats.historyPdf', compact('report'));
-        return $pdf->download("history.pdf");
+
+        return $pdf->download('history.pdf');
     }
 
     public function showReport2(Request $request)
@@ -875,36 +858,35 @@ class BeatController extends Controller
     {
         // $companies = Company::all();
         // $report = [];
-        //foreach($companies as $company){
+        // foreach($companies as $company){
         $students = $company->students->where('session_programme_id', 1);
         $totalStudents = count($students);
         $totalEligibleStudents = count($students->whereIn('beat_status', [1, 2, 3]));
         $totalIneligibleStudents = count($students->whereNotIn('beat_status', [1, 2, 3]));
         // $eligibleStudentsPercent = round((($totalStudents - $totalIneligibleStudents) / $totalStudents) * 100, 2);
-        $eligibleStudentsPercent = ($totalStudents > 0) 
-    ? round((($totalStudents - $totalIneligibleStudents) / $totalStudents) * 100, 2) 
+        $eligibleStudentsPercent = ($totalStudents > 0)
+    ? round((($totalStudents - $totalIneligibleStudents) / $totalStudents) * 100, 2)
     : 0;
         // $InEligibleStudentsPercent = round((($totalIneligibleStudents) / $totalStudents) * 100, 2);
-        $InEligibleStudentsPercent = ($totalStudents > 0) 
-    ? round(($totalIneligibleStudents / $totalStudents) * 100, 2) 
+        $InEligibleStudentsPercent = ($totalStudents > 0)
+    ? round(($totalIneligibleStudents / $totalStudents) * 100, 2)
     : 0; // Avoid division by zero
-       // dd($InEligibleStudentsPercent);
+        // dd($InEligibleStudentsPercent);
         $guardAreas = count($company->guardAreas);
         $patrolAreas = count($company->patrolAreas);
-       // dd($company->beatRound[0]->current_round);
+        // dd($company->beatRound[0]->current_round);
         $current_round = optional($company->beatRound->first())->current_round;
 
         $attained_current_round = count($students->whereIn('beat_status', [1, 2, 3])->where('beat_round', $current_round)->values());
         $NotAttained_current_round = count($students->whereIn('beat_status', [1])->where('beat_round', '<', $current_round)->values());
         $exceededAttained_current_round = count($students->whereIn('beat_status', [1])->where('beat_round', '>', $current_round)->values());
         $fastingStudentCount = count($students->where('fast_status', 1)->values());
-        
+
         $ICTStudents = $students->where('beat_exclusion_vitengo_id', 1)->values();
         $ujenziStudents = $students->where('beat_exclusion_vitengo_id', 2)->values();
         $hospitalStudents = $students->where('beat_exclusion_vitengo_id', 3)->values();
         $emergencyStudents = $students->whereNotNull('beat_emergency')->where('beat_status', 0)->values();
         $reserveStudents = BeatReserve::where('company_id', $company->id)->where('beat_round', $current_round)->get();
-
 
         // Fetch guard and patrol areas with proper time filters
         $_guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());
@@ -922,56 +904,55 @@ class BeatController extends Controller
             }
         }
 
-
         if ($number_of_guards > 0) {
-    $days_per_round = round(($totalEligibleStudents / $number_of_guards), 0);
-} else {
-    // Handle the case where there are no guards
-    $days_per_round = 0; // or some other default value or error
-}
+            $days_per_round = round(($totalEligibleStudents / $number_of_guards), 0);
+        } else {
+            // Handle the case where there are no guards
+            $days_per_round = 0; // or some other default value or error
+        }
 
         $company = [
             'company_id' => $company->id,
             'company_name' => $company->name,
             'data' => [
-                    'totalStudents' => $totalStudents,
-                    'totalIneligibleStudents' => $totalIneligibleStudents,
-                    'totalEligibleStudents' => $totalEligibleStudents,
-                    'eligibleStudentsPercent' => $eligibleStudentsPercent,
-                    'InEligibleStudentsPercent' => $InEligibleStudentsPercent,
-                    'reserveStudents' => $reserveStudents,
-                    'guardAreas' => $guardAreas,
-                    'patrolAreas' => $patrolAreas,
-                    'current_round' => $current_round,
-                    'attained_current_round' => $attained_current_round,
-                    'NotAttained_current_round' => $NotAttained_current_round,
-                    'exceededAttained_current_round' => $exceededAttained_current_round,
-                    'fastingStudentCount' => $fastingStudentCount,
-                    'number_of_guards' => $number_of_guards,
-                    'days_per_round' => $days_per_round,
-                    'vitengo' => [
-                            [
-                                'name' => 'ICT',
-                                'students' => $ICTStudents
-                            ],
-                            [
-                                'name' => 'UJENZI',
-                                'students' => $ujenziStudents
-                            ],
-                            [
-                                'name' => 'HOSPITAL',
-                                'students' => $hospitalStudents
-                            ],
+                'totalStudents' => $totalStudents,
+                'totalIneligibleStudents' => $totalIneligibleStudents,
+                'totalEligibleStudents' => $totalEligibleStudents,
+                'eligibleStudentsPercent' => $eligibleStudentsPercent,
+                'InEligibleStudentsPercent' => $InEligibleStudentsPercent,
+                'reserveStudents' => $reserveStudents,
+                'guardAreas' => $guardAreas,
+                'patrolAreas' => $patrolAreas,
+                'current_round' => $current_round,
+                'attained_current_round' => $attained_current_round,
+                'NotAttained_current_round' => $NotAttained_current_round,
+                'exceededAttained_current_round' => $exceededAttained_current_round,
+                'fastingStudentCount' => $fastingStudentCount,
+                'number_of_guards' => $number_of_guards,
+                'days_per_round' => $days_per_round,
+                'vitengo' => [
+                    [
+                        'name' => 'ICT',
+                        'students' => $ICTStudents,
+                    ],
+                    [
+                        'name' => 'UJENZI',
+                        'students' => $ujenziStudents,
+                    ],
+                    [
+                        'name' => 'HOSPITAL',
+                        'students' => $hospitalStudents,
+                    ],
 
-                        ],
-                    'emergencyStudents' => $emergencyStudents
-                ]
+                ],
+                'emergencyStudents' => $emergencyStudents,
+            ],
         ];
-        //array_push($report, $company);
-        //}
+
+        // array_push($report, $company);
+        // }
         return $company;
     }
-
 
     public function downloadReport(Request $request)
     {
@@ -981,6 +962,7 @@ class BeatController extends Controller
         $report = $this->generateBeatReport($startDate, $endDate, $dateFilter);
 
         $pdf = PDF::loadView('beats.beat_report_pdf', ['report' => $report]);
+
         return $pdf->download('beat_report.pdf');
     }
 
@@ -1146,8 +1128,6 @@ class BeatController extends Controller
         return $report;
     }
 
-
-
     public function showBeat(Beat $beat)
     {
         $students = Student::whereIn('id', $beat->student_ids)->get();
@@ -1162,6 +1142,7 @@ class BeatController extends Controller
     {
         $beat = Beat::findOrFail($id);
         $beat->delete();
+
         return redirect()->route('beats.index')->with('success', 'Beat deleted successfully!');
     }
 
@@ -1169,6 +1150,7 @@ class BeatController extends Controller
     {
         $reserves = BeatReserve::where('company_id', $companyId)->where('beat_date', $date)->get();
         $company = Company::find($companyId);
+
         return view('beats.reserves', compact('date', 'reserves', 'company'));
     }
 
@@ -1185,7 +1167,7 @@ class BeatController extends Controller
     {
 
         $request->validate([
-            'replacement_reason' => 'required|string'
+            'replacement_reason' => 'required|string',
         ]);
         $student = Student::find($studentId);
         $reserve = Student::find($reserveId);
@@ -1208,7 +1190,6 @@ class BeatController extends Controller
         return redirect()->route('beats.reserves', ['companyId' => $reserve->company_id, 'date' => $date])->with('success', 'Reserve replaced successfully.');
     }
 
-
     public function beatReplacementStudent($studentId, $date, $beatReserveId)
     {
 
@@ -1221,18 +1202,20 @@ class BeatController extends Controller
         foreach ($patrol_areas as $area) {
             $beats = $area->beats->where('date', $date);
 
-            if (count($beats) > 0)
+            if (count($beats) > 0) {
                 foreach ($beats as $beat) {
                     $beat_students = array_merge($beat_students, json_decode($beat->student_ids));
                 }
+            }
         }
 
         foreach ($guard_areas as $area) {
             $beats = $area->beats->where('date', $date);
-            if (count($beats) > 0)
+            if (count($beats) > 0) {
                 foreach ($beats as $beat) {
                     $beat_students = array_merge($beat_students, json_decode($beat->student_ids));
                 }
+            }
         }
         $students = Student::whereIn('id', $beat_students)->orderBy('first_name')->get();
 

@@ -7,7 +7,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/tps-smis/" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="/tps-smis/attendences/">Attendences</a></li>
+                <li class="breadcrumb-item"><a href="/tps-smis/attendences/">{{  $attendenceType->name  }} Attendences</a></li>
                 <li class="breadcrumb-item active"><a href="#">{{ $company->description }}</a></li>
                 </li>
             </ol>
@@ -26,8 +26,8 @@
 <h4>Attendances for {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}.</h4><br>
     <div class="d-flex @if(auth()->user()->hasRole(['CRO','Admin','Super Administrator'])) justify-content-between @else justify-content-end @endif">
 @php
-    $attendanceCompany = $company->company_attendance($date);
-    $attendanceStatus = $attendanceCompany->status;
+    $attendanceCompany = $company->company_attendance($date, $attendenceType->id);
+    $attendanceStatus = $attendanceCompany?->status;
     $hoursSinceUpdate = \Carbon\Carbon::parse($attendanceCompany->updated_at)->diffInHours(\Carbon\Carbon::now());
 @endphp
 @if(auth()->user()->hasRole(['CRO','Admin','Super Administrator']))
@@ -156,7 +156,7 @@ function confirmStatusChange(event, status, message) {
 </script>
 
 
-        <a href="{{ route('attendences.generatePdf',['companyId'=>$company->id,'date'=>$date, 'attendenceTypeId' => $attendenceType->id]) }}">
+        <a href="{{ route('attendences.generatePdf',['companyId'=>$company->id,'date'=>$date, 'attendenceTypeId' => $attendenceType->id]) }}" target="_blank">
             <button title="Download report" class="btn btn-sm btn-success"><i class="gap 2 bi bi-download"></i> Report</button>
         </a>
 
@@ -183,7 +183,7 @@ function confirmStatusChange(event, status, message) {
                 </tr>
             </thead>
             <tbody>
-                <?php    $i = 0;?>
+                <?php $i = 0; ?>
                 @foreach ($attendences as $key => $attendence)
                     <tr>
                         <td>{{$attendence->platoon->company->name}} - {{$attendence->platoon->name}}</td>

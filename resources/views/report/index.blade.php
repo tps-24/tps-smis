@@ -44,7 +44,12 @@
     </form>
 
     <!-- Report Download -->
+<<<<<<< HEAD
     <form class="d-flex gap-2 align-items-end" action="{{ route('reports.generateAttendanceReport') }}" method="get">
+=======
+     @if(!request('end_date'))
+    <form class="d-flex gap-2 align-items-end" action="{{ route('reports.generateAttendanceReport') }}" method="get" target="_blank">
+>>>>>>> ecb3bfd (Jogging as attendance type.)
         <select class="form-control" name="company_id" id="company_id" required style="min-width: 200px;">
             <option value="" selected disabled>Company</option>
             @foreach ($companies as $company)
@@ -55,7 +60,11 @@
             <i class="bi bi-download me-1"></i> Report
         </button>
     </form>
+<<<<<<< HEAD
 
+=======
+    @endif
+>>>>>>> ecb3bfd (Jogging as attendance type.)
 </div>
 
 <div class="chart-container" style="padding: 0 10% 0 10%">

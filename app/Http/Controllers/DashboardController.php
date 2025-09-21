@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
@@ -18,10 +19,12 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
     private $selectedSessionId;
+
     protected $graphDataService;
+
     public function __construct(GraphDataService $graphDataService)
     {
-        $this->graphDataService  = $graphDataService;
+        $this->graphDataService = $graphDataService;
         $this->selectedSessionId = session('selected_session');
         if (! $this->selectedSessionId) {
             $this->selectedSessionId = 1;
@@ -33,34 +36,45 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
 
+        $companyId = null;
+        $companiesId = [];
+        $staffsCount = null;
         // Check if a session ID has been submitted
         if (request()->has('session_id')) {
             // Store the selected session ID in the session
             session(['selected_session' => request()->session_id]);
         }
         // Get the selected session ID from the session
-        $selectedSessionId = session('selected_session',1);
+        $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
+            $selectedSessionId = 1;
+        }
         $pending_message = session('pending_message');
 
         $dailyCount = $weeklyCount = $monthlyCount = 0;
-        $user       = Auth::user();
-        $companies  = [];
+        $user = Auth::user();
+        $companies = [];
         if ($user->hasRole(['Sir Major', 'OC Coy', 'Instructor'])) {
             $companies = [$user->staff->company];
+            $companyId = $user->staff->company->id;
+            $staffsCount = Staff::where('status', '!=', 'dismissed')->where('company_id', $companyId)->count('forceNumber');
         } else {
             $companies = Company::all();
-
+            $staffsCount = Staff::where('status', '!=', 'dismissed')->count('forceNumber');
         }
 
-        $companyId = $request->input('company_id');
-        $platoon   = $request->input('platoon');
+        if ($request->input('company_id')) {
+            $companyId = $request->input('company_id');
+        }
+        $platoon = $request->input('platoon');
         if ($companyId) {
-            $companies = [Company::find($companyId)];
+            $company = Company::find($companyId);
+            $companies = [$company];
         }
 
         foreach ($companies as $company) {
             $admittedNotReleasedCount = $company->sickStudents->where('excuse_type_id', 3)->whereNull('is_discharged')->pluck('id');
-            $daily                    = $company->sickStudents()->whereDate('created_at', Carbon::today())->pluck('id');
+            $daily = $company->sickStudents()->whereDate('created_at', Carbon::today())->pluck('id');
             $dailyCount += $admittedNotReleasedCount->merge($daily)->unique()->count();
 
             $weekly = $company->sickStudents()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->pluck('id');
@@ -68,12 +82,13 @@ class DashboardController extends Controller
 
             $monthly = $company->sickStudents()->whereMonth('created_at', now()->month)->pluck('id');
             $monthlyCount += $admittedNotReleasedCount->merge($monthly)->unique()->count();
+            $companiesId = array_merge($companiesId, [$company->id]);
         }
 
-        $today     = Carbon::today();
-        $thisWeek  = Carbon::now()->startOfWeek();
+        $today = Carbon::today();
+        $thisWeek = Carbon::now()->startOfWeek();
         $thisMonth = Carbon::now()->startOfMonth();
-        $thisYear  = Carbon::now()->startOfYear();
+        $thisYear = Carbon::now()->startOfYear();
 
         // Count statistics based on the selected filters
         // $dailyCount   = (clone $query)->whereDate('created_at', $today)->count();
@@ -124,7 +139,7 @@ class DashboardController extends Controller
         for ($i = 2; $i >= 0; $i--) {
             $months[] = Carbon::now()->subMonths($i)->format('F Y'); // e.g. "April 2025"
         }
-        $date                = $request->has('date') ? Carbon::parse($request->date)->format('F Y') : now()->format('F Y');
+        $date = $request->has('date') ? Carbon::parse($request->date)->format('F Y') : now()->format('F Y');
         $recentAnnouncements = Announcement::where('expires_at', '>', Carbon::now())
             ->orderBy('created_at', 'desc')
             ->take(4)
@@ -132,19 +147,30 @@ class DashboardController extends Controller
 
         if (auth()->user()->hasRole('Student')) {
             return view('dashboard.student_dashboard', compact('pending_message', 'selectedSessionId'));
-        } else if (auth()->user()->hasRole('Receptionist|Doctor')) {
+        } elseif (auth()->user()->hasRole('Receptionist|Doctor')) {
             return view('dispensary.index', compact('dailyCount', 'weeklyCount', 'monthlyCount', 'patientDistribution', 'companies', 'months', 'date'));
         } else {
-            $todayStudentReport = $this->todayStudentReport();
+            $todayStudentReport = $this->todayStudentReport($companiesId);
 
+            // $denttotalCount   = Student::where('session_programme_id', $selectedSessionId ?? 1)->count();
             $denttotalCount = Student::where('session_programme_id', $selectedSessionId ?? 1)
-            ->whereDoesntHave('dismissal') // exclude dismissed students
-            ->count();
+                ->when(! is_null($companyId), function ($query) use ($companyId) {
+                    return $query->where('company_id', $companyId);
+                })
+                ->count();
 
-            $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)->where('beat_status', 1)->count();
-            $beats            = Beat::where('date', Carbon::today()->toDateString())->get();
-            $filteredBeats    = $beats->filter(function ($beat) use ($selectedSessionId) {
+            // $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)->where('beat_status', 1)->count();
+            $dentpresentCount = Student::where('session_programme_id', $selectedSessionId)
+                ->where('beat_status', 1)
+                ->when(! is_null($companyId), function ($query) use ($companyId) {
+                    return $query->where('company_id', $companyId);
+                })
+                ->count();
+
+            $beats = Beat::where('date', Carbon::today()->toDateString())->get();
+            $filteredBeats = $beats->filter(function ($beat) use ($selectedSessionId) {
                 $studentIds = json_decode($beat->student_ids, true);
+
                 return Student::whereIn('id', $studentIds)->where('session_programme_id', $selectedSessionId ?? 1)->exists();
             });
             $totalStudentsInBeats = $filteredBeats->sum(function ($beat) {
@@ -167,9 +193,9 @@ class DashboardController extends Controller
                 })
                 ->count();
 
-            $staffsCount           = Staff::where('status','!=','dismissed')->count('forceNumber');
+            $graphData = $this->graphDataService->getGraphData(null, null, $companiesId);
             $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
-            $graphData             = $this->graphDataService->getGraphData();
+
             return view('dashboard.dashboard', compact(
                 'selectedSessionId', 'denttotalCount',
                 'dentpresentCount', 'totalStudentsInBeats',
@@ -182,11 +208,12 @@ class DashboardController extends Controller
     public function getContent(Request $request)
     {
         $sessionProgrammeId = session('selected_session'); // Use session variable to get the selected session programme ID
-        $denttotalCount     = Student::where('session_programme_id', $sessionProgrammeId)->count();
-        $dentpresentCount   = Student::where('session_programme_id', $sessionProgrammeId)->where('beat_status', 1)->count();
-        $beats              = Beat::where('date', Carbon::today()->toDateString())->get();
-        $filteredBeats      = $beats->filter(function ($beat) use ($sessionProgrammeId) {
+        $denttotalCount = Student::where('session_programme_id', $sessionProgrammeId)->count();
+        $dentpresentCount = Student::where('session_programme_id', $sessionProgrammeId)->where('beat_status', 1)->count();
+        $beats = Beat::where('date', Carbon::today()->toDateString())->get();
+        $filteredBeats = $beats->filter(function ($beat) use ($sessionProgrammeId) {
             $studentIds = json_decode($beat->student_ids, true);
+
             return Student::whereIn('id', $studentIds)->where('session_programme_id', $sessionProgrammeId)->exists();
         });
         $totalStudentsInBeats = $filteredBeats->sum(function ($beat) {
@@ -202,7 +229,7 @@ class DashboardController extends Controller
                         ->whereNull('released_at'); // Checks for released_at = NULL when excuse_type_id = 3
                 });
         })->count();
-        $staffsCount           = Staff::count('forceNumber');
+        $staffsCount = Staff::count('forceNumber');
         $beatStudentPercentage = $denttotalCount > 0 ? ($totalStudentsInBeats / $denttotalCount) * 100 : 0;
 
         return view('dashboard.partials.dashboard_content', compact('denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage'));
@@ -212,27 +239,27 @@ class DashboardController extends Controller
     {
         $timeRange = $request->input('timeRange');
         $startDate = $request->input('startDate');
-        $endDate   = $request->input('endDate');
+        $endDate = $request->input('endDate');
 
         // Default to today if no date range is selected
         if (! $startDate || ! $endDate) {
             $startDate = Carbon::today()->toDateString();
-            $endDate   = Carbon::today()->toDateString();
+            $endDate = Carbon::today()->toDateString();
         }
 
         // Calculate start and end dates based on time range
         switch ($timeRange) {
             case 'daily':
                 $startDate = Carbon::today()->toDateString();
-                $endDate   = Carbon::today()->toDateString();
+                $endDate = Carbon::today()->toDateString();
                 break;
             case 'weekly':
                 $startDate = Carbon::now()->startOfWeek()->toDateString();
-                $endDate   = Carbon::now()->endOfWeek()->toDateString();
+                $endDate = Carbon::now()->endOfWeek()->toDateString();
                 break;
             case 'monthly':
                 $startDate = Carbon::now()->startOfMonth()->toDateString();
-                $endDate   = Carbon::now()->endOfMonth()->toDateString();
+                $endDate = Carbon::now()->endOfMonth()->toDateString();
                 break;
         }
 
@@ -269,9 +296,9 @@ class DashboardController extends Controller
 
         // Build the data response
         $data = [
-            'labels'   => $labels,
-            'absents'  => array_fill(0, count($labels), $absents),
-            'sick'     => array_fill(0, count($labels), $sick),
+            'labels' => $labels,
+            'absents' => array_fill(0, count($labels), $absents),
+            'sick' => array_fill(0, count($labels), $sick),
             'lockedUp' => array_fill(0, count($labels), $lockedUp),
         ];
 
@@ -291,12 +318,12 @@ class DashboardController extends Controller
         $weeklyComparison = [];
         foreach ($weeklyAttendance as $index => $week) {
             if ($index > 0) {
-                $previousWeek       = $weeklyAttendance[$index - 1];
+                $previousWeek = $weeklyAttendance[$index - 1];
                 $weeklyComparison[] = [
-                    'year'               => $week->year,
-                    'week'               => $week->week,
+                    'year' => $week->year,
+                    'week' => $week->week,
                     'present_difference' => $week->total_present - $previousWeek->total_present,
-                    'absent_difference'  => $week->total_absent - $previousWeek->total_absent,
+                    'absent_difference' => $week->total_absent - $previousWeek->total_absent,
                 ];
             }
         }
@@ -312,7 +339,7 @@ class DashboardController extends Controller
         return view('dashboard.default_dashboard', compact('currentProgramsCount', 'inactiveProgramsCount', 'programmes', 'weeklyAttendance', 'weeklyComparison'));
     }
 
-    private function todayStudentReport()
+    private function todayStudentReport($companiesId)
     {
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
@@ -320,15 +347,15 @@ class DashboardController extends Controller
         }
 
         $present = 0;
-        $absent  = 0;
-        $sick    = 0;
-        $lockUp  = 0;
+        $absent = 0;
+        $sick = 0;
+        $lockUp = 0;
 
-        $platoons = Platoon::all();
+        $platoons = Platoon::whereIn('company_id', $companiesId)->get();
 
         foreach ($platoons as $platoon) {
-            //dd($platoon->company->company_attendance('12-8-2025')->status);
-            if ($platoon->company?->company_attendance(now())?->status != "verified") {
+            // dd($platoon->company->company_attendance('12-8-2025')->status);
+            if ($platoon->company?->company_attendance(now())?->status != 'verified') {
                 continue;
             }
 
@@ -341,15 +368,15 @@ class DashboardController extends Controller
             }
 
         }
-        $total          = Student::where('session_programme_id', $selectedSessionId)->count();
+        $total = Student::where('session_programme_id', $selectedSessionId)->whereIn('company_id', $companiesId)->count();
         $presentPercent = $total == 0 ? 0 : round(($present / ($total) * 100), 1);
+
         return [
-            'present'        => $present,
-            'absent'         => $absent,
-            'sick'           => $sick,
-            'lockUp'         => $lockUp,
-            'presentPercent' => $presentPercent . '%',
+            'present' => $present,
+            'absent' => $absent,
+            'sick' => $sick,
+            'lockUp' => $lockUp,
+            'presentPercent' => $presentPercent.'%',
         ];
     }
-
 }

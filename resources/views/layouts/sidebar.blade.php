@@ -170,11 +170,11 @@
                             </a>
                             <ul class="treeview-menu">
                                 <li>
-                                    <a href="/tps-smis/attendences/type/1">Morning</a>
+                                    <a href="/tps-smis/attendences/type/1">Jogging</a>
                                 </li>
-                                <!-- <li>
+                                 <li>
                     <a href="/tps-smis/attendences/type/2">Master Parade</a>
-                  </li> -->
+                  </li>
                                 <li>
                                     <a href="/tps-smis/attendences/type/4">Flag</a>
                                 </li>
