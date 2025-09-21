@@ -321,6 +321,12 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('downloads.index') }}">
+                    <i class="bi bi-weapon"></i>
+                    <span class="menu-text">Weapon Panel</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('timetable.index') }}">
                     <i class="bi bi-calendar2"></i>
                     <span class="menu-text">Timetable</span>

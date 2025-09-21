@@ -25,7 +25,7 @@
                             <h2>Add Course Results</h2>
                         </div>
                         <div class="pull-right">
-                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('coursework_results.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                            <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('semester_exams.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                         </div>
                     </div>
                 </div>

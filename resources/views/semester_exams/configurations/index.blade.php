@@ -7,8 +7,8 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Course Work</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="#">Coursework (CW) Assessment types for {{  $course->courseName }}</a></li>
+        <li class="breadcrumb-item"><a href="#">Semester Exam</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">Semester Exam (SE) Configuration for {{  $course->courseName }}</a></li>
       </ol>
     </nav>
   </div>
@@ -38,11 +38,11 @@
         <div class="card mb-4">            
             <div class="card-header">
                 <div class="pull-right">
-                    <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('coursework_results.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                    <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('semester_exams.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
                 </div>
 
                 <div class="mt-1">
-                <p>&nbspHere you can configure course result assessment types. If you encounter any issues, feel free to contact support.</p>
+                <p>&nbspHere you can configure Semester Examination (SE). If you encounter any issues, feel free to contact support.</p>
                 </div>
                 
                 <div class="pull-right" style="float:right !important;">
@@ -60,7 +60,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Coursework Title</th>
+                                    <th>Semester Exam Title</th>
                                     <th>Max Score</th>
                                     <th>Date</th>
                                     <th scope="col" width="280px">Actions</th>

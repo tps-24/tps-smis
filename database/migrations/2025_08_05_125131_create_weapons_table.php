@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::create('weapons', function (Blueprint $table) {
-        $table->id();
-        $table->string('serial_number');
-        $table->string('specification')->nullable();
-        $table->string('category'); // New
-        $table->string('weapon_model'); // New
-        $table->timestamps();
-    });
+   Schema::create('weapons', function (Blueprint $table) {
+    $table->id();
+    $table->string('serial_number')->unique();
+    $table->foreignId('weapon_model_id');
+    $table->timestamps();
+});
+
     }
 
     /**

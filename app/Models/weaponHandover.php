@@ -12,12 +12,9 @@ class WeaponHandover extends Model
         'staff_name',
         'staff_rank',
         'handover_date',
-        'shift_end',
         'return_date',
-        'purpose_before',
         'purpose',
         'remarks',
-        'condition_after',
         'status',
     ];
 

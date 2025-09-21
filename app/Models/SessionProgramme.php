@@ -30,4 +30,5 @@ class SessionProgramme extends Model
     {
         return $this->hasMany(ProgrammeCourseSemester::class);
     }
+    
 }

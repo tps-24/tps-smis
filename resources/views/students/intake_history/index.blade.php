@@ -75,7 +75,7 @@
 @section('content')
 <div class="card mb-4" style="margin-right: 0px;">
   <div class="card-header">
-    <h5 class="card-title">Intake Management Summary</h5>
+    <h5 class="card-title">Intake Management Summary - {{ $active_session }}</h5>
     <p class="card-text">This page provides a summary of the intake history of students.</p>
   </div>
 
@@ -179,8 +179,8 @@
       </center>
       
 
-      <div class="col-sm-4" style="margin-left:-10px">
-        <div class="card-body" style="margin-right: 0px;">
+      <div class="col-sm-12">
+        <div class="card-body">
           <span>Trend and Analysis Pattern</span>
           <button id="resetFiltersBtn" class="btn btn-outline-secondary btn-sm">
             🔄 Reset Filters
@@ -188,7 +188,7 @@
         </div>
 
       </div>
-      <div class="col-sm-8" style="margin-right:-20px">
+      <div class="col-sm-12">
         <div class="card-body" style="padding-right: -20px !important; ">
           
           

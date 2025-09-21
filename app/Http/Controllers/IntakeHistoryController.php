@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Company;
+use App\Models\SessionProgramme;
 use App\Models\TerminationReason;
 
 class IntakeHistoryController extends Controller
@@ -44,9 +45,10 @@ class IntakeHistoryController extends Controller
                             ->get();
 
         $terminationReasons = TerminationReason::all()->groupBy('category');
+        $active_session = SessionProgramme::where('id', $selectedSessionId)->pluck('session_programme_name')->first();
 
 
-        return view('students.intake_history.index', compact('stats', 'students', 'regions', 'companies', 'terminationReasons'));
+        return view('students.intake_history.index', compact('stats', 'students', 'regions', 'companies', 'terminationReasons', 'active_session'));
     }
 
     

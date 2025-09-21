@@ -119,81 +119,40 @@ class SemesterExamResultController extends Controller
         //
     }
 
-    public function getUploadExplanation($courseId, $semesterId)
-    {
-        $course = Course::find($courseId);
-        return view('semester_exams.upload_explanation', compact('course', 'semesterId'));
-    }
+   
+    public function getExamResultsByCourse($courseId, $semesterId)
+{
+    $selectedSessionId = session('selected_session') ?? 4;
 
-    public function uploadResults(Request $request, $courseId)
-    {
-        $course    = Course::find($courseId);
-        $validator = Validator::make($request->all(), [
-            'import_file' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    if (! in_array($value->getClientOriginalExtension(), ['csv', 'xls', 'xlsx'])) {
-                        $fail('Incorrect :attribute type. Please upload a CSV, XLS, or XLSX file.');
-                    }
-                },
-            ],
-        ]);
+    // Get course info
+    $course = DB::table('courses')
+        ->where('id', $courseId)
+        ->first();
 
-        // dd('Excel import executed successfully');
-        if ($validator->fails()) {
-            // Return an error response if validation fails
-            return back()->with('error', $validator->errors()->first());
-        }
-
-        try {
-            // Perform the import using the provided Excel file
-            Excel::import(new CourseExamResultImport($courseId, $request->semesterId), $request->file('import_file'));
-
-            // Redirect with success message after successful import
-            return redirect()->route('semester_exams.index')->with('success', 'Course exam results uploaded successfully.');
-        } catch (Exception $e) {
-            // Catch any errors during the import process and return an error response
-            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
-        }
-        return $course;
-    }
-
-    public function configure($courseId)
-    {
-        $course = Course::find($courseId);
-        return view('semester_exams.configurations.index', compact('course'));
-    }
-
-    public function getExamResultsByCourse($courseId,$semesterId)
-    {
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 4;
-        }
-        $course = DB::table('courses')
-            ->where('id', $courseId)
-            ->get();
-        $results = SemesterExamResult::whereHas('semesterExam', function ($query) use ($courseId, $semesterId, $selectedSessionId) {
+    // Fetch paginated semester exam results
+    $results = SemesterExamResult::whereHas('semesterExam', function ($query) use ($courseId, $semesterId, $selectedSessionId) {
             $query->where('course_id', $courseId)
                 ->where('semester_id', $semesterId)
                 ->where('session_programme_id', $selectedSessionId);
         })
-            ->with(['student', 'semesterExam'])
-            ->paginate(10);
+        ->with(['student', 'semesterExam'])
+        ->paginate(10);
 
-          $hasFinalResults = FinalResult::with('student')
-            ->where('course_id', $courseId)
-            ->where('semester_id', $semesterId)
-            ->whereHas('student', function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId);
-            })->count();
-        return response()->json([
-            'course'  => $course ?? [],
-            'hasFinalResults' =>$hasFinalResults > 0,
-            'results' => [
-                'data'  => $results,
-                'links' => $results->toArray()['links'], // Provide pagination links
-            ],
-        ]);
-    }
+    // Check if final results exist
+    $hasFinalResults = FinalResult::with('student')
+        ->where('course_id', $courseId)
+        ->where('semester_id', $semesterId)
+        ->whereHas('student', function ($query) use ($selectedSessionId) {
+            $query->where('session_programme_id', $selectedSessionId);
+        })
+        ->exists();
+
+    // Return JSON with paginator included
+    return response()->json([
+        'course'          => $course ?? [],
+        'hasFinalResults' => $hasFinalResults,
+        'results'         => $results, // send paginator directly
+    ]);
+}
+
 }

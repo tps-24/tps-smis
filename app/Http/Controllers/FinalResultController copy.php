@@ -185,4 +185,41 @@ class FinalResultController extends Controller
         return redirect()->route('final_results.index')
                          ->with('success', 'Final results generated successfully.');
     }
+
+    public function generateAll()
+    {
+        $selectedSessionId =  session('selected_session',1);
+        $courses = Course::whereHas('semester.sessionProgramme', function ($q) use ($programmeId, $sessionId) {
+            $q->where('programme_id', $programmeId)
+              ->where('session_id', $sessionId);
+        })
+        ->get();
+
+        return $courses;
+        $enrollments = Enrollment::all();
+
+        foreach ($enrollments as $enrollment) {
+            $resultData = $this->finalResultService->calculateFinalResult(
+                $enrollment->student_id,
+                $enrollment->semester_id,
+                $enrollment->course_id
+            );
+
+            $resultData['student_id'] = $enrollment->student_id;
+            $resultData['semester_id'] = $enrollment->semester_id;
+            $resultData['course_id'] = $enrollment->course_id;
+
+            $finalResult = FinalResult::updateOrCreate(
+                [
+                    'student_id' => $enrollment->student_id,
+                    'semester_id' => $enrollment->semester_id,
+                    'course_id' => $enrollment->course_id,
+                ],
+                $resultData
+            );
+        }
+
+        return redirect()->route('final_results.index')
+                         ->with('success', 'Final results generated successfully.');
+    }
 }

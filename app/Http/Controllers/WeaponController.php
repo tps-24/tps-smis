@@ -9,78 +9,96 @@ use App\Models\WeaponType;
 use App\Models\Armory;
 use App\Models\Staff;
 use App\Models\WeaponHandover;
+use App\Models\Handover;
 use Illuminate\Support\Facades\DB;
-
-
-
 
 class WeaponController extends Controller
 {
-  public function index(Request $request)
+public function index(Request $request)
 {
-    $query = Weapon::query();
+    // Base query with eager loading
+    $query = Weapon::with(['model.type', 'model.category']);
 
-    // Apply category filter
+    // Apply filters
     if ($request->filled('category')) {
-        $query->where('category', $request->category);
-    }
-
-    // Apply search filter
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('serial_number', 'LIKE', "%{$search}%")
-              ->orWhere('weapon_model', 'LIKE', "%{$search}%");
+        $query->whereHas('model.category', function ($q) use ($request) {
+            $q->where('name', $request->category);
         });
     }
 
-    // Paginated results after filtering
-    $weapons = $query->paginate(10);
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('serial_number', 'like', "%{$search}%")
+              ->orWhereHas('model', function ($q2) use ($search) {
+                  $q2->where('name', 'like', "%{$search}%");
+              });
+        });
+    }
 
-    // Filtered total count
-    $totalWeapons = (clone $query)->count();
+    // Paginated weapons
+    $weapons = $query->paginate(50);
 
-    // Filtered count per category
-    $categoryCounts = (clone $query)
-        ->select('category', DB::raw('count(*) as total'))
-        ->groupBy('category')
-        ->pluck('total', 'category');
+    // ✅ FIXED: Stats with proper joins
+    $stats = Weapon::selectRaw('categories.name as category, COUNT(*) as total')
+        ->join('weapon_models', 'weapons.weapon_model_id', '=', 'weapon_models.id')
+        ->join('categories', 'weapon_models.category_id', '=', 'categories.id')
+        ->groupBy('categories.name')
+        ->get();
 
-    return view('weapons.index', compact('weapons', 'totalWeapons', 'categoryCounts'));
+    // ✅ Count filtered weapons
+    $totalWeapons = $query->count();
+
+    // ✅ Modal category counts with same filters
+    $categoryCounts = Weapon::join('weapon_models', 'weapons.weapon_model_id', '=', 'weapon_models.id')
+        ->join('categories', 'weapon_models.category_id', '=', 'categories.id')
+        ->select('categories.name as category', \DB::raw('COUNT(*) as total'))
+        ->groupBy('categories.name');
+
+    if ($request->filled('category')) {
+        $categoryCounts->where('categories.name', $request->category);
+    }
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $categoryCounts->where(function ($q) use ($search) {
+            $q->where('weapons.serial_number', 'like', "%{$search}%")
+              ->orWhere('weapon_models.name', 'like', "%{$search}%");
+        });
+    }
+
+    $categoryCounts = $categoryCounts->pluck('total', 'category')->toArray();
+
+    return view('weapons.index', compact(
+        'weapons',
+        'stats',
+        'totalWeapons',
+        'categoryCounts'
+    ));
 }
 
-
-
-
     public function create()
-    {
+{
+    $categories = \App\Models\Category::with('types.models')->get();
 
-        $models = WeaponModel::with('type', 'category')->get();
-         $categories = Category::all();
-         return view('weapons.create', compact('models', 'categories'));
+    return view('weapons.create', compact('categories'));
+}
 
-        
-    }
 
   public function store(Request $request)
 {
     $request->validate([
-        'serial_number' => 'required|string',
-        'specification' => 'nullable|string',
-        'category' => 'required|string',
-        'weapon_model' => 'required|string',
+        'serial_number' => 'required|unique:weapons,serial_number',
+        'weapon_model_id' => 'required|exists:weapon_models,id',
     ]);
 
     Weapon::create([
         'serial_number' => $request->serial_number,
-        'specification' => $request->specification,
-        'category' => $request->category,
-        'weapon_model' => $request->weapon_model,
+        'weapon_model_id' => $request->weapon_model_id,
     ]);
 
-    return redirect()->route('weapons.index')->with('success', 'Weapon added successfully!');
+    return redirect()->route('weapons.index')
+                     ->with('success', 'Weapon added successfully!');
 }
-
 
     public function show(Weapon $weapon)
     {
@@ -88,24 +106,32 @@ class WeaponController extends Controller
         return view('weapons.show', compact('weapon'));
     }
 
-    public function edit(Weapon $weapon)
-    {
-        $models = WeaponModel::with('type', 'category')->get();
-        return view('weapons.edit', compact('weapon', 'models'));
-    }
+   public function edit(Weapon $weapon)
+{
+    // Eager-load the weapon's model, type, and category
+    $weapon->load('model.type', 'model.category');
 
-    public function update(Request $request, Weapon $weapon)
-    {
-        $request->validate([
-            'serial_number' => 'required|unique:weapons,serial_number,' . $weapon->id,
-            'specification' => 'nullable',
-            'weapon_model_id' => 'required|exists:weapon_models,id'
-        ]);
+    // Fetch all models with their type & category (for dropdown)
+    $models = WeaponModel::with(['type', 'category'])->get();
 
-        $weapon->update($request->all());
+    return view('weapons.edit', compact('weapon', 'models'));
+}
 
-        return redirect()->route('weapons.index')->with('success', 'Weapon updated successfully.');
-    }
+public function update(Request $request, Weapon $weapon)
+{
+    $request->validate([
+        'serial_number'    => 'required|string|max:255',
+        'weapon_model_id'  => 'required|exists:weapon_models,id',
+    ]);
+
+    $weapon->update([
+        'serial_number'    => $request->serial_number,
+        'weapon_model_id'  => $request->weapon_model_id,
+    ]);
+
+    return redirect()->route('weapons.index')
+                     ->with('success', 'Weapon updated successfully!');
+}
 
     public function destroy(Weapon $weapon)
     {
@@ -113,78 +139,51 @@ class WeaponController extends Controller
         return redirect()->route('weapons.index')->with('success', 'Weapon deleted successfully.');
     }
 
-  public function handoverStore(Request $request, Weapon $weapon)
+    public function storeHandover(Request $request, Weapon $weapon)
 {
     $request->validate([
-        'staff_id'       => 'required|exists:staff,id',
-        'handover_date'  => 'required|date',
-        'return_date'    => 'required|date|after_or_equal:handover_date',
-        'remarks'        => 'nullable|string',
+        'staff_id' => 'required|exists:staff,id',
+        'handover_date' => 'required|date',
+        'return_date' => 'required|date|after:handover_date',
+        'purpose' => 'required|string',
+        'remarks' => 'nullable|string',
     ]);
 
-    // Save to weapon_handovers table
-    WeaponHandover::create([
-        'weapon_id'      => $weapon->id,
-        'staff_id'       => $request->staff_id,
-        'handover_date'  => $request->handover_date,
-        'return_date'    => $request->return_date,
-        'remarks'        => $request->remarks,
-        'status'         => 'assigned',
+    $handover = Handover::create([
+        'weapon_id'    => $weapon->id,
+        'staff_id'     => $request->staff_id,
+        'handover_date'=> $request->handover_date,
+        'return_date'  => $request->return_date,
+        'purpose'      => $request->purpose,
+        'remarks'      => $request->remarks,
+        'status'       => 'assigned',
     ]);
 
-    // Update weapon status to taken
     $weapon->update(['status' => 'taken']);
 
-    return redirect()->route('weapons.show', $weapon->id)
-        ->with('success', 'Weapon successfully handed over to staff.');
+    return redirect()->route('weapons.show', $weapon)
+                     ->with('success', 'Weapon handover recorded successfully.');
 }
+    // Show handover form
 
-public function markAsReturned(WeaponHandover $handover)
-{
-    // Update handover record
-    $handover->update([
-        'status' => 'returned'
-    ]);
+    public function handover(Weapon $weapon)
+    {
+        return view('weapons.handover', compact('weapon'));
+    }
 
-    // Update weapon status to available
-    $handover->weapon->update([
-        'status' => 'available'
-    ]);
+   
+    // Mark weapon as returned
+    public function returnWeapon(Handover $handover)
+    {
+        $handover->update([
+            'status'      => 'returned',
+            'return_date' => now(), // auto-fill when returned
+        ]);
 
-    return redirect()->route('weapons.show', $handover->weapon_id)
-        ->with('success', 'Weapon marked as returned.');
-}
+        // Mark weapon back as available
+        $handover->weapon->update(['status' => 'available']);
 
-
-
-public function handover($id)
-{
-    $weapon = Weapon::findOrFail($id);
-
-    // Fetch all staff with correct field names
-    $staff = Staff::select('id', 'firstName', 'middleName', 'lastName', 'rank')
-                  ->orderBy('firstName', 'asc')
-                  ->get();
-
-    return view('weapons.handover', compact('weapon', 'staff'));
-}
-
-
-
-
- public function returnWeapon(Request $request, Handover $handover)
-{
-    $handover->update([
-        'status' => 'returned',
-        'return_date' => now(),
-        'condition_on_return' => $request->condition_on_return ?? 'Good',
-    ]);
-
-    // ✅ Update weapon status back to Available
-    $handover->weapon->update(['status' => 'Available']);
-
-    return back()->with('success', 'Weapon marked as returned.');
-}
-
-
+        return redirect()->route('weapons.show', $handover->weapon)
+                         ->with('success', 'Weapon marked as returned.');
+    }
 }
