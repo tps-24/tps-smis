@@ -15,7 +15,7 @@ class GraphDataService
 {
     private $selectedSessionId;
 
-    public function getGraphData($start_date = null, $end_date = null, $companiesId = null): array
+    public function getGraphData($start_date = null, $end_date = null)
     {
         $sessionId = session('selected_session') ?: 1;
         $today = Carbon::today();
@@ -41,11 +41,6 @@ class GraphDataService
 
         $attendances = Attendence::where('session_programme_id', $sessionId)
             ->whereBetween('date', [$minStart, $maxEnd])
-            ->when(! empty($companiesId), function ($query) use ($companiesId) {
-                $query->whereHas('platoon', function ($q) use ($companiesId) {
-                    $q->whereIn('company_id', $companiesId);
-                });
-            })
             ->get();
 
         // ---------------- DAILY LOOP ----------------
@@ -54,7 +49,7 @@ class GraphDataService
             $dayKey = $date->format('Y-m-d');
 
             if (isset($dailyData['keys'][$dayKey])) {
-                $companyAttendance = $attendance->platoon->company?->company_attendance($date);
+                $companyAttendance = $attendance->platoon->company?->company_attendance($date, 1);
 
                 if ($companyAttendance && $companyAttendance->status != 'verified') {
                     continue; // Only skip if attendance exists AND is not verified
@@ -64,7 +59,7 @@ class GraphDataService
                 $dailyData['absents'][$i] += (int) $attendance->absent;
                 $dailyData['sick'][$i] = $this->getSickCount($date);
                 $dailyData['lockUps'][$i] = $this->getLockUpCount($date);
-                $dailyData['leaves'][$i] = $this->getLeaveCount($date, $companiesId ?? []);
+                $dailyData['leaves'][$i] = $this->getLeaveCount($date);
             }
         }
 
@@ -188,20 +183,12 @@ class GraphDataService
             })->count();
     }
 
-    private function getLeaveCount(Carbon $date, array $companyIds = []): int
+    private function getLeaveCount(Carbon $date): int
     {
-        return LeaveRequest::whereNull('rejected_at') // Not rejected
-            ->where(function ($query) use ($date) {
-                $query->whereNull('return_date') // No return yet
-                    ->orWhereDate('return_date', '>=', $date); // Returning in future
-            })
-            ->whereNotNull('approved_at') // Approved
-            ->when(! empty($companyIds), function ($query) use ($companyIds) {
-                $query->whereHas('student.platoonRelation', function ($q) use ($companyIds) {
-                    $q->whereIn('company_id', $companyIds);
-                });
-            })
-            ->count();
+        return LeaveRequest::where(function ($q) use ($date) {
+            $q->whereNull('return_date')
+                ->orWhereDate('return_date', '>=', $date);
+        })->count();
     }
 
     private function getSickCountForMonth($month, $year): int
