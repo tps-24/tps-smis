@@ -152,11 +152,7 @@
             <img src="{{ asset('resources/assets/images/logo.png') }}" style="height: 40px; width: 30px; margin: 0 0;"
                 alt="Police Logo">
 
-<<<<<<< HEAD
-            <h4>{{ strtoupper($company->description) }} DATE {{\Carbon\Carbon::now()->format('d F, Y')}}</h4>
-=======
-            <h4>{{   strtoupper($attendenceType->name. '   state') }} {{\Carbon\Carbon::now()->format('d F, Y')}} {{ strtoupper($company->description) }}  </h4>
->>>>>>> ecb3bfd (Jogging as attendance type.)
+            <h4> {{ strtoupper($attendenceType-> name. ' state')}} {{\Carbon\Carbon::now()->format('d F, Y')}}  {{ strtoupper($company->description) }}</h4>
         </div>
         @if (count($sessionProgrammeAttendance) === 0)
         <h4 class="tight-header">No attedance recorded for this Company.</h4>
@@ -192,17 +188,10 @@
 
         <h4 class="tight-header">{{ $session['session_programme']['programme_name'] }}</h4>
         <table class="table-sm table tight-table">
-<<<<<<< HEAD
             <thead>
                 <tr>
                     <th class="vertical">
                         <div>PLATOON</div>
-=======
-           <thead>
-                <tr>
-                    <th class="vertical">
-                        <div></div>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     </th>
                     <th class="vertical">
                         <div>PRESENT</div>
@@ -216,14 +205,9 @@
                     <th class="vertical">
                         <div>ED</div>
                     </th>
-                    <th class="vertical">
-<<<<<<< HEAD
-=======
-                        <div>LEAVES</div>
-                    </th>
                     @if ($attendenceType->id != 1 &  $attendenceType->id != 3)
+                    
                     <th class="vertical">
->>>>>>> ecb3bfd (Jogging as attendance type.)
                         <div>DOG&HORSE</div>
                     </th>
                     <th class="vertical">
@@ -235,16 +219,12 @@
                     <th class="vertical">
                         <div>USAFI</div>
                     </th>
-<<<<<<< HEAD
                     <th class="vertical">
                         <div>OFF</div>
                     </th>
                     <th class="vertical">
                         <div>COURSE</div>
                     </th>
-=======
-                    
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <th class="vertical">
                         <div>MESS</div>
                     </th>
@@ -252,11 +232,7 @@
                         <div>ZAHANATI</div>
                     </th>
                     <th class="vertical">
-<<<<<<< HEAD
-                        <div>KAZINI</div>
-=======
                         <div>USHONI</div>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     </th>
                     <th class="vertical">
                         <div>IT</div>
@@ -264,25 +240,12 @@
                     <th class="vertical">
                         <div>MSIKITINI</div>
                     </th>
-<<<<<<< HEAD
-=======
                     @endif
-                    <th class="vertical">
-                        <div>OFF</div>
-                    </th>
-                    <th class="vertical">
-                        <div>COURSE</div>
-                    </th>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <th class="vertical">
                         <div>FIELD</div>
                     </th>
                     <th class="vertical">
-<<<<<<< HEAD
-                        <div>USHONI</div>
-=======
                         <div>KAZINI</div>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     </th>
                     <th class="vertical">
                         <div>ME</div>
@@ -324,47 +287,28 @@
                 @endphp
 
                 @foreach($session['attendances'] as $attendance)
-<<<<<<< HEAD
-
-=======
->>>>>>> ecb3bfd (Jogging as attendance type.)
                 <tr>
                     <td>{{ $attendance->platoon->name ?? 'N/A' }}</td>
                     <td>{{ $attendance->present === 0 ? '' : $attendance->present }}</td>
                     <td>{{ $attendance->sentry === 0 ? '' : $attendance->sentry }}</td>
                     <td>{{ $attendance->adm === 0 ? '' : $attendance->adm }}</td>
                     <td>{{ $attendance->ed === 0 ? '' : $attendance->ed }}</td>
-<<<<<<< HEAD
-=======
-                    <td>{{ $attendance->safari === 0 ? '' : $attendance->safari }}</td>
                     @if ($attendenceType->id != 1 &  $attendenceType->id != 3)
->>>>>>> ecb3bfd (Jogging as attendance type.)
+                                        
                     <td>{{ $attendance->dog_and_horse === 0 ? '' : $attendance->dog_and_horse }}</td>
                     <td>{{ $attendance->michezo === 0 ? '' : $attendance->michezo }}</td>
                     <td>{{ $attendance->ujenzi === 0 ? '' : $attendance->ujenzi }}</td>
                     <td>{{ $attendance->usafi === 0 ? '' : $attendance->usafi }}</td>
-<<<<<<< HEAD
                     <td>{{ $attendance->off === 0 ? '' : $attendance->off }}</td>
                     <td>{{ $attendance->course === 0 ? '' : $attendance->course }}</td>
                     <td>{{ $attendance->mess === 0 ? '' : $attendance->mess }}</td>
                     <td>{{ $attendance->sick === 0 ? '' : $attendance->sick }}</td>
-                    <td>{{ $attendance->kazini === 0 ? '' : $attendance->kazini }}</td>
-=======
-                    <td>{{ $attendance->mess === 0 ? '' : $attendance->mess }}</td>
->>>>>>> ecb3bfd (Jogging as attendance type.)
+                    <td>{{ $attendance->ushoni === 0 ? '' : $attendance->ushoni }}</td>
                     <td>{{ $attendance->it === 0 ? '' : $attendance->it }}</td>
                     <td>{{ $attendance->msikitini === 0 ? '' : $attendance->msikitini }}</td>
-                    <td>{{ $attendance->field === 0 ? '' : $attendance->field }}</td>
-                    <td>{{ $attendance->ushoni === 0 ? '' : $attendance->ushoni }}</td>
-<<<<<<< HEAD
-=======
                     @endif
-                    <td>{{ $attendance->off === 0 ? '' : $attendance->off }}</td>
-                    <td>{{ $attendance->course === 0 ? '' : $attendance->course }}</td>
-                    <td>{{ $attendance->sick === 0 ? '' : $attendance->sick }}</td>
+                    <td>{{ $attendance->field === 0 ? '' : $attendance->field }}</td>
                     <td>{{ $attendance->kazini === 0 ? '' : $attendance->kazini }}</td>
-
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <td>{{ $attendance->male === 0 ? '' : $attendance->male }}</td>
                     <td>{{ $attendance->female === 0 ? '' : $attendance->female }}</td>
                     <td>{{ $attendance->total === 0 ? '' : $attendance->total }}</td>
@@ -425,37 +369,21 @@
                     <th>{{ $totals['sentry'] }}</th>
                     <th>{{ $totals['adm'] }}</th>
                     <th>{{ $totals['ed'] }}</th>
-<<<<<<< HEAD
-=======
-                    <th>{{ $totals['safari'] }}</th>
                     @if ($attendenceType->id != 1 &  $attendenceType->id != 3)
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <th>{{ $totals['dog_and_horse'] }}</th>
                     <th>{{ $totals['michezo'] }}</th>
                     <th>{{ $totals['ujenzi'] }}</th>
                     <th>{{ $totals['usafi'] }}</th>
-<<<<<<< HEAD
                     <th>{{ $totals['off'] }}</th>
                     <th>{{ $totals['course'] }}</th>
-                    <th>{{ $totals['mess'] }}</th>
-                    <th>{{ $totals['sick'] }}</th>
-                    <th>{{ $totals['kazini'] }}</th>
-                    <th>{{ $totals['it'] }}</th>
-                    <th>{{ $totals['msikitini'] }}</th>
-                    <th>{{ $totals['field'] }}</th>
-                    <th>{{ $totals['ushoni'] }}</th>
-=======
                     <th>{{ $totals['mess'] }}</th>
                     <th>{{ $totals['sick'] }}</th>
                     <th>{{ $totals['ushoni'] }}</th>
                     <th>{{ $totals['it'] }}</th>
                     <th>{{ $totals['msikitini'] }}</th>
                     @endif
-                    <th>{{ $totals['off'] }}</th>
-                    <th>{{ $totals['course'] }}</th>
                     <th>{{ $totals['field'] }}</th>
                     <th>{{ $totals['kazini'] }}</th>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <th>{{ $totals['male'] }}</th>
                     <th>{{ $totals['female'] }}</th>
                     <th>{{ $totals['total'] }}</th>
@@ -484,14 +412,8 @@
                     <th class="vertical">
                         <div>ED</div>
                     </th>
-                    <th class="vertical">
-<<<<<<< HEAD
-=======
-                        <div>LEAVES</div>
-                    </th>
                     @if ($attendenceType->id != 1 &  $attendenceType->id != 3)
                     <th class="vertical">
->>>>>>> ecb3bfd (Jogging as attendance type.)
                         <div>DOG&HORSE</div>
                     </th>
                     <th class="vertical">
@@ -503,16 +425,12 @@
                     <th class="vertical">
                         <div>USAFI</div>
                     </th>
-<<<<<<< HEAD
                     <th class="vertical">
                         <div>OFF</div>
                     </th>
                     <th class="vertical">
                         <div>COURSE</div>
                     </th>
-=======
-                    
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <th class="vertical">
                         <div>MESS</div>
                     </th>
@@ -520,11 +438,7 @@
                         <div>ZAHANATI</div>
                     </th>
                     <th class="vertical">
-<<<<<<< HEAD
-                        <div>KAZINI</div>
-=======
                         <div>USHONI</div>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     </th>
                     <th class="vertical">
                         <div>IT</div>
@@ -532,25 +446,12 @@
                     <th class="vertical">
                         <div>MSIKITINI</div>
                     </th>
-<<<<<<< HEAD
-=======
                     @endif
-                    <th class="vertical">
-                        <div>OFF</div>
-                    </th>
-                    <th class="vertical">
-                        <div>COURSE</div>
-                    </th>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <th class="vertical">
                         <div>FIELD</div>
                     </th>
                     <th class="vertical">
-<<<<<<< HEAD
-                        <div>USHONI</div>
-=======
                         <div>KAZINI</div>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     </th>
                     <th class="vertical">
                         <div>ME</div>
@@ -562,10 +463,7 @@
                         <div>JUMLA</div>
                     </th>
                 </tr>
-<<<<<<< HEAD
                 </tr>
-=======
->>>>>>> ecb3bfd (Jogging as attendance type.)
             </thead>
             <tbody>
                 <tr>
@@ -574,37 +472,21 @@
                     <td>{{ $grandTotals['sentry'] }}</td>
                     <td>{{ $grandTotals['adm'] }}</td>
                     <td>{{ $grandTotals['ed'] }}</td>
-<<<<<<< HEAD
-=======
-                    <td>{{ $grandTotals['safari'] }}</td>
                     @if ($attendenceType->id != 1 &  $attendenceType->id != 3)
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <td>{{ $grandTotals['dog_and_horse'] }}</td>
                     <td>{{ $grandTotals['michezo'] }}</td>
                     <td>{{ $grandTotals['ujenzi'] }}</td>
                     <td>{{ $grandTotals['usafi'] }}</td>
-<<<<<<< HEAD
                     <td>{{ $grandTotals['off'] }}</td>
                     <td>{{ $grandTotals['course'] }}</td>
-                    <td>{{ $grandTotals['mess'] }}</td>
-                    <td>{{ $grandTotals['sick'] }}</td>
-                    <td>{{ $grandTotals['kazini'] }}</td>
-                    <td>{{ $grandTotals['it'] }}</td>
-                    <td>{{ $grandTotals['msikitini'] }}</td>
-                    <td>{{ $grandTotals['field'] }}</td>
-                    <td>{{ $grandTotals['ushoni'] }}</td>
-=======
                     <td>{{ $grandTotals['mess'] }}</td>
                     <td>{{ $grandTotals['sick'] }}</td>
                     <td>{{ $grandTotals['ushoni'] }}</td>
                     <td>{{ $grandTotals['it'] }}</td>
                     <td>{{ $grandTotals['msikitini'] }}</td>
                     @endif
-                    <td>{{ $grandTotals['off'] }}</td>
-                    <td>{{ $grandTotals['course'] }}</td>
                     <td>{{ $grandTotals['field'] }}</td>
                     <td>{{ $grandTotals['kazini'] }}</td>
->>>>>>> ecb3bfd (Jogging as attendance type.)
                     <td>{{ $grandTotals['male'] }}</td>
                     <td>{{ $grandTotals['female'] }}</td>
                     <td>{{ $grandTotals['total'] }}</td>
