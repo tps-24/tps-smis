@@ -183,12 +183,20 @@ class GraphDataService
             })->count();
     }
 
-    private function getLeaveCount(Carbon $date): int
+    private function getLeaveCount(Carbon $date, array $companyIds = []): int
     {
-        return LeaveRequest::where(function ($q) use ($date) {
-            $q->whereNull('return_date')
-                ->orWhereDate('return_date', '>=', $date);
-        })->count();
+        return LeaveRequest::whereNull('rejected_at') // Not rejected
+            ->where(function ($query) use ($date) {
+                $query->whereNull('return_date') // No return yet
+                    ->orWhereDate('return_date', '>=', $date); // Returning in future
+            })
+            ->whereNotNull('approved_at') // Approved
+            ->when(! empty($companyIds), function ($query) use ($companyIds) {
+                $query->whereHas('student.platoonRelation', function ($q) use ($companyIds) {
+                    $q->whereIn('company_id', $companyIds);
+                });
+            })
+            ->count();
     }
 
     private function getSickCountForMonth($month, $year): int
