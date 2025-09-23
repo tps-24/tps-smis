@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td style="text-align: center;">${index + 1}</td>
                         <td style="text-align: center;">${student.force_number}</td>
                         <td>${fullName}</td>
-                        <td style="text-align: center;">${result.total_score}</td>
+                        <td style="text-align: center;">${result.total_score ?? ''} </td>
                         <td style="text-align: center;">${result.grade}</td>
                         <td style="text-align: center;">
                             <button class="btn btn-info btn-sm">View</button>

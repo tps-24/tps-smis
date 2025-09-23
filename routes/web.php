@@ -290,9 +290,9 @@ Route::group(['middleware' => ['auth']], function () {
     });
     Route::get('final_results/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'getResults'])->name('final_results');
     Route::get('final_results/create-generate', [FinalResultController::class, 'createGenerate'])->name('final_results.createGenerate');
-    Route::get('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.generate');
+    Route::get('final_results/generate/{sessionId}', [FinalResultController::class, 'generate'])->name('final_results.generate');
     Route::get('final_results/generate-all', [FinalResultController::class, 'generateAll'])->name('final_results.generate.all');
-    Route::post('final_results/generate/{sessionId}', [FinalResultController::class, 'generateAll'])->name('final_results.session.generate');
+    Route::post('final_results/generate/{sessionId}', [FinalResultController::class, 'generate'])->name('final_results.session.generate');
     Route::get('final_results/return/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'returnResults'])->name('final_results.return');
     Route::get('final_results/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'getResults'])->name('final_results');
     Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
