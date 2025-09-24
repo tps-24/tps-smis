@@ -23,7 +23,7 @@
         </div>
     @endsession  
 <div class="card-body">
-    <form action="{{ url('/mps/search') }}" method="POST" class="d-flex justify-content-between mb-3">
+    <form action="{{ route('visitors.searchStudent') }}" method="POST" class="d-flex justify-content-between mb-3">
     @csrf
     <div class="d-flex">
         <!-- Company Dropdown -->
@@ -68,7 +68,7 @@
                                     <td>{{$student->company->name}}</td>
                                     <td>{{$student->platoon}}</td>
                                     <td>
-                                        <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">View</a>
+                                    <a class="btn btn-info btn-sm" href="{{ route('students.show', $student->id) }}">View</a>
                                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#statusModal{{ $student->id ?? ''}}">
                                             Enter Details

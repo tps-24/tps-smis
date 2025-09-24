@@ -45,6 +45,16 @@
       .table-responsive td, .table-responsive th { 
         font-weight: normal;
       }
+  /* Global responsive style for SweetAlert popups */
+  .swal2-popup {
+    max-width: 90vw !important;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    white-space: normal;
+    font-size: 1rem;
+    padding: 1rem;
+  }
+
     </style>
     @yield('style')
     

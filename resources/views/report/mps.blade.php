@@ -90,9 +90,18 @@
     </form>
 
     <!-- Right: Report Download Button -->
-    <a href="{{ route('reports.generateMPSReport') }}" title="Download report" class="btn btn-sm btn-success">
-        <i class="bi bi-download me-1"></i> Report
-    </a>
+<form method="GET" action="{{ route('reports.generateMPSReport') }}" class="d-inline">
+        @if(request('start_date'))
+            <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+        @endif
+        @if(request('end_date'))
+            <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+        @endif
+
+        <button type="submit" class="btn btn-sm btn-success" title="Download report">
+            <i class="bi bi-download me-1"></i> Report
+        </button>
+    </form>
 </div>
 
 
