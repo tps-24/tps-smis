@@ -205,15 +205,15 @@ class FinalResultController extends Controller
         //     $resultData['semester_id'] = $enrollment->semester_id;
         //     $resultData['course_id']   = $enrollment->course_id;
 
-        //     $finalResult = FinalResult::updateOrCreate(
-        //         [
-        //             'student_id'  => $enrollment->student_id,
-        //             'semester_id' => $enrollment->semester_id,
-        //             'course_id'   => $enrollment->course_id,
-        //         ],
-        //         $resultData
-        //     );
-        // }
+            $finalResult = FinalResult::updateOrCreate(
+                [
+                    'student_id'  => $enrollment->student_id,
+                    'semester_id' => $enrollment->semester_id,
+                    'course_id'   => $enrollment->course_id,
+                ],
+                $resultData
+            );
+        
 
         return redirect()->route('final_results.index')
             ->with('success', 'Final results generated successfully.');

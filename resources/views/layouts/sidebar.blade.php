@@ -129,39 +129,43 @@
             </li>
             @endcan()
 
-            @can('staff-list')
+            
                 <li class="treeview">
                     <a href="#!">
                         <i class="bi bi-box"></i>
                         <span class="menu-text">Staffs</span>
                     </a>
                     <ul class="treeview-menu">
+                        @can('staff-list')
                         <li>
                             <a href="{{ route('staffs.index') }}">Staff Details</a>
                         </li>
-                        @can('staff-create')
+                        @endcan()
+                                        @can('staff-create')
                                         <li>
                                             <a href="{{ route('staffs.create') }}">Staff Registration</a>
                                         </li>
+                                        @endcan()
+                                        @can('staff-list')
                                         <li>
                                             <a href="{{ route('staffs.summary.index') }}">Staff Summary</a>
                                         </li>
-                                        @can('timesheet-list')
+                                        @endcan()
+                                        
                                             <li>
                                                 <a href="{{ route('timesheets.index') }}">
                                                     <i class="bi bi-archive"></i>
                                                     <span class="menu-text">Time Sheet</span>
                                                 </a>
                                             </li>
-                                        @endcan
+                                        
 
                                         <!-- <li>
                             <a href="">Staff Resume</a>
                             </li> -->
-                        @endcan()
+                        
                     </ul>
                 </li>
-            @endcan()
             @can('attendance-list')
                         <li class="treeview">
                             <a href="#!">

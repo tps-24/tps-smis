@@ -49,7 +49,7 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $prog->programmeName }}</td>
                     <td>{{ $prog->abbreviation }}</td>
-                    <td>@if($prog->duration == 1) {{$prog->duration}} &nbsp;Year @elseif($prog->duration >= 2){{$prog->duration}}&nbsp;Years @endif</td>
+                    <td>@if($prog->duration == 1) {{$prog->duration}} &nbsp;Year @elseif($prog->duration >= 2){{$prog->duration}}&nbsp;Months @endif</td>
                     <td>{{ $prog->department->departmentName ?? '' }}</td>
                     <td>{{ $studyLevels->firstWhere('id', $prog->studyLevel_id)->studyLevelName  ?? ''}}</td>
                     <td>

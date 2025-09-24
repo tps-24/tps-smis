@@ -717,7 +717,7 @@
                                                                         <p class="mb-1"><strong>Dismissed At:</strong> {{ \Carbon\Carbon::parse($dismissal->dismissed_at)->format('d M Y') }}</p>
                                                                         <p class="mb-1"><strong>Reason:</strong> {{ $dismissal->reason_label }} ({{ $dismissal->category }})</p>
                                                                         @if ($dismissal->custom_reason && $dismissal->custom_reason !== 'null')
-                                                                            <p class="mb-1"><strong>Specified Reason:</strong> {{ $dismissal->custom_reason }}</p>
+                                                                            <p class="mb-1"><strong>Specified Reason:</strong> {{ $dismissal->custom_reason ?? '' }}</p>
                                                                         @endif
                                                                         <p class="mb-0 text-muted"><em>Recorded by system on {{ \Carbon\Carbon::parse($dismissal->created_at)->format('d M Y, H:i') }}</em></p>
                                                                         </div>

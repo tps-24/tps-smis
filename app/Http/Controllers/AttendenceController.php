@@ -450,7 +450,7 @@ class AttendenceController extends Controller
             session(['selected_session' => request()->session_id]);
         }
 
-        $selectedSessionId = session('selected_session');
+        $selectedSessionId = session('selected_session', 1);
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
         }
@@ -709,7 +709,6 @@ class AttendenceController extends Controller
         // Loop through the grouped attendance data
         foreach ($attendances as $sessionProgrammeId => $records) {
             $session = $records->first()->sessionProgramme; // Get the first record's sessionProgramme relationship
-
             // Store the grouped data in the array
             $sessionProgrammeAttendance[] = [
                 'session_programme_id' => $sessionProgrammeId,
