@@ -196,23 +196,27 @@ td ul li {
             </tr>
         </tbody>
     </table>
+@if ($staff->schools->isNotEmpty())
     <div style="page-break-before: always;"></div>
         <h3>(B) EDUCATION AND TRAINING / ELIMU NA MAFUNZO YA UJUZI</h3>
-        <h3>1. Elimu ya Msingi</h3>
-        <table class="table table-sm table-bordered">
-            <thead>
-                <tr>
-                    <th>Name of school</th>
-                    <th>Village</th>
-                    <th>District</th>
-                    <th>Year of Admission</th>
-                    <th>Year of graduation</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if ($staff->schools)
-                @foreach ($staff->schools as $school)
-                @if ($school->education_level_id == 1)
+        @php
+    $primarySchools = $staff->schools->where('education_level_id', 1);
+@endphp
+
+@if ($primarySchools->isNotEmpty())
+    <h3>1. Elimu ya Msingi</h3>
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Name of School</th>
+                <th>Village</th>
+                <th>District</th>
+                <th>Year of Admission</th>
+                <th>Year of Graduation</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($primarySchools as $school)
                 <tr>
                     <td>{{ $school->name }}</td>
                     <td>{{ $school->village }}</td>
@@ -220,151 +224,164 @@ td ul li {
                     <td>{{ $school->admission_year }}</td>
                     <td>{{ $school->graduation_year }}</td>
                 </tr>
-                @endif
-                @endforeach
-                @endif
-            </tbody>
-        </table>
+            @endforeach
+        </tbody>
+    </table>
+@endif
 
-        <h3>2. Elimu ya Sekondari</h3>
-        <table class="table table-sm table-bordered">
-            <thead>
+@php
+    // Filter only secondary education levels (e.g., O-Level = 2, A-Level = 3)
+    $secondarySchools = $staff->schools->whereIn('education_level_id', [2, 3]);
+@endphp
+
+@if ($secondarySchools->isNotEmpty())
+    <h3>2. Elimu ya Sekondari</h3>
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Level</th>
+                <th>Name of School</th>
+                <th>Village</th>
+                <th>District</th>
+                <th>Year of Admission</th>
+                <th>Year of Graduation</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($secondarySchools as $school)
                 <tr>
-                    <th></th>
-                    <th>Name of school</th>
-                    <th>Village</th>
-                    <th>District</th>
-                    <th>Year of Admission</th>
-                    <th>Year of graduation</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if ($staff->schools)
-                @foreach ($staff->schools as $school)
-                @if ($school->education_level_id == 2 || $school->education_level_id == 3)
-                <tr>
-                    <td>{{$school->education_level->name}}</td>
+                    <td>{{ $school->education_level->name }}</td>
                     <td>{{ $school->name }}</td>
                     <td>{{ $school->village }}</td>
                     <td>{{ $school->district }}</td>
                     <td>{{ $school->admission_year }}</td>
                     <td>{{ $school->graduation_year }}</td>
                 </tr>
-                @endif
-                @endforeach
-                @endif
-            </tbody>
-        </table>
+            @endforeach
+        </tbody>
+    </table>
+@endif
 
-        <h3>3. Colleges/Vyuo alivyosoma</h3>
-        <table class="table table-sm table-bordered">
-            <thead>
-                <tr>
-                    <th>College/University</th>
-                    <th>Duration</th>
-                    <th>Region/country</th>
-                    <th>Award</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if ($staff->schools)
-                @foreach ($staff->schools as $school)
-                @if ($school->education_level_id == 4)
+        @php
+    // Filter only college/university level records (education_level_id = 4)
+    $collegeSchools = $staff->schools->where('education_level_id', 4);
+@endphp
+
+@if ($collegeSchools->isNotEmpty())
+    <h3>3. Colleges / Vyuo Alivyosoma</h3>
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>College/University</th>
+                <th>Duration</th>
+                <th>Region/Country</th>
+                <th>Award</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($collegeSchools as $school)
                 <tr>
                     <td>{{ $school->name }}</td>
                     <td>{{ $school->duration }}</td>
                     <td>{{ $school->country }}</td>
                     <td>{{ $school->award }}</td>
                 </tr>
-                @endif
-                @endforeach
-                @endif
-            </tbody>
-        </table>
+            @endforeach
+        </tbody>
+    </table>
+@endif
 
-        <h4>(C) OTHER COURSES, PROFESSIONAL EXAMINATION AND WORKSHOP ATTENDED</h4>
-        <table class="table table-sm table-bordered">
-            <thead>
+        @php
+    // Filter other courses, professional exams, and workshops (education_level_id = 5)
+    $otherCourses = $staff->schools->where('education_level_id', 5);
+@endphp
+
+@if ($otherCourses->isNotEmpty())
+    <h4>(C) OTHER COURSES, PROFESSIONAL EXAMINATIONS AND WORKSHOPS ATTENDED</h4>
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>S/NO</th>
+                <th style="width: 80px;">Duration</th>
+                <th>Theme and Award</th>
+                <th>College/Organization</th>
+                <th>Venue</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($otherCourses as $index => $course)
                 <tr>
-                    <td>S/NO</td>
-                    <td style="width: 80px;">Duration</td>
-                    <td>Theme and Award</td>
-                    <td>College/Organization</td>
-                    <td>Venue</td>
+                    <td>{{ $index + 1 }}.</td>
+                    <td>{{ $course->duration }}</td>
+                    <td>{{ $course->award }}</td>
+                    <td>{{ $course->name }}</td>
+                    <td>{{ $course->venue }}</td>
                 </tr>
+            @endforeach
+        </tbody>
+    </table>
+@endif
 
-            </thead>
-            <tbody>
-                @php
-                    $n=0;
-                @endphp
-                @if ($staff->schools)
-                @foreach ($staff->schools as $school)
-                @if ($school->education_level_id == 5)
-                <tr>
-                    <td>{{++$n}}.</td>
-                    <td>{{ $school->duration }}</td>
-                    <td>{{ $school->award }}</td>
-                    <td>{{ $school->name }}</td>
-                    <td>{{ $school->venue }}</td>
-                </tr>
-                @endif
-                @endforeach
-                @endif
-            </tbody>
-        </table>
 
-        <h3>(D) WORK AND EXPERIENCE</h3>
-        <h4>CURRENT TITLE / CHEO CHAKO KWA SASA <strong>{{$staff->rank}}</strong> </h4>
-        <table class="table table-sm table-bordered">
-            <thead>
-                <tr>
-                    <td>S/NO</td>
-                    <td style="width:90px;">Year</td>
-                    <td>Organization</td>
-                    <td>Location</td>
-                    <td>Title</td>
-                    <td>Duties</td>
-                </tr>
+       @if ($staff->work_experiences && $staff->work_experiences->isNotEmpty())
+    <h3>(D) WORK AND EXPERIENCE</h3>
 
-            </thead>
-            <tbody>
-                @php
-                $i = 0;
-                @endphp
-                @if ($staff->work_experiences)
-                @foreach ($staff->work_experiences as $work_experience)
+    <h4>
+        CURRENT TITLE / CHEO CHAKO KWA SASA:
+        <strong>{{ $staff->rank }}</strong>
+    </h4>
+
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>S/NO</th>
+                <th style="width: 90px;">Year</th>
+                <th>Organization</th>
+                <th>Location</th>
+                <th>Title</th>
+                <th>Duties</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($staff->work_experiences as $work_experience)
                 <tr>
-                    <td>{{++$i}}.</td>
-                    <td>{{ substr($work_experience->start_date, 0, 4)}} - {{ substr($work_experience->end_date, 0, 4)}}
+                    <td>{{ $loop->iteration }}.</td>
+                    <td>
+                        {{ \Carbon\Carbon::parse($work_experience->start_date)->format('Y') }} -
+                        {{ \Carbon\Carbon::parse($work_experience->end_date)->format('Y') }}
                     </td>
                     <td>{{ $work_experience->institution }}</td>
                     <td>{{ $work_experience->address }}</td>
                     <td>{{ $work_experience->job_title }}</td>
                     <td>
                         @php
-                        $duties = $work_experience->duties == null? null :
-                        json_decode($work_experience->duties);
+                            $duties = $work_experience->duties ? json_decode($work_experience->duties) : [];
                         @endphp
-                        <ul>
-                            @foreach ($duties as $duty)
-                            <li>{{ $duty }}</li>
-                            @endforeach
-                        </ul>
+                        @if (!empty($duties))
+                            <ul class="mb-0">
+                                @foreach ($duties as $duty)
+                                    <li>{{ $duty }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <em>No duties listed</em>
+                        @endif
                     </td>
                 </tr>
-                @endforeach
-                @endif
-            </tbody>
-        </table>
+            @endforeach
+        </tbody>
+    </table>
+@endif
 
-    <h3>(E) REFEREES/WADHAMINI</h3>
+
+   @if ($staff->referees && $staff->referees->isNotEmpty())
+    <h3>(E) REFEREES / WADHAMINI</h3>
     <table class="table table-bordered">
         <thead>
             <tr>
-                <td>S/N</td>
+                <th>S/N</th>
                 <th>NAME</th>
-                <!-- <th>TITLE</th> -->
+                {{-- <th>TITLE</th> --}}
                 <th>ORGANIZATION</th>
                 <th>ADDRESS</th>
                 <th>EMAIL</th>
@@ -372,30 +389,33 @@ td ul li {
             </tr>
         </thead>
         <tbody>
-            @php
-            $i = 0;
-            @endphp
             @foreach ($staff->referees as $referee)
-            <tr>
-                <td>{{++$i}}</td>
-                <td>{{$referee->referee_fullname}}</td>
-                <!-- <td>{{$referee->title}}</td> -->
-                <td>{{$referee->organization}}</td>
-                <td>{{$referee->address}}</td>
-                <td>{{$referee->email_address}}</td>
-                <td>{{$referee->phone_number}}</td>
-            </tr>
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $referee->referee_fullname }}</td>
+                    {{-- <td>{{ $referee->title }}</td> --}}
+                    <td>{{ $referee->organization }}</td>
+                    <td>{{ $referee->address }}</td>
+                    <td>{{ $referee->email_address }}</td>
+                    <td>{{ $referee->phone_number }}</td>
+                </tr>
             @endforeach
         </tbody>
-
     </table>
+@else
+    <p>No referees available.</p>
+@endif
+@endif
+</div>
 <br>
+<div>
 <center style="display:flex;  text-align: end; gap: 50px;" >
     <span>Signature.........................</span>
     <span>Date......................</span>
 </center>
 
     </div>
+    
 </body>
 
 </html>

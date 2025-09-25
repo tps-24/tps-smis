@@ -12,12 +12,16 @@ class StudentPost extends Model
         'region',
         'district',
         'unit',
-        'office'
-        ];
-
+        'office',
+    ];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
     }
 }

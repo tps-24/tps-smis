@@ -22,7 +22,7 @@
         $i = 0;
         use Carbon\Carbon;
     @endphp
-            <form action="{{ route('timesheets.filter') }}" method="POST" class="d-flex flex-nowrap align-items-center gap-2 overflow-auto">
+            <form action="{{ route('timesheets.filter') }}" method="POST" class="d-flex flex-nowrap align-items-center gap-2 overflow-auto mb-2">
                 @csrf
                 @method('POST')
 

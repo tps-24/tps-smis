@@ -100,6 +100,7 @@
 @endsection
 
 @section('content')
+@include('layouts.sweet_alerts.index')
     <!-- ===== Dashboard Content Row ===== -->
     <div class="row gx-4" id="dashboardContent">
         @include('dashboard.partials.dashboard_content', compact('denttotalCount', 'dentpresentCount', 'totalStudentsInBeats', 'patientsCount', 'staffsCount', 'beatStudentPercentage'))

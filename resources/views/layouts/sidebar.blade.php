@@ -115,11 +115,11 @@
                         <a href="/tps-smis/students/create">Student Registration</a>
                     </li>
                     @endcan()
-                    @can('post-view')
+
                      <li>
                         <a href="{{ route('students-post.index') }}">Students Post</a>
                     </li> 
-                    @endcan()
+
                     @can('student-create')
                     <li>
                         <a href="/tps-smis/intake_history">Intake Summary</a>

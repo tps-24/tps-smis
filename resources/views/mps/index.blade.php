@@ -22,7 +22,7 @@
 @section('content')
 @include('layouts.sweet_alerts.index')
 
-<div style="display: flex; justify-content: space-between; margin-right: 2px; margin-bottom: 2px;">
+<div style="display: flex; justify-content: space-between; margin-right: 2px; margin-bottom: 2px;" class="mb-2">
     <a href="{{ route('mps.all') }}">
         <button class="btn btn-sm btn-primary">View all</button>
     </a>
@@ -53,7 +53,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php        $i = 0; ?>
+                        <?php $i = 0; ?>
                         @foreach ($mpsStudents as $student)
                             <tr>
                                 <td>{{++$i}}</td>

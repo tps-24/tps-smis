@@ -19,7 +19,7 @@
 @section('content')
 @include('layouts.sweet_alerts.index')
 @can('mps-create')
-<div style="display: flex; justify-content: flex-end; margin-right: 2px;">
+<div style="display: flex; justify-content: flex-end; margin-right: 2px;" class="mb-2">
     <a href="{{route('visitors.create')}}"><button class="btn btn-sm btn-success">Add Student</button></a>
 </div>
 @endcan
@@ -41,7 +41,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php        $i = 0; ?>
+                <?php $i = 0; ?>
                 @foreach ($mpsVisitors as $visitor)
                 <tr>
                     <td>{{++$i}}</td>
@@ -51,7 +51,9 @@
                     <td>{{$visitor->relationship}}</td>
                     <td>{{ $visitor->visited_at }}</td>
                     <td>{{$visitor->staff->last_name}}</td>
+                    @if($visitor->created_at && $visitor->created_at->gt(now()->subHours(2)))
                     <td class="d-flex gap-2">
+                        
                         @can('mps-edit')
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#statusModal{{ $visitor->id ?? ''}}">
@@ -59,11 +61,15 @@
                         </button>
                         @endcan
                         @can('mps-delete')
-                        <form action="{{ route('visitors.destroy', $visitor) }}" method="POST" style="display:inline;">
+                        <form id="deleteForm-{{ $visitor->id }}" action="{{ route('visitors.destroy', $visitor) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            <button type="button" class="btn btn-sm btn-danger"
+                                onclick="confirmDelete('deleteForm-{{ $visitor->id }}', ' visitor {{ $visitor->names }} informations')">
+                                Delete
+                            </button>
                         </form>
+
                         @endcan
                         <div class="modal fade" id="statusModal{{  $visitor->id ?? '' }}" tabindex="-1"
                             aria-labelledby="statusModalLabel{{  $visitor->id ?? '' }}" aria-hidden="true">
@@ -124,8 +130,9 @@
                                 </div>
                             </div>
                         </div>
+                        
                     </td>
-
+                    @endif
                 </tr>
                 @endforeach
             </tbody>

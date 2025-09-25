@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Attendence;
@@ -18,19 +19,22 @@ use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
-
     private $companies;
+
     private $selectedSessionId;
+
     protected $graphDataService;
+
     public function __construct(GraphDataService $graphDataService)
     {
         $this->graphDataService = $graphDataService;
         $this->selectedSessionId = session('selected_session');
-        if (!$this->selectedSessionId) {
+        if (! $this->selectedSessionId) {
             $this->selectedSessionId = 1;
         }
         $this->middleware('permission:report-list', ['only' => ['index', 'generateAttendanceReport', 'hospital', 'leaves', 'mps', 'generateHospitalReport', 'generateLeavesReport']]);
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -74,8 +78,6 @@ class ReportController extends Controller
         ]);
     }
 
-
-
     private function getAttendanceData($companyIds, $startDate = null, $endDate = null)
     {
         $now = Carbon::today();
@@ -85,7 +87,7 @@ class ReportController extends Controller
 
         // Use defaults only if you want a default range when dates not provided,
         // but your request was to query total if dates null, so skip default range here.
-        if (!$hasDateFilter) {
+        if (! $hasDateFilter) {
             $startDate = null;
             $endDate = null;
         }
@@ -122,7 +124,7 @@ class ReportController extends Controller
             $days = $rawDaily->keys();
         }
 
-        $dailyCounts = $days->map(fn($date) => [
+        $dailyCounts = $days->map(fn ($date) => [
             'date' => $date,
             'total_absent' => $rawDaily[$date]->total_absent ?? 0,
             'total_kazini' => $rawDaily[$date]->total_kazini ?? 0,
@@ -195,8 +197,8 @@ class ReportController extends Controller
             ->groupBy(DB::raw('YEAR(attendences.date)'), DB::raw('MONTH(attendences.date)'))
             ->orderByRaw('YEAR(attendences.date), MONTH(attendences.date)')
             ->get()
-            ->mapWithKeys(fn($item) => [
-                $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT) => $item,
+            ->mapWithKeys(fn ($item) => [
+                $item->year.'-'.str_pad($item->month, 2, '0', STR_PAD_LEFT) => $item,
             ]);
 
         $monthlyCounts = collect();
@@ -231,14 +233,14 @@ class ReportController extends Controller
 
         $absentCounts = $absentQuery
             ->pluck('absent_student_ids')
-            ->flatMap(fn($v) => json_decode($v, true) ?? [])
-            ->filter(fn($id) => is_numeric($id))
+            ->flatMap(fn ($v) => json_decode($v, true) ?? [])
+            ->filter(fn ($id) => is_numeric($id))
             ->countBy()
             ->sortDesc()
             ->take(10);
 
         $students = Student::whereIn('id', $absentCounts->keys())->get()->keyBy('id');
-        $mostAbsentStudent = $absentCounts->map(fn($count, $id) => [
+        $mostAbsentStudent = $absentCounts->map(fn ($count, $id) => [
             'student' => $students[$id] ?? null,
             'count' => $count,
         ])->values();
@@ -251,13 +253,10 @@ class ReportController extends Controller
         ];
     }
 
-
-
     public function generateAttendanceReport(Request $request)
     {
         $company = Company::find($request->company_id);
         $companyId = $company->id; // your specific company ID
-
 
         $attendances = Attendence::with('sessionProgramme') // eager load sessionProgramme relationship
             ->whereIn('platoon_id', function ($query) use ($companyId) {
@@ -303,13 +302,15 @@ class ReportController extends Controller
 
         }
         $sick_students = Patient::where('company_id', $companyId)->whereIn('excuse_type_id', [3, 1])->whereIn('student_id', $sick_student_ids)->whereNull('released_at')->get();
-        //return $sessionProgrammeAttendance;
+        // return $sessionProgrammeAttendance;
         $pdf = PDF::loadView('report.attendancePdf', compact('company', 'sessionProgrammeAttendance', 'sick_students'));
         $pdf->set_option('margin_top', 10);
         $pdf->set_option('isHtml5ParserEnabled', true);
         $pdf->set_option('isPhpEnabled', true);
-        return $pdf->stream("attendance_report.pdf");
+
+        return $pdf->stream('attendance_report.pdf');
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -442,6 +443,7 @@ class ReportController extends Controller
             'on_leave' => array_column($monthlyCounts, 'on_leave'),
             'late' => array_column($monthlyCounts, 'late'),
         ];
+
         return view('report.leaves', compact(
             'leaveRequests',
             'dailyCounts',
@@ -495,17 +497,18 @@ class ReportController extends Controller
     private function getWeekNumber($date)
     {
         $selectedSessionId = session('selected_session');
-        if (!$selectedSessionId) {
+        if (! $selectedSessionId) {
             $selectedSessionId = 1;
         }
         $sessionProgramme = SessionProgramme::find($selectedSessionId);
         // Define the specified start date (September 30, 2024)
         $startDate = Carbon::createFromFormat('d-m-Y', Carbon::parse($sessionProgramme->startDate)->format('d-m-Y'));
-        //dd($date);
+        // dd($date);
         // Define the target date for which you want to calculate the week number
         $date = Carbon::parse($date); // This could be the current date, or any specific date
         // Calculate the difference in weeks between the start date and the target date
         $weekNumber = (int) ceil($startDate->diffInDays($date) / 7) + 1; // Adding 1 to make it 1-based (Week 1, Week 2, ...)
+
         return (int) $weekNumber;
     }
 
@@ -518,7 +521,7 @@ class ReportController extends Controller
         $pdf->set_option('isHtml5ParserEnabled', true);
         $pdf->set_option('isPhpEnabled', true);
 
-        return $pdf->stream("hospital_report.pdf");
+        return $pdf->stream('hospital_report.pdf');
     }
 
     public function generateLeavesReport()
@@ -528,19 +531,25 @@ class ReportController extends Controller
         $pdf->set_option('margin_top', 10);
         $pdf->set_option('isHtml5ParserEnabled', true);
         $pdf->set_option('isPhpEnabled', true);
-        return $pdf->stream("leaves_report.pdf");
+
+        return $pdf->stream('leaves_report.pdf');
     }
 
-    public function generateMPSReport()
+    public function generateMPSReport(Request $request)
     {
-        $data = $this->getMPSData();
-        //return $data['monthlyCounts'];
+        $start_date = $request->query('start_date');
+        $end_date = $request->query('end_date');
+
+        $data = $this->getMPSData($start_date, $end_date);
+
         $pdf = PDF::loadView('report.mpsPdf', compact('data'));
         $pdf->set_option('margin_top', 10);
         $pdf->set_option('isHtml5ParserEnabled', true);
         $pdf->set_option('isPhpEnabled', true);
-        return $pdf->stream("leaves_report.pdf");
+
+        return $pdf->stream('mps_report.pdf');
     }
+
     private function getHospitalData()
     {
         $user = Auth::user();
@@ -553,46 +562,45 @@ class ReportController extends Controller
         $selectedSessionId = session('selected_session') == '' ? 1 : session('selected_session');
         $sevenDaysAgo = Carbon::today()->subDays(6); // 6 days ago + today = 7 days
 
-        $rawCounts = Patient::selectRaw("
+        $rawCounts = Patient::selectRaw('
         DATE(created_at) as date,
         COUNT(*) as total,
         SUM(CASE WHEN excuse_type_id = 1 THEN 1 ELSE 0 END) as ED,
         SUM(CASE WHEN excuse_type_id = 2 THEN 1 ELSE 0 END) as LD,
         SUM(CASE WHEN excuse_type_id = 3 THEN 1 ELSE 0 END) as Adm
-    ")
-    ->whereHas('student', function ($query) use ($selectedSessionId, $company_ids) {
-        $query->where('session_programme_id', $selectedSessionId)
-              ->whereIn('company_id', $company_ids);
-    })
-    ->whereIn('excuse_type_id', [1, 2, 3])
-    ->whereNull('released_at') // ✅ Only active patients
-    ->whereDate('created_at', '>=', $sevenDaysAgo)
-    ->groupBy(DB::raw('DATE(created_at)'))
-    ->orderBy('date')
-    ->get()
-    ->mapWithKeys(function ($item) {
-        return [
-            $item->date => [
-                'date' => $item->date,
-                'total' => (int) $item->total,
-                'ED' => (int) $item->ED,
-                'LD' => (int) $item->LD,
-                'Adm' => (int) $item->Adm,
-            ],
-        ];
-    })
-    ->toArray();
-
+    ')
+            ->whereHas('student', function ($query) use ($selectedSessionId, $company_ids) {
+                $query->where('session_programme_id', $selectedSessionId)
+                    ->whereIn('company_id', $company_ids);
+            })
+            ->whereIn('excuse_type_id', [1, 2, 3])
+            ->whereNull('released_at') // ✅ Only active patients
+            ->whereDate('created_at', '>=', $sevenDaysAgo)
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [
+                    $item->date => [
+                        'date' => $item->date,
+                        'total' => (int) $item->total,
+                        'ED' => (int) $item->ED,
+                        'LD' => (int) $item->LD,
+                        'Adm' => (int) $item->Adm,
+                    ],
+                ];
+            })
+            ->toArray();
 
         $weeklyCounts = [];
         for ($i = 0; $i < 7; $i++) {
             $date = Carbon::today()->subDays(6 - $i)->toDateString(); // from oldest to newest
             $weeklyCounts[] = [
-                "date" => $date,
-                "total" => 0,
-                "ED" => 0,
-                "LD" => 0,
-                "Adm" => 0,
+                'date' => $date,
+                'total' => 0,
+                'ED' => 0,
+                'LD' => 0,
+                'Adm' => 0,
             ];
         }
         $dailyCounts = array_map(function ($weeklyItem) use ($rawCounts) {
@@ -609,13 +617,13 @@ class ReportController extends Controller
         // Get the date 5 weeks ago
         $fiveWeeksAgo = Carbon::today()->subWeeks(5); // 5 weeks ago
 
-        $rawCounts = Patient::selectRaw("
+        $rawCounts = Patient::selectRaw('
         DATE(created_at) as date,
         COUNT(*) as total,
         SUM(CASE WHEN excuse_type_id = 1 THEN 1 ELSE 0 END) as ED,
         SUM(CASE WHEN excuse_type_id = 2 THEN 1 ELSE 0 END) as LD,
         SUM(CASE WHEN excuse_type_id = 3 THEN 1 ELSE 0 END) as Adm
-    ")
+    ')
             ->whereHas('student', function ($query) use ($selectedSessionId, $company_ids) {
                 $query->where('session_programme_id', $selectedSessionId)->whereIn('company_id', $company_ids);
             })
@@ -642,11 +650,11 @@ class ReportController extends Controller
         for ($i = 0; $i < 5; $i++) {
             $date = Carbon::today()->subWeeks(4 - $i)->startOfWeek()->toDateString(); // Week starting from 5 weeks ago
             $weeklyCounts[] = [
-                "date" => $date,
-                "total" => 0,
-                "ED" => 0,
-                "LD" => 0,
-                "Adm" => 0,
+                'date' => $date,
+                'total' => 0,
+                'ED' => 0,
+                'LD' => 0,
+                'Adm' => 0,
             ];
         }
 
@@ -695,6 +703,7 @@ class ReportController extends Controller
 
         $monthlyCounts = array_map(function ($monthItem) use ($rawCounts) {
             $month = $monthItem['month'];
+
             return [
                 'month' => Carbon::parse($month)->format('F Y'),
                 'total' => $rawCounts[$month]['total'] ?? 0,
@@ -716,13 +725,14 @@ class ReportController extends Controller
             ->map(function ($item) {
                 // Retrieve the student associated with the patient by student_id
                 $student = $item->student; // Assumes a relationship named 'student' in the Patient model
-    
+
                 return [
                     'student_id' => $student->id,            // Access student ID
                     'student' => $student,                // Access student's name or any other student details
                     'count' => $item->occurrence_count, // The number of occurrences
                 ];
             });
+
         return [
             'mostOccurredStudents' => $mostOccurredStudents,
             'dailyCounts' => $dailyCounts,
@@ -730,6 +740,7 @@ class ReportController extends Controller
             'monthlyCounts' => $monthlyCounts,
         ];
     }
+
     private function getLeavesData($start_date = null, $end_date = null)
     {
         $user = Auth::user();
@@ -754,12 +765,12 @@ class ReportController extends Controller
         // ======================== DAILY ========================
         $rawDaily = LeaveRequest::whereBetween('created_at', [$start, $end])
             ->whereIn('company_id', $company_ids)
-            ->selectRaw("
+            ->selectRaw('
             DATE(created_at) AS date,
             COUNT(CASE WHEN return_date IS NOT NULL AND return_date < end_date THEN 1 END) AS returned,
             COUNT(CASE WHEN return_date IS NULL AND end_date > NOW() THEN 1 END) AS on_leave,
             COUNT(CASE WHEN return_date IS NULL AND end_date <= NOW() THEN 1 END) AS late
-        ")
+        ')
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
             ->get()
@@ -783,7 +794,7 @@ class ReportController extends Controller
 
         // ======================== WEEKLY ========================
         // If no custom dates, use last 5 full weeks
-        if (!$start_date && !$end_date) {
+        if (! $start_date && ! $end_date) {
             $startOfFirstWeek = $today->copy()->subWeeks(4)->startOfWeek();
             $endOfLastWeek = $today->copy()->endOfWeek();
         } else {
@@ -793,17 +804,17 @@ class ReportController extends Controller
 
         $rawWeekly = LeaveRequest::whereBetween('created_at', [$startOfFirstWeek, $endOfLastWeek])
             ->whereIn('company_id', $company_ids)
-            ->selectRaw("
+            ->selectRaw('
             YEARWEEK(created_at, 1) AS year_week,
             MIN(DATE(created_at)) AS created_at,
             COUNT(CASE WHEN return_date IS NOT NULL AND return_date < end_date THEN 1 END) AS returned,
             COUNT(CASE WHEN return_date IS NULL AND end_date > NOW() THEN 1 END) AS on_leave,
             COUNT(CASE WHEN return_date IS NULL AND end_date <= NOW() THEN 1 END) AS late
-        ")
-            ->groupBy(DB::raw("YEARWEEK(created_at, 1)"))
+        ')
+            ->groupBy(DB::raw('YEARWEEK(created_at, 1)'))
             ->orderBy('year_week')
             ->get()
-            ->keyBy(fn($row) => Carbon::parse($row->created_at)->format('oW'));
+            ->keyBy(fn ($row) => Carbon::parse($row->created_at)->format('oW'));
 
         $weeklyCounts = [];
         $week = $startOfFirstWeek->copy();
@@ -812,7 +823,7 @@ class ReportController extends Controller
             $raw = $rawWeekly[$weekKey] ?? null;
 
             $weeklyCounts[] = [
-                'week_start_date' => 'Week ' . $week->isoWeek,
+                'week_start_date' => 'Week '.$week->isoWeek,
                 'returned' => $raw->returned ?? 0,
                 'on_leave' => $raw->on_leave ?? 0,
                 'late' => $raw->late ?? 0,
@@ -823,7 +834,7 @@ class ReportController extends Controller
 
         // ======================== MONTHLY ========================
         // Default: current month + 2 previous
-        if (!$start_date && !$end_date) {
+        if (! $start_date && ! $end_date) {
             $startOfFirstMonth = $today->copy()->subMonths(2)->startOfMonth();
             $endOfLastMonth = $today->copy()->endOfMonth();
         } else {
@@ -873,6 +884,7 @@ class ReportController extends Controller
             ->get()
             ->map(function ($item) {
                 $student = $item->student;
+
                 return [
                     'student_id' => $student->id,
                     'student' => $student,
@@ -902,12 +914,12 @@ class ReportController extends Controller
         $sevenDaysAgo = Carbon::now()->subDays(6)->startOfDay();
 
         $rawCounts = LeaveRequest::whereDate('created_at', '>=', $sevenDaysAgo)
-            ->selectRaw("
+            ->selectRaw('
         DATE(created_at) AS date,
         COUNT(CASE WHEN return_date IS NOT NULL AND return_date < end_date THEN 1 END) AS returned,
         COUNT(CASE WHEN return_date IS NULL AND end_date > NOW() THEN 1 END) AS on_leave,
         COUNT(CASE WHEN return_date IS NULL AND end_date <= NOW() THEN 1 END) AS late
-        ")
+        ')
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
             ->get()
@@ -944,14 +956,14 @@ class ReportController extends Controller
         $endDate = Carbon::now()->endOfWeek();                                      // End of current week
 
         $rawCounts = LeaveRequest::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw("
+            ->selectRaw('
         YEARWEEK(created_at, 1) AS year_week, -- mode 1 = weeks start on Monday
         MIN(DATE(created_at)) as week_start_date, -- not reliable for empty weeks, used just as backup
         COUNT(CASE WHEN return_date IS NOT NULL AND return_date < end_date THEN 1 END) AS returned,
         COUNT(CASE WHEN return_date IS NULL AND end_date > NOW() THEN 1 END) AS on_leave,
         COUNT(CASE WHEN return_date IS NULL AND end_date <= NOW() THEN 1 END) AS late
-    ")
-            ->groupBy(DB::raw("YEARWEEK(created_at, 1)"))
+    ')
+            ->groupBy(DB::raw('YEARWEEK(created_at, 1)'))
             ->orderBy('year_week')
             ->get()
             ->keyBy('year_week');
@@ -965,7 +977,7 @@ class ReportController extends Controller
             $raw = $rawCounts[$weekKey] ?? null;
 
             $weeklyCounts[] = [
-                'week_start_date' => $this->getWeekNumber($weekStartDate) . ' Week',
+                'week_start_date' => $this->getWeekNumber($weekStartDate).' Week',
                 'returned' => $raw->returned ?? 0,
                 'on_leave' => $raw->on_leave ?? 0,
                 'late' => $raw->late ?? 0,
@@ -1025,13 +1037,14 @@ class ReportController extends Controller
             ->map(function ($item) {
                 // Retrieve the student associated with the patient by student_id
                 $student = $item->student; // Assumes a relationship named 'student' in the Patient model
-    
+
                 return [
                     'student_id' => $student->id,            // Access student ID
                     'student' => $student,                // Access student's name or any other student details
                     'count' => $item->occurrence_count, // The number of occurrences
                 ];
             });
+
         return [
             'leaveRequests' => $leaveRequests,
             'dailyCounts' => $dailyCounts,
@@ -1039,42 +1052,45 @@ class ReportController extends Controller
             'monthlyCounts' => $monthlyCounts,
         ];
     }
+
     private function getMPSData($start_date = null, $end_date = null)
     {
         $user = Auth::user();
-        $company_ids = [];
+        $company_ids = $user->hasRole(['Sir Major', 'Instructor', 'OC Coy'])
+            ? [$user->staff->company_id]
+            : Company::pluck('id')->toArray();
 
-        if ($user->hasRole(['Sir Major', 'Instructor', 'OC Coy'])) {
-            $company_ids = [$user->staff->company_id];
+        // ===== DATE RANGES =====
+        if ($start_date && $end_date) {
+            $dailyStart = Carbon::parse($start_date)->startOfDay();
+            $dailyEnd = Carbon::parse($end_date)->endOfDay();
+
+            $weeklyStart = Carbon::parse($start_date)->startOfWeek();
+            $weeklyEnd = Carbon::parse($end_date)->endOfWeek();
+
+            $monthlyStart = Carbon::parse($start_date)->startOfMonth();
+            $monthlyEnd = Carbon::parse($end_date)->endOfMonth();
         } else {
-            $company_ids = Company::pluck('id');
+            $dailyStart = Carbon::now()->subDays(6)->startOfDay();
+            $dailyEnd = Carbon::now()->endOfDay();
+
+            $weeklyStart = Carbon::now()->startOfWeek()->subWeeks(4);
+            $weeklyEnd = Carbon::now()->endOfWeek();
+
+            $monthlyStart = Carbon::now()->subMonths(2)->startOfMonth();
+            $monthlyEnd = Carbon::now()->endOfMonth();
         }
 
-        // Set chart-specific date ranges
-        $dailyStart = $start_date ? Carbon::parse($start_date)->startOfDay() : Carbon::now()->subDays(6)->startOfDay();
-        $dailyEnd = $end_date ? Carbon::parse($end_date)->endOfDay() : Carbon::now()->endOfDay();
-
-        $weeklyStart = $start_date ? Carbon::parse($start_date)->startOfWeek() : Carbon::now()->startOfWeek()->subWeeks(4);
-        $weeklyEnd = $end_date ? Carbon::parse($end_date)->endOfWeek() : Carbon::now()->endOfWeek();
-
-        $monthlyStart = $start_date ? Carbon::parse($start_date)->startOfMonth() : Carbon::now()->startOfMonth()->subMonths(2);
-        $monthlyEnd = $end_date ? Carbon::parse($end_date)->endOfMonth() : Carbon::now()->endOfMonth();
-
-        // ========== DAILY ==========
+        // ===== DAILY =====
         $mpsCounts = DB::table('m_p_s as mps')
             ->join('students as s', 'mps.student_id', '=', 's.id')
             ->selectRaw('DATE(mps.arrested_at) as date, COUNT(DISTINCT mps.student_id) as mps_count')
-            //->whereBetween('mps.arrested_at', [$dailyStart, $dailyEnd])
+            ->whereBetween('mps.arrested_at', [$dailyStart, $dailyEnd])
             ->whereIn('s.company_id', $company_ids)
-            ->where(function ($query) use ($dailyEnd) {
-                $query->whereNull('mps.released_at')
-                    ->orWhere('mps.released_at', '<=', $dailyEnd);
-            })
             ->groupByRaw('DATE(mps.arrested_at)')
             ->orderByRaw('DATE(mps.arrested_at)')
             ->get()
             ->keyBy('date');
-
 
         $mpsVisitorCounts = DB::table('m_p_s_visitors as v')
             ->join('students as s', 'v.student_id', '=', 's.id')
@@ -1087,7 +1103,7 @@ class ReportController extends Controller
             ->keyBy('date');
 
         $dailyCounts = [];
-        $period = Carbon::parse($dailyStart)->toPeriod(Carbon::parse($dailyEnd));
+        $period = Carbon::parse($dailyStart)->daysUntil(Carbon::parse($dailyEnd)->addDay());
         foreach ($period as $date) {
             $key = $date->toDateString();
             $dailyCounts[] = [
@@ -1097,32 +1113,32 @@ class ReportController extends Controller
             ];
         }
 
-        // ========== WEEKLY ==========
-        $weeklyRaw = DB::table('m_p_s')
-            ->selectRaw("YEARWEEK(arrested_at, 1) as year_week, COUNT(DISTINCT student_id) as mps_count")
-            //->whereBetween('arrested_at', [$weeklyStart, $weeklyEnd])
-            ->where(function ($query) use ($weeklyEnd) {
-                $query->whereNull('released_at')
-                    ->orWhere('released_at', '<=', $weeklyEnd);
-            })
-            ->groupBy(DB::raw('YEARWEEK(arrested_at, 1)'))
-            ->orderBy(DB::raw('YEARWEEK(arrested_at, 1)'))
+        // ===== WEEKLY =====
+        $weeklyRaw = DB::table('m_p_s as mps')
+            ->join('students as s', 'mps.student_id', '=', 's.id')
+            ->selectRaw("DATE_FORMAT(mps.arrested_at, '%x%v') as year_week, COUNT(DISTINCT mps.student_id) as mps_count")
+            ->whereBetween('mps.arrested_at', [$weeklyStart, $weeklyEnd])
+            ->whereIn('s.company_id', $company_ids)
+            ->groupBy(DB::raw("DATE_FORMAT(mps.arrested_at, '%x%v')"))
+            ->orderBy(DB::raw("DATE_FORMAT(mps.arrested_at, '%x%v')"))
             ->get()
             ->keyBy('year_week');
 
-        $weeklyVisitorRaw = DB::table('m_p_s_visitors')
-            ->selectRaw("YEARWEEK(visited_at, 1) as year_week, COUNT(DISTINCT student_id) as visitor_count")
-            ->whereBetween('visited_at', [$weeklyStart, $weeklyEnd])
-            ->groupBy(DB::raw('YEARWEEK(visited_at, 1)'))
-            ->orderBy(DB::raw('YEARWEEK(visited_at, 1)'))
+        $weeklyVisitorRaw = DB::table('m_p_s_visitors as v')
+            ->join('students as s', 'v.student_id', '=', 's.id')
+            ->selectRaw("DATE_FORMAT(v.visited_at, '%x%v') as year_week, COUNT(DISTINCT v.student_id) as visitor_count")
+            ->whereBetween('v.visited_at', [$weeklyStart, $weeklyEnd])
+            ->whereIn('s.company_id', $company_ids)
+            ->groupBy(DB::raw("DATE_FORMAT(v.visited_at, '%x%v')"))
+            ->orderBy(DB::raw("DATE_FORMAT(v.visited_at, '%x%v')"))
             ->get()
             ->keyBy('year_week');
 
         $weeklyCounts = [];
         $weekCursor = Carbon::parse($weeklyStart);
         while ($weekCursor->lte($weeklyEnd)) {
-            $yearWeekKey = intval($weekCursor->format('oW'));
-            $label = 'Week of ' . $weekCursor->format('M d');
+            $yearWeekKey = $weekCursor->format('oW');
+            $label = 'Week '.$this->getWeekNumber($weekCursor);
 
             $weeklyCounts[] = [
                 'week_start' => $label,
@@ -1132,7 +1148,7 @@ class ReportController extends Controller
             $weekCursor->addWeek();
         }
 
-        // ========== MONTHLY ==========
+        // ===== MONTHLY =====
         $monthlyRaw = DB::table('m_p_s as mps')
             ->join('students as s', 'mps.student_id', '=', 's.id')
             ->selectRaw('YEAR(mps.arrested_at) as year, MONTH(mps.arrested_at) as month, COUNT(DISTINCT mps.student_id) as mps_count')
@@ -1141,7 +1157,7 @@ class ReportController extends Controller
             ->groupByRaw('YEAR(mps.arrested_at), MONTH(mps.arrested_at)')
             ->orderByRaw('YEAR(mps.arrested_at), MONTH(mps.arrested_at)')
             ->get()
-            ->mapWithKeys(fn($item) => [sprintf('%04d-%02d', $item->year, $item->month) => $item->mps_count]);
+            ->mapWithKeys(fn ($item) => [sprintf('%04d-%02d', $item->year, $item->month) => $item->mps_count]);
 
         $monthlyVisitorRaw = DB::table('m_p_s_visitors as v')
             ->join('students as s', 'v.student_id', '=', 's.id')
@@ -1151,7 +1167,7 @@ class ReportController extends Controller
             ->groupByRaw('YEAR(v.visited_at), MONTH(v.visited_at)')
             ->orderByRaw('YEAR(v.visited_at), MONTH(v.visited_at)')
             ->get()
-            ->mapWithKeys(fn($item) => [sprintf('%04d-%02d', $item->year, $item->month) => $item->visitor_count]);
+            ->mapWithKeys(fn ($item) => [sprintf('%04d-%02d', $item->year, $item->month) => $item->visitor_count]);
 
         $monthlyCounts = [];
         $monthCursor = Carbon::parse($monthlyStart);
@@ -1165,9 +1181,9 @@ class ReportController extends Controller
             $monthCursor->addMonth();
         }
 
-        // ========== CURRENT + TOP STUDENTS ==========
+        // ===== CURRENT + TOP STUDENTS =====
         $currentLockedUpStudents = Mps::whereNull('released_at')
-            ->whereHas('student', fn($q) => $q->whereIn('company_id', $company_ids))
+            ->whereHas('student', fn ($q) => $q->whereIn('company_id', $company_ids))
             ->with('student')
             ->get();
 
@@ -1179,15 +1195,13 @@ class ReportController extends Controller
             'students.company_id'
         )
             ->join('students', 'm_p_s.student_id', '=', 'students.id')
-            ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
-                $query->whereBetween('arrested_at', [$start_date, $end_date]);
-            })
+            ->when($start_date, fn ($q) => $q->where('arrested_at', '>=', $start_date))
+            ->when($end_date, fn ($q) => $q->where('arrested_at', '<=', $end_date))
             ->whereIn('students.company_id', $company_ids)
             ->groupBy('student_id', 'students.first_name', 'students.last_name', 'students.company_id')
             ->orderByDesc('count')
             ->take(10)
             ->get();
-
 
         $topVisitedStudents = MpsVisitor::select(
             'student_id',
@@ -1197,16 +1211,15 @@ class ReportController extends Controller
             'students.company_id'
         )
             ->join('students', 'm_p_s_visitors.student_id', '=', 'students.id')
-            ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
-                $query->whereBetween('visited_at', [$start_date, $end_date]);
-            })
+            ->when($start_date, fn ($q) => $q->where('visited_at', '>=', $start_date))
+            ->when($end_date, fn ($q) => $q->where('visited_at', '<=', $end_date))
             ->whereIn('students.company_id', $company_ids)
             ->groupBy('student_id', 'students.first_name', 'students.last_name', 'students.company_id')
             ->orderByDesc('count')
             ->take(10)
             ->get();
 
-
+        // ===== RETURN DATA INCLUDING START + END DATE =====
         return [
             'dailyCounts' => $dailyCounts,
             'weeklyCounts' => $weeklyCounts,
@@ -1214,7 +1227,8 @@ class ReportController extends Controller
             'currentLockedUpStudents' => $currentLockedUpStudents,
             'topLockedUpStudents' => $topLockedUpStudents,
             'topVisitedStudents' => $topVisitedStudents,
+            'start_date' => $dailyStart->format('Y-m-d'),
+            'end_date' => $dailyEnd->format('Y-m-d'),
         ];
     }
-
 }
