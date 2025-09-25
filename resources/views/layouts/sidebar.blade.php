@@ -325,9 +325,9 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('downloads.index') }}">
+                <a href="{{ route('weapons.index') }}">
                     <i class="bi bi-weapon"></i>
-                    <span class="menu-text">Weapon Panel</span>
+                    <span class="menu-text">Weapons</span>
                 </a>
             </li>
             <li>

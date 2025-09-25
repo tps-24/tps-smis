@@ -87,7 +87,7 @@
     }
 
     // Get the selected session ID from the session
-    $selectedSessionId = session('selected_session');
+    $selectedSessionId = session('selected_session') ?? 1; // Default to 1 if not set
     @endphp
 
     @can('programme-session-list')
