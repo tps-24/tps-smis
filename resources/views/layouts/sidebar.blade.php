@@ -509,6 +509,11 @@
                         <li>
                             <a href="{{ route('companies.index') }}">Companies Settings</a>
                         </li>
+                        @can('vitengo-view')
+                         <li>
+                            <a href="{{ route('vitengo.index') }}">Vitengo Settings</a>
+                        </li>
+                        @endcan()
                         <li class="treeview">
                             <a href="#!">
                                 <span class="menu-text">Notification </span>

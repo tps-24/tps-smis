@@ -5,6 +5,7 @@ use App\Http\Controllers\AttendenceController;
 use App\Http\Controllers\BeatController;
 use App\Http\Controllers\CampusController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseWorkController;
 use App\Http\Controllers\CourseworkResultController;
@@ -13,22 +14,23 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExcuseTypeController;
-use App\Http\Controllers\NotificationAudienceController;
-use App\Http\Controllers\NotificationTypesController;
-use App\Http\Controllers\TerminationReasonController;
 use App\Http\Controllers\FinalResultController;
 use App\Http\Controllers\GradeMappingController;
 use App\Http\Controllers\GradingSystemController;
 use App\Http\Controllers\GuardAreaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\IntakeHistoryController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\MPSController;
 use App\Http\Controllers\MPSVisitorController;
+use App\Http\Controllers\NotificationAudienceController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationTypesController;
 use App\Http\Controllers\OptionalCourseEnrollmentController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatrolAreaController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProgrammeController;
 use App\Http\Controllers\ProgrammeCourseSemesterController;
@@ -42,27 +44,22 @@ use App\Http\Controllers\SemesterExamResultController;
 use App\Http\Controllers\SessionProgrammeController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StaffProgrammeCourseController;
+use App\Http\Controllers\StaffSummaryController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentPostController;
 use App\Http\Controllers\TeacherOnDutyController;
+use App\Http\Controllers\TerminationReasonController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\IntakeHistoryController;
-use App\Http\Controllers\StaffSummaryController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\StudentPostController;
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\VitengoController;
 use App\Http\Controllers\WeaponController;
-use App\Http\Controllers\ShiftController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Http\Request;
-use App\Http\Controllers\WeaponHandoverController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Route;
 
-
-
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 Auth::routes();
 
@@ -105,8 +102,7 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
 //     Route::get('/downloadPdf/{company_id}/{beatType}/{day}', 'generateTodayPdf')->name('beats.downloadPdf');
 // });
 
-Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
-});
+Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {});
 
 // Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
 //     Route::get('/course/{course}', [CourseController::class, 'show'])->name('course.show');
@@ -139,7 +135,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('students/filter', [IntakeHistoryController::class, 'filterStudents'])->name('students.filter');
     Route::get('/regions/by-session', [StudentController::class, 'getRegionsBySession'])->name('regions.bySession');
 
-
     Route::get('/default', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/print-certificates', [FinalResultController::class, 'studentList'])->name('studentList');
     Route::get('/print-certificates/summary', [FinalResultController::class, 'summary'])->name('studentList');
@@ -154,7 +149,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('courseworks/{semesterId}/{courseId}', [CourseworkController::class, 'getCourseworks']);
 
-    //Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
+    // Route::get('/coursework_results/course/{course}', [CourseworkResultController::class, 'getResultsByCourse']);
     Route::get('/coursework_results/coursework/{coursework}', [CourseworkResultController::class, 'getResultsByCourse']);
 
     Route::get('/coursework/summary/{id}', [CourseworkResultController::class, 'summary'])->name('coursework.summary');
@@ -221,19 +216,17 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/unassign-instructors/{courseInstructorId}', [StaffProgrammeCourseController::class, 'unAssignInstructor'])->name('unassign.course');
     Route::put('/students/{id}/dismiss', [StudentController::class, 'dismiss'])->name('students.dismiss');
 
-
     Route::controller(StudentController::class)->prefix('students')->group(function () {
         Route::post('activate_beat_status/{studentId}', 'activate_beat_status')->name('students.activate_beat_status');
         Route::post('deactivate_beat_status/{studentId}', 'deactivate_beat_status')->name('students.deactivate_beat_status');
         /**
-         *
          *  Wizard route for student registration
          */
         Route::prefix('create')->group(function () {
-            Route::get('step-two/{type}', "createStepTwo");
+            Route::get('step-two/{type}', 'createStepTwo');
             Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
 
-            Route::get('step-three', "createStepTwo");
+            Route::get('step-three', 'createStepTwo');
             Route::post('post-step-one/{type}', 'postStepOne');
             Route::post('post-step-two/{type}', 'postStepTwo');
             Route::post('post-step-three/{type}', 'postStepThree');
@@ -299,7 +292,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/students/bulk-update-students', [StudentController::class, 'updateStudents'])->name('student.updateStudents');
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('staff.profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
-    Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); //Not yet, needs email config
+    Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); // Not yet, needs email config
     Route::post('users/search', [UserController::class, 'search'])->name('users.search');
 
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
@@ -317,6 +310,11 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('students/{student}/safari/', [SafariStudentController::class, 'store'])->name('storeSafariStudent');
     Route::put('students/return-safari/{safariStudent}', [SafariStudentController::class, 'updateSafari'])->name('returnSafariStudent');
+
+    Route::prefix('vitengo ')->controller(VitengoController::class)->group(function () {
+        Route::post('activate', 'activate')->name('vitengo.activate');
+        Route::post('deactivate', 'deactivate')->name('vitengo.deactivate');
+    });
 
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
@@ -340,20 +338,20 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('certificates', CertificateController::class);
     Route::resource('intake_history', IntakeHistoryController::class);
     Route::resource('posts', PostController::class);
-    
-    Route::resource('companies', CompanyController::class);
-    
 
-    Route::prefix('students-post')->controller(StudentPostController::class)->group(function(){
-        Route::post('bulkimport','import')->name('students-post.bulkimport');
-        Route::get('search','search')->name('students-post.search');
-        Route::get('downloadSample','downloadSample')->name('students-post.downloadSample');
+    Route::resource('companies', CompanyController::class);
+    Route::resource('vitengo', VitengoController::class);
+
+    Route::prefix('students-post')->controller(StudentPostController::class)->group(function () {
+        Route::post('bulkimport', 'import')->name('students-post.bulkimport');
+        Route::get('search', 'search')->name('students-post.search');
+        Route::get('downloadSample', 'downloadSample')->name('students-post.downloadSample');
     });
-        Route::prefix('posts')->controller(PostController::class)->group(function(){
-        Route::post('publish/{post}','publish')->name('post.publish');
+    Route::prefix('posts')->controller(PostController::class)->group(function () {
+        Route::post('publish/{post}', 'publish')->name('post.publish');
     });
     Route::resource('students-post', StudentPostController::class);
-    
+
     // Define the custom route first
 
     Route::prefix('companies')->controller(CompanyController::class)->group(function () {
@@ -361,41 +359,41 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/{platoonId}/platoon/delete', 'destroy_platoon')->name('companies.platoon.destroy');
     });
 
-    //Notification routes
+    // Notification routes
 
-    Route::prefix('/notifications')->group(function(){
-        Route::prefix('/audiences')->controller(NotificationAudienceController::class)->group(function(){
-            Route::get('/','index')->name('notifications.audiences.index');
-            Route::get('/create','create')->name('notifications.audiences.create');
-            Route::get('/edit/{notificationAudience}','edit')->name('notifications.audiences.edit');
-            Route::delete('/destroy/{notificationAudience}','destroy')->name('notifications.audiences.destroy');
-            Route::get('/{notificationAudience}','show')->name('notifications.audiences.show');
-            Route::post('/store','store')->name('notifications.audiences.store');
-            Route::put('/update/{notificationAudience}','update')->name('notifications.audiences.update');
+    Route::prefix('/notifications')->group(function () {
+        Route::prefix('/audiences')->controller(NotificationAudienceController::class)->group(function () {
+            Route::get('/', 'index')->name('notifications.audiences.index');
+            Route::get('/create', 'create')->name('notifications.audiences.create');
+            Route::get('/edit/{notificationAudience}', 'edit')->name('notifications.audiences.edit');
+            Route::delete('/destroy/{notificationAudience}', 'destroy')->name('notifications.audiences.destroy');
+            Route::get('/{notificationAudience}', 'show')->name('notifications.audiences.show');
+            Route::post('/store', 'store')->name('notifications.audiences.store');
+            Route::put('/update/{notificationAudience}', 'update')->name('notifications.audiences.update');
         });
 
-        Route::prefix('/types')->controller(NotificationTypesController::class)->group(function(){
-            Route::get('/','index')->name('notifications.types.index');
-            Route::get('/create','create')->name('notifications.types.create');
-            Route::get('/edit/{notificationType}','edit')->name('notifications.types.edit');
-            Route::delete('/destroy/{notificationType}','destroy')->name('notifications.types.destroy');
-            Route::get('/{notificationType}','show')->name('notifications.types.show');
-            Route::post('/store','store')->name('notifications.types.store');
-            Route::put('/update/{notificationType}','update')->name('notifications.types.update');
+        Route::prefix('/types')->controller(NotificationTypesController::class)->group(function () {
+            Route::get('/', 'index')->name('notifications.types.index');
+            Route::get('/create', 'create')->name('notifications.types.create');
+            Route::get('/edit/{notificationType}', 'edit')->name('notifications.types.edit');
+            Route::delete('/destroy/{notificationType}', 'destroy')->name('notifications.types.destroy');
+            Route::get('/{notificationType}', 'show')->name('notifications.types.show');
+            Route::post('/store', 'store')->name('notifications.types.store');
+            Route::put('/update/{notificationType}', 'update')->name('notifications.types.update');
         });
     });
 
-    //End of notification routes
+    // End of notification routes
 
-    // routes/web.php    
+    // routes/web.php
     Route::get('platoons/{companyName}', [AttendenceController::class, 'getPlatoons']);
     Route::get('campanies/{campusId}', [GuardAreaController::class, 'get_companies']);
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {
-        Route::post('store/request',  'requestAttendance')->name('attendance.store.request');
-        Route::get('show/request',  'createAttendanceRequests')->name('attendance.show.request');
-        Route::post('request/update-status',  'updateRequestStatus')->name('attendance.request.update-status');
-        
+        Route::post('store/request', 'requestAttendance')->name('attendance.store.request');
+        Route::get('show/request', 'createAttendanceRequests')->name('attendance.show.request');
+        Route::post('request/update-status', 'updateRequestStatus')->name('attendance.request.update-status');
+
         Route::get('type-test/{type_id}', 'attendence');
         Route::get('type/{type_id}', 'attendence')->name('attendances.summary');
         // Route::post('create/{type_id}', 'create');
@@ -413,7 +411,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('storeMchanganuo/{attendenceId}/', 'storeMchanganuo')->name('attendences.storeMchanganuo');
 
         Route::get('today/{company_id}/{type}/{date}/{attendenceTypeId}', 'today')->name('today');
-        Route::patch('/companies/{company}/attendance/{date}',  'updateCompanyAttendance')->name('attendance.updateCompanyAttendance');
+        Route::patch('/companies/{company}/attendance/{date}', 'updateCompanyAttendance')->name('attendance.updateCompanyAttendance');
     });
 
     Route::controller(ReportController::class)->prefix('reports')->group(function () {
@@ -428,7 +426,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     });
 
-    //Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {});
+    // Route::controller(AttendenceController::class)->prefix('attendences')->group(function () {});
 
     Route::get('course/courseworks/create/{courseId}', [CourseWorkController::class, 'create'])->name('course.coursework.create');
     Route::get('course/courseworks/{courseId}', [CourseWorkController::class, 'getCourse'])->name('course.coursework');
@@ -437,8 +435,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('enrollments/sessions/delete/{id}', [EnrollmentController::class, 'destroy'])->name('enrollments.session.delete');
     // Route::get('course/courseworks/create/{courseId}',[SemesterExamController::class,'create'])->name('course.coursework.create');
     // Route::get('course/courseworks/{courseId}',[SemesterExamController::class,'getCourse'])->name('course.coursework');
-    Route::post('course/semester_exams/store/{courseId}',[SemesterExamController::class,'store'])->name('course.semester_exams.store');
-    
+    Route::post('course/semester_exams/store/{courseId}', [SemesterExamController::class, 'store'])->name('course.semester_exams.store');
 
     Route::resource('grading_systems', GradingSystemController::class);
     Route::resource('grade_mappings', GradeMappingController::class);
@@ -484,10 +481,10 @@ Route::group(['middleware' => ['auth']], function () {
          *  Wizard route for student registration
          */
         Route::prefix('create')->group(function () {
-            Route::get('step-two/{type}', "createStepTwo");
+            Route::get('step-two/{type}', 'createStepTwo');
             Route::get('step-three/{type}', [StudentController::class, 'createStepThree']);
 
-            Route::get('step-three', "createStepTwo");
+            Route::get('step-three', 'createStepTwo');
             Route::post('post-step-one/{type}', 'postStepOne');
             Route::post('post-step-two/{type}', 'postStepTwo');
             Route::post('post-step-three/{type}', 'postStepThree');
@@ -512,9 +509,9 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 Route::get('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
-     ->name('notifications.markAsRead');
+    ->name('notifications.markAsRead');
 
-//start
+// start
 Route::controller(StudentController::class)->prefix('students')->group(function () {
     /**
      *  Wizard route for student registration
@@ -534,14 +531,13 @@ Route::controller(StudentController::class)->prefix('students')->group(function 
     /**
      * End of wizard for student registration
      */
-
     Route::post('store', 'store');
     Route::post('{id}/update', 'update');
     Route::post('{id}/delete', 'destroy');
     Route::post('bulkimport', 'import');
 
 });
-//end
+// end
 
 Route::get('/hospital/viewDetails/{timeframe}', [PatientController::class, 'viewDetails'])->name('hospital.viewDetails');
 Route::get('/hospital/show/{id}', [PatientController::class, 'show'])->name('hospital.show');
@@ -581,7 +577,7 @@ Route::put('/patients/discharge/{id}', [PatientController::class, 'discharge'])-
 Route::put('/patients/{id}/discharge', [PatientController::class, 'discharge'])->name('patients.discharge');
 Route::get('/doctor/admitted', [PatientController::class, 'admitted'])->name('doctor.admitted');
 Route::post('/doctor/discharge/{id}', [PatientController::class, 'discharge'])->name('doctor.discharge');
-//Route::post('/doctor/discharge/{id}', [DoctorController::class, 'discharge'])->name('doctor.discharge');
+// Route::post('/doctor/discharge/{id}', [DoctorController::class, 'discharge'])->name('doctor.discharge');
 
 // 📅 Timetable Routes
 Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');
@@ -593,7 +589,7 @@ Route::delete('/timetable/{id}', [TimetableController::class, 'destroy'])->name(
 Route::get('/timetable/export-pdf', [TimetableController::class, 'exportPDF'])->name('timetable.exportPDF');
 Route::get('/generate-timetable', [TimetableController::class, 'generateTimetable'])->name('timetable.generate');
 
-//Downloader Centre Routes
+// Downloader Centre Routes
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads.index');          // List files
@@ -641,12 +637,11 @@ Route::get('/leave-requests/{id}/rejected-pdf', [LeaveRequestController::class, 
 
 Route::get('/staffs/{id}/resume', [StaffController::class, 'generateResume'])->name('staffs.resume');
 
-  // Show the form to students
-    Route::get('/leave-request', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
+// Show the form to students
+Route::get('/leave-request', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
 
-    // Store leave request
-    Route::post('/leave-request', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
-
+// Store leave request
+Route::post('/leave-request', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
 
 Route::resource('weapons', WeaponController::class);
 Route::get('/weapons/{weapon}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
@@ -656,8 +651,7 @@ Route::post('/weapons/{weapon}/handover', [WeaponController::class, 'storeHandov
 Route::post('/handovers/{handover}/return', [WeaponController::class, 'returnWeapon'])->name('handovers.return');
 
 Route::get('/weapons/{id}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
-Route::post('/handover/{id}/return', [WeaponController::class, 'markAsReturned']) ->name('handover.return');
-    
+Route::post('/handover/{id}/return', [WeaponController::class, 'markAsReturned'])->name('handover.return');
+
 Route::get('weapons/create', [WeaponController::class, 'create'])->name('weapons.create');
 Route::post('weapons', [WeaponController::class, 'store'])->name('weapons.store');
-
