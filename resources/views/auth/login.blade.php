@@ -78,21 +78,17 @@
               </div> -->
 
               <div class="d-grid gap-4" style="margin-top:40px">
-                <!-- <a href="#" class="btn btn-outline-dark">Not registered? Signup</a> -->
                   <button type="submit" class="btn btn-primary">
                   {{ __('Login') }}
                   </button>
                   
-                  <a href="/tps-smis/students/registration" class="btn btn-outline-dark">Not registered? Signup</a>
+                  <!-- <a href="/tps-smis/students/registration" class="btn btn-outline-dark">Not registered? Signup</a> -->
                   @if (Route::has('password.request'))
-                      <!-- <a class="btn btn-link" href="{{ route('password.request') }}">
-                          {{ __('Forgot Your Password?') }}
-                      </a> -->
+                      <!-- <a class="btn btn-link" href="{{ route('password.request') }}"> -->
+                      <a class="btn btn-link" href="#">
+                          {{ __('Forgot Your Password ?') }}
+                      </a>
                   @endif
-
-                  <!-- <a class="btn btn-link" href="/tps-rms/students/create">
-                      {{ __('Register New Student') }}
-                  </a> -->
               </div>
             </div>
             <!-- Authbox ends -->
