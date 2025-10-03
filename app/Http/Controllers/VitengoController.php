@@ -7,59 +7,108 @@ use Illuminate\Http\Request;
 
 class VitengoController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:vitengo-create')->only(['create', 'store']);
+        $this->middleware('permission:vitengo-view')->only(['index', 'show']);
+        $this->middleware('permission:vitengo-edit')->only(['edit', 'update']);
+        $this->middleware('permission:vitengo-delete')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $vitengo = Vitengo::orderBy('id', 'Asc')->paginate(5);
+
+        return view('vitengo.index', compact('vitengo'))
+            ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('vitengo.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        Vitengo::create($request->all());
+
+        return redirect()->route('vitengo.index')
+            ->with('success', 'Kitengo '.$request->name.' created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Vitengo $vitengo)
     {
-        //
+
+        return view('vitengo.show', compact('vitengo'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Vitengo $vitengo)
     {
-        //
+        return view('vitengo.edit', compact('vitengo'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Vitengo $vitengo)
     {
-        //
+        // Validate incoming request data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'is_active' => 'required|boolean',
+        ]);
+
+        try {
+            // Update the Vitengo record
+            $vitengo->update([
+                'name' => $request->name,
+            ]);
+
+            // Redirect with success message
+            return redirect()->route('vitengo.index')
+                ->with('success', 'Kitengo '.$vitengo->name.' updated successfully.');
+
+        } catch (\Exception $e) {
+            // Handle unexpected errors
+            return redirect()->back()
+                ->with('error', 'Failed to update Kitengo. Please try again later.');
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Vitengo $vitengo)
+    public function destroy(Vitengo $Vitengo)
     {
-        //
+        $Vitengo->delete();
+
+        return redirect()->route('vitengo.index')
+            ->with('success', 'Kitengo  '.$Vitengo->name.'  deleted successfully.');
+    }
+
+    public function activate(Request $request)
+    {
+        $kitengo = Vitengo::find($request->kitengo_id);
+        if (! $kitengo) {
+        }
+        $kitengo->is_active = true;
+        $kitengo->save();
+
+        return redirect()->route('vitengo.index')
+            ->with('success', 'Kitengo '.$kitengo->name.'deactivated successfully.');
+    }
+
+    public function deactivate(Request $request)
+    {
+        $kitengo = Vitengo::find($request->kitengo_id);
+        if (! $kitengo) {
+        }
+        $kitengo->is_active = false;
+        $kitengo->save();
+
+        return redirect()->route('vitengo.index')
+            ->with('success', 'Kitengo '.$kitengo->name.' activated successfully.');
     }
 }

@@ -9,7 +9,7 @@ class Vitengo extends Model
     protected $fillable = [
         'name',
         'description',
-        'status',
+        'is_active',
     ];
 
     public function students()

@@ -13,25 +13,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        
 
         $this->call([
-            //  PermissionTableSeeder::class,
-              WeaponsHierarchySeeder::class,
+            PermissionTableSeeder::class,
+            // WeaponsHierarchySeeder::class,
             // CreateAdminUserSeeder::class,
             // BeatTypeSeeder::class,
             // AreaSeeder::class,
-           // VitengoSeeder::class,
+            // VitengoSeeder::class,
             // CompanySeeder::class,
             // PlatoonSeeder::class,
             // AttendenceTypeSeeder::class,
             // AttendenceSeeder::class,
             // GradingSystemsTableSeeder::class,
             // PatientsTableSeeder::class,
-            //SafariTypeSeeder::class,
-            //EducationLevelSeeder::class
-            //NotificationAudienceSeeder::class,
-            //NotificationTypeSeeder::class
+            // SafariTypeSeeder::class,
+            // EducationLevelSeeder::class
+            // NotificationAudienceSeeder::class,
+            // NotificationTypeSeeder::class
         ]);
 
         // User::factory(10)->create();
@@ -42,5 +41,3 @@ class DatabaseSeeder extends Seeder
         // ]);
     }
 }
-
-
