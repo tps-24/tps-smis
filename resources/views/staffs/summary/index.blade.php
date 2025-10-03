@@ -71,6 +71,27 @@
       <span class="input-group-text">Name</span>
       <input type="text" class="form-control" name="staff_name" placeholder="Enter staff name">
     </div>
+    <div class="input-group">
+      <span class="input-group-text">Rank</span>
+      <select class="form-control" name="rank" >
+        <option value="">Select rank</option>
+        <option value="PC">Police Constable (PC)</option>
+        <option value="CPL">Corporal (CPL)</option>
+        <option value="SGT">Sergeant (SGT)</option>
+        <option value="S/SGT">Staff Sergeant (S/SGT)</option>
+        <option value="SM">Sergeant Major (SM)</option>
+        <option value="A/INSP">Assistant Inspector of Police (A/INSP)</option>
+        <option value="INSP">Inspector of Police (INSP)</option>
+        <option value="ASP">Assistant Superintendent of Police (ASP)</option>
+        <option value="SP">Superintendent of Police (SP)</option>
+        <option value="SSP">Senior Superintendent of Police (SSP)</option>
+        <option value="ACP">Assistant Commissioner of Police (ACP)</option>
+        <option value="SACP">Senior Assistant Commissioner of Police (SACP)</option>
+        <!-- <option value="DCP">Deputy Commissioner of Police (DCP)</option>
+        <option value="CP">Commissioner of Police (CP)</option>
+        <option value="IGP">Inspector General of Police (IGP)</option> -->
+      </select>
+    </div>
     <input type="hidden" name="status" id="filterStatus" value="">
     <button type="submit" class="btn btn-primary">Filter</button>
   </form>

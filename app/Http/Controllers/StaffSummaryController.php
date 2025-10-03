@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Student;
 use App\Models\Staff;
-use App\Models\StudentDismissed;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class StaffSummaryController extends Controller
 {
@@ -24,57 +21,57 @@ class StaffSummaryController extends Controller
         if (! $selectedSessionId) {
             $selectedSessionId = 1;
         }
-        
+
         // Aggregate summary counts
         $stats = [
-            'total'   => Staff::all(),
+            'total' => Staff::all(),
             'active' => Staff::where('status', 'active')->get(),
-            'dismissed'       => Staff::where('status', 'dismissed')->get(),
-            'study'        => Staff::where('status', 'study')->get(),
-            'leave'        => Staff::where('status', 'leave')->get(),
-            'trip'        => Staff::where('status', 'trip')->get(),
+            'dismissed' => Staff::where('status', 'dismissed')->get(),
+            'study' => Staff::where('status', 'study')->get(),
+            'leave' => Staff::where('status', 'leave')->get(),
+            'trip' => Staff::where('status', 'trip')->get(),
         ];
+
         return view('staffs.summary.index', compact('stats'));
     }
 
     public function filterStaff(Request $request)
-{
-    $type = $request->get('type', 'total'); // optional type filter, default total
-    $validTypes = ['active', 'study', 'leave', 'trip', 'dismissed'];
+    {
+        $type = $request->get('type', 'total'); // optional type filter, default total
+        $validTypes = ['active', 'study', 'leave', 'trip', 'dismissed'];
 
-    $query = Staff::query();
+        $query = Staff::query();
 
-    // Filter by status type if valid
-    if (in_array($type, $validTypes)) {
-        $query->where('status', $type);
+        // Filter by status type if valid
+        if (in_array($type, $validTypes)) {
+            $query->where('status', $type);
+        }
+
+        // Filter by staff name (search firstName or lastName)
+        if ($request->filled('staff_name')) {
+            $name = $request->staff_name;
+            $query->where(function ($q) use ($name) {
+                $q->where('firstName', 'like', "%$name%")
+                    ->orWhere('lastName', 'like', "%$name%")
+                    ->orWhere('forceNumber', 'like', "%$name%");
+            });
+        }
+
+        // Optionally, filter by force number
+        if ($request->filled('force_number')) {
+            $query->where('forceNumber', 'like', '%'.$request->force_number.'%');
+        }
+        // Optionally, filter by rank
+        if ($request->filled('rank')) {
+            $query->where('rank', $request->rank);
+        }
+        // Paginate the result (10 per page)
+        $staffs = $query->paginate(10);
+
+        return response()->json([
+            'staffs' => $staffs,
+        ]);
     }
-
-    // Filter by staff name (search firstName or lastName)
-    if ($request->filled('staff_name')) {
-        $name = $request->staff_name;
-        $query->where(function ($q) use ($name) {
-            $q->where('firstName', 'like', "%$name%")
-              ->orWhere('lastName', 'like', "%$name%")
-              ->orWhere('forceNumber', 'like', "%$name%");
-        });
-    }
-
-    // Optionally, filter by force number
-    if ($request->filled('force_number')) {
-        $query->where('forceNumber', 'like', '%' . $request->force_number . '%');
-    }
-
-    // Paginate the result (10 per page)
-    $staffs = $query->paginate(10);
-
-    return response()->json([
-        'staffs' => $staffs,
-    ]);
-}
-
-
-
-
 
     /**
      * Show the form for creating a new resource.

@@ -161,6 +161,7 @@ class Student extends Model
             }
 
         }
+        // dd($semester_one_total_credit_weight);
         foreach ($courses as $course) {
             if ($course->semesters->first()->pivot->semester_id == 1) {
                 $semester_one_total_grade_credit += $course->pivot->credit_weight;
