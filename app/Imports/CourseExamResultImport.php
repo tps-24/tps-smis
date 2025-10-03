@@ -39,14 +39,15 @@ class CourseExamResultImport implements ToCollection
 
             try {
                 // Skip empty rows
-                if (empty($row[1]) || empty($row[2])) {
-                    continue;
-                }
+                // if (empty($row[1]) || empty($row[2])) {
+                //     continue;
+                // }
 
-                $names =  explode(" ", $row[1]);
-                $student = Student::where('first_name', $names[0])->where('middle_name', $names[1])->where('last_name', $names[2])->where('session_programme_id', 4)->first();
+                //$names =  explode(" ", $row[1]);
+                //$student = Student::where('first_name', $names[0])->where('middle_name', $names[1])->where('last_name', $names[2])->where('session_programme_id', 4)->first();
+                $student = Student::where('force_number', $row[1])->first();
                 if (! $student) {
-                    Log::error("Error creating exam of ". $names[0].' '.$names[1].' '.$names[2] );
+                    Log::error("Error creating exam of ". $row[1]);
                 }
                 // Retrieve the student by force number
                 // $student = Student::where('force_number', $row[1])->first();
@@ -75,7 +76,7 @@ class CourseExamResultImport implements ToCollection
                     ], [
                         'student_id'       => $student->id,
                         'semester_exam_id' => $semesterExam->id,
-                        'score'            => $row[7],
+                        'score'            => $row[3],
                         'created_by'       => Auth::user()->id,
                     ]);
 

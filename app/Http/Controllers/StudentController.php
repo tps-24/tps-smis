@@ -49,10 +49,8 @@ class StudentController extends Controller
             session(['selected_session' => request()->session_id]);
         }
 
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 1;
-        }
+        $selectedSessionId = session('selected_session',1);
+
 
         // Global approved count based on selected session only
         $approvedCount = Student::where('session_programme_id', $selectedSessionId)

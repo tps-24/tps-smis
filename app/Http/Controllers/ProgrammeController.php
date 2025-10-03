@@ -31,9 +31,9 @@ class ProgrammeController extends Controller
     public function index(Request $request): View
     {
         $studyLevels = StudyLevel::get();
-        $programmes = Programme::orderBy('id','DESC')->paginate(5);
+        $programmes = Programme::orderBy('id','DESC')->paginate(10);
         return view('programmes.index',compact('programmes','studyLevels'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+            ->with('i', ($request->input('page', 1) - 1) * 10);
     }
 
     /**

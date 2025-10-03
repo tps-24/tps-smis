@@ -27,15 +27,14 @@ class ProgrammeCourseSemesterController extends Controller
     public function index()
     {
         $semesterId = 1;
-        $sessionProgrammeId = 4;
-        $programmeId = 1;
-        $programme = Programme::findOrFail(1);
+        $sessionProgrammeId = session('selected_session', 4);
+        //$programme = Programme::findOrFail(1);
 
         $programme = Programme::with(['courses' => function($query) use ($semesterId, $sessionProgrammeId) {
             $query->wherePivot('semester_id', $semesterId)
                   ->wherePivot('session_programme_id', $sessionProgrammeId);
-        }])->findOrFail($programmeId);
-
+        }])->findOrFail($sessionProgrammeId);
+        
         $semester = Semester::findOrFail($semesterId);
         $sessionProgramme = SessionProgramme::findOrFail($sessionProgrammeId);
         $courses = $programme->courses;
@@ -43,12 +42,12 @@ class ProgrammeCourseSemesterController extends Controller
 
 
         $courses1 = $programme->courses()->wherePivot('semester_id', 1)
-                            ->wherePivot('session_programme_id', 4)
+                            ->wherePivot('session_programme_id', $sessionProgrammeId)
                             ->orderBy('course_type', 'ASC')
                             ->get();
                             
         $courses2 = $programme->courses()->wherePivot('semester_id', 2)
-                            ->wherePivot('session_programme_id', 4)
+                            ->wherePivot('session_programme_id', $sessionProgrammeId)
                             ->orderBy('course_type', 'ASC')
                             ->get();
             
@@ -74,23 +73,20 @@ class ProgrammeCourseSemesterController extends Controller
     {
         $programme = Programme::findOrFail($id);
         $semester = Semester::findOrFail(2);
-        $sessionProgramme = SessionProgramme::findOrFail(4);
+        $sessionProgramme = SessionProgramme::findOrFail(session('selected_session', 4));
         $courses = Course::all();
-
         // Retrieve staff with 'instructor' role
         $staffs = User::whereHas('roles', function($query) {
             $query->where('name', 'Instructor');
         })->get();
 
         // $staffs = Staff::get();
-
         $courses1 = $programme->courses()->wherePivot('semester_id', 1)
-        ->wherePivot('session_programme_id', 4)
+        ->wherePivot('session_programme_id', $sessionProgramme->id)
         ->orderBy('course_type', 'ASC')
         ->get();
-        
         $courses2 = $programme->courses()->wherePivot('semester_id', 2)
-                ->wherePivot('session_programme_id', 4)
+                ->wherePivot('session_programme_id', $sessionProgramme->id)
                 ->orderBy('course_type', 'ASC')
                 ->get();
 
@@ -102,6 +98,7 @@ public function store(Request $request)
 {
     $this->validate($request, [
         'programme_id' => 'required|exists:programmes,id',
+        'semester_id' => 'required|exists:semesters,id',
         'session_programme_id' => 'required|exists:session_programmes,id',
         'course_type' => 'required|in:core,minor,optional',
         'credit_weight' => 'required|integer',

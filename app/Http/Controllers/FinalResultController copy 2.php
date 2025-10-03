@@ -13,9 +13,7 @@ use App\Models\Student;
 use App\Services\FinalResultService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Barryvdh\Snappy\Facades\SnappyPdf;
-use App\Models\AdmittedStudent;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class FinalResultController extends Controller
 {
@@ -222,78 +220,56 @@ class FinalResultController extends Controller
             ->with('success', 'Final results generated successfully.');
     }
 
-
-    public function generateTranscriptxx(Request $request)
-    {
-        $selectedStudentIds = $request->input('selected_students');
-        if (empty($selectedStudentIds)) {
-            return redirect()->back()->with('error', 'No students selected.');
-        }
-
-        $students = Student::whereIn('id', $selectedStudentIds)
-            ->with(['finalResults', 'admittedStudent'])
-            ->get();
-
-        // Attach QR code to each student
-
-
-
-        // Pass only students to the view
-        $pdf = Pdf::loadView('final_results.pdf', compact('students'))
-            ->setPaper('a4', 'landscape');
-
-
-        return $pdf->stream('final_results.pdf');
-    }
-
-
     public function generateTranscript(Request $request)
     {
+        // dd($request->input());
         $selectedStudentIds = $request->input('selected_students');
         if (empty($selectedStudentIds)) {
             return redirect()->back()->with('error', 'No students selected.');
         }
 
-        $students = Student::whereIn('id', $selectedStudentIds)
-            ->with(['finalResults', 'admittedStudent'])
-            ->get();
-
-        foreach ($students as $student) {
-            $admission = $student->admittedStudent;
-
-        
-
-            $qrPayload = json_encode([
-                'full_name' => $student->first_name . ' ' . $student->last_name ?? '',
-                // 'dob' => $student->dob ?? '',
-                'nin' => $student->nin ?? '',
-                'programme_abbreviation' => $student->programme->abbreviation ?? '',
-                'registration_number' => $admission->registration_number ?? '',
-                'completion_date' => $admission->completion_date ?? '',
-            ]);
-
-            \Log::info('QR Payload:', ['payload' => $qrPayload]);
+        $students = Student::whereIn('id', $selectedStudentIds)->with('finalResults')->with('admittedStudent')->get();
 
 
-            $student->qrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode(
-                QrCode::format('svg')
-                    ->size(120) // ✅ Small but crisp
-                    ->errorCorrection('M') // Medium balance
-                    ->generate($qrPayload)
-            );
 
-        }
 
-        $pdf = Pdf::loadView('final_results.pdf', compact('students'))
-            ->setPaper('a4', 'landscape');
+$student = Student::with('admittedStudent')->findOrFail($id);
 
+$barcodeData = implode('|', [
+    $student->first_name,
+    $student->dob->format('d-m-Y'),
+    $student->nin,
+    $student->programme_id,
+    $student->admittedStudent->registration_number ?? 'N/A',
+    optional($student->admittedStudent->completion_date)->format('d-m-Y') ?? 'N/A',
+]);
+
+
+$generator = new BarcodeGeneratorPNG();
+$barcode = $generator->getBarcode($barcodeData, $generator::TYPE_CODE_128);
+$barcodeBase64 = base64_encode($barcode);
+
+
+        //dd($students);
+        // dd($this->finalResultService->calculateFinalResult(
+        //     '513','2','4'
+        // ));
+        // Query data from 'final_results' table and process certificates
+        // Generate and return PDF with selected students' certificates
+        //return $students[0]->courses;
+        // Example (using a package like Dompdf or another PDF library):
+        $pdf = PDF::loadView('final_results.pdf', compact('students'))->setPaper('a4', 'landscape');
+
+
+        // Set the HTML5 parser option
+        // $pdf->setOptions(['isHtml5ParserEnabled' => true]);
+
+        // Render the HTML as PDF
+        $pdf->render();
+        // Return the PDF content as a response to be rendered in a new browser window
         return $pdf->stream('final_results.pdf');
+
     }
-
-
-
-
-
 
     public function generateCertificate_oldNew(Request $request)
     {

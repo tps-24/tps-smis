@@ -176,11 +176,12 @@ class Student extends Model
         $semesterOneGPA = $semester_one_total_grade_credit == 0 ? 0 : $semester_one_total_credit_weight / $semester_one_total_grade_credit;
         $semesterTwoGPA = $semester_two_total_grade_credit == 0 ? 0 : $semester_two_total_credit_weight / $semester_two_total_grade_credit;
 
-        $overallGPA = round(($semesterOneGPA + $semesterTwoGPA) / 2, 1);
+        $overallGPA = floor(($semesterOneGPA + $semesterTwoGPA) / 2 * 10) / 10;
 
+        $overallGPA = number_format($overallGPA, 1);       
         return collect([
-            'semesterOneGPA' => round($semesterOneGPA, 1),
-            'semesterTwoGPA' => round($semesterTwoGPA, 1),
+            'semesterOneGPA' => number_format(floor($semesterOneGPA * 10) / 10, 1),
+            'semesterTwoGPA' => number_format(floor($semesterTwoGPA * 10) / 10, 1),
             'overallGPA' => $overallGPA,
             'classAwarded' => $this->getClass($overallGPA),
         ]);

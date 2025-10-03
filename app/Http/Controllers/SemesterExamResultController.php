@@ -122,7 +122,7 @@ class SemesterExamResultController extends Controller
    
     public function getExamResultsByCourse($courseId, $semesterId)
 {
-    $selectedSessionId = session('selected_session') ?? 4;
+    $selectedSessionId = session('selected_session',4); // Default to 4 if not set
 
     // Get course info
     $course = DB::table('courses')
@@ -130,7 +130,7 @@ class SemesterExamResultController extends Controller
         ->first();
 
     // Fetch paginated semester exam results
-    $results =  ::whereHas('semesterExam', function ($query) use ($courseId, $semesterId, $selectedSessionId) {
+    $results =  SemesterExamResult::whereHas('semesterExam', function ($query) use ($courseId, $semesterId, $selectedSessionId) {
             $query->where('course_id', $courseId)
                 ->where('semester_id', $semesterId)
                 ->where('session_programme_id', $selectedSessionId);
