@@ -7,6 +7,7 @@ use App\Models\CourseWork;
 use App\Models\CourseworkResult;
 use App\Models\Programme;
 use App\Models\Semester;
+use App\Models\SemesterExam;
 use App\Models\Student;
 use App\Models\User;
 use Exception;
@@ -200,22 +201,42 @@ class CourseworkResultController extends Controller
         }
     }
 
-    public function coursework()
-    {
-        $user      = auth()->user()->id;
-        $studentId = Student::where('user_id', $user)->pluck('id');
-        // $student = Student::find($studentId[0]);
-        // $coursework = $student->coursework();
+   public function coursework()
+{
+    $userId = auth()->id();
 
-        $results = CourseworkResult::where('student_id', $studentId[0])
-            ->with(['student', 'course', 'coursework', 'semester', 'programmeCourseSemester'])->get();
+    $student = Student::where('user_id', $userId)->first();
 
-        $groupedBySemester = $results->groupBy('semester_id');
-
-        // dd($groupedBySemester);
-
-        return view('students.coursework.coursework', compact('groupedBySemester'));
+    if (!$student) {
+        return redirect()->back()->with('error', 'Student record not found.');
     }
+
+    // Get student's courses with pivot info (credit_weight, course_type, semester_id)
+    $studentCourses = $student->courses()
+        ->withPivot(['semester_id', 'course_type', 'credit_weight'])
+        ->get()
+        ->keyBy('id');  // Key by course id for easy access in Blade
+
+    $results = CourseworkResult::with([
+            'student',
+            'coursework.assessmentType',
+            'coursework.course',
+            'coursework.semester',
+            'coursework.programme', 
+            'programmeCourseSemester'
+        ])
+        ->where('student_id', $student->id)
+        ->get();
+
+    $assessmentTypes = $results->pluck('coursework.assessmentType')->unique()->filter()->values();
+
+    // Group by coursework's semester ID (use 'unknown' if missing)
+    $groupedBySemester = $results->groupBy(fn($result) => optional($result->coursework->semester)->id ?? 'unknown');
+    $groupedBySemester = $groupedBySemester->sortKeys();
+
+    return view('students.coursework.coursework', compact('groupedBySemester', 'assessmentTypes', 'studentCourses'));
+}
+
 
     public function summary($id)
     {
@@ -238,6 +259,10 @@ class CourseworkResultController extends Controller
 
         return view('course_works_results.create', compact('students', 'courses', 'courseWorks', 'semesters'));
     }
+
+    
+
+
 
     /**
      * Store a newly created resource in storage.

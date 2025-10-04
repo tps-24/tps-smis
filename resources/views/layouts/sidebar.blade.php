@@ -299,6 +299,14 @@
                     </a>
                 </li>
             @endcan()
+            @can('student-coursework-list')
+                <li>
+                    <a href="{{ route('students.exam_results') }}">
+                        <i class="bi bi-printer"></i>
+                        <span class="menu-text">Exam Results</span>
+                    </a>
+                </li>
+            @endcan()
             @can('coursework-config')
             @endcan()
 

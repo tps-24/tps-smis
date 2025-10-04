@@ -286,21 +286,26 @@ class StudentController extends Controller
 
     }
 
-    public function myCourses()
+        public function myCourses()
     {
-        $user      = auth()->user()->id;
-        $studentId = Student::where('user_id', $user)->pluck('id');
-        $student   = Student::find($studentId[0]);
-        $courses   = $student->courses();
+        $userId = auth()->id();
 
-        // $role = auth()->user()->role;
-        // dd($courses);
+        // Get the student model for the logged-in user
+        $student = Student::where('user_id', $userId)->first();
 
-        // $role = auth()->user()->role;
-        // dd($courses);
+        if (!$student) {
+            // Handle no student found, maybe redirect or show error
+            abort(404, 'Student not found');
+        }
+
+        // Load courses with pivot data
+        $courses = $student->courses()
+            ->withPivot(['semester_id', 'course_type', 'credit_weight'])
+            ->get();
 
         return view('students.mycourse', compact('courses'));
     }
+
 
     //Haitumiki for now
     public function dashboard()

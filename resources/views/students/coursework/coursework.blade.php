@@ -12,11 +12,9 @@
     }
     #date {
         position: absolute;
-        bottom: 10px; /* Adjust as needed */
-        right: 15px;  /* Adjust as needed */
+        bottom: 10px;
+        right: 15px;
     }
-
-    
     .table-outer {
         overflow-x: auto;
     }
@@ -26,14 +24,13 @@
     .table tbody tr:last-child td {
         border-bottom: 1px solid #dee2e6;
     }
-
-    .nd{
-        margin-top:20px;
+    .nd {
+        margin-top: 20px;
     }
 </style>
 @endsection
+
 @section('scrumb')
-<!-- Scrumb starts -->
 <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
@@ -46,11 +43,9 @@
         </nav>
     </div>
 </nav>
-<!-- Scrumb ends -->
-
 @endsection
+
 @section('content')
-<!-- Row starts -->
 <div class="row gx-4">
     <div class="col-sm-12">
         <div class="card mb-3">
@@ -61,67 +56,119 @@
                 </div>
                 @endif
             </div>
-                @php
-                $i=1;
-                $j=1;
-                @endphp
             <div class="card-body">
-                
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <ul class="nav nav-tabs" id="semesterTab" role="tablist">
                     @foreach($groupedBySemester as $semesterId => $results)
-                        <li class="nav-item">
-                            <a class="nav-link {{ $loop->first ? 'active' : '' }}" id="semester-{{ $semesterId }}-tab" data-toggle="tab" href="#semester-{{ $semesterId }}" role="tab" aria-controls="semester-{{ $semesterId }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                                 {{ $results->first()->semester->semester_name }}
-                            </a>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $loop->first ? 'active' : '' }}" 
+                                    id="semester-tab-{{ $semesterId }}" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#semester-{{ $semesterId }}" 
+                                    type="button" role="tab" 
+                                    aria-controls="semester-{{ $semesterId }}" 
+                                    aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+                                {{ $results->first()->coursework->semester->semester_name ?? 'Unknown Semester' }}
+                            </button>
                         </li>
                     @endforeach
                 </ul>
-                <div class="tab-content" id="myTabContent">
-                    @foreach($groupedBySemester as $semesterId => $results)
-                        <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="semester-{{ $semesterId }}" role="tabpanel" aria-labelledby="semester-{{ $semesterId }}-tab">
-                            <div class="table-outer mt-3">
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-bordered truncate m-0">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col" width="1%">S/N</th>
-                                                <th scope="col" width="15%">Course Code</th>
-                                                <th scope="col" width="50%">Course Name</th>
-                                                <th scope="col" width="10%">Credits</th>
-                                                <th scope="col" width="7%">Score</th>
-                                                <th scope="col" width="10%">Remarks</th>
-                                                <th scope="col" width="7%">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @php
-                                                $i = 1;
-                                            @endphp
 
-                                            @foreach($results as $result)
-                                                <tr>
-                                                    <td>{{ $i++ }}</td>
-                                                    <td>{{ $result->course->courseCode }}</td>
-                                                    <td>{{ $result->course->courseName }}</td>
-                                                    <td>{{ $result->programmeCourseSemester->credit_weight }}</td>
-                                                    <td>{{ $result->score }}</td>
-                                                    <td><?php if($result->score < 16){ ?> <span style="color:red">Fail</span> <?php }else{ echo "Pass"; }?> </td>
-                                                    
-                                                    <td>
-                                                        <a href="{{ route('coursework.summary', $result->id) }}" class="btn btn-info btn-sm">
-                                                            <i class="fa-solid fa-eye"></i> View
-                                                        </a>
-                                                    </td>
-                                                </tr>
+                <div class="tab-content mt-3" id="semesterTabContent">
+                    
+
+            @foreach($groupedBySemester as $semesterId => $results)
+            @php $sn = 1; @endphp
+                @php
+                    // Group by course ID to ensure one row per course
+                    $groupedByCourse = $results->groupBy(function($result) {
+                        return optional($result->coursework->course)->id;
+                    });
+                @endphp
+
+                <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                    id="semester-{{ $semesterId }}"
+                    role="tabpanel"
+                    aria-labelledby="semester-tab-{{ $semesterId }}">
+
+                    <div class="table-outer">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered m-0">
+                                <thead>
+                                    <tr>
+                                        <th>S/N</th>
+                                        <th>Course Code</th>
+                                        <th>Course Name</th>
+                                        <th>Credit Weight</th>
+                                        @foreach($assessmentTypes as $type)
+                                            <th>{{ $type->type_name }}</th>
+                                        @endforeach
+                                        <th>Total</th>
+                                        <th>Remarks</th>
+                                        <!-- <th>Actions</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($groupedByCourse as $courseResults)
+                                        @php
+                                            $course = optional($courseResults->first()->coursework->course);
+                                            $scores = [];
+
+                                            // Initialize empty score for each assessment type
+                                            foreach($assessmentTypes as $type) {
+                                                $scores[$type->type_name] = 0;
+                                            }
+
+                                            // Fill in scores for the course by assessment type
+                                            foreach($courseResults as $result) {
+                                                $typeName = optional($result->coursework->assessmentType)->type_name;
+                                                if ($typeName) {
+                                                    $scores[$typeName] += $result->score;
+                                                }
+                                            }
+
+                                            $total = array_sum($scores);
+
+                                            // Get credit weight from studentCourses passed from controller
+                                            $creditWeight = isset($studentCourses[$course->id]) ? $studentCourses[$course->id]->pivot->credit_weight : 'N/A';
+                                        @endphp
+
+                                        <tr>
+                                            <td>{{ $sn++ }}.</td>
+                                            <td>{{ $course->courseCode ?? 'N/A' }} </td>
+                                            <td>{{ $course->courseName ?? 'N/A' }}</td>
+                                            <td>{{ $creditWeight }}</td>
+                                            @foreach($assessmentTypes as $type)
+                                                <td>{{ $scores[$type->type_name] }}</td>
                                             @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+
+                                            <td>{{ $total }}</td>
+
+                                            <td>
+                                                @if($total < 16)
+                                                    <span style="color:red;">Fail</span>
+                                                @else
+                                                    Pass
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="{{ 6 + count($assessmentTypes) }}" class="text-center">
+                                                No coursework results found for this semester.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+
+                            </table>
                         </div>
-                    @endforeach
+                    </div>
+                </div>
+            @endforeach
+
                 </div>
             </div>
-            </div>
-<!-- Row ends -->
+        </div>
+    </div>
+</div>
 @endsection

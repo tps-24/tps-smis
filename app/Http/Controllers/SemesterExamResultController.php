@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 
 class SemesterExamResultController extends Controller
 {
@@ -48,6 +49,30 @@ class SemesterExamResultController extends Controller
 
         return view('semester_exams.index', compact('programme', 'semesters', 'selectedSemester'));
     }
+
+  public function showExamResults()
+{
+    // Get the authenticated student
+    $user = Auth::user();
+    $student = $user->student;
+
+    // Retrieve results with relationships eager-loaded
+    $results = SemesterExamResult::with([
+        'semesterExam.semester',
+        'semesterExam.course',
+        'semesterExam.course.programmes'
+    ])
+    ->where('student_id', $student->id)
+    ->get();
+    // Group results by semester
+    $groupedBySemester = $results->groupBy(function ($result) {
+        return $result->semesterExam->semester->id;
+    });
+
+    return view('students.exam.results', [
+        'groupedBySemester' => $groupedBySemester,
+    ]);
+}
 
     /**
      * Show the form for creating a new resource.

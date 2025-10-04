@@ -31,4 +31,9 @@ class CourseWork extends Model
     {
         return $this->belongsTo(AssessmentType::class, 'assessment_type_id');
     }
+
+    public function programme()
+    {
+        return $this->belongsTo(Programme::class);
+    }
 }
