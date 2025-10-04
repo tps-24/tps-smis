@@ -64,6 +64,10 @@ require __DIR__.'/auth.php';
 Auth::routes();
 
 Route::get('/tps_smis', [HomeController::class, 'index'])->name('home');
+Route::get('/imagick-test', function () {
+    return extension_loaded('imagick') ? 'Imagick is working!' : 'Imagick not loaded.';
+});
+
 
 // Route::get('/', function () {
 //     return view('dashboard.default_dashboard');

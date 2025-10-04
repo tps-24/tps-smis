@@ -38,7 +38,9 @@ class BulkImportStudents implements ToCollection, ToModel
                 $student = new Student();
                 $student->force_number = $row[0];
                 $student->first_name = $row[1];
-                $student->middle_name = $row[2];
+                if (!empty($row[2])) {
+                    $student->middle_name = $row[2];
+                }
                 $student->last_name = $row[3];
                 $student->session_programme_id = $this->getSessionId();
 
@@ -61,7 +63,7 @@ class BulkImportStudents implements ToCollection, ToModel
                 $student->education_level = $row[12];
                 $student->next_kin_names = $row[16];
                 $student->next_kin_phone = $row[17];
-                $student->religion = $row[21];
+                //$student->religion = $row[21];
                 $student->beat_status = 0;
 
                 // Save student record first
@@ -71,7 +73,7 @@ class BulkImportStudents implements ToCollection, ToModel
 
                 // **Only create a user account if session_programme_id is NOT 1 or 5**
                 if ($student->session_programme_id != 1 && $student->session_programme_id != 5) {
-                    $email = strtolower($row[1] .'.'.$row[3].'@tpf.go.tz');
+                    $email = strtolower($row[1].'.'.$row[3].'@tpf.go.tz');
                     $password = strtoupper($row[3]);
 
                     $user = new User();

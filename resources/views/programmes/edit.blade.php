@@ -61,7 +61,7 @@
                         </div>
                         <div class="col-xs-6 col-sm-6 col-md-12">
                             <div class="form-group">
-                                <strong>Duration (In Years):</strong>
+                                <strong>Duration (In Months):</strong>
                                 <input type="number" name="duration" placeholder="Enter Duration Period" class="form-control" value="{{ $programme->duration }}">
                             </div>
                         </div>

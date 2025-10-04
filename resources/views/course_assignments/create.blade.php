@@ -48,6 +48,23 @@
                             <div class="card mb-4">
                             <div class="card-body">
                                 <div class="m-0">
+                                    <label class="form-label" for="abc4">Semester</label>
+                                    <select class="form-select" name="semester_id" aria-label="Default select">
+                                        <option value="" selected disabled>-- Choose semester</option> 
+                                        <option value="1" {{ old('semester_id', 'default_value') == '1' ? 'selected' : '' }}>1</option>
+                                        <option value="2" {{ old('semester_id', 'default_value') == '2' ? 'selected' : '' }}>2</option>
+                                    </select>
+                                </div>
+                                @error('forceNumber')
+                                    <div class="error">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            </div>
+                        </div>    
+                        <div class="col-12" id="pfn0">
+                            <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="m-0">
                                     <label class="form-label" for="abc4">Course Type</label>
                                     <select class="form-select" name="course_type" aria-label="Default select">
                                         <option value="" selected disabled>-- Choose course type</option> 
@@ -93,9 +110,12 @@
                             </div>
                             </div>
                         </div> 
-                        <input type="number" name="session_programme_id" value="4" class="form-control" hidden>
-                        <input type="number" name="programme_id" value="1" class="form-control" hidden>
-                        <input type="number" name="semester_id" value="2" class="form-control" hidden>
+                        @php
+                        $sessionProgrammeId = session('selected_session', 4);
+                        $sessionProgramme = \App\Models\SessionProgramme::find($sessionProgrammeId);
+                        @endphp
+                        <input type="number" name="session_programme_id" value="{{$sessionProgrammeId}}" class="form-control" hidden>
+                        <input type="number" name="programme_id" value="{{$sessionProgramme->programme_id}}" class="form-control" hidden>
                         <input type="number" name="created_by" value="{{ Auth::user()->id }}" class="form-control" hidden>  
                         <br> 
                         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
@@ -288,7 +308,7 @@
                 <form action="{{ route('assign.instructors') }}" method="POST">
                     @csrf
                     @method('POST')
-                    <input type="hidden" name="programme_id" value="{{ $programme->id }}">
+                    <input type="hidden" name="programme_id" value="{{ $sessionProgramme->programme_id }}">
                     <input type="hidden" name="semester_id" value="{{ $semester->id }}">
                     <input type="hidden" name="session_programme_id" value="{{ $sessionProgramme->id }}">
                     <input type="hidden" name="course_id" value="{{ $course->id }}">

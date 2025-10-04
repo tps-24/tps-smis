@@ -133,7 +133,7 @@
                     <span style="font-size:30px !important">Semester Exam Results</span>
                     <!-- <h6>Here display the course choosen</h6> -->
 
-                    <button disabled id="add_btn" class="btn btn-success mb-2"
+                    <button id="add_btn" class="btn btn-success mb-2"
                         style="float:right !important; margin-right:1%;">
                         <a href="" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> Upload SE Results</a>
                     </button>

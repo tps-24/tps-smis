@@ -91,16 +91,12 @@
 
                         @php $selectedSession = session('selected_session'); @endphp
 
-                        <form action="{{ $selectedSession == 4
-                ? route('final.generateTranscript')
-                : route('final.generateCertificate') }}" method="POST" class="form-inline mb-4">
-
+                        <form action="{{ in_array($selectedSession, [4, 6]) ? route('final.generateTranscript') : route('final.generateCertificate') }}" method="POST" class="form-inline mb-4">
                             @csrf
-
                             <div class="card-header">
                                 <i>Choose student(s) to print Certificate or Transcripts</i>
                                 <button type="submit" class="btn btn-secondary" style="float:right">
-                                    {{ $selectedSession == 4 ? 'Print Transcript(s)' : 'Print Certificate(s)' }}
+                                    {{ in_array($selectedSession, [4, 6]) ? 'Print Transcript(s)' : 'Print Certificate(s)' }}
                                 </button>
                             </div>
 

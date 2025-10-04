@@ -48,7 +48,7 @@ class SessionProgrammeController extends Controller
             'session_programme_name' => 'required|unique:session_programmes,session_programme_name',
             'year' => 'required',
         ]);
-    
+        //return $request->all();
         SessionProgramme::create($request->all());
     
         return redirect()->route('session_programmes.index')

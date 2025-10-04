@@ -254,7 +254,7 @@
                     @endforeach
                     <tr>
                         <td colspan="2"><b>Semester I GPA:</b></td>
-                        <td colspan="2"><strong>{{ $student->gpa['semesterOneGPA'] }}</strong></td>
+                        <td colspan="2">{{ $student->gpa['semesterOneGPA'] }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -271,28 +271,24 @@
                         <th width="5%">Grade</th>
                     </tr>
                 </thead>
-                @php
-                    $semesterTwoResults = $student->finalResults
-                        ->where('semester_id', 2)
-                        ->sortBy(fn($r) => $r->course->courseCode ?? '');
-                @endphp
-
                 <tbody>
-                    @foreach($semesterTwoResults as $result)
-                        <tr>
-                            <td>{{ $result->course->courseCode ?? '' }}</td>
-                            <td>{{ $result->course->courseName ?? '' }}</td>
-                            <td>{{ $result->course->programmes->first()->pivot->credit_weight ?? '' }}</td>
-                            <td>{{ $result->grade ?? '' }}</td>
-                        </tr>
+                    @foreach($student->finalResults as $result)
+                        @if($result->semester_id == 2)
+                            <tr>
+                                <td>{{ $result->course->courseCode ?? ''}}</td>
+                                <td>{{ $result->course->courseName ?? ''}}</td>
+                                <td>{{ $result->course->programmes->first()->pivot->credit_weight ?? '' }}</td>
+                                <td>{{ $result->grade ?? ''}}</td>
+                            </tr>
+                        @endif
                     @endforeach
+
 
                     <tr>
                         <td colspan="2"><b>Semester II GPA:</b></td>
-                        <td colspan="2"><strong>{{ $student->gpa['semesterTwoGPA'] }}</strong></td>
+                        <td colspan="2">{{ $student->gpa['semesterTwoGPA'] }}</td>
                     </tr>
                 </tbody>
-
             </table>
         </div>
     </div>
@@ -309,8 +305,8 @@
             <p style=" font-size:18px">Date of Issue</p>
         </div>            
 
-        <div class="qr-code" style="text-align: center; margin-top: -65px;">
-            <img src="{{ $student->qrCodeBase64 }}" style="width: 100px;" alt="QR Code">
+        <div class="qr-code" style="text-align: center; margin-top: -60px;">
+            <img src="{{ $student->qrCodeBase64 }}" style="width: 90px;" alt="QR Code">
         </div>
 
     </div>

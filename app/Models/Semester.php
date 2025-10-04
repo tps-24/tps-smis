@@ -29,11 +29,20 @@ class Semester extends Model
     { 
         return $this->hasMany(FinalResult::class); 
     }
-    public function courses()
+    public function courses_old()
     {
         return $this->belongsToMany(Course::class, 'programme_course_semesters')
                     ->withPivot('programme_id', 'course_type', 'credit_weight');
     }
+
+    public function courses()
+{
+    $currentSession = session('selected_session',4);
+
+    return $this->belongsToMany(Course::class, 'programme_course_semesters')
+                ->withPivot('programme_id', 'course_type', 'credit_weight', 'session_programme_id')
+                ->wherePivot('session_programme_id', $currentSession);
+}
 
     // public function programmeCourseSemesters()
     // {

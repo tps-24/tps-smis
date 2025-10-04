@@ -15,6 +15,19 @@ return [
 
     'public_path' => null,  // Override the public path if needed
 
+
+    'orientation' => 'portrait',
+    'defines' => [
+        "DOMPDF_ENABLE_REMOTE" => true,
+        "DOMPDF_ENABLE_PHP" => true,
+        "DOMPDF_ENABLE_HTML5PARSER" => true,
+        "DOMPDF_ENABLE_CSS_FLOAT" => true,
+        "DOMPDF_ENABLE_JAVASCRIPT" => false,
+        "DOMPDF_UNICODE_ENABLED" => true,
+        "DOMPDF_IMAGE_BACKEND" => "GD", // ✅ Force GD backend
+    ],
+
+
     /*
      * Dejavu Sans font is missing glyphs for converted entities, turn it off if you need to show € and £.
      */
@@ -140,7 +153,7 @@ return [
          * @link http://www.ros.co.nz/pdf
          * @link http://www.php.net/image
          */
-        'pdf_backend' => 'CPDF',
+        'pdf_backend' => 'GD',
 
         /**
          * html target media view which should be rendered into pdf.
@@ -233,7 +246,7 @@ return [
          *
          * @var bool
          */
-        'enable_php' => false,
+        'enable_php' => true,
 
         /**
          * Rnable inline JavaScript

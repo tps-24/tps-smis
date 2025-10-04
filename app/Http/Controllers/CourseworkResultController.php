@@ -46,7 +46,6 @@ class CourseworkResultController extends Controller
         $selectedSemesterId = $request->get('semester_id');
         $selectedSemester   = $selectedSemesterId ? Semester::with('courses')->find($selectedSemesterId) : null;
 
-
         return view('course_works_results.index', compact('programme', 'semesters', 'selectedSemester'));
     }
 
