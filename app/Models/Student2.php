@@ -5,7 +5,7 @@ namespace App\Models;
 use Auth;
 use Illuminate\Database\Eloquent\Model;
 
-class Student extends Model
+class Student2 extends Model
 {
     protected $casts = [
         'next_of_kin' => 'array',
@@ -161,7 +161,6 @@ class Student extends Model
             }
 
         }
-        // dd($semester_one_total_credit_weight);
         foreach ($courses as $course) {
             if ($course->semesters->first()->pivot->semester_id == 1) {
                 $semester_one_total_grade_credit += $course->pivot->credit_weight;
@@ -174,46 +173,21 @@ class Student extends Model
         }
 
         // Calculation of gpa for each semester
-        // $semesterOneGPA = $semester_one_total_grade_credit == 0 ? 0 : $semester_one_total_credit_weight / $semester_one_total_grade_credit;
-        // $semesterTwoGPA = $semester_two_total_grade_credit == 0 ? 0 : $semester_two_total_credit_weight / $semester_two_total_grade_credit;
+        $semesterOneGPA = $semester_one_total_grade_credit == 0 ? 0 : $semester_one_total_credit_weight / $semester_one_total_grade_credit;
+        $semesterTwoGPA = $semester_two_total_grade_credit == 0 ? 0 : $semester_two_total_credit_weight / $semester_two_total_grade_credit;
 
-        // $average = ($semesterOneGPA + $semesterTwoGPA) / 2;
-        // $overallGPA = intval($average * 10) / 10;
+        $overallGPA = floor(($semesterOneGPA + $semesterTwoGPA) / 2 * 10) / 10;
 
-        // $overallGPA = number_format($overallGPA, 1);
-
-        
-
-        // Calculate and truncate Semester One GPA
-        $semesterOneGPA = $semester_one_total_grade_credit == 0
-            ? 0
-            : $this->truncateToDecimal($semester_one_total_credit_weight / $semester_one_total_grade_credit, 1);
-
-        // Calculate and truncate Semester Two GPA
-        $semesterTwoGPA = $semester_two_total_grade_credit == 0
-            ? 0
-            : $this->truncateToDecimal($semester_two_total_credit_weight / $semester_two_total_grade_credit, 1);
-
-        // Average the truncated semester GPAs and truncate the final result
-        $averageGPA = ($semesterOneGPA + $semesterTwoGPA) / 2;
-        $overallGPA = $this->truncateToDecimal($averageGPA, 1);
-
+        $overallGPA = number_format($overallGPA, 1);       
         return collect([
-            'semesterOneGPA' => $semesterOneGPA,
-            'semesterTwoGPA' => $semesterTwoGPA,
+            'semesterOneGPA' => number_format(floor($semesterOneGPA * 10) / 10, 1),
+            'semesterTwoGPA' => number_format(floor($semesterTwoGPA * 10) / 10, 1),
             'overallGPA' => $overallGPA,
             'classAwarded' => $this->getClass($overallGPA),
         ]);
 
-        //return $total_credit > 0 ? round($total_grade_credit / $total_credit, 1) : null; // Avoid division by zero
+        return $total_credit > 0 ? round($total_grade_credit / $total_credit, 1) : null; // Avoid division by zero
     }
-    // Truncate helper function
-        function truncateToDecimal($number, $decimals = 1)
-        {
-            $factor = pow(10, $decimals);
-
-            return intval($number * $factor) / $factor;
-        }
 
     public function getClass($gpa)
     {

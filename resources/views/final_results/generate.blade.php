@@ -25,6 +25,11 @@
             <div class="card-header">
 
             </div>
+            @if ($enrollments->isEmpty())
+            <div class="alert alert-info" role="alert">
+                No enrollments found. Please ensure students are enrolled in courses for the selected session programme.
+            </div>
+            @else
             <div class="pull-right">
                 <!-- <a class="btn btn-success mb-2" href="{{ route('final_results.create') }}" style="float:right !important; margin-right:1%"><i class="fa fa-plus"></i> Create New course</a> -->
 
@@ -91,41 +96,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="table-outer">
-                    <div class="table-responsive">
-                        <table class="table table-striped truncate m-0">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Student</th>
-                                    <th>Semester</th>
-                                    <th>Course</th>
-                                    <th>Total Score</th>
-                                    <th>Grade</th>
-                                    <th>Actions</th>
-
-                                    <!-- <tr>
-                      <th scope="col">No</th>
-                      <th scope="col">Course Name</th>
-                      <th scope="col">Course Code</th>
-                      <th scope="col">Department</th>
-                      <th scope="col" width="280px">Actions</th>
-                  </tr> -->
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php
-                                $i=1;
-                                @endphp
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            </div>          
         </div>
+         @endif
     </div>
 </div>
 <!-- Row ends -->

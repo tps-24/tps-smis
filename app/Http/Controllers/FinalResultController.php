@@ -93,7 +93,8 @@ class FinalResultController extends Controller
 
     public function createGenerate()
     {
-        $enrollments  = Enrollment::all();
+        $sessionProgrammeId = session('selected_session', 1);
+        $enrollments  = Enrollment::where('session_programme_id', $sessionProgrammeId)->get();
         $finalResults = FinalResult::with(['student', 'semester', 'course'])->get();
         return view('final_results.generate', compact('finalResults', 'enrollments'));
     }
@@ -484,50 +485,63 @@ class FinalResultController extends Controller
         ]);
     }
 
-     public function generateAll()
-    {
-        
-        $sessionId =  session('selected_session',1);
+     
+    public function generateAll()
+{
+    $sessionProgrammeId = session('selected_session', 1);
+    $sessionProgramme = SessionProgramme::with(['students'])->findOrFail($sessionProgrammeId);
 
-        $session = SessionProgramme::with(['programmeCourseSemesters.course', 'programmeCourseSemesters.programme'])
-        ->findOrFail($sessionId);
-    $courses = $session->programmeCourseSemesters->map(function ($pcs) {
-        return [
-            'course_id'   => $pcs->course->id,
-            'courseCode'  => $pcs->course->courseCode,
-            'courseName'  => $pcs->course->courseName,
-            'programmeId' => $pcs->programme->id,
-            'programme'   => $pcs->programme->programmeName,
-            'semesterId'  => $pcs->semester_id,
-            'courseType'  => $pcs->course_type,
-            'creditWeight'=> $pcs->credit_weight,
-        ];
-    });
-        return $courses;
-        $enrollments = Enrollment::all();
+    // Get all enrollments (i.e., courses assigned to this sessionProgramme)
+    $enrollments = Enrollment::where('session_programme_id', $sessionProgrammeId)->get();
 
-        foreach ($enrollments as $enrollment) {
+    if ($enrollments->isEmpty()) {
+        return redirect()->back()->with('info', 'No courses are assigned to this session.');
+    }
+
+    foreach ($enrollments as $enrollment) {
+        $courseId = $enrollment->course_id;
+        $semesterId = $enrollment->semester_id;
+
+        // Ensure the exam exists for this course & semester
+        $semesterExam = SemesterExam::where('course_id', $courseId)
+            ->where('semester_id', $semesterId)
+            ->first();
+
+        if (!$semesterExam) {
+            \Log::warning("Skipped course during final result generation: {$enrollment->course} (Course ID: {$courseId}, Semester ID: {$semesterId})");
+            // Skip this course if exam not configured
+            continue;
+        }
+
+        $semesterExamId = $semesterExam->id;
+
+        foreach ($sessionProgramme->students as $student) {
             $resultData = $this->finalResultService->calculateFinalResult(
-                $enrollment->student_id,
-                $enrollment->semester_id,
-                $enrollment->course_id
+                $student->id,
+                $semesterExamId,
+                $semesterId,
+                $courseId
             );
 
-            $resultData['student_id'] = $enrollment->student_id;
-            $resultData['semester_id'] = $enrollment->semester_id;
-            $resultData['course_id'] = $enrollment->course_id;
+            $resultData = array_merge($resultData, [
+                'student_id'  => $student->id,
+                'semester_id' => $semesterId,
+                'course_id'   => $courseId,
+            ]);
 
-            $finalResult = FinalResult::updateOrCreate(
+            FinalResult::updateOrCreate(
                 [
-                    'student_id' => $enrollment->student_id,
-                    'semester_id' => $enrollment->semester_id,
-                    'course_id' => $enrollment->course_id,
+                    'student_id'  => $student->id,
+                    'semester_id' => $semesterId,
+                    'course_id'   => $courseId,
                 ],
                 $resultData
             );
         }
-
-        return redirect()->route('final_results.index')
-                         ->with('success', 'Final results generated successfully.');
     }
+
+    return redirect()->route('final_results.index')
+        ->with('success', 'Final results for all students and courses generated successfully.');
+}
+
 }

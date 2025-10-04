@@ -50,12 +50,27 @@ class StudentController extends Controller
         }
 
         $selectedSessionId = session('selected_session',1);
+        $user = Auth::user();
+        $companies = [];
 
+    if ($user->hasRole(['Teacher', 'Instructor', 'OC Coy']) || $user->hasRole('Sir Major')) {
+            $companies = collect([$user->staff->company]);
+            if (count($companies) != 0) {
+                if ($companies[0] == null) {               
+                    //return view('attendences/index', compact('attendenceType', 'date'));
+                }
+            }
+        } elseif ($user->hasRole(['Admin', 'Academic Coordinator', 'Super Administrator', 'Chief Instructor', 'Staff Officer'])) {
+            $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+                $query->where('session_programme_id', $selectedSessionId);
+            })->get();
 
+        }
+        
         // Global approved count based on selected session only
         $approvedCount = Student::where('session_programme_id', $selectedSessionId)
+            ->whereIn('company_id', $companies->pluck('id'))
             ->where('status', 'approved')
-            ->where('enrollment_status', 1)
             ->count();
     
         $terminationReasons = TerminationReason::all()
@@ -64,10 +79,7 @@ class StudentController extends Controller
 
         
 
-        $students  = Student::where('session_programme_id', $selectedSessionId)->where('enrollment_status', 1)->orderBy('company_id')->orderBy('platoon')->paginate(20);
-        $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
-            $query->where('session_programme_id', $selectedSessionId); // Filter students by session
-        })->get();
+        $students  = Student::where('session_programme_id', $selectedSessionId)->whereIn('company_id', $companies->pluck('id'))->where('enrollment_status', 1)->orderBy('company_id')->orderBy('platoon')->paginate(20);
 
         return view('students.index', compact('students', 'companies', 'approvedCount', 'terminationReasons'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
