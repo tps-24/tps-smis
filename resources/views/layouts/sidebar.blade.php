@@ -129,7 +129,7 @@
             </li>
             @endcan()
 
-            
+                @if (!auth()->user()->hasRole(['Student']) )
                 <li class="treeview">
                     <a href="#!">
                         <i class="bi bi-box"></i>
@@ -166,6 +166,7 @@
                         
                     </ul>
                 </li>
+                @endif
             @can('attendance-list')
                         <li class="treeview">
                             <a href="#!">
@@ -301,9 +302,9 @@
             @endcan()
             @can('student-coursework-list')
                 <li>
-                    <a href="{{ route('students.exam_results') }}">
+                    <a href="{{ route('students.final_results') }}">
                         <i class="bi bi-printer"></i>
-                        <span class="menu-text">Exam Results</span>
+                        <span class="menu-text">Final Results</span>
                     </a>
                 </li>
             @endcan()

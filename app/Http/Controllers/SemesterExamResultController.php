@@ -50,7 +50,7 @@ class SemesterExamResultController extends Controller
         return view('semester_exams.index', compact('programme', 'semesters', 'selectedSemester'));
     }
 
-  public function showExamResults()
+  public function showExamResults2()
 {
     // Get the authenticated student
     $user = Auth::user();

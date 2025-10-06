@@ -44,7 +44,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
                 <li class="breadcrumb-item"><a href="#">Courses</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><a href="#">Registered Courses for You</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a href="#">Registered Courses</a></li>
                 <li class="breadcrumb-item right-align"><a href="#" id="date">{{ now()->format('l jS \\o\\f F, Y') }}</a></li>
             </ol>
         </nav>

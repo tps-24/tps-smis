@@ -123,7 +123,7 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
     Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
     Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
-    Route::get('/students/exam-results', [SemesterExamResultController::class, 'showExamResults'])->name('students.exam_results');
+    Route::get('/students/exam-results', [FinalResultController::class, 'showExamResults'])->name('students.final_results');
     // Route::resource('students', StudentController::class);
 
 });
