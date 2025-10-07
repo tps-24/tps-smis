@@ -1,3 +1,4 @@
+## Start in development
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -20,3 +21,49 @@
     RewriteRule ^ index.php [L]
     RewriteRule ^storage/ - [L]
 </IfModule>
+## End in development
+
+##Start in production
+
+# <IfModule mod_rewrite.c>
+#     <IfModule mod_negotiation.c>
+#         Options -MultiViews -Indexes
+#     </IfModule>
+
+#     RewriteEngine On
+
+#     # ----------------------------------------
+#     # Redirect any /tps-smis/... to /...
+#     # ----------------------------------------
+#     RewriteCond %{REQUEST_URI} ^/tps-smis/(.*)$ [NC]
+#     RewriteRule ^tps-smis/(.*)$ /$1 [L,R=301]
+
+#     # ----------------------------------------
+#     # Standard Laravel rules
+#     # ----------------------------------------
+#     RewriteBase /
+
+#     # Handle Authorization Header
+#     RewriteCond %{HTTP:Authorization} .
+#     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+#     # Redirect trailing slashes if not a folder
+#     RewriteCond %{REQUEST_FILENAME} !-d
+#     RewriteCond %{REQUEST_URI} (.+)/$
+#     RewriteRule ^ %1 [L,R=301]
+
+#     # Send all requests to index.php
+#     RewriteCond %{REQUEST_FILENAME} !-d
+#     RewriteCond %{REQUEST_FILENAME} !-f
+#     RewriteRule ^ index.php [L]
+
+#     # Allow storage symlink access
+#     RewriteRule ^storage/ - [L]
+# </IfModule>
+
+# # php -- BEGIN cPanel-generated handler
+# <IfModule mime_module>
+#   AddHandler application/x-httpd-ea-php82 .php .php8 .phtml
+# </IfModule>
+##end in production
+# php -- END cPanel-generated handler
