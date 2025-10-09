@@ -38,7 +38,7 @@ class FinalResultController extends Controller
         
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
-            $selectedSessionId = 4;
+            $selectedSessionId = 1;
         }
 
         $students   = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
@@ -54,7 +54,7 @@ class FinalResultController extends Controller
 
         // dd($companies);
 
-        return view('final_results.student_certificate', compact('students', 'companies'));
+        return view('final_results.student_certificate', compact('students', 'companies', 'selectedSessionId'));
 
     }
     public function index(Request $request)

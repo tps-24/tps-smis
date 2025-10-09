@@ -70,33 +70,31 @@
 
                     <div class="card my-3">
                         <div class="col-12 col-md-3">
-    <form action="{{ route('students.search_certificate', $company->id) }}" method="GET">
-        @csrf
-        <div class="row align-items-center">
-            <label class="col-auto mb-0">Filter by Platoon</label>
-            <div class="col">
-                <select onchange="this.form.submit()" class="form-select" name="platoon" required>
-                    <option value="" selected disabled>Select Platoon</option>
-                    @for ($i = 1; $i < 15; $i++)
-                        <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
-                            {{ $i }}
-                        </option>
-                    @endfor
-                </select>
-            </div>
-        </div>
-    </form>
-</div>
+                            <form action="{{ route('students.search_certificate', $company->id) }}" method="GET">
+                                @csrf
+                                <div class="row align-items-center">
+                                    <label class="col-auto mb-0">Filter by Platoon</label>
+                                    <div class="col">
+                                        <select onchange="this.form.submit()" class="form-select" name="platoon" required>
+                                            <option value="" selected disabled>Select Platoon</option>
+                                            @for ($i = 1; $i < 15; $i++)
+                                                <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
+                                                    {{ $i }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
 
 
-                        @php $selectedSession = session('selected_session'); @endphp
-
-                        <form action="{{ in_array($selectedSession, [4, 6]) ? route('final.generateTranscript') : route('final.generateCertificate') }}" method="POST" class="form-inline mb-4">
+                        <form action="{{ in_array($selectedSessionId, [4, 6]) ? route('final.generateTranscript') : route('final.generateCertificate') }}" method="POST" class="form-inline mb-4">
                             @csrf
                             <div class="card-header">
                                 <i>Choose student(s) to print Certificate or Transcripts</i>
                                 <button type="submit" class="btn btn-secondary" style="float:right">
-                                    {{ in_array($selectedSession, [4, 6]) ? 'Print Transcript(s)' : 'Print Certificate(s)' }}
+                                    {{ in_array($selectedSessionId, [4, 6]) ? 'Print Transcript(s)' : 'Print Certificate(s)' }}
                                 </button>
                             </div>
 
