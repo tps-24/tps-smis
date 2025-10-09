@@ -86,7 +86,7 @@
                     </li>
                 @else
                     <li>
-                        <a href="/tps-smis">
+                        <a href="/">
                             <i class="bi bi-bar-chart-line"></i>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -94,7 +94,7 @@
                 @endif
             @else
                 <li>
-                    <a href="/tps-smis">
+                    <a href="/">
                         <i class="bi bi-bar-chart-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -108,11 +108,11 @@
                 </a>
                 <ul class="treeview-menu">
                     <li>
-                        <a href="/tps-smis/students">Student Details</a>
+                        <a href="{{ url('students')}}">Student Details</a>
                     </li>
                     @can('student-create')
                     <li>
-                        <a href="/tps-smis/students/create">Student Registration</a>
+                        <a href="{{ url('students/create')}}">Student Registration</a>
                     </li>
                     @endcan()
 
@@ -122,7 +122,7 @@
 
                     @can('student-create')
                     <li>
-                        <a href="/tps-smis/intake_history">Intake Summary</a>
+                        <a href="{{ url('intake_history')}}">Intake Summary</a>
                     </li>
                     @endcan()
                 </ul>
@@ -175,16 +175,16 @@
                             </a>
                             <ul class="treeview-menu">
                                 <li>
-                                    <a href="/tps-smis/attendences/type/1">Jogging</a>
+                                    <a href="{{ url('attendences/type/1')}}">Jogging</a>
                                 </li>
                                  <li>
-                    <a href="/tps-smis/attendences/type/2">Master Parade</a>
+                    <a href="{{ url('attendences/type/2')}}">Master Parade</a>
                   </li>
                                 <li>
-                                    <a href="/tps-smis/attendences/type/4">Flag</a>
+                                    <a href="{{ url('attendences/type/4')}}">Flag</a>
                                 </li>
                                 <li>
-                                    <a href="/tps-smis/attendences/type/3">Night</a>
+                                    <a href="{{ url('attendences/type/3')}}">Night</a>
                                 </li>
                                 @if(auth()->user()->hasRole(['CRO','Super Administrator','Admin']))
                                     <li>
@@ -354,7 +354,7 @@
                         </a>
                         <ul class="treeview-menu">
                             <li>
-                                <a href="/tps-smis/mps">Lock Up</a>
+                                <a href="{{ url('mps')}}">Lock Up</a>
                             </li>
                             <li>
                                 <a href="{{ route('visitors.index') }}">Visitors</a>
@@ -413,7 +413,7 @@
         <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i> Chief Instructor Panel</a></li>
       @endhasanyrole
     @else
-      <li><a href="{{ url('/tps-smis') }}"><i class="bi bi-bar-chart-line"></i> Dashboard</a></li>
+      <li><a href="{{ url('/') }}"><i class="bi bi-bar-chart-line"></i> Dashboard</a></li>
     @endauth
   </ul>
 </li>
