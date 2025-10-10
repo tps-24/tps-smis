@@ -86,7 +86,7 @@
                     </li>
                 @else
                     <li>
-                        <a href="/">
+                        <a href="{{ url('/') }}">
                             <i class="bi bi-bar-chart-line"></i>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -94,7 +94,7 @@
                 @endif
             @else
                 <li>
-                    <a href="/">
+                    <a href="{{ url('/') }}">
                         <i class="bi bi-bar-chart-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>

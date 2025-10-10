@@ -35,25 +35,32 @@
             @csrf
             @method("POST")
             <input type="text" name="name" value="{{ request('name') }}" class="form-control form-control-sm flex-shrink-0" style="width: 120px;" placeholder="Name">
-            <select name="company_id" onchange="this.form.submit()" class="form-select form-select-sm flex-shrink-0" style="width: 140px;">
-                <option value="" disabled {{ !request('company_id') ? 'selected' : '' }}>Company</option>
-                @foreach ($companies as $company)
-                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
-                @endforeach
-            </select>
-            <select name="platoon" onchange="this.form.submit()" class="form-select form-select-sm flex-shrink-0" style="width: 110px;">
-                <option value="" disabled {{ !request('platoon') ? 'selected' : '' }}>Platoon</option>
-                @for ($i = 1; $i < 15; $i++)
-                <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>{{ $i }}</option>
-                @endfor
-            </select>
+            <select id="companies"
+            name="company_id"
+            class="form-select form-select-sm flex-shrink-0"
+            style="width: 140px;" onchange="this.form.submit()">
+        <option value="" {{ !request('company_id') ? 'selected' : '' }}>Company</option>
+        @foreach ($companies as $company)
+            <option value="{{ $company->id }}"
+                {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                {{ $company->name }}
+            </option>
+        @endforeach
+    </select>
+
+    <select id="platoons"
+            name="platoon"
+            class="form-select form-select-sm flex-shrink-0"
+            style="width: 110px;" onchange="this.form.submit()">
+        <option value="">Platoon</option>
+    </select>
         </form>
     </div>
 
     <!-- Right: Create / Sheet -->
     <div class="d-flex col-auto gap-2 justify-content-end">
         @can('student-create')
-            @if(request()->has('platoon'))
+            @if(request()->filled('platoon') && request()->filled('company_id'))
             <a class="btn btn-success btn-sm flex-shrink-0" href="{{ route('students.generatePdf', [request('platoon'),request('company_id')]) }}">
                 <i class="bi bi-download"></i> Sheet
             </a>
@@ -272,5 +279,46 @@
         }
     });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const companiesSelect = document.getElementById('companies');
+    const platoonsSelect = document.getElementById('platoons');
+    const selectedCompany = companiesSelect.value;
+    const selectedPlatoon = "{{ request('platoon') }}"; // Keeps platoon selected after reload
+
+    // Function to load platoons for a given company
+    function loadPlatoons(companyId, preselect = null) {
+        platoonsSelect.innerHTML = '<option value="">Platoon</option>';
+
+        if (companyId) {
+            fetch(`/tps-smis/platoons/${companyId}`)
+                .then(response => response.json())
+                .then(platoons => {
+                    platoons.forEach(platoon => {
+                        const option = document.createElement('option');
+                        option.value = platoon.name;
+                        option.text = platoon.name;
+                        platoonsSelect.appendChild(option);
+                    });
+
+                    // Preselect platoon if exists
+                    if (preselect) {
+                        platoonsSelect.value = preselect;
+                    }
+                })
+                .catch(error => console.error('Error fetching platoons:', error));
+        }
+    }
+
+    // Load platoons on page load if a company is already selected
+    if (selectedCompany) {
+        loadPlatoons(selectedCompany, selectedPlatoon);
+    }
+
+    // Reload platoons when company changes
+    companiesSelect.addEventListener('change', function () {
+        loadPlatoons(this.value);
+    });
+});
 </script>
 @endsection
