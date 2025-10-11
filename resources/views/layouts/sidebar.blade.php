@@ -86,7 +86,7 @@
                     </li>
                 @else
                     <li>
-                        <a href="/">
+                        <a href="{{ url('/') }}">
                             <i class="bi bi-bar-chart-line"></i>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -94,7 +94,7 @@
                 @endif
             @else
                 <li>
-                    <a href="/">
+                    <a href="{{ url('/') }}">
                         <i class="bi bi-bar-chart-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -537,9 +537,14 @@
                             </ul>
                         </li>
                         @can('create-backup')
-                            <li>
-                                <a href="#">Backup & Restore</a>
-                            </li>
+                        <li>
+                            <a href="{{ route('audit-logs.index') }}">Audit Logs</a>
+                        </li>
+                        @endcan()
+                        @can('create-backup')
+                        <li>
+                            <a href="#">Backup & Restore</a>
+                        </li>
                         @endcan()
                     </ul>
                 </li>

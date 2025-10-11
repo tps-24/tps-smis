@@ -164,7 +164,7 @@
 @endsection
 
 
-    @section('scripts')
+@section('scripts')
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -199,8 +199,4 @@
     });
 </script>
 
-
-
-
-
-    @endsection
+@endsection

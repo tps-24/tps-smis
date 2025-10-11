@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseWork;
+use App\Models\CourseworkResult;
 use App\Models\Course;
 use App\Models\Semester;
 use App\Models\AssessmentType;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\AuditHelper;
 
 class CourseWorkController extends Controller
 {
@@ -16,7 +19,7 @@ class CourseWorkController extends Controller
     {
         $this->middleware('permission:coursework-create')->only(['create', 'store']);
         $this->middleware('permission:coursework-list')->only(['index', 'show']);
-        $this->middleware('permission:coursework-update')->only(['edit', 'update']);
+        $this->middleware('permission:coursework-edit')->only(['edit', 'update']);
         $this->middleware('permission:coursework-delete')->only(['destroy']);
     }
 
@@ -93,18 +96,114 @@ class CourseWorkController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CourseWork $courseWork)
+
+    public function update(Request $request, $id)
     {
-        //
+        $courseWork = CourseWork::findOrFail($id);
+        $course = Course::findOrFail($courseWork->course_id);
+        $coursePivot = $course->semesters[0]->pivot;
+
+        $request->validate([
+            'assessment_type_id' => 'required|exists:assessment_types,id',
+            'coursework_title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('courseworks')->where(function ($query) use ($request, $courseWork) {
+                    return $query->where('course_id', $courseWork->course_id)
+                                ->where('assessment_type_id', $request->assessment_type_id);
+                })->ignore($courseWork->id), // Ignore current record
+            ],
+            'max_score' => 'required|integer|min:1',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $courseWork->update([
+            'assessment_type_id' => $request->assessment_type_id,
+            'coursework_title' => $request->coursework_title,
+            'max_score' => $request->max_score,
+            'due_date' => $request->due_date ?? NULL,
+            'semester_id' => $coursePivot->semester_id, // Optional: if semester can change
+            'session_programme_id' => $coursePivot->session_programme_id, // Optional
+            'updated_by' => $request->user()->id, // Optional audit field
+        ]);
+
+        return redirect()->back()->with('success', 'Assessment type updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CourseWork $courseWork)
+
+    public function destroy(Request $request, $id)
     {
-        return $courseWork;
+        $courseWork = CourseWork::findOrFail($id);
+        $user = $request->user();
+        $hasResults = $courseWork->courseworkResults()->exists();
+
+        // If results exist but cascade not confirmed, block deletion
+        if ($hasResults && !$request->has('cascade')) {
+            return redirect()->back()->withErrors([
+                'This coursework has associated results. Confirm deletion to proceed.'
+            ]);
+        }
+
+        // Capture snapshots before deletion
+        $courseworkSnapshot = $courseWork->toArray();
+        $resultsSnapshot = $hasResults ? $courseWork->courseworkResults->toArray() : [];
+
+        // Cascade delete results if confirmed
+        if ($hasResults && $request->cascade) {
+            $courseWork->courseworkResults()->delete();
+        }
+
+        // Delete coursework
+        $courseWork->delete();
+
+        // Log audit entry
+        $browserName = AuditHelper::detectBrowser($request->header('User-Agent'));
+
+        AuditLog::create([
+            'user_id' => $user?->id,
+            'action' => 'delete_coursework',
+            'target_type' => 'CourseWork',
+            'target_id' => $courseWork->id,
+            'metadata' => [
+                'title' => $courseWork->coursework_title,
+                'max_score' => $courseWork->max_score,
+                'deleted_results_count' => count($resultsSnapshot),
+            ],
+            'old_values' => [
+                'coursework' => $courseworkSnapshot,
+                'results' => $resultsSnapshot,
+            ],
+            'new_values' => null,
+            'ip_address' => $request->ip(),
+            'user_agent' => $browserName, // parsed browser name
+        ]);
+
+
+        return redirect()->back()->with('success', 'Coursework and related results deleted successfully.');
     }
+
+
+    function detectBrowser($userAgent)
+    {
+        if (strpos($userAgent, 'Edg/') !== false) {
+            return 'Microsoft Edge';
+        } elseif (strpos($userAgent, 'Chrome/') !== false) {
+            return 'Google Chrome';
+        } elseif (strpos($userAgent, 'Firefox/') !== false) {
+            return 'Mozilla Firefox';
+        } elseif (strpos($userAgent, 'Safari/') !== false) {
+            return 'Safari';
+        } else {
+            return 'Unknown';
+        }
+    }
+
+
 
     public function getCourseworksxx($semesterId){
         
@@ -131,6 +230,8 @@ class CourseWorkController extends Controller
     
         return response()->json($courseworks);
     }
+
+
      
 
 }

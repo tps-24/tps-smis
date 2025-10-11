@@ -22,8 +22,19 @@ class CourseworkResultController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index_old(Request $request)
     {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
+        $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
+            $selectedSessionId = 1;
+        }
+
         $programme = Programme::findOrFail(1);
         $userId             = $request->user()->id;
         $user = $request->user();
@@ -32,7 +43,7 @@ class CourseworkResultController extends Controller
             $user->hasRole('Academic Coordinator') ||
              $user->hasRole('Chief Instructor') ||
              $user->hasRole('Head of Department')){
-        $semesters          = Semester::with('courses')->get();
+        $semesters    = Semester::with('courses')->get();
 
         }
         else if($request->user()->hasRole('Instructor')){
@@ -49,6 +60,55 @@ class CourseworkResultController extends Controller
 
         return view('course_works_results.index', compact('programme', 'semesters', 'selectedSemester'));
     }
+
+
+    public function index(Request $request)
+    {
+        // Handle session selection
+        if ($request->has('session_id')) {
+            session(['selected_session' => $request->session_id]);
+        }
+
+        $selectedSessionId = session('selected_session') ?? 1;
+
+        $programme = Programme::findOrFail(1);
+        $user = $request->user();
+        $userId = $user->id;
+
+        // Role-based semester/course access
+        if (
+            $user->hasRole('Super Administrator') ||
+            $user->hasRole('Academic Coordinator') ||
+            $user->hasRole('Chief Instructor') ||
+            $user->hasRole('Head of Department')
+        ) {
+            $semesters = Semester::with(['courses' => function ($query) use ($selectedSessionId) {
+                $query->where('session_programme_id', $selectedSessionId);
+            }])->get();
+        }
+        elseif ($user->hasRole('Instructor')) {
+            $semesters = Semester::with(['courses' => function ($query) use ($userId, $selectedSessionId) {
+                $query->where('session_programme_id', $selectedSessionId)
+                    ->whereHas('courseInstructors', function ($subQuery) use ($userId) {
+                        $subQuery->where('user_id', $userId);
+                    });
+            }])->get();
+        }
+        else {
+            $semesters = [];
+        }
+
+        // Optional semester filter
+        $selectedSemesterId = $request->get('semester_id');
+        $selectedSemester = $selectedSemesterId
+            ? Semester::with(['courses' => function ($query) use ($selectedSessionId) {
+                $query->where('session_programme_id', $selectedSessionId);
+            }])->find($selectedSemesterId)
+            : null;
+
+        return view('course_works_results.index', compact('programme', 'semesters', 'selectedSemester', 'selectedSessionId'));
+    }
+
 
     public function getResultsByCourse_old($courseId)
     {
