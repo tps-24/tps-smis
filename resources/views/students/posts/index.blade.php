@@ -21,11 +21,7 @@
 @section('content')
     @include('layouts.sweet_alerts.index')
     <div class="card-body">
-        @can('post-create')
-            <div class="text-end">
-                <a href="{{ route('students-post.create') }}" class="btn btn-success btn-sm">Upload Post</a>
-            </div>
-        @endcan
+
         <div>
             <h2>Students Posts</h2>
         </div>

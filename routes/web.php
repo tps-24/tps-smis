@@ -351,7 +351,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::prefix('students-post')->controller(StudentPostController::class)->group(function () {
         Route::post('bulkimport', 'import')->name('students-post.bulkimport');
         Route::get('search', 'search')->name('students-post.search');
+        Route::get('edit-post', 'edit_post')->name('students-post.edit_post');
         Route::get('downloadSample', 'downloadSample')->name('students-post.downloadSample');
+        Route::get('updateDownloadSample', 'updateDownloadSample')->name('students-post.updateDownloadSample');
     });
     Route::prefix('posts')->controller(PostController::class)->group(function () {
         Route::post('publish/{post}', 'publish')->name('post.publish');

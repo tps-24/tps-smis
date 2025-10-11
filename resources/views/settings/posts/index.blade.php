@@ -64,11 +64,36 @@
                     <td class="d-flex gap-2">
                     <form id="publishForm{{ $post->id }}" action="{{ route('post.publish', $post->id) }}" method="post">
                         @csrf
-                        @if($post->status == 'pending')
-                          <button class="btn btn-sm btn-primary" type="button" onclick="confirmAction('publishForm{{ $post->id }}', 'Publish Post','Post','Publish')">Publish</button>
-                        @else
-                          <button class="btn btn-sm btn-warning" type="button" onclick="confirmAction('publishForm{{ $post->id }}', 'Unpublish Post','Post','Unpublish')">Unpublish</button>
-                        @endif
+                        @php
+                            // Get the user's post (from session or database)
+                            $uploadedPost = session('uploaded_post') ?? $post ?? null;
+                        @endphp
+
+                      <div class="text-end">
+                        @can('post-create')
+                            {{-- Case 1: No uploaded post yet --}}
+                            @if ($uploadedPost->student_posts->isEmpty())
+                                <a href="{{ route('students-post.create') }}" class="btn btn-success btn-sm">Upload</a>
+
+                            {{-- Case 2: Has uploaded post but still pending --}}
+                            @elseif ($uploadedPost->status === 'pending')
+                                <a href="{{ route('students-post.edit_post') }}" class="btn btn-info btn-sm">Update</a>
+
+                                <button class="btn btn-sm btn-primary" type="button"
+                                    onclick="confirmAction('publishForm{{ $uploadedPost->id }}', 'Publish Post','Post','Publish')">
+                                    Publish
+                                </button>
+
+                            {{-- Case 3: Post already published --}}
+                            @elseif ($uploadedPost->status === 'published')
+                                <button class="btn btn-sm btn-warning" type="button"
+                                    onclick="confirmAction('publishForm{{ $uploadedPost->id }}', 'Unpublish Post','Post','Unpublish')">
+                                    Unpublish
+                                </button>
+                            @endif
+                        @endcan
+                      </div>
+
                       </form>
                     @if($post->status == 'pending')
                     <form id="deleteForm{{ $post->id }}" action="{{ route('posts.destroy', $post->id) }}" method="post">

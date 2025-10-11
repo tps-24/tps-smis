@@ -189,4 +189,12 @@ class StudentPostController extends Controller
         }
         abort(404);
     }
+
+    
+    public function edit_post()
+    {
+        return view('students.posts.edit');
+    }
+
+
 }
