@@ -67,7 +67,14 @@
                     <img src="{{ asset('resources/assets/images/logo.png') }}" style="height:60 !important; width:50"
                         alt="Police Logo">
                 </div>
-                <h4>RIPOTI YA HOSPITALI {{\Carbon\Carbon::now()->format('d F, Y')}}</h4>
+                <h4>RIPOTI YA HOSPITALI 
+                @if($start_date && $end_date)
+                    KUTOKA TAREHE {{ \Carbon\Carbon::parse($start_date)->format('d F, Y') }} HADI {{ \Carbon\Carbon::parse($end_date)->format('d F, Y') }}
+                @else
+                    TAREHE
+                {{\Carbon\Carbon::now()->format('d F, Y')}}
+                @endif
+            </h4>
             </div>
         </div>
 
@@ -85,7 +92,7 @@
                 <tr>
                     {{-- Only set the rowspan for the first row of the period --}}
                     @if($index === 0)
-                    <td rowspan="{{ count($data['dailyCounts']) }}">{{ 'Ndani ya Siku 7' }}</td> {{-- Example Period --}}
+                    <td rowspan="{{ count($data['dailyCounts']) }}">{{ 'Ndani ya Siku '.($start_date && $end_date ? \Carbon\Carbon::parse($start_date)->diffInDays(\Carbon\Carbon::parse($end_date)) : '7') }}</td> {{-- Example Period --}}
                     @endif
                     <td>{{ \Carbon\Carbon::parse($day['date'])->format('d F, Y') }}</td>
                     <td>{{ $day['total'] }}</td>
@@ -99,7 +106,7 @@
                 <tr>
                     {{-- Only set the rowspan for the first row of the period --}}
                     @if($index === 0)
-                    <td rowspan="{{ count($data['weeklyCounts']) }}">{{ 'Ndani ya Wiki 5' }}</td> {{-- Example Period --}}
+                    <td rowspan="{{ count($data['weeklyCounts']) }}">{{ 'Ndani ya Wiki '.($start_date && $end_date ? round(\Carbon\Carbon::parse($start_date)->diffInWeeks(\Carbon\Carbon::parse($end_date))+1,0) : '5') }}</td> {{-- Example Period --}}
                     @endif
                     <td>{{ $week['date'] }}</td>
                     <td>{{ $week['total'] }}</td>
@@ -113,7 +120,7 @@
                 <tr>
                     {{-- Only set the rowspan for the first row of the period --}}
                     @if($index === 0)
-                    <td rowspan="{{ count($data['monthlyCounts']) }}">{{ 'Ndani ya miezi 3' }}</td>
+                    <td rowspan="{{ count($data['monthlyCounts']) }}">{{ 'Ndani ya miezi '.($start_date && $end_date ? round(\Carbon\Carbon::parse($start_date)->diffInMonths(\Carbon\Carbon::parse($end_date))+1,0) : '3') }}</td>
                     {{-- Example Period --}}
                     @endif
                     <td>{{ $month['month'] }}</td>
