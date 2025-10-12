@@ -67,28 +67,119 @@
                             </thead>
                             <tbody>
                               @foreach ($course->courseWorks as $index => $courseWork)
-                                  <tr>
-                                      <td>{{ $index + 1 }}</td>
-                                      <td>{{ $courseWork->AssessmentType->type_name }}</td>
-                                      <td>{{ $courseWork->coursework_title }}</td>
-                                      <td>{{ $courseWork->max_score }}</td>
-                                      <td>{{ $courseWork->due_date }}</td>
-                                      <td>
-                                          <a class="btn btn-info btn-sm" href="{{ route('course_works.show', $courseWork->id) }}">
-                                              <i class="fa-solid fa-list"></i> Show
-                                          </a>
-                                          <a class="btn btn-primary btn-sm" href="{{ route('course_works.edit', $courseWork->id) }}">
-                                              <i class="fa-solid fa-pen-to-square"></i> Edit
-                                          </a>
-                                          <form method="POST" action="{{ route('course_works.destroy', $courseWork->id) }}" style="display:inline">
-                                              @csrf
-                                              @method('DELETE')
-                                              <button type="submit" class="btn btn-danger btn-sm">
-                                                  <i class="fa-solid fa-trash"></i> Delete
-                                              </button>
-                                          </form>
-                                      </td>
-                                  </tr>
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $courseWork->AssessmentType->type_name }}</td>
+                                    <td>{{ $courseWork->coursework_title }}</td>
+                                    <td>{{ $courseWork->max_score }}</td>
+                                    <td>{{ $courseWork->due_date }}</td>
+                                    <td>
+                                    <!-- <a class="btn btn-info btn-sm" href="{{ route('course_works.show', $courseWork->id) }}">
+                                        <i class="fa-solid fa-list"></i> Show
+                                    </a> -->
+
+                                    <!-- Trigger Button -->
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCourseworkModal{{ $courseWork->id }}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </button>
+                                    <!-- <form method="POST" action="{{ route('course_works.destroy', $courseWork->id) }}" style="display:inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fa-solid fa-trash"></i> Delete
+                                        </button>
+                                    </form> -->
+
+
+
+                                    <!-- Delete Trigger -->
+                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCourseworkModal{{ $courseWork->id }}">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="deleteCourseworkModal{{ $courseWork->id }}" tabindex="-1" aria-labelledby="deleteCourseworkModalLabel{{ $courseWork->id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                        <form method="POST" action="{{ route('course_works.destroy', $courseWork->id) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteCourseworkModalLabel{{ $courseWork->id }}">Confirm Deletion</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                                            <div>
+                                                This coursework has associated results. <br>Deleting it will also remove all related records.
+                                            </div>
+                                        </div>
+
+                                            <p><strong>Are you sure you want to proceed?</strong></p>
+                                            <input type="hidden" name="cascade" value="true">
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fa-solid fa-trash-can"></i> Delete with Results
+                                            </button>
+                                            </div>
+                                        </form>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <!-- End of Delete Modal -->
+
+
+                                    </td>
+                                </tr>
+
+                                <!-- Edit Modal -->
+                                <div class="modal fade" id="editCourseworkModal{{ $courseWork->id }}" tabindex="-1" aria-labelledby="editCourseworkModalLabel{{ $courseWork->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                    <form method="POST" action="{{ route('course_works.update', $courseWork->id) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="editCourseworkModalLabel{{ $courseWork->id }}">Edit Assessment Type</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                        <div class="form-group">
+                                            <label>Assessment Type</label>
+                                            <select name="assessment_type_id" class="form-control">
+                                            @foreach ($assessmentTypes as $type)
+                                                <option value="{{ $type->id }}" {{ $courseWork->assessment_type_id == $type->id ? 'selected' : '' }}>
+                                                {{ $type->type_name }}
+                                                </option>
+                                            @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Coursework Title</label>
+                                            <input type="text" name="coursework_title" class="form-control" value="{{ $courseWork->coursework_title }}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Max Score</label>
+                                            <input type="number" name="max_score" class="form-control" value="{{ $courseWork->max_score }}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Due Date</label>
+                                            <input type="date" name="due_date" class="form-control" value="{{ $courseWork->due_date }}">
+                                        </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fa-solid fa-floppy-disk"></i> Update
+                                        </button>
+                                        </div>
+                                    </form>
+                                    </div>
+                                </div>
+                                </div>
+                                <!-- End of Edit Modal -->
                               @endforeach
                           </tbody>
 
@@ -100,7 +191,7 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Create Modal -->
 <div class="modal fade" id="addCourseworkModal" tabindex="-1" aria-labelledby="addCourseworkModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -152,4 +243,5 @@
         </div>
     </div>
 </div>
+<!-- End of Create Modal -->
 @endsection

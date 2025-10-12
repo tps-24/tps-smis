@@ -21,10 +21,9 @@ class CourseWork extends Model
     {
         return $this->belongsTo(Semester::class);
     }
-
     public function courseworkResults()
     {
-        return $this->hasMany(CourseworkResult::class);
+        return $this->hasMany(CourseworkResult::class, 'coursework_id');
     }
 
     public function assessmentType()

@@ -54,6 +54,7 @@ use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VitengoController;
 use App\Http\Controllers\WeaponController;
+use App\Http\Controllers\AuditLogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
@@ -459,6 +460,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('guard-areas', GuardAreaController::class);
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('attendences', AttendenceController::class);
+    Route::resource('audit-logs', AuditLogController::class);
 
     Route::controller(RefereeController::class)->prefix('referee')->group(function () {
         Route::get('/referee/delete/{refereeId}', 'destroy')->name('referees.delete');

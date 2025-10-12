@@ -559,9 +559,14 @@
                             </ul>
                         </li>
                         @can('create-backup')
-                            <li>
-                                <a href="#">Backup & Restore</a>
-                            </li>
+                        <li>
+                            <a href="{{ route('audit-logs.index') }}">Audit Logs</a>
+                        </li>
+                        @endcan()
+                        @can('create-backup')
+                        <li>
+                            <a href="#">Backup & Restore</a>
+                        </li>
                         @endcan()
                     </ul>
                 </li>
