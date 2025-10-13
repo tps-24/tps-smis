@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Vitengo;
 use Illuminate\Http\Request;
-
+use App\Services\AuditLoggerService;
 class VitengoController extends Controller
 {
     public function __construct()
@@ -80,10 +80,23 @@ class VitengoController extends Controller
         }
     }
 
-    public function destroy(Vitengo $Vitengo)
+    public function destroy(Vitengo $Vitengo, Request $request, AuditLoggerService $auditLogger)
     {
+        $vitengoSnapshot = $Vitengo;
         $Vitengo->delete();
-
+        $auditLogger->logAction([
+            'action' => 'delete_kitengo',
+            'target_type' => 'Vitengo',
+            'target_id' => $vitengoSnapshot->id,
+            'metadata' => [
+                'title' => $vitengoSnapshot->name ?? null,
+            ],
+            'old_values' => [
+                'kitengo' => $vitengoSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('vitengo.index')
             ->with('success', 'Kitengo  '.$Vitengo->name.'  deleted successfully.');
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\SessionProgramme;
 use Illuminate\Http\Request;
+use App\Services\AuditLoggerService;
 use Illuminate\Support\Facades\Validator;
 class PostController extends Controller
 {
@@ -71,13 +72,27 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy(Post $post, Request $request, AuditLoggerService $auditLogger)
     {
-    // Delete the post
-    $post->delete();
-
-    // Redirect back with a success message
-    return redirect()->back() ->with('success', 'Post deleted successfully.');
+        $postSnapshot = $post;
+        $name = $post->session->session_programme_name ?? 'N/A';
+        // Delete the post
+        $post->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_post',
+            'target_type' => 'Post',
+            'target_id' => $postSnapshot->id,
+            'metadata' => [
+                'title' => $name,
+            ],
+            'old_values' => [
+                'post' => $postSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
+        // Redirect back with a success message
+        return redirect()->back() ->with('success', 'Post deleted successfully.');
     }
 
     public function publish(Request $request, Post $post)

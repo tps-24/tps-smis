@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\AuditLoggerService;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use DB;
@@ -169,9 +170,24 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id): RedirectResponse
+    public function destroy($id, Request $request, AuditLoggerService $auditLogger): RedirectResponse
     {
-        DB::table("roles")->where('id',$id)->delete();
+        $role = Role::find($id);
+        $roleSnapshot = $role;
+        $roleSnapshot->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_role',
+            'target_type' => 'Role',
+            'target_id' => $roleSnapshot->id,
+            'metadata' => [
+                'title' => $roleSnapshot->name ?? null,
+            ],
+            'old_values' => [
+                'role' => $roleSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('roles.index')
                         ->with('success','Role deleted successfully');
     }

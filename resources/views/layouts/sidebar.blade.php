@@ -101,35 +101,35 @@
                 </li>
             @endif
             @can('student-list')
-            <li class="treeview">
-                <a href="#!">
-                    <i class="bi bi-box"></i>
-                    <span class="menu-text">Students</span>
-                </a>
-                <ul class="treeview-menu">
-                    <li>
-                        <a href="{{ url('students')}}">Student Details</a>
-                    </li>
-                    @can('student-create')
-                    <li>
-                        <a href="{{ url('students/create')}}">Student Registration</a>
-                    </li>
-                    @endcan()
+                <li class="treeview">
+                    <a href="#!">
+                        <i class="bi bi-box"></i>
+                        <span class="menu-text">Students</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="{{ url('students')}}">Student Details</a>
+                        </li>
+                        @can('student-create')
+                            <li>
+                                <a href="{{ url('students/create')}}">Student Registration</a>
+                            </li>
+                        @endcan()
 
-                     <li>
-                        <a href="{{ route('students-post.index') }}">Students Post</a>
-                    </li> 
+                        <li>
+                            <a href="{{ route('students-post.index') }}">Students Post</a>
+                        </li>
 
-                    @can('student-create')
-                    <li>
-                        <a href="{{ url('intake_history')}}">Intake Summary</a>
-                    </li>
-                    @endcan()
-                </ul>
-            </li>
+                        @can('student-create')
+                            <li>
+                                <a href="{{ url('intake_history')}}">Intake Summary</a>
+                            </li>
+                        @endcan()
+                    </ul>
+                </li>
             @endcan()
 
-                @if (!auth()->user()->hasRole(['Student']) )
+            @if (!auth()->user()->hasRole(['Student']))
                 <li class="treeview">
                     <a href="#!">
                         <i class="bi bi-box"></i>
@@ -137,67 +137,67 @@
                     </a>
                     <ul class="treeview-menu">
                         @can('staff-list')
-                        <li>
-                            <a href="{{ route('staffs.index') }}">Staff Details</a>
-                        </li>
+                            <li>
+                                <a href="{{ route('staffs.index') }}">Staff Details</a>
+                            </li>
                         @endcan()
-                                        @can('staff-create')
-                                        <li>
-                                            <a href="{{ route('staffs.create') }}">Staff Registration</a>
-                                        </li>
-                                        @endcan()
-                                        @can('staff-list')
-                                        <li>
-                                            <a href="{{ route('staffs.summary.index') }}">Staff Summary</a>
-                                        </li>
-                                        @endcan()
-                                        
-                                            <li>
-                                                <a href="{{ route('timesheets.index') }}">
-                                                    <i class="bi bi-archive"></i>
-                                                    <span class="menu-text">Time Sheet</span>
-                                                </a>
-                                            </li>
-                                        
+                        @can('staff-create')
+                            <li>
+                                <a href="{{ route('staffs.create') }}">Staff Registration</a>
+                            </li>
+                        @endcan()
+                        @can('staff-list')
+                            <li>
+                                <a href="{{ route('staffs.summary.index') }}">Staff Summary</a>
+                            </li>
+                        @endcan()
 
-                                        <!-- <li>
-                            <a href="">Staff Resume</a>
-                            </li> -->
-                        
+                        <li>
+                            <a href="{{ route('timesheets.index') }}">
+                                <i class="bi bi-archive"></i>
+                                <span class="menu-text">Time Sheet</span>
+                            </a>
+                        </li>
+
+
+                        <!-- <li>
+                                <a href="">Staff Resume</a>
+                                </li> -->
+
                     </ul>
                 </li>
-                @endif
+            @endif
             @can('attendance-list')
-                        <li class="treeview">
-                            <a href="#!">
-                                <i class="bi bi-bar-chart-line"></i>
-                                <span class="menu-text">Attendances</span>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li>
-                                    <a href="{{ url('attendences/type/1')}}">Jogging</a>
-                                </li>
-                                 <li>
-                    <a href="{{ url('attendences/type/2')}}">Master Parade</a>
-                  </li>
-                                <li>
-                                    <a href="{{ url('attendences/type/4')}}">Flag</a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('attendences/type/3')}}">Night</a>
-                                </li>
-                                @if(auth()->user()->hasRole(['CRO','Super Administrator','Admin']))
-                                    <li>
-                                        <a href="{{ route('attendance.show.request') }}">Requests</a>
-                                    </li>
-                                @endif
-                                @can('report-list')
-                                    <li>
-                                        <a href="{{ route('reports.index') }}">Summary</a>
-                                    </li>                                    
-                                @endcan
-                            </ul>
+                <li class="treeview">
+                    <a href="#!">
+                        <i class="bi bi-bar-chart-line"></i>
+                        <span class="menu-text">Attendances</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="{{ url('attendences/type/1')}}">Jogging</a>
                         </li>
+                        <li>
+                            <a href="{{ url('attendences/type/2')}}">Master Parade</a>
+                        </li>
+                        <li>
+                            <a href="{{ url('attendences/type/4')}}">Flag</a>
+                        </li>
+                        <li>
+                            <a href="{{ url('attendences/type/3')}}">Night</a>
+                        </li>
+                        @if(auth()->user()->hasRole(['CRO', 'Super Administrator', 'Admin']))
+                            <li>
+                                <a href="{{ route('attendance.show.request') }}">Requests</a>
+                            </li>
+                        @endif
+                        @can('report-list')
+                            <li>
+                                <a href="{{ route('reports.index') }}">Summary</a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
             @endcan()
             @can('hospital-list')
                 <li class="treeview">
@@ -208,13 +208,13 @@
                     <ul class="treeview-menu">
 
                         <li>
-                            <a href="{{ route('dispensary.page') }}">Hospital Dashboard</a>
+                            <a href="{{ route('dispensary.page') }}">Dashboard</a>
                         </li>
                         @can('hospital-create')
                             <li>
                                 <a href="{{ route('hospital.index') }}">
                                     <i class="bi bi-hospital"></i>
-                                    <span class="menu-text">Sick Panel</span>
+                                    <span class="menu-text">Patients</span>
                                 </a>
                             </li>
                         @endcan()
@@ -223,18 +223,23 @@
                             <li>
                                 <a href="{{ route('receptionist.index') }}">
                                     <i class="bi bi-person-lines-fill"></i>
-                                    <span class="menu-text">Receptionist Panel</span>
+                                    <span class="menu-text">Reception</span>
                                 </a>
                             </li>
                         @endcan()
                         @can('hospital-edit')
                             <li>
                                 <a href="{{ route('doctor.page') }}">
-                                    <i class="bi bi-stethoscope"></i>
-                                    <span class="menu-text">Doctor Panel</span>
+                                    <i class="fa-solid fa-stethoscope"></i>
+                                    <span class="menu-text">Doctor</span>
                                 </a>
                             </li>
                         @endcan()
+                        @can('report-list')
+                            <li>
+                                <a href="{{ route('reports.hospital') }}">Summary</a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
             @endcan()
@@ -256,8 +261,8 @@
                             </li>
                         @endcan()
                         <!-- <li>
-                            <a href="#">My Courses</a> For Teacher
-                        </li>-->
+                                <a href="#">My Courses</a> For Teacher
+                            </li>-->
                         <li>
                             <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a> <!-- For Teacher-->
                         </li>
@@ -347,25 +352,25 @@
             </li>
 
             @can('mps-list')
-                    <li class="treeview">
-                        <a href="!#">
-                            <i class="bi bi-pie-chart"></i>
-                            <span class="menu-text">MPS</span>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li>
-                                <a href="{{ url('mps')}}">Lock Up</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('visitors.index') }}">Visitors</a>
-                            </li>
-                        @can('report-list')
+                <li class="treeview">
+                    <a href="!#">
+                        <i class="bi bi-pie-chart"></i>
+                        <span class="menu-text">MPS</span>
+                    </a>
+                    <ul class="treeview-menu">
                         <li>
-                            <a href="{{ route('reports.mps') }}">Summary</a>
-                        </li>                            
+                            <a href="{{ url('mps')}}">Lock Up</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('visitors.index') }}">Visitors</a>
+                        </li>
+                        @can('report-list')
+                            <li>
+                                <a href="{{ route('reports.mps') }}">Summary</a>
+                            </li>
                         @endcan
-                        </ul>
-                    </li>
+                    </ul>
+                </li>
             @endcan()
             @can('teacher_on_duty-view')
                 <li>
@@ -375,49 +380,62 @@
                     </a>
                 </li>
             @endcan
-          
 
-@can('leave-list')
-<li class="treeview">
-  <a href="#">
-    <i class="bi bi-mouse3"></i>
-    <span class="menu-text">Leave(s)</span>
-  </a>
-  <ul class="treeview-menu">
-    @auth
-      {{-- Student --}}
-      @role('Student')
-        <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for Leave</a></li>
-      @endrole
 
-      {{-- Sir Major --}}
-      @role('Sir Major')
-        <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a></li>
-      @endrole
+            @can('leave-list')
+                <li class="treeview">
+                    <a href="#">
+                        <i class="bi bi-mouse3"></i>
+                        <span class="menu-text">Leave(s)</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @auth
+                            {{-- Student --}}
+                            @role('Student')
+                            <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for
+                                    Leave</a></li>
+                            @endrole
 
-      {{-- OC Coy --}}
-      @role('OC Coy')
-        <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC Panel</a></li>
-      @endrole
+                            {{-- Sir Major --}}
+                            @role('Sir Major')
+                            <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a>
+                            </li>
+                            @endrole
 
-      {{-- Chief Instructor --}}
-      @role('Chief Instructor')
-        <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i> Chief Instructor Panel</a></li>
-      @endrole
+                            {{-- OC Coy --}}
+                            @role('OC Coy')
+                            <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC
+                                    Panel</a></li>
+                            @endrole
 
-      {{-- Admins (see all) --}}
-      @hasanyrole('Admin|Super Administrator')
-        <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for Leave</a></li>
-        <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a></li>
-        <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC Panel</a></li>
-        <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i> Chief Instructor Panel</a></li>
-      @endhasanyrole
-    @else
-      <li><a href="{{ url('/') }}"><i class="bi bi-bar-chart-line"></i> Dashboard</a></li>
-    @endauth
-  </ul>
-</li>
-@endcan
+                            {{-- Chief Instructor --}}
+                            @role('Chief Instructor')
+                            <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i>
+                                    Chief Instructor Panel</a></li>
+                            @endrole
+
+                            {{-- Admins (see all) --}}
+                            @hasanyrole('Admin|Super Administrator')
+                            <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for
+                                    Leave</a></li>
+                            <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a>
+                            </li>
+                            <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC
+                                    Panel</a></li>
+                            <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i>
+                                    Chief Instructor Panel</a></li>
+                            @endhasanyrole
+                        @else
+                            <li><a href="{{ url('/') }}"><i class="bi bi-bar-chart-line"></i> Dashboard</a></li>
+                        @endauth
+                        @can('report-list')
+                            <li>
+                                <a href="{{ route('reports.leaves') }}">Summary</a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
+            @endcan
 
 
             @can('beat-list')
@@ -465,9 +483,13 @@
                     <ul class="treeview-menu">
 
                         <li>
+                            <a href="{{ route('reports.index') }}">Attendances</a>
+                        </li>
+                        <li>
                             <a href="{{ route('reports.hospital') }}">Hospital</a>
                         </li>
-                                                                                                                                                                
+                        <li>
+                            <a href="{{ route('reports.mps') }}">MPS</a>
                         <li>
                             <a href="{{ route('reports.leaves') }}">Leaves</a>
                         </li>
@@ -519,9 +541,9 @@
                             <a href="{{ route('companies.index') }}">Companies Settings</a>
                         </li>
                         @can('vitengo-view')
-                         <li>
-                            <a href="{{ route('vitengo.index') }}">Vitengo Settings</a>
-                        </li>
+                            <li>
+                                <a href="{{ route('vitengo.index') }}">Vitengo Settings</a>
+                            </li>
                         @endcan()
                         <li class="treeview">
                             <a href="#!">

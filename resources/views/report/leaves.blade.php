@@ -87,11 +87,15 @@
         <!-- Submit Button -->
         <button type="submit" class="btn btn-primary">Filter</button>
     </form>
+    <form action="{{ route('reports.generateLeavesReport') }}" method="get">
+        <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+        <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+        <!-- Right: Report Download Button -->
+        <button type="submit" class="btn btn-sm btn-success">
+            <i class="bi bi-download me-1"></i> Report
+        </button>
+    </form>
 
-    <!-- Right: Report Download Button -->
-    <a href="{{ route('reports.generateLeavesReport') }}" title="Download report" class="btn btn-sm btn-success">
-        <i class="bi bi-download me-1"></i> Report
-    </a>
 </div>
 
 

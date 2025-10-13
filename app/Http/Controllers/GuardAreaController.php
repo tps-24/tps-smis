@@ -8,7 +8,7 @@ use App\Models\Campus;
 use App\Models\BeatException;
 use App\Models\BeatTimeException;
 use Illuminate\Http\Request;
-
+use App\Services\AuditLoggerService;
 class GuardAreaController extends Controller
 {
     /**
@@ -145,9 +145,23 @@ class GuardAreaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(GuardArea $guardArea)
+    public function destroy(GuardArea $guardArea,Request $request, AuditLoggerService $auditLogger)
     {
+        $guardAreaSnapshot = $guardArea;
         $guardArea->delete();
+                $auditLogger->logAction([
+            'action' => 'delete_guard_area',
+            'target_type' => 'GuardArea',
+            'target_id' => $guardAreaSnapshot->id,
+            'metadata' => [
+                'title' => $guardAreaSnapshot->name  ?? null,
+            ],
+            'old_values' => [
+                'guard_area' => $guardAreaSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('guard-areas.index')->with('success','Guard area deleted successfully.');
     }
 

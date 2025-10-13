@@ -8,6 +8,7 @@ use App\Models\Campus;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use App\Services\AuditLoggerService;
 
 class CompanyController extends Controller
 {
@@ -93,10 +94,23 @@ class CompanyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Company $company)
+    public function destroy(Company $company, Request $request, AuditLoggerService $auditLogger)
     {
+        $companySnapshot = $company;
         $company->delete();
-    
+        $auditLogger->logAction([
+            'action' => 'delete_company',
+            'target_type' => 'Company',
+            'target_id' => $companySnapshot->id,
+            'metadata' => [
+                'title' => $companySnapshot->name ?? null,
+            ],
+            'old_values' => [
+                'company' => $companySnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('companies.index')
                         ->with('success','Campus deleted successfully');
     }

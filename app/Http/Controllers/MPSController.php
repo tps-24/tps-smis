@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Services\AuditLoggerService;
 
 class MPSController extends Controller
 {
@@ -152,8 +153,9 @@ class MPSController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $mPSStudentId)
+    public function update(Request $request, $mPSStudentId, AuditLoggerService $auditLogger)
     {
+
         $mPSstudent = MPS::find($mPSStudentId);
         if (!$mPSstudent) {
             abort(404);
@@ -165,23 +167,55 @@ class MPSController extends Controller
         if ($validator->errors()->any()) {
             return redirect()->back()->withErrors($validator->errors());
         }
+        $mPSstudentSnapshot = $mPSstudent;
+        
         $mPSstudent->arrested_at = $request->arrested_at;
         $mPSstudent->description = $request->description;
         $mPSstudent->save();
-
+        $auditLogger->logAction([
+            'action' => 'update_mps_visitor',
+            'target_type' => 'mPSstudent',
+            'target_id' => $mPSstudentSnapshot->id,
+            'metadata' => [
+                'title' => $mPSstudentSnapshot->names,
+            ],
+            'old_values' => [
+                'mPSstudent' => $mPSstudentSnapshot,
+            ],
+            'new_values' => [
+                'mPSstudent' => $mPSstudent,
+            ],
+            'request' => $request,
+        ]);
         return redirect()->back()->with('success', 'MPS student record updated succesfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($mPS)
+    public function destroy($mPS,Request $request, AuditLoggerService $auditLogger)
     {
         $mPSstudent = MPS::find($mPS);
         if (!$mPSstudent) {
             abort(404);
         }
+   
+        $mPSstudentSnapshot = $mPSstudent;
         $mPSstudent->delete();
+
+        $auditLogger->logAction([
+            'action' => 'delete_mps_visitor',
+            'target_type' => 'mPSstudent',
+            'target_id' => $mPSstudentSnapshot->id,
+            'metadata' => [
+                'title' => $mPSstudentSnapshot->names,
+            ],
+            'old_values' => [
+                'mPSstudent' => $mPSstudentSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->back()->with('success', 'MPS student record deleted succesfully.');
 
     }

@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\AuditLoggerService;
 // Namespace for the Log facade
 
 //use Barryvdh\DomPDF\Facade as PDF;
@@ -135,7 +136,7 @@ class StudentController extends Controller
 
     }
 
-    public function dismiss(Request $request, $id)
+    public function dismiss(Request $request, $id, AuditLoggerService $auditLogger)
     {
        $request->validate([
             'reason_id'     => 'required|exists:termination_reasons,id',
@@ -157,6 +158,27 @@ class StudentController extends Controller
             'enrollment_status' => 0, 
         ]);
 
+        $auditLogger->logAction([
+            'action' => 'dismiss_student',
+            'target_type' => 'Student',
+            'target_id' => $student->id,
+            'metadata' => [
+                'title' => $student->force_number. ' '.$student->first_name. ' '.$student->last_name,
+                'programme' => $student->programme ?? null,
+            ],
+            'old_values' => [
+                'enrollment_status' => 1,
+            ],
+            'new_values' => [
+                'enrollment_status' => 0,
+                'dismissal_data' => [
+                    'reason'    =>  TerminationReason::where('id', $request->reason_id)->pluck('reason')->first(),
+                    'custom_reason'    => $request->custom_reason ?? 'null',
+                    'dismissed_at' => $request->dismissed_at,
+                ],
+            ],
+            'request' => $request,
+        ]);
         return redirect()->back()->with('success', 'Student has been dismissed successfully.');
     }
 

@@ -81,11 +81,11 @@
                                                     href="{{ route('timesheets.edit', $timesheet->id) }}"> Edit</a></button>
                                             @endcan
 
-                                            <form action="{{ route('timesheets.destroy', $timesheet->id) }}" method="POST"
+                                            <form id="deleteForm{{ $timesheet->id }}" action="{{ route('timesheets.destroy', $timesheet->id) }}" method="POST"
                                                 style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button @if($timesheet->status == 'approved' || $timesheet->status == 'rejected') disabled @endif class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                                <button @if($timesheet->status == 'approved' || $timesheet->status == 'rejected') disabled @endif class="btn btn-sm btn-danger" type="button" onclick="confirmDelete('deleteForm{{ $timesheet->id }}', 'Time sheet of {{ $timesheet->user->name}}')">Delete</button>
                                             </form>
                                         </td>
 

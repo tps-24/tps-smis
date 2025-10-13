@@ -16,6 +16,7 @@
 <!-- Scrumb ends --> 
 @endsection
 @section('content')
+@include('layouts.sweet_alerts.index')
 <!-- Row starts -->
 <div class="row gx-4">
   <div class="col-sm-12">
@@ -68,10 +69,10 @@
                       <td>
                           <a class="btn btn-info btn-sm" href="{{ route('session_programmes.show',$session_p->id) }}"><i class="fa-solid fa-list"></i> Show</a>
                           <a class="btn btn-primary btn-sm" href="{{ route('session_programmes.edit',$session_p->id) }}"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
-                            <form method="POST" action="{{ route('session_programmes.destroy', $session_p->id) }}" style="display:inline">
+                            <form id="deleteForm{{ $session_p->id }}" method="POST" action="{{ route('session_programmes.destroy', $session_p->id) }}" style="display:inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('deleteForm{{ $session_p->id }}', '{{ $session_p->session_programme_name}} Session')"><i class="fa-solid fa-trash" ></i> Delete</button>
                             </form>
                       </td>
                   </tr>

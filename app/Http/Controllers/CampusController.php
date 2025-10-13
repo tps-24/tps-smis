@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Campus;
 use Illuminate\Http\Request;
+use App\Services\AuditLoggerService;
 
 class CampusController extends Controller
 {
@@ -85,10 +86,23 @@ class CampusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Campus $campus): RedirectResponse
+    public function destroy(Campus $campus, Request $request, AuditLoggerService $auditLogger)
     {
+        $campusSnapshot = $campus;
         $campus->delete();
-    
+        $auditLogger->logAction([
+                'action' => 'delete_campus',
+                'target_type' => 'Campus',
+                'target_id' => $campus->id,
+                'metadata' => [
+                    'title' => $campusSnapshot->campusName ?? null,
+                ],
+                'old_values' => [
+                    'campus' => $campusSnapshot,
+                ],
+                'new_values' => null,
+                'request' => $request,
+            ]);
         return redirect()->route('campuses.index')
                         ->with('success','Campus deleted successfully');
     }

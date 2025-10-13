@@ -17,6 +17,7 @@
  
 @endsection
 @section('content')
+@include('layouts.sweet_alerts.index')
 <!-- Row starts -->
 <div class="row gx-4">
   <div class="col-sm-8 col-12">
@@ -53,11 +54,11 @@
                         @endcan
 
                         @can('role-delete')
-                        <form method="POST" action="{{ route('roles.destroy', $role->id) }}" style="display:inline">
+                        <form id="deleteForm{{ $role->id }}" method="POST" action="{{ route('roles.destroy', $role->id) }}" style="display:inline">
                             @csrf
                             @method('DELETE')
 
-                            <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('deleteForm{{ $role->id }}', 'Role {{ $role->name}}')"><i class="fa-solid fa-trash"></i> Delete</button>
                         </form>
                         @endcan
                     </td>

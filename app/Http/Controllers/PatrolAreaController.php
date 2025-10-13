@@ -8,7 +8,7 @@ use App\Models\Company;
 use App\Models\Campus;
 use App\Models\BeatTimeException;
 use Illuminate\Http\Request;
-
+use App\Services\AuditLoggerService;
 class PatrolAreaController extends Controller
 {
     /**
@@ -98,7 +98,7 @@ class PatrolAreaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, PatrolArea $patrolArea)
+    public function update(Request $request, PatrolArea $patrolArea, AuditLoggerService $auditLogger)
     {
         $request->validate([
             'start_area' => 'required',
@@ -112,6 +112,8 @@ class PatrolAreaController extends Controller
             'number_of_guards' => 'required|numeric|min:0'
         ]);
 
+        $patrolAreaSnapshot = $patrolArea;
+
         $patrolArea->start_area = $request->start_area;
         $patrolArea->end_area = $request->end_area;
         $patrolArea->company_id = $request->company_id;
@@ -120,6 +122,22 @@ class PatrolAreaController extends Controller
         $patrolArea->beat_exception_ids = $request->beat_exception_ids  ?  json_encode($request->beat_exception_ids): NULL;
         $patrolArea->beat_time_exception_ids = $request->beat_time_exception_ids? json_encode($request->beat_time_exception_ids): NULL;
         $patrolArea->number_of_guards = $request->number_of_guards;
+
+        $auditLogger->logAction([
+            'action' => 'update_patrol_area',
+            'target_type' => 'PatrolArea',
+            'target_id' => $patrolAreaSnapshot->id,
+            'metadata' => [
+                'title' => $patrolAreaSnapshot->start_area. '-'.$patrolAreaSnapshot->end_area  ,
+            ],
+            'old_values' => [
+                'patrol_area' => $patrolAreaSnapshot,
+            ],
+            'new_values' => [
+                'patrol_area' => $patrolArea,
+            ],
+            'request' => $request,
+        ]);
          $patrolArea->save();
 
         return redirect()->route('patrol-areas.index')->with('success','Patrol Area Updated successfully.');
@@ -128,9 +146,23 @@ class PatrolAreaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(PatrolArea $patrolArea)
+    public function destroy(PatrolArea $patrolArea, Request $request, AuditLoggerService $auditLogger)
     {
+        $patrolAreaSnapshot = $patrolArea;
         $patrolArea->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_patrol_area',
+            'target_type' => 'PatrolArea',
+            'target_id' => $patrolAreaSnapshot->id,
+            'metadata' => [
+                'title' => $patrolAreaSnapshot->start_area. '-'.$patrolAreaSnapshot->end_area,
+            ],
+            'old_values' => [
+                'patrol_area' => $patrolAreaSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('patrol-areas.index')->with('success','Guard area deleted successfully.');
     }
 }

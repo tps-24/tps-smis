@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
     
 use Illuminate\Http\Request;
+use App\Services\AuditLoggerService;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
@@ -181,9 +182,26 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id): RedirectResponse
+    public function destroy($id, Request $request, AuditLoggerService $auditLogger): RedirectResponse
     {
-        User::find($id)->delete();
+        $user = User::find($id);
+        $userSnapshot = $user;
+        $roles = $user->getRoleNames();
+        $user->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_User',
+            'target_type' => 'User',
+            'target_id' => $userSnapshot->id,
+            'metadata' => [
+                'title' => $userSnapshot->name,
+                'roles' => $roles
+            ],
+            'old_values' => [
+                'user' => $userSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('users.index')
                         ->with('success','User deleted successfully');
     }

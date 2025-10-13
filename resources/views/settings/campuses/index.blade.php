@@ -17,6 +17,7 @@
  
 @endsection
 @section('content')
+@include('layouts.sweet_alerts.index')
 <!-- Row starts -->
 <div class="row gx-4">
   <div class="col-sm-12">
@@ -51,10 +52,10 @@
                     <td>
                         <a class="btn btn-info btn-sm" href="{{ route('campuses.show',$campus->id) }}"><i class="fa-solid fa-list"></i> Show</a>
                         <a class="btn btn-primary btn-sm" href="{{ route('campuses.edit',$campus->id) }}"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
-                          <form method="POST" action="{{ route('campuses.destroy', $campus->id) }}" style="display:inline">
+                          <form id="deleteForm{{ $campus->id }}" method="POST" action="{{ route('campuses.destroy', $campus->id) }}" style="display:inline">
                               @csrf
                               @method('DELETE')
-                              <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</button>
+                              <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('deleteForm{{ $campus->id }}', '{{ $campus->campusName }} Campus')"><i class="fa-solid fa-trash"></i> Delete</button>
                           </form>
                     </td>
                 </tr>
