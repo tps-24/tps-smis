@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\AuditLoggerService;
 use App\Models\SessionProgramme;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -90,10 +91,23 @@ class SessionProgrammeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SessionProgramme $product): RedirectResponse
+    public function destroy(SessionProgramme $session_programme, Request $request, AuditLoggerService $auditLogger): RedirectResponse
     {
-        $product->delete();
-    
+        $session_programmeSnapShot = $session_programme;
+        $session_programme->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_session_programme',
+            'target_type' => 'Student',
+            'target_id' => $session_programmeSnapShot->id,
+            'metadata' => [
+                'title' => $session_programmeSnapShot->session_programme_name ?? null,
+            ],
+            'old_values' => [
+                'session_programme' => $session_programmeSnapShot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('session_programmes.index')
                         ->with('success','Session programme deleted successfully');
     }

@@ -11,8 +11,7 @@ use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
-use App\Helpers\AuditHelper;
-
+use App\Services\AuditLoggerService;
 class CourseWorkController extends Controller
 {
     public function __construct()
@@ -136,7 +135,7 @@ class CourseWorkController extends Controller
      * Remove the specified resource from storage.
      */
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $id, AuditLoggerService $auditLogger)
     {
         $courseWork = CourseWork::findOrFail($id);
         $user = $request->user();
@@ -162,26 +161,23 @@ class CourseWorkController extends Controller
         $courseWork->delete();
 
         // Log audit entry
-        $browserName = AuditHelper::detectBrowser($request->header('User-Agent'));
-
-        AuditLog::create([
-            'user_id' => $user?->id,
-            'action' => 'delete_coursework',
-            'target_type' => 'CourseWork',
-            'target_id' => $courseWork->id,
-            'metadata' => [
-                'title' => $courseWork->coursework_title,
-                'max_score' => $courseWork->max_score,
-                'deleted_results_count' => count($resultsSnapshot),
-            ],
-            'old_values' => [
-                'coursework' => $courseworkSnapshot,
-                'results' => $resultsSnapshot,
-            ],
-            'new_values' => null,
-            'ip_address' => $request->ip(),
-            'user_agent' => $browserName, // parsed browser name
-        ]);
+        $auditLogger->logAction([
+                'action' => 'delete_coursework',
+                'target_type' => 'CourseWork',
+                'target_id' => $courseWork->id,
+                'metadata' => [
+                    'title' => $courseWork->coursework_title,
+                    'max_score' => $courseWork->max_score,
+                    'deleted_results_count' => count($resultsSnapshot),
+                ],
+                'old_values' => [
+                    'coursework' => $courseworkSnapshot,
+                    'results' => $resultsSnapshot,
+                ],
+                'new_values' => null,
+                'request' => $request,
+                'user' => $user,
+            ]);
 
 
         return redirect()->back()->with('success', 'Coursework and related results deleted successfully.');

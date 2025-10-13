@@ -19,7 +19,7 @@ use App\Models\NextOfKin;
 use App\Imports\BulkImportStaff;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-
+use App\Services\AuditLoggerService;
 
 class StaffController extends Controller
 {
@@ -261,17 +261,37 @@ class StaffController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Staff $staff)
+    public function destroy(Staff $staff, Request $request, AuditLoggerService $auditLogger)
     {
         // First, delete the corresponding user
         $user = $staff->user; // Assuming there's a relationship defined between Staff and User
+
         if ($user) {
+            //capture user snapshot before deleted
+            $userSnapshot = $user;
             $user->delete();
         }
-    
+
+        //capture staff snapshot before deleted
+        $staffSnapshot = $staff;
         // Then, delete the staff member
         $staff->delete();
-    
+        
+        $auditLogger->logAction([
+        'action' => 'delete_staff',
+        'target_type' => 'Staff',
+        'target_id' => $staffSnapshot->id,
+        'metadata' => [
+            'title' => $staffSnapshot->forceNumber. ' '.$staffSnapshot->firstName . ' '.$staffSnapshot->lastName,
+            'department' => $staffSnapshot->department ?? null,
+        ],
+        'old_values' => [
+            'user' => $userSnapshot,
+            'staff' => $staffSnapshot,
+        ],
+        'new_values' => null,
+        'request' => $request,
+    ]);
         return redirect()->route('staffs.index')->with('success', 'Staff and corresponding user deleted successfully.');
     }
     public function downloadSample () {

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Services\AuditLoggerService;
 use App\Models\Department;
 use Illuminate\Http\Request;
 
@@ -86,9 +86,24 @@ class DepartmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Department $department): RedirectResponse
+    public function destroy(Department $department, Request $request, AuditLoggerService $auditLogger)
     {
+        $departmentSnapshot = $department;
         $department->delete();
+
+        $auditLogger->logAction([
+            'action' => 'delete_department',
+            'target_type' => 'Department',
+            'target_id' => $departmentSnapshot->id,
+            'metadata' => [
+                'title' => $departmentSnapshot->departmentName ?? null,
+            ],
+            'old_values' => [
+                'department' => $departmentSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
     
         return redirect()->route('departments.index')
                         ->with('success','Department deleted successfully');

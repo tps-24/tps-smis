@@ -6,6 +6,8 @@ use App\Models\TimeSheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\Services\AuditLoggerService;
+
 class TimeSheetController extends Controller
 {
     /**
@@ -109,10 +111,25 @@ class TimeSheetController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(TimeSheet $timeSheet, $timeSheetId)
+    public function destroy(TimeSheet $timeSheet, $timeSheetId, AuditLoggerService $auditLogger)
     {
         $timeSheet = TimeSheet::findOrFail($timeSheetId);
+        $timeSheetSnapshot = $timeSheet;
         $timeSheet->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_timesheet',
+            'target_type' => 'TimeSheet',
+            'target_id' => $timeSheetSnapshot->id,
+            'metadata' => [
+                'title' => $timeSheetSnapshot->description ?? null,
+                'date' => $timeSheetSnapshot->date ?? null,
+            ],
+            'old_values' => [
+                'timesheet' => $timeSheetSnapshot,
+                'staff' => $timeSheetSnapshot->staff ?? null,
+            ],
+            'new_values' => null,
+        ]);
         return redirect()->route('timesheets.index')->with('success', 'Timesheet deleted successfully.');
 
     }

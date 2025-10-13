@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\NotificationType;
 use Illuminate\Http\Request;
+use App\Services\AuditLoggerService;
 
 class NotificationTypesController extends Controller
 {
@@ -76,9 +77,23 @@ class NotificationTypesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(NotificationType $notificationType)
+    public function destroy(NotificationType $notificationType, Request $request, AuditLoggerService $auditLogger)
     {
+        $notificationTypeSnapshot = $notificationType;
         $notificationType->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_notification_type',
+            'target_type' => 'NotificationType',
+            'target_id' => $notificationType->id,
+            'metadata' => [
+                'title' => $notificationTypeSnapshot->name ?? null,
+            ],
+            'old_values' => [
+                'notification_type' => $notificationTypeSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('notifications.types.index')
             ->with('success', 'Notification types deleted successfully');
     }

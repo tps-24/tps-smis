@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Semester;
+use App\Services\AuditLoggerService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -64,10 +65,23 @@ class SemesterController extends Controller
                          ->with('success', 'Semester updated successfully.');
     }
 
-    public function destroy(Semester $semester)
+    public function destroy(Semester $semester, Request $request, AuditLoggerService $auditLogger): RedirectResponse
     {
+        $semesterSnapshot = $semester;
         $semester->delete();
-
+                $auditLogger->logAction([
+        'action' => 'delete_staff',
+        'target_type' => 'Staff',
+        'target_id' => $semesterSnapshot->id,
+        'metadata' => [
+            'title' => $semesterSnapshot->semester_name ?? null,
+        ],
+        'old_values' => [
+            'semester' => $semesterSnapshot,
+        ],
+        'new_values' => null,
+        'request' => $request,
+    ]);
         return redirect()->route('semesters.index')
                          ->with('success', 'Semester deleted successfully.');
     }

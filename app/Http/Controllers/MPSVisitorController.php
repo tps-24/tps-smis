@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\Company;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use App\Services\AuditLoggerService;
 
 class MPSVisitorController extends Controller
 {
@@ -91,7 +92,7 @@ class MPSVisitorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id , AuditLoggerService $auditLogger)
     {
 
         $mPSVisitor= MPSVisitor::find($id);
@@ -104,7 +105,23 @@ class MPSVisitorController extends Controller
         if ($validator->errors()->any()) {
             return redirect()->back()->withErrors($validator->errors());
         }
+        $mPSVisitorSnapshot = $mPSVisitor;
 
+        $auditLogger->logAction([
+            'action' => 'update_mps_visitor',
+            'target_type' => 'MPSVisitor',
+            'target_id' => $mPSVisitorSnapshot->id,
+            'metadata' => [
+                'title' => $mPSVisitorSnapshot->names,
+            ],
+            'old_values' => [
+                'MPSVisitor' => $mPSVisitorSnapshot,
+            ],
+            'new_values' =>[
+                'mpsVisitor' => $mPSVisitor,
+            ],
+            'request' => $request,
+        ]);
         $mPSVisitor->visited_at =$request->visited_at;
         $mPSVisitor->names=$request->visitor_name;
         $mPSVisitor->phone =$request->visitor_phone;
@@ -117,10 +134,26 @@ class MPSVisitorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MPSVisitor $mPSVisitor, $id)
+    public function destroy(MPSVisitor $mPSVisitor, $id, Request $request, AuditLoggerService $auditLogger)
     { 
+        
         $mPSVisitor= MPSVisitor::find($id);
+        $mPSVisitorSnapshot = $mPSVisitor;
         $mPSVisitor->delete();
+
+        $auditLogger->logAction([
+            'action' => 'delete_mps_visitor',
+            'target_type' => 'MPSVisitor',
+            'target_id' => $mPSVisitorSnapshot->id,
+            'metadata' => [
+                'title' => $mPSVisitorSnapshot->names,
+            ],
+            'old_values' => [
+                'MPSVisitor' => $mPSVisitorSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('visitors.index')->with('success', 'Visitor details deleted successfully.');
     }
     public function searchStudent(Request $request){

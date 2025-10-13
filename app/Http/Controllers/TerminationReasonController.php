@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TerminationReason;
 use Illuminate\Http\Request;
+use App\Services\AuditLoggerService;
 
 class TerminationReasonController extends Controller
 {
@@ -91,9 +92,23 @@ class TerminationReasonController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(TerminationReason $terminationReason)
+    public function destroy(TerminationReason $terminationReason, Request $request, AuditLoggerService $auditLogger)
     {
+        $terminationReasonSnapShot= $terminationReason;
         $terminationReason->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_termination_reason',
+            'target_type' => 'TerminationReason',
+            'target_id' => $terminationReasonSnapShot->id,
+            'metadata' => [
+                'title' => $terminationReasonSnapShot->reason ?? null,
+            ],
+            'old_values' => [
+                'termination_reason' => $terminationReasonSnapShot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('termination_reasons.index')
                         ->with('success','Reason deleted successfully');
     }
