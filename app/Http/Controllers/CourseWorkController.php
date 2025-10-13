@@ -188,23 +188,6 @@ class CourseWorkController extends Controller
     }
 
 
-    function detectBrowser($userAgent)
-    {
-        if (strpos($userAgent, 'Edg/') !== false) {
-            return 'Microsoft Edge';
-        } elseif (strpos($userAgent, 'Chrome/') !== false) {
-            return 'Google Chrome';
-        } elseif (strpos($userAgent, 'Firefox/') !== false) {
-            return 'Mozilla Firefox';
-        } elseif (strpos($userAgent, 'Safari/') !== false) {
-            return 'Safari';
-        } else {
-            return 'Unknown';
-        }
-    }
-
-
-
     public function getCourseworksxx($semesterId){
         
     Log::info("Fetching courseworks for semester ID: {$semesterId}");
