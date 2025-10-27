@@ -54,6 +54,9 @@ use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VitengoController;
 use App\Http\Controllers\WeaponController;
+use App\Http\Controllers\WeaponModelController;
+use App\Http\Controllers\WeaponBorrowerController;
+use App\Http\Controllers\BorrowedWeaponController;
 use App\Http\Controllers\AuditLogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -652,15 +655,36 @@ Route::get('/leave-request', [LeaveRequestController::class, 'create'])->name('l
 // Store leave request
 Route::post('/leave-request', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
 
+
+Route::get('weapons/summary', [WeaponController::class, 'summary'])->name('weapons.summary');
+Route::get('weapons/uploads', [WeaponController::class, 'get_upload'])->name('weapons.uploads');
+Route::post('weapons/bulkimport', [WeaponController::class, 'bulkimport'])->name('weapons.bulkimport');
+Route::get('weapons/downloadSample', [WeaponController::class, 'downloadSample'])->name('weapons.downloadSample');
 Route::resource('weapons', WeaponController::class);
 Route::get('/weapons/{weapon}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
 Route::post('/weapons/{weapon}/handover', [WeaponController::class, 'storeHandover'])->name('weapons.handover.store');
+Route::post('/weapons/{weapon}/return', [WeaponController::class, 'return'])->name('weapons.return');
 
+Route::resource('weapon-models', WeaponModelController::class);
+
+
+Route::get('borrowed-weapons/{borrower}/model/{model}', [WeaponBorrowerController::class, 'show'])
+    ->name('borrowed-weapons.model');
+Route::patch('borrowed-weapons/approve/{weapon_borrower}', [WeaponBorrowerController::class, 'approve'])
+    ->name('weapon-borrowing.approve');
+
+Route::patch('borrowed-weapons/return/{weapon_borrower}', [WeaponBorrowerController::class, 'return'])
+    ->name('weapon-borrowing.return');
+
+Route::resource('weapon-borrowing', WeaponBorrowerController::class);
+Route::resource('borrowed-weapons', BorrowedWeaponController::class);
 // Mark as returned
 Route::post('/handovers/{handover}/return', [WeaponController::class, 'returnWeapon'])->name('handovers.return');
-
+Route::post('/handovers/{handover}/return', [WeaponController::class, 'returnWeapon'])->name('handovers.return');
 Route::get('/weapons/{id}/handover', [WeaponController::class, 'handover'])->name('weapons.handover');
 Route::post('/handover/{id}/return', [WeaponController::class, 'markAsReturned'])->name('handover.return');
 
 Route::get('weapons/create', [WeaponController::class, 'create'])->name('weapons.create');
+
 Route::post('weapons', [WeaponController::class, 'store'])->name('weapons.store');
+

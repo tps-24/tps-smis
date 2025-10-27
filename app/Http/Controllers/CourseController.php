@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use DB;
+use App\Services\AuditLoggerService;
 
 class CourseController extends Controller
 {
@@ -108,14 +109,30 @@ class CourseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Course $course)
+    public function update(Request $request, Course $course,  AuditLoggerService $auditLogger)
     {
         request()->validate([
             'courseName' => 'required|unique:courses,courseName,' . $course->id,
             'courseCode' => 'required',
        ]);
-   
-       $course->update($request->all());
+           $courseSnapshot = clone $course;
+            $course->update($request->all());     
+            $auditLogger->logAction([
+            'action' => 'update_course',
+            'target_type' => 'Course',
+            'target_id' => $courseSnapshot->id,
+            'metadata' => [
+                'title' => $courseSnapshot->name ?? null,
+            ],
+            'old_values' => [
+                'course' => $courseSnapshot,
+            ],
+            'new_values' => [
+                'course' => $course,
+            ],
+            'request' => $request,
+        ]);
+       
    
        return redirect()->route('courses.index')
                        ->with('success','Course updated successfully');
@@ -124,10 +141,23 @@ class CourseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course): RedirectResponse
+    public function destroy(Course $course, Request $request, AuditLoggerService $auditLogger): RedirectResponse
     {
+        $courseSnapshot = clone $course;
         $course->delete();
-    
+        $auditLogger->logAction([
+            'action' => 'delete_course',
+            'target_type' => 'Course',
+            'target_id' => $courseSnapshot->id,
+            'metadata' => [
+                'title' => $courseSnapshot->name ?? null,
+            ],
+            'old_values' => [
+                'course' => $courseSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('courses.index')
                         ->with('success','Course deleted successfully');
     }

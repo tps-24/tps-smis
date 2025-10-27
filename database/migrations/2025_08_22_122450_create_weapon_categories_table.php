@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::table('weapons', function (Blueprint $table) {
-        $table->string('status')->default('Available'); // Available or Taken
-    });
+        Schema::create('weapon_categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-         Schema::table('weapons', function (Blueprint $table) {
-        $table->dropColumn('status');
-    });
+        Schema::dropIfExists('weapon_categories');
     }
 };

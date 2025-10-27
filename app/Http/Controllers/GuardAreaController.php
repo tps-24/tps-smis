@@ -95,7 +95,7 @@ class GuardAreaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, GuardArea $guardArea)
+    public function update(Request $request, GuardArea $guardArea, AuditLoggerService $auditLogger)
     {
         $request->validate([
             'guard_area_name' => 'required',
@@ -107,6 +107,7 @@ class GuardAreaController extends Controller
             'beat_time_exception_ids.*' => 'nullable|numeric|exists:beat_time_exceptions,id',
             'number_of_guards' => 'required|numeric|min:0'
         ]);
+        $guardAreaSnapshot = clone $guardArea;
 
         $guardArea->name = $request->guard_area_name;
         $guardArea->company_id = $request->company_id;
@@ -116,7 +117,21 @@ class GuardAreaController extends Controller
         $guardArea->beat_time_exception_ids = $request->beat_time_exception_ids? json_encode($request->beat_time_exception_ids): NULL;
         $guardArea->number_of_guards = $request->number_of_guards;
          $guardArea->save();
-
+        $auditLogger->logAction([
+            'action' => 'delete_guard_area',
+            'target_type' => 'GuardArea',
+            'target_id' => $guardAreaSnapshot->id,
+            'metadata' => [
+                'title' => $guardAreaSnapshot->name  ?? null,
+            ],
+            'old_values' => [
+                'guard_area' => $guardAreaSnapshot,
+            ],
+            'new_values' => [
+                'guardArea'=> $guardArea,
+            ],
+            'request' => $request,
+        ]);
         return redirect()->route('guard-areas.index')->with('success','Guard Area Updated successfully.');
     }
 
@@ -147,7 +162,7 @@ class GuardAreaController extends Controller
      */
     public function destroy(GuardArea $guardArea,Request $request, AuditLoggerService $auditLogger)
     {
-        $guardAreaSnapshot = $guardArea;
+        $guardAreaSnapshot = clone $guardArea;
         $guardArea->delete();
                 $auditLogger->logAction([
             'action' => 'delete_guard_area',

@@ -185,7 +185,7 @@ class StaffController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Staff $staff)
+    public function update(Request $request, Staff $staff,AuditLoggerService $auditLogger)
 {
     $this->validate($request, [
         'forceNumber' => 'required|unique:staff,forceNumber,' . $staff->id,
@@ -216,6 +216,7 @@ class StaffController extends Controller
     $user = User::find($userId);  // Simplified user retrieval
 
     if ($user) {
+        $userSnapshot = $user;
         $user->update([
             'name' => $fullName,
             //'email' => $input['email']
@@ -225,7 +226,7 @@ class StaffController extends Controller
     // Update user roles
     DB::table('model_has_roles')->where('model_id', $userId)->delete();
     $user->assignRole($request->input('roles'));
-
+    $staffSnapshot = clone $staff;
     // Update staff details
     $staff->update($input);
 
@@ -252,6 +253,29 @@ class StaffController extends Controller
         );
     }
 
+            //capture staff snapshot before deleted
+        
+        // Then, delete the staff member
+        
+        $auditLogger->logAction([
+        'action' => 'update_staff',
+        'target_type' => 'Staff',
+        'target_id' => $staffSnapshot->id,
+        'metadata' => [
+            'title' => $staffSnapshot->forceNumber. ' '.$staffSnapshot->firstName . ' '.$staffSnapshot->lastName,
+            'department' => $staffSnapshot->department ?? null,
+        ],
+        'old_values' => [
+            'staff' => $staffSnapshot,
+            'user' => $userSnapshot,
+        ],
+        'new_values' => [
+            'staff' => $staff,
+            'user' => $userSnapshot,
+        ],
+        'request' => $request,
+    ]);
+
     // Redirect back with a success message
     return redirect()->route('staffs.index')->with('success', 'Staff updated successfully.');
 }
@@ -265,15 +289,15 @@ class StaffController extends Controller
     {
         // First, delete the corresponding user
         $user = $staff->user; // Assuming there's a relationship defined between Staff and User
-
+        $userSnapshot = $user;
         if ($user) {
             //capture user snapshot before deleted
-            $userSnapshot = $user;
+            
             $user->delete();
         }
 
         //capture staff snapshot before deleted
-        $staffSnapshot = $staff;
+        $staffSnapshot = clone $staff;
         // Then, delete the staff member
         $staff->delete();
         

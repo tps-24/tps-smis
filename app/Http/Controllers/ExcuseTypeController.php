@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExcuseType;
 use Illuminate\Http\Request;
-
+use App\Services\AuditLoggerService;
 class ExcuseTypeController extends Controller
 {
     public function __construct()
@@ -70,8 +70,10 @@ class ExcuseTypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ExcuseType $excuseType)
+    public function update(Request $request, ExcuseType $excuseType, AuditLoggerService $auditLogger)
     {
+        $excuseTypeSnapshot = clone $excuseType;
+
         if($request->excuseName == $excuseType->excuseName){
             if($request->abbreviation == $excuseType->abbreviation){
                 request()->validate([
@@ -103,7 +105,21 @@ class ExcuseTypeController extends Controller
         }
    
        $excuseType->update($request->all());
-   
+                $auditLogger->logAction([
+            'action' => 'update_excuse_type',
+            'target_type' => 'ExcuseType',
+            'target_id' => $excuseTypeSnapshot->id,
+            'metadata' => [
+                'excuseType' => $excuseTypeSnapshot,
+            ],
+            'old_values' => [
+                'department' => $excuseTypeSnapshot,
+            ],
+            'new_values' => [
+                'excuseType' => $excuseType
+            ],
+            'request' => $request,
+        ]);
        return redirect()->route('excuse_types.index')
                        ->with('success','Excuse type updated successfully');
     }
@@ -111,9 +127,23 @@ class ExcuseTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ExcuseType $excuseType)
+    public function destroy(ExcuseType $excuseType, Request $request, AuditLoggerService $auditLogger)
     {
+        $excuseTypeSnapshot = clone $excuseType;
         $excuseType->delete();
+        $auditLogger->logAction([
+            'action' => 'delete_excuse_type',
+            'target_type' => 'ExcuseType',
+            'target_id' => $excuseTypeSnapshot->id,
+            'metadata' => [
+                'excuseType' => $excuseTypeSnapshot,
+            ],
+            'old_values' => [
+                'department' => $excuseTypeSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('excuse_types.index')
                         ->with('success','Excuse type deleted successfully');
     }

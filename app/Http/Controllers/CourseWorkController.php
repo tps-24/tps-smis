@@ -96,7 +96,7 @@ class CourseWorkController extends Controller
      * Update the specified resource in storage.
      */
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, AuditLoggerService $auditLogger)
     {
         $courseWork = CourseWork::findOrFail($id);
         $course = Course::findOrFail($courseWork->course_id);
@@ -116,7 +116,9 @@ class CourseWorkController extends Controller
             'max_score' => 'required|integer|min:1',
             'due_date' => 'nullable|date',
         ]);
-
+        $hasResults = $courseWork->courseworkResults()->exists();
+        $courseworkSnapshot = $courseWork->toArray();
+        $resultsSnapshot = $hasResults ? $courseWork->courseworkResults->toArray() : [];
         $courseWork->update([
             'assessment_type_id' => $request->assessment_type_id,
             'coursework_title' => $request->coursework_title,
@@ -127,6 +129,25 @@ class CourseWorkController extends Controller
             'updated_by' => $request->user()->id, // Optional audit field
         ]);
 
+        $auditLogger->logAction([
+                'action' => 'update_coursework',
+                'target_type' => 'CourseWork',
+                'target_id' => $courseWork->id,
+                'metadata' => [
+                    'title' => $courseWork->coursework_title,
+                    'max_score' => $courseWork->max_score,
+                    'deleted_results_count' => count($resultsSnapshot),
+                ],
+                'old_values' => [
+                    'coursework' => $courseworkSnapshot,
+                    'results' => $resultsSnapshot,
+                ],
+                'new_values' => [
+                    'coursework'=> $courseWork,
+                ],
+                'request' => $request,
+
+            ]);
         return redirect()->back()->with('success', 'Assessment type updated successfully.');
     }
 

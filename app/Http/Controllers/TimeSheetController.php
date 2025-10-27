@@ -85,7 +85,7 @@ class TimeSheetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, TimeSheet $timeSheet, $timeSheetId)
+    public function update(Request $request, TimeSheet $timeSheet, $timeSheetId,AuditLoggerService $auditLogger)
     {
         $validated = $request->validate([
             'description' => 'required|string|max:500',
@@ -98,11 +98,28 @@ class TimeSheetController extends Controller
         if(!Gate::allows('update-timesheet', $timeSheet)){
             abort(403);
           }
+          $timeSheetSnapshot = clone $timeSheet;
         $timeSheet -> tasks= json_encode($request->tasks);
         $timeSheet -> hours= $request->hours;
         $timeSheet -> date= $request->date;
         $timeSheet -> description= $request->description;
         $timeSheet->save();
+                $auditLogger->logAction([
+            'action' => 'update_timesheet',
+            'target_type' => 'TimeSheet',
+            'target_id' => $timeSheetSnapshot->id,
+            'metadata' => [
+                'title' => $timeSheetSnapshot->description ?? null,
+                'data' => $timeSheetSnapshot ,
+            ],
+            'old_values' => [
+                'timesheet' => $timeSheetSnapshot,
+                'staff' => $timeSheetSnapshot->staff ?? null,
+            ],
+            'new_values' => [
+                'timesheet'=> $timeSheet,
+            ],
+        ]);
         return redirect()->route('timesheets.index')->with('success', 'Timesheet updated successfully.');
 
 
@@ -114,7 +131,7 @@ class TimeSheetController extends Controller
     public function destroy(TimeSheet $timeSheet, $timeSheetId, AuditLoggerService $auditLogger)
     {
         $timeSheet = TimeSheet::findOrFail($timeSheetId);
-        $timeSheetSnapshot = $timeSheet;
+        $timeSheetSnapshot = clone $timeSheet;
         $timeSheet->delete();
         $auditLogger->logAction([
             'action' => 'delete_timesheet',
@@ -122,7 +139,7 @@ class TimeSheetController extends Controller
             'target_id' => $timeSheetSnapshot->id,
             'metadata' => [
                 'title' => $timeSheetSnapshot->description ?? null,
-                'date' => $timeSheetSnapshot->date ?? null,
+                'data' => $timeSheetSnapshot,
             ],
             'old_values' => [
                 'timesheet' => $timeSheetSnapshot,

@@ -112,7 +112,7 @@ class PatrolAreaController extends Controller
             'number_of_guards' => 'required|numeric|min:0'
         ]);
 
-        $patrolAreaSnapshot = $patrolArea;
+        $patrolAreaSnapshot = clone  $patrolArea;
 
         $patrolArea->start_area = $request->start_area;
         $patrolArea->end_area = $request->end_area;

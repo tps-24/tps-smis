@@ -1,6 +1,18 @@
 @extends('layouts.main')
 
 @section('content')
+@if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 <div class="container">
     <h2>Handover Weapon: {{ $weapon->serial_number }}</h2>
 
@@ -13,10 +25,10 @@
             <select name="staff_id" id="staff_id" class="form-select staff-select" required>
                 <option value="">-- Search or Select Staff --</option>
                 @foreach(App\Models\Staff::orderBy('firstName')->get() as $staff)
-                    <option value="{{ $staff->id }}">
+                    <option value="{{ $staff->id }}">{{ $staff->rank }} - 
                         {{ $staff->firstName }}
                         @if(!empty($staff->middleName)) {{ $staff->middleName }} @endif
-                        {{ $staff->lastName }} - {{ $staff->rank }}
+                         {{ $staff->lastName }}
                     </option>
                 @endforeach
             </select>
@@ -25,13 +37,13 @@
         {{-- Handover Date --}}
         <div class="form-group mb-3">
             <label><strong>Handover Date</strong></label>
-            <input type="datetime-local" name="handover_date" class="form-control" required>
+            <input type="datetime-local" name="handover_at" class="form-control" required>
         </div>
 
         {{-- Expected Return Date --}}
         <div class="form-group mb-3">
             <label><strong>Expected Return Date & Time</strong></label>
-            <input type="datetime-local" name="return_date" class="form-control" required>
+            <input type="datetime-local" name="expected_return_at" class="form-control" required>
         </div>
 
         {{-- Purpose --}}
@@ -41,10 +53,10 @@
         </div>
 
         {{-- Remarks --}}
-        <div class="form-group mb-3">
+        <!-- <div class="form-group mb-3">
             <label><strong>Additional Remarks</strong></label>
             <textarea name="remarks" class="form-control"></textarea>
-        </div>
+        </div> -->
 
         <button class="btn btn-primary">Submit</button>
     </form>

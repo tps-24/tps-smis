@@ -53,29 +53,42 @@ class SemesterController extends Controller
         return view('semesters.edit', compact('semester'));
     }
 
-    public function update(Request $request, Semester $semester)
+    public function update(Request $request, Semester $semester,AuditLoggerService $auditLogger)
     {
         $request->validate([
             'semester_name' => 'required|string|max:255',
         ]);
 
+        $semesterSnapshot = clone $semester;
         $semester->update($request->all());
-
+        $auditLogger->logAction([
+            'action' => 'update_semester',
+            'target_type' => 'Semester',
+            'target_id' => $semesterSnapshot->id,
+            'metadata' => [
+                'title' => $semesterSnapshot->semester_name ?? null,
+            ],
+        'old_values' => [
+            'semester' => $semesterSnapshot,
+        ],
+        'new_values' => null,
+        'request' => $request,
+    ]);
         return redirect()->route('semesters.index')
                          ->with('success', 'Semester updated successfully.');
     }
 
     public function destroy(Semester $semester, Request $request, AuditLoggerService $auditLogger): RedirectResponse
     {
-        $semesterSnapshot = $semester;
+        $semesterSnapshot = clone $semester;
         $semester->delete();
-                $auditLogger->logAction([
-        'action' => 'delete_staff',
-        'target_type' => 'Staff',
-        'target_id' => $semesterSnapshot->id,
-        'metadata' => [
-            'title' => $semesterSnapshot->semester_name ?? null,
-        ],
+        $auditLogger->logAction([
+            'action' => 'delete_semester',
+            'target_type' => 'Semester',
+            'target_id' => $semesterSnapshot->id,
+            'metadata' => [
+                'title' => $semesterSnapshot->semester_name ?? null,
+            ],
         'old_values' => [
             'semester' => $semesterSnapshot,
         ],

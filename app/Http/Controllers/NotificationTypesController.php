@@ -60,8 +60,10 @@ class NotificationTypesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, NotificationType $notificationType)
+    public function update(Request $request, NotificationType $notificationType,AuditLoggerService $auditLogger)
     {
+        $notificationTypeSnapshot = clone $notificationType;
+
         request()->validate([
             'name' => 'required|unique:notification_types,name,' . $notificationType->id,
             'description' => 'required',
@@ -69,7 +71,21 @@ class NotificationTypesController extends Controller
 
 
         $notificationType->update($request->all());
-
+        $auditLogger->logAction([
+            'action' => 'update_notification_type',
+            'target_type' => 'NotificationType',
+            'target_id' => $notificationType->id,
+            'metadata' => [
+                'title' => $notificationTypeSnapshot->name ?? null,
+            ],
+            'old_values' => [
+                'notification_type' => $notificationTypeSnapshot,
+            ],
+            'new_values' => [
+                'notification_type' => $notificationType,
+            ],
+            'request' => $request,
+        ]);
         return redirect()->route('notifications.types.index')
             ->with('success', 'Notification type updated successfully');
     }
@@ -79,7 +95,7 @@ class NotificationTypesController extends Controller
      */
     public function destroy(NotificationType $notificationType, Request $request, AuditLoggerService $auditLogger)
     {
-        $notificationTypeSnapshot = $notificationType;
+        $notificationTypeSnapshot = clone $notificationType;
         $notificationType->delete();
         $auditLogger->logAction([
             'action' => 'delete_notification_type',

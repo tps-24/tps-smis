@@ -7,7 +7,7 @@ use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-
+use App\Services\AuditLoggerService;
 
 class AnnouncementController extends Controller
 {
@@ -111,7 +111,7 @@ class AnnouncementController extends Controller
         return view('announcements.edit', compact('announcement'));
     }
 
-    public function update(Request $request, Announcement $announcement)
+    public function update(Request $request, Announcement $announcement, AuditLoggerService $auditLogger)
     {
         $request->validate([
             'title' => 'required',
@@ -119,14 +119,47 @@ class AnnouncementController extends Controller
             'type' => 'required',
             'expires_at' => 'nullable|date',
         ]);
+        $announcementSnapshot = clone  $announcement;
 
         $announcement->update($request->all());
+
+        $auditLogger->logAction([
+            'action' => 'update_announcement',
+            'target_type' => 'Announcement',
+            'target_id' => $announcementSnapshot->id,
+            'metadata' => [
+                'title' => $announcementSnapshot->title,
+            ],
+            'old_values' => [
+                'announcement' => $announcementSnapshot,
+            ],
+            'new_values' => [
+                'announcement' => $announcement,
+            ],
+            'request' => $request,
+        ]);
         return redirect()->route('announcements.index')->with('success', 'Announcement updated successfully.');
     }
 
-    public function destroy(Announcement $announcement)
+    public function destroy(Announcement $announcement, Request $request, AuditLoggerService $auditLogger)
     {
+        $announcementSnapshot = clone  $announcement;
         $announcement->delete();
+                $auditLogger->logAction([
+            'action' => 'delete_announcement',
+            'target_type' => 'Announcement',
+            'target_id' => $announcementSnapshot->id,
+            'metadata' => [
+                'title' => $announcementSnapshot->title,
+            ],
+            'old_values' => [
+                'announcement' => $announcementSnapshot,
+            ],
+            'new_values' => [
+                'announcement' => $announcement,
+            ],
+            'request' => $request,
+        ]);
         return redirect()->route('announcements.index')->with('success', 'Announcement deleted successfully.');
     }
 

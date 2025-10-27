@@ -9,7 +9,7 @@ class WeaponType extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'category_id'];
+    protected $fillable = ['name','description', 'weapon_category_id'];
 
     
 
@@ -19,7 +19,7 @@ class WeaponType extends Model
     }
     public function category()
 {
-    return $this->belongsTo(Category::class, 'category_id');
+    return $this->belongsTo(WeaponCategory::class, 'weapon_category_id');
 }
 
 }

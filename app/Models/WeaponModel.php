@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory; 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 class WeaponModel extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'weapon_type_id', 'category_id'];
+    protected $fillable = ['name','description', 'weapon_type_id', 'weapon_category_id'];
 
     public function type()
     {
@@ -17,13 +17,13 @@ class WeaponModel extends Model
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(WeaponCategory::class, 'weapon_category_id');
     }
 
     public function weapons()
-{
-    return $this->hasMany(Weapon::class, 'weapon_model_id');
-}
+    {
+        return $this->hasMany(Weapon::class, 'weaponModel_id');
+    }
 
 }
 

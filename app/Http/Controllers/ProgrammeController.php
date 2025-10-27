@@ -11,6 +11,7 @@ use App\Models\Department;
 use App\Models\StudyLevel;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use App\Services\AuditLoggerService;
 use DB;
 
 
@@ -110,7 +111,7 @@ class ProgrammeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, $id,AuditLoggerService $auditLogger): RedirectResponse
     {
         // Retrieve the programme by its ID 
         $programme = Programme::findOrFail($id); 
@@ -127,7 +128,22 @@ class ProgrammeController extends Controller
         // Update the programme with validated data 
 
         $programme->update($validatedData);
-   
+        $programmeSnapshot = clone $programme;
+        $auditLogger->logAction([
+            'action' => 'update_programme',
+            'target_type' => 'Programme',
+            'target_id' => $programme->id,
+            'metadata' => [
+                'title' => $programmeSnapshot->programmeName ?? null,
+            ],
+            'old_values' => [
+                'programme' => $programmeSnapshot,
+            ],
+            'new_values' => [
+                'programme'=> $programme,
+            ],
+            'request' => $request,
+        ]);
         return redirect()->route('programmes.index')
                        ->with('success','Session programme updated successfully');
     }
@@ -135,10 +151,25 @@ class ProgrammeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Programme $programme)
+    public function destroy(Programme $programme, Request $request,AuditLoggerService $auditLogger)
     {
+        
+        
+        $programmeSnapshot = clone $programme;
         $programme->delete();
-    
+        $auditLogger->logAction([
+            'action' => 'delete_programme',
+            'target_type' => 'Programme',
+            'target_id' => $programme->id,
+            'metadata' => [
+                'title' => $programmeSnapshot->programmeName ?? null,
+            ],
+            'old_values' => [
+                'programme' => $programmeSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->route('programmes.index')
                         ->with('success','Session programme deleted successfully');
     }

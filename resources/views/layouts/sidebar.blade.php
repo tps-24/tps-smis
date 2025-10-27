@@ -161,8 +161,8 @@
 
 
                         <!-- <li>
-                                <a href="">Staff Resume</a>
-                                </li> -->
+                                    <a href="">Staff Resume</a>
+                                    </li> -->
 
                     </ul>
                 </li>
@@ -261,8 +261,8 @@
                             </li>
                         @endcan()
                         <!-- <li>
-                                <a href="#">My Courses</a> For Teacher
-                            </li>-->
+                                    <a href="#">My Courses</a> For Teacher
+                                </li>-->
                         <li>
                             <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a> <!-- For Teacher-->
                         </li>
@@ -338,17 +338,31 @@
                     <span class="menu-text">Download Center</span>
                 </a>
             </li>
-            <li>
-                <a href="{{ route('weapons.index') }}">
-                    <i class="bi bi-weapon"></i>
-                    <span class="menu-text">Weapons</span>
-                </a>
-            </li>
+
             <li>
                 <a href="{{ route('timetable.index') }}">
                     <i class="bi bi-calendar2"></i>
                     <span class="menu-text">Timetable</span>
                 </a>
+            </li>
+            <li class="treeview">
+                <a href="!#">
+                    <i class="bi bi-shield"></i> <!-- Changed icon -->
+                    <span class="menu-text">Weapons</span>
+                </a>
+                <ul class="treeview-menu">
+                    <li>
+                        <a href="{{ route('weapon-models.index')}}">Models</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('weapon-borrowing.index')}}">Borrowing</a>
+                    </li>
+                    @can('report-list')
+                        <li>
+                            <a href="{{ route('weapons.summary') }}">Summary</a>
+                        </li>
+                    @endcan
+                </ul>
             </li>
 
             @can('mps-list')
@@ -559,14 +573,14 @@
                             </ul>
                         </li>
                         @can('create-backup')
-                        <li>
-                            <a href="{{ route('audit-logs.index') }}">Audit Logs</a>
-                        </li>
+                            <li>
+                                <a href="{{ route('audit-logs.index') }}">Audit Logs</a>
+                            </li>
                         @endcan()
                         @can('create-backup')
-                        <li>
-                            <a href="#">Backup & Restore</a>
-                        </li>
+                            <li>
+                                <a href="#">Backup & Restore</a>
+                            </li>
                         @endcan()
                     </ul>
                 </li>

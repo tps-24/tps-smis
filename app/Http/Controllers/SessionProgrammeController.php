@@ -75,15 +75,27 @@ class SessionProgrammeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request,  SessionProgramme $sessionProgramme)
+    public function update(Request $request,  SessionProgramme $sessionProgramme,AuditLoggerService $auditLogger)
     {
         request()->validate([
             'session_programme_name' => 'required|unique:session_programmes,session_programme_name,'. $sessionProgramme->id,
             'year' => 'required',
        ]);
-   
+       $session_programmeSnapShot = clone $sessionProgramme;
        $sessionProgramme->update($request->all());
-   
+         $auditLogger->logAction([
+            'action' => 'update_session_programme',
+            'target_type' => 'Session',
+            'target_id' => $session_programmeSnapShot->id,
+            'metadata' => [
+                'title' => $session_programmeSnapShot->session_programme_name ?? null,
+            ],
+            'old_values' => [
+                'session_programme' => $session_programmeSnapShot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
        return redirect()->route('session_programmes.index')
                        ->with('success','Session programme updated successfully');
     }
@@ -93,11 +105,11 @@ class SessionProgrammeController extends Controller
      */
     public function destroy(SessionProgramme $session_programme, Request $request, AuditLoggerService $auditLogger): RedirectResponse
     {
-        $session_programmeSnapShot = $session_programme;
+        $session_programmeSnapShot = clone $session_programme;
         $session_programme->delete();
         $auditLogger->logAction([
             'action' => 'delete_session_programme',
-            'target_type' => 'Student',
+            'target_type' => 'Session',
             'target_id' => $session_programmeSnapShot->id,
             'metadata' => [
                 'title' => $session_programmeSnapShot->session_programme_name ?? null,
