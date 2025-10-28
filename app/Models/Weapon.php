@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Weapon extends Model
 {
@@ -11,18 +11,35 @@ class Weapon extends Model
 
     protected $fillable = [
         'serial_number',
-        'weapon_model_id',
+        'company_id',
+        'weaponModel_id',
+        'weaponOwnershipType_id',
+        'owner',
     ];
 
-    // ✅ A weapon belongs to a model (e.g. AK47 serial 1234 belongs to AK47 model)
-    public function model()
+    protected $casts = [
+        'owner' => 'array',
+    ];
+
+    // Relationships
+
+    public function company()
     {
-        return $this->belongsTo(WeaponModel::class, 'weapon_model_id');
+        return $this->belongsTo(Company::class);
     }
 
-    // ✅ Weapons Handover history
-    public function handovers()
+    public function weaponModel()
     {
-        return $this->hasMany(Handover::class);
+        return $this->belongsTo(WeaponModel::class, 'weaponModel_id');
+    }
+
+    public function ownershipType()
+    {
+        return $this->belongsTo(WeaponOwnershipType::class, 'weaponOwnershipType_id');
+    }
+
+        public function handovers()
+    {
+        return $this->hasMany(WeaponHandover::class, );
     }
 }

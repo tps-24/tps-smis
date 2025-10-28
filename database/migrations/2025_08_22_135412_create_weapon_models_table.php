@@ -11,17 +11,9 @@ return new class extends Migration
         Schema::create('weapon_models', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Example: AK-47, Glock 17, M4A1
-
-            // Foreign key to weapon_types
+            $table->string('description');
             $table->unsignedBigInteger('weapon_type_id')->nullable();
-            $table->foreign('weapon_type_id')
-                ->references('id')
-                ->on('weapon_types')
-                ->onDelete('cascade'); // If a type is deleted, its models will also be deleted
-                 $table->foreignId('category_id')
-                  ->constrained('categories')
-                  ->cascadeOnDelete();
-
+            $table->foreign('weapon_type_id')->references('id')->on('weapon_types')->onDelete('set null');
             $table->timestamps();
         });
     }

@@ -70,15 +70,28 @@ class CampusController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Campus $campus)
+    public function update(Request $request, Campus $campus, AuditLoggerService $auditLogger)
     {
+        $campusSnapshot = clone $campus;
         request()->validate([
             'campusName' => 'required|unique:campuses,campusName,'.$campus->id,
             'description' => 'required',
         ]);
-   
+        
        $campus->update($request->all());
-   
+        $auditLogger->logAction([
+                'action' => 'update_campus',
+                'target_type' => 'Campus',
+                'target_id' => $campus->id,
+                'metadata' => [
+                    'title' => $campusSnapshot->campusName ?? null,
+                ],
+                'old_values' => [
+                    'campus' => $campusSnapshot,
+                ],
+                'new_values' => null,
+                'request' => $request,
+            ]);
        return redirect()->route('campuses.index')
                        ->with('success','Campus updated successfully');
     }
@@ -88,7 +101,7 @@ class CampusController extends Controller
      */
     public function destroy(Campus $campus, Request $request, AuditLoggerService $auditLogger)
     {
-        $campusSnapshot = $campus;
+        $campusSnapshot = clone $campus;
         $campus->delete();
         $auditLogger->logAction([
                 'action' => 'delete_campus',

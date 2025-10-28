@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use App\Services\AuditLoggerService;
 
 class EnrollmentController extends Controller
 {
@@ -81,11 +82,26 @@ class EnrollmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id, AuditLoggerService $auditLogger)
     {
         $enrollment = Enrollment::find($id);
+        $enrollmentSnapshot = clone $enrollment;
         $enrollment->delete();
 
+        $auditLogger->logAction([
+            'action' => 'delete_enrollment',
+            'target_type' => 'Enrollment',
+            'target_id' => $enrollmentSnapshot->id,
+            'metadata' => [
+                'enrollment' => $enrollmentSnapshot,
+
+            ],
+            'old_values' => [
+                'department' => $enrollmentSnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
         return redirect()->back()->with('success', 'Session unenrolled successfully.');
     }
 }

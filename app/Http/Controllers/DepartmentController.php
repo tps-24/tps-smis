@@ -69,7 +69,7 @@ class DepartmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Department $department)
+    public function update(Request $request, Department $department, AuditLoggerService $auditLogger)
     {
         request()->validate([
             'departmentName' => 'required|unique:departments,departmentName,'.$department->id,
@@ -77,7 +77,24 @@ class DepartmentController extends Controller
             'is_active' => 'required',
         ]);
    
-       $department->update($request->all());
+        $departmentSnapshot = clone $department;
+        $department->update($request->all());
+        $auditLogger->logAction([
+            'action' => 'update_department',
+            'target_type' => 'Department',
+            'target_id' => $departmentSnapshot->id,
+            'metadata' => [
+                'title' => $departmentSnapshot->departmentName ?? null,
+            ],
+            'old_values' => [
+                'department' => $departmentSnapshot,
+            ],
+            'new_values' => [
+                'department'=> $department,
+            ],
+            'request' => $request,
+        ]);
+       
    
        return redirect()->route('departments.index')
                        ->with('success','Department updated successfully');
@@ -88,7 +105,7 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department, Request $request, AuditLoggerService $auditLogger)
     {
-        $departmentSnapshot = $department;
+        $departmentSnapshot = clone $department;
         $department->delete();
 
         $auditLogger->logAction([

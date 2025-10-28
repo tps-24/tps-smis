@@ -77,16 +77,29 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Company $company)
+    public function update(Request $request, Company $company, AuditLoggerService $auditLogger)
     {
         request()->validate([
             'name' => 'required|unique:companies,name,'.$company->id,
             'campus_id' => 'required',
             'description' => 'required',
         ]);
-   
+    $companySnapshot = clone $company;
        $company->update($request->all());
-   
+           
+        $auditLogger->logAction([
+            'action' => 'update_company',
+            'target_type' => 'Company',
+            'target_id' => $companySnapshot->id,
+            'metadata' => [
+                'title' => $companySnapshot->name ?? null,
+            ],
+            'old_values' => [
+                'company' => $companySnapshot,
+            ],
+            'new_values' => null,
+            'request' => $request,
+        ]);
        return redirect()->route('companies.index')
                        ->with('success','Company updated successfully');
     }
@@ -96,7 +109,7 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company, Request $request, AuditLoggerService $auditLogger)
     {
-        $companySnapshot = $company;
+        $companySnapshot = clone $company;
         $company->delete();
         $auditLogger->logAction([
             'action' => 'delete_company',

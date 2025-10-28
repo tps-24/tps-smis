@@ -24,37 +24,39 @@ class WeaponModelsTableSeeder extends Seeder
         $shotgun = WeaponType::firstOrCreate(['name' => 'Shotgun'], ['description' => 'Close range weapons']);
 
         // Define default models
-        $models = [
-            ['name' => 'AK-47',        'weapon_type_id' => $rifle->id,   'category_id' => $firearm->id],
-            ['name' => 'M16',          'weapon_type_id' => $rifle->id,   'category_id' => $firearm->id],
-            ['name' => 'Glock 17',     'weapon_type_id' => $pistol->id,  'category_id' => $firearm->id],
-            ['name' => 'Beretta M9',   'weapon_type_id' => $pistol->id,  'category_id' => $firearm->id],
-            ['name' => 'MP5',          'weapon_type_idd' => $smg->id,     'category_id' => $firearm->id],
-            ['name' => 'Uzi',          'weapon_type_id' => $smg->id,     'category_id' => $firearm->id],
-            ['name' => 'M249 SAW',     'weapon_type_id' => $lmg->id,     'category_id' => $firearm->id],
-            ['name' => 'PKM',          'weapon_type_id' => $lmg->id,     'category_id' => $firearm->id],
-            ['name' => 'Remington 870','weapon_type_id' => $shotgun->id, 'category_id' => $firearm->id],
-            ['name' => 'Mossberg 500', 'weapon_type_id' => $shotgun->id, 'category_id' => $firearm->id],
+$models = [
+    ['name' => 'AK-47',        'weapon_type_id' => $rifle->id,   'weapon_category_id' => $firearm->id, 'description' => 'A reliable Soviet-era assault rifle known for its durability.'],
+    ['name' => 'M16',          'weapon_type_id' => $rifle->id,   'weapon_category_id' => $firearm->id, 'description' => 'A standard-issue American military rifle, accurate and lightweight.'],
+    ['name' => 'Glock 17',     'weapon_type_id' => $pistol->id,  'weapon_category_id' => $firearm->id, 'description' => 'A widely-used semi-automatic pistol with high capacity and reliability.'],
+    ['name' => 'Beretta M9',   'weapon_type_id' => $pistol->id,  'weapon_category_id' => $firearm->id, 'description' => 'Standard sidearm of the U.S. military for decades, chambered in 9mm.'],
+    ['name' => 'MP5',          'weapon_type_id' => $smg->id,     'weapon_category_id' => $firearm->id, 'description' => 'A compact 9mm submachine gun, used by special forces and police.'],
+    ['name' => 'Uzi',          'weapon_type_id' => $smg->id,     'weapon_category_id' => $firearm->id, 'description' => 'An Israeli submachine gun known for its compact design and ease of use.'],
+    ['name' => 'M249 SAW',     'weapon_type_id' => $lmg->id,     'weapon_category_id' => $firearm->id, 'description' => 'A light machine gun providing sustained automatic fire for infantry units.'],
+    ['name' => 'PKM',          'weapon_type_id' => $lmg->id,     'weapon_category_id' => $firearm->id, 'description' => 'A Russian general-purpose machine gun chambered in 7.62mm.'],
+    ['name' => 'Remington 870','weapon_type_id' => $shotgun->id, 'weapon_category_id' => $firearm->id, 'description' => 'A pump-action shotgun widely used by law enforcement and hunters.'],
+    ['name' => 'Mossberg 500', 'weapon_type_id' => $shotgun->id, 'weapon_category_id' => $firearm->id, 'description' => 'A versatile pump-action shotgun known for reliability and customization.'],
 
-            // Explosives
-            ['name' => 'Hand Grenade', 'weapon_type_id' => null, 'category_id' => $explosive->id],
-            ['name' => 'Claymore Mine','weapon_type_id' => null, 'category_id' => $explosive->id],
-            ['name' => 'C4 Explosive', 'weapon_type_id' => null, 'category_id' => $explosive->id],
+    // Explosives
+    ['name' => 'Hand Grenade', 'weapon_type_id' => null, 'weapon_category_id' => $explosive->id, 'description' => 'A throwable explosive device designed for short-range combat.'],
+    ['name' => 'Claymore Mine','weapon_type_id' => null, 'weapon_category_id' => $explosive->id, 'description' => 'A directional anti-personnel mine that projects shrapnel forward.'],
+    ['name' => 'C4 Explosive', 'weapon_type_id' => null, 'weapon_category_id' => $explosive->id, 'description' => 'A plastic explosive used for demolition, known for its stability and power.'],
 
-            // Ammunition
-            ['name' => '7.62mm Rounds','weapon_type_id' => null, 'category_id' => $ammo->id],
-            ['name' => '9mm Rounds',   'weapon_type_id' => null, 'category_id' => $ammo->id],
-            ['name' => '5.56mm Rounds','weapon_type_id' => null, 'category_id' => $ammo->id],
-        ];
+    // Ammunition
+    ['name' => '7.62mm Rounds','weapon_type_id' => null, 'weapon_category_id' => $ammo->id, 'description' => 'Ammunition commonly used in battle rifles and light machine guns.'],
+    ['name' => '9mm Rounds',   'weapon_type_id' => null, 'weapon_category_id' => $ammo->id, 'description' => 'Standard pistol and submachine gun ammunition used worldwide.'],
+    ['name' => '5.56mm Rounds','weapon_type_id' => null, 'weapon_category_id' => $ammo->id, 'description' => 'Lightweight rifle ammunition used in assault rifles like the M16.'],
+];
+
 
         foreach ($models as $model) {
-            WeaponModel::firstOrCreate(
-                ['name' => $model['name']],
-                [
-                    'weapon_type_id'     => $model['weapon_type_id'],
-                    'category_id' => $model['category_id'],
-                ]
-            );
+WeaponModel::updateOrCreate(
+    ['name' => $model['name']],
+    [
+        'description'       => $model['description'] ?? '',
+        'weapon_type_id'    => $model['weapon_type_id'],
+    ]
+);
+
         }
     }
 }
