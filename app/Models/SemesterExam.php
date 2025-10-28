@@ -12,7 +12,7 @@ class SemesterExam extends Model
     protected $fillable = [
         'course_id',
         'semester_id',
-        'name',                // optional: exam name/type (Midterm, Final, etc.)
+        'exam_title',                // optional: exam name/type (Midterm, Final, etc.)
         'exam_date',
         'max_score',
         'session_programme_id',

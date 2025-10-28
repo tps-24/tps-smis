@@ -453,7 +453,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('course_works', CourseWorkController::class);
     Route::resource('coursework_results', CourseworkResultController::class);
     Route::resource('semester_exams_config', SemesterExamController::class);
-    Route::resource('semester_exams', SemesterExamController::class);
+    Route::resource('semester_exams',  SemesterExamResultController::class);
     Route::resource('final_results', FinalResultController::class);
     Route::resource('/settings/excuse_types', ExcuseTypeController::class);
     Route::resource('/settings/termination_reasons', TerminationReasonController::class);
@@ -474,13 +474,17 @@ Route::group(['middleware' => ['auth']], function () {
         // Route::get('/course_results/configure/{courseId}', 'configure')->name('exam.configure');
         // Route::post('/course_results/store/{courseId}', 'store')->name('course.exam_result.store');
         Route::get('/course_results/course/{courseId}/{semesterId}', 'getExamResultsByCourse')->name('course.getExamResults');
+        
+        Route::get('/semester_exam_results/{courseId}/{semesterId}', 'getExamResultsByCourse')->name('course.getExamResults');
     });
+
+
 
     Route::controller(SemesterExamController::class)->prefix('semester_exams')->group(function () {
         Route::get('/upload_explanation/{courseId}/{semesterId}', 'getUploadExplanation')->name('exam.upload_explanation');
-        Route::post('/course_results/upload/{courseId}', 'uploadResults')->name('course_exam_results.upload');
-        Route::get('/course_results/configure/{courseId}', 'configure')->name('exam.configure');
-        Route::post('/course_results/store/{courseId}', 'store')->name('course.exam_result.store');
+        Route::post('/upload/{courseId}', 'uploadResults')->name('course_exam_results.upload');
+        Route::get('/configure/{courseId}', 'configure')->name('exam.configure');
+        Route::post('/store/{courseId}', 'store')->name('course.store');
 
     });
     // Route::resource('beats', BeatController::class);

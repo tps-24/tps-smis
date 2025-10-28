@@ -82,15 +82,6 @@
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCourseworkModal{{ $courseWork->id }}">
                                         <i class="fa-solid fa-pen-to-square"></i> Edit
                                     </button>
-                                    <!-- <form method="POST" action="{{ route('course_works.destroy', $courseWork->id) }}" style="display:inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            <i class="fa-solid fa-trash"></i> Delete
-                                        </button>
-                                    </form> -->
-
-
 
                                     <!-- Delete Trigger -->
                                     <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCourseworkModal{{ $courseWork->id }}">

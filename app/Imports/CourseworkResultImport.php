@@ -47,7 +47,7 @@ class CourseworkResultImport implements ToCollection
                 }
 
                 // Retrieve the student by force number
-                $student = Student::where('force_number', $row[1])->first();
+                $student = Student::where('force_number', trim($row[1]))->first();
                 if (!$student) {
                     throw new Exception('Student with force number ' . $row[1] . ' not found.');
                 }
