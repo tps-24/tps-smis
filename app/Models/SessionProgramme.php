@@ -26,6 +26,11 @@ class SessionProgramme extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+        public function programme()
+    {
+        return $this->belongsTo(Programme::class,'programme_id');
+    }
     public function programmeCourseSemesters()
     {
         return $this->hasMany(ProgrammeCourseSemester::class);

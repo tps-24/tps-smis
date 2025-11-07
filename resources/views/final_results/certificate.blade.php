@@ -76,29 +76,20 @@
                 {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
             </p>
             <p>
-                has successfully attended and passed the <strong>SERGEANT COURSE NO.2/2024/2025</strong><br> 
+                has successfully attended and passed the <strong>{{ $session_programme->session_programme_name }}</strong><br> 
                 held at <strong>Tanzania Police School-Moshi</strong>
             </p>
             <p>
-                From <strong>19 March 2025</strong> to <strong>30 May 2025</strong>.
+                From <strong>{{ \Carbon\Carbon::parse($session_programme->startDate)->format('d F Y') }}</strong>
+                 to <strong>{{ \Carbon\Carbon::parse($session_programme->endDate)->format('d F Y') }}</strong>
+.
             </p>
             <p style="text-align:left; margin-top:30px !important; font-size: 22px;"><i>The following subjects were completed:-</i></p>
             
             <ul>
-                <li>Police Duties and Administration</li>
-                <li>Human Rights and Policing</li>
-                <li>Police Leadership</li>
-                <li>Communication Skills and Customer Care</li>
-                <li>Traffic Control and Management</li>
-                <li>Criminal Investigation, Intelligence, and Forensic Science</li>
-                <li>Criminal Procedure</li>
-                <li>Law of Evidence</li>
-                <li>Criminal Law</li>
-                <li>Gender Issues and Child Protection</li>
-                <li>Public Health and Environmental Protection</li>
-                <li>Community Policing, Radicalization, Violent Extremism, and Terrorism</li>
-                <li>Drill and Parade</li>
-                <li>Military and Safety Training</li>
+                @foreach($programme_courses as $programme_course)
+                    <li>{{ $programme_course->course->courseName }}</li>                                                                                                            
+                @endforeach
             </ul>
         </div>
     </div>

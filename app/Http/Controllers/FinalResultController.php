@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use App\Models\AdmittedStudent;
+use App\Models\ProgrammeCourseSemester;
 use Illuminate\Support\Facades\Auth;
 
 class FinalResultController extends Controller
@@ -354,6 +355,10 @@ class FinalResultController extends Controller
 
     public function generateCertificate(Request $request)
     {
+        $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
+            $selectedSessionId = 1;
+        }
         //  dd($request->input());
         // Retrieve selected student IDs from the request
         $selectedStudentIds = $request->input('selected_students');
@@ -371,9 +376,11 @@ class FinalResultController extends Controller
             return redirect()->back()->with('error', 'No valid student data found.');
         }
 
+        $session_programme = SessionProgramme::find($selectedSessionId);
+        $programme_courses = ProgrammeCourseSemester::where('session_programme_id',$selectedSessionId)->get();
         // Load the certificate view and configure the PDF
         try {
-            $pdf = PDF::loadView('final_results.certificate', compact('students'))
+            $pdf = PDF::loadView('final_results.certificate', compact('students','session_programme','programme_courses'))
                 ->setPaper('a4', 'portrait')
                 ->setOptions([
                     'isHtml5ParserEnabled' => true,
