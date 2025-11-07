@@ -22,46 +22,6 @@ class CourseworkResultController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index_old(Request $request)
-    {
-        // Check if a session ID has been submitted
-        if (request()->has('session_id')) {
-            // Store the selected session ID in the session
-            session(['selected_session' => request()->session_id]);
-        }
-        
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 1;
-        }
-
-        $programme = Programme::findOrFail(1);
-        $userId             = $request->user()->id;
-        $user = $request->user();
-        if(
-            $user->hasRole('Super Administrator') ||
-            $user->hasRole('Academic Coordinator') ||
-             $user->hasRole('Chief Instructor') ||
-             $user->hasRole('Head of Department')){
-        $semesters    = Semester::with('courses')->get();
-
-        }
-        else if($request->user()->hasRole('Instructor')){
-        $semesters = Semester::with(['courses' => function ($query) use ($userId) {
-            $query->whereHas('courseInstructors', function ($subQuery) use ($userId) {
-                $subQuery->where('user_id', $userId);
-            });
-        }])->get();
-        }else{
-            $semesters = [];
-        }
-        $selectedSemesterId = $request->get('semester_id');
-        $selectedSemester   = $selectedSemesterId ? Semester::with('courses')->find($selectedSemesterId) : null;
-
-        return view('course_works_results.index', compact('programme', 'semesters', 'selectedSemester'));
-    }
-
-
     public function index(Request $request)
     {
         // Handle session selection

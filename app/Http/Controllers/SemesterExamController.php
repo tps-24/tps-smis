@@ -6,7 +6,7 @@ use App\Models\SemesterExam;
 use Illuminate\Http\Request;
 use App\Models\Programme;
 use App\Models\Semester;
-
+use App\Services\AuditLoggerService;
 use App\Imports\CourseExamResultImport;
 use App\Models\Course;
 use Exception;
@@ -19,9 +19,9 @@ class SemesterExamController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function indexold(Request $request)
     {
-         $programme = Programme::findOrFail(1);
+        $programme = Programme::findOrFail(1);
         $userId    = $request->user()->id;
         $user      = $request->user();
         if (
@@ -42,8 +42,10 @@ class SemesterExamController extends Controller
         }
         $selectedSemesterId = $request->get('semester_id');
         $selectedSemester   = $selectedSemesterId ? Semester::with('courses')->find($selectedSemesterId) : null;
+        $selectedCourseId = $request->get('course_id');
+        $selectedCourse = $selectedCourseId ? Course::find($selectedCourseId) : null;
 
-        return view('semester_exams.index', compact('programme', 'semesters', 'selectedSemester'));
+        return view('semester_exams.index', compact('programme', 'semesters', 'selectedSemester', 'selectedCourse'));
     }
 
     /**
@@ -57,40 +59,6 @@ class SemesterExamController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(Request $request, $courseId)
-    // {
-    //     $course = Course::findOrFail($courseId);
-    //     $coursePivot =  $course->semesters[0]->pivot;
-    //     $request->validate([
-    //         'assessment_type_id' => 'required|exists:assessment_types,id',
-    //         'coursework_title' => [
-    //             'required',
-    //             'string',
-    //             'max:255',
-    //             Rule::unique('course_works')->where(function ($query) use ($request, $courseId) {
-    //                 return $query->where('course_id', $courseId) // Check within the same course
-    //                             ->where('assessment_type_id', $request->assessment_type_id); // Check within the same assessment type
-    //             }),
-    //         ],
-    //         'max_score' => 'required|integer|min:1',
-    //         'due_date' => 'nullable|date',
-    //     ]);
-
-    //     SemesterExam::create([
-    //         'programme_id' => $coursePivot->programme_id,
-    //         'course_id' => $course->id,
-    //         'semester_id' => $coursePivot->semester_id,
-    //         'assessment_type_id' => $request->assessment_type_id,
-    //         'coursework_title' => $request->coursework_title,
-    //         'max_score' => $request->max_score,
-    //         'due_date' => $request->due_date?? NULL,
-    //         'session_programme_id' =>$coursePivot->session_programme_id,
-    //         'created_by' => $request->user()->id
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Assessment type added successfully.');
-    // }
-
     public function store(Request $request, $courseId)
     {
         //return $request->all();
@@ -108,14 +76,14 @@ class SemesterExamController extends Controller
         SemesterExam::create([
             'course_id'            => $course->id,
             'semester_id'          => $coursePivot->semester_id,
-            'assessment_type_id'   => $request->assessment_type_id,
+            'exam_title'                => $request->exam_title,
             'max_score'            => $request->max_score,
             'exam_date'            => $request->exam_date,
             'session_programme_id' => $coursePivot->session_programme_id,
             'created_by'           => $request->user()->id,
         ]);
 
-        return redirect()->back()->with('success', 'Course Exam configured successfully.');
+        return redirect()->back()->with('success', 'Course Semester Exam configured successfully.');
     }
 
     /**
@@ -137,18 +105,56 @@ class SemesterExamController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SemesterExam $semesterExam)
+    public function update(Request $request, $id)
     {
-        //
+        $exam = SemesterExam::findOrFail($id);
+
+        $validated = $request->validate([
+            'exam_title' => 'required|string|max:255',
+            'max_score' => 'required|numeric|min:0',
+            'exam_date' => 'required|date',
+        ]);
+
+        $exam->update($validated);
+
+        return redirect()->back()->with('success', 'Semester exam configuration updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SemesterExam $semesterExam)
+
+    public function destroy(Request $request, $id, AuditLoggerService $auditLogger)
     {
-        return $semesterExam;
+        $exam = SemesterExam::findOrFail($id);
+        $user = $request->user();
+
+        // Capture snapshot before deletion
+        $examSnapshot = $exam->toArray();
+
+        // Delete exam
+        $exam->delete();
+
+        // Log audit entry via service
+        $auditLogger->logAction([
+            'action' => 'delete_semester_exam',
+            'target_type' => 'SemesterExam',
+            'target_id' => $exam->id,
+            'metadata' => [
+                'title' => $exam->exam_title ?? 'Untitled',
+                'semester_id' => $exam->semester_id,
+                'exam_type' => $exam->exam_type ?? null,
+            ],
+            'old_values' => $examSnapshot,
+            'new_values' => null,
+            'request' => $request,
+            'user' => $user,
+        ]);
+
+        return redirect()->back()->with('success', 'Semester exam deleted successfully.');
     }
+
+
 
     public function semExams($semesterId, $courseId)
     {
@@ -210,8 +216,9 @@ class SemesterExamController extends Controller
 
     public function configure($courseId)
     {
-        $course = Course::find($courseId);
+        $course = Course::with('semesterExams')->findOrFail($courseId);
         return view('semester_exams.configurations.index', compact('course'));
     }
+
 
 }

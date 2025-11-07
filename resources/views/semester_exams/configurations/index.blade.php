@@ -38,8 +38,12 @@
         <div class="card mb-4">            
             <div class="card-header">
                 <div class="pull-right">
-                    <a class="btn btn-primary btn-sm mb-2 backbtn" href="{{ route('semester_exams.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+                    <a class="btn btn-primary btn-sm mb-2 backbtn"
+                        href="{{ route('semester_exams.index', ['semester_id' => $course->semester_id]) }}">
+                        <i class="fa fa-arrow-left"></i> Back
+                    </a>
                 </div>
+                
 
                 <div class="mt-1">
                 <p>&nbspHere you can configure Semester Examination (SE). If you encounter any issues, feel free to contact support.</p>
@@ -47,7 +51,7 @@
                 
                 <div class="pull-right" style="float:right !important;">
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addCourseworkModal">
-                        <i class="fa fa-plus"></i> Add Exam
+                        <i class="fa fa-plus"></i> Add Configuration
                     </button>
                 </div>
             </div>
@@ -67,33 +71,97 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                  <tr>
-                                      <td>1</td>
-                                      <td>{{ $course->courseName }}</td>
-                                      <td>{{ $course->semesterExams[0]->max_score }}</td>
-                                      <td>{{ $course->semesterExams[0]->exam_date }}</td>
-                                      <td>
-                                          <a class="btn btn-info btn-sm" href="{{ route('course_works.show', $course->id) }}">
-                                              <i class="fa-solid fa-list"></i> Show
-                                          </a>
-                                          <a class="btn btn-primary btn-sm" href="{{ route('course_works.edit', $course->id) }}">
-                                              <i class="fa-solid fa-pen-to-square"></i> Edit
-                                          </a>
-                                          <form method="POST" action="{{ route('course_works.destroy', $course->id) }}" style="display:inline">
-                                              @csrf
-                                              @method('DELETE')
-                                              <button type="submit" class="btn btn-danger btn-sm">
-                                                  <i class="fa-solid fa-trash"></i> Delete
-                                              </button>
-                                          </form>
-                                      </td>
-                                  </tr>
+                                @foreach($course->semesterExams as $exam)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $exam->exam_title }}</td>
+                                    <td>{{ $exam->max_score }}</td>
+                                    <td>{{ $exam->exam_date }}</td>
+                                    <td>
+                                        <!-- Actions -->
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#updateExamModal{{ $exam->id }}">
+                                            <i class="fa-solid fa-pen-to-square"></i> Update
+                                        </button>
+
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteExamModal{{ $exam->id }}">
+                                            <i class="fa-solid fa-trash-can"></i> Delete
+                                        </button>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="deleteExamModal{{ $exam->id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <form method="POST" action="{{ route('semester_exams.destroy', $exam->id) }}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title text-danger">Confirm Deletion</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="alert alert-warning">
+                                                                This will permanently delete the exam configuration.
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger btn-sm">Delete Configuration</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Update Modal -->
+                                 <div class="modal fade" id="updateExamModal{{ $exam->id }}" tabindex="-1" aria-labelledby="updateExamModalLabel{{ $exam->id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <form method="POST" action="{{ route('semester_exams.update', $exam->id) }}">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="updateExamModalLabel{{ $exam->id }}">Update Semester Exam Configuration</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group mb-2">
+                                                        <label for="exam_title_{{ $exam->id }}"><strong>Exam Title:</strong></label>
+                                                        <input type="text" name="exam_title" id="exam_title_{{ $exam->id }}"
+                                                            value="{{ $exam->exam_title }}" class="form-control" required>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label for="max_score_{{ $exam->id }}"><strong>Max Score:</strong></label>
+                                                        <input type="number" name="max_score" id="max_score_{{ $exam->id }}"
+                                                            value="{{ $exam->max_score }}" class="form-control" required>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label for="exam_date_{{ $exam->id }}"><strong>Date:</strong></label>
+                                                        <input type="date" name="exam_date" id="exam_date_{{ $exam->id }}"
+                                                            value="{{ $exam->exam_date }}" class="form-control" required>
+                                                    </div>
+                                                    <input type="hidden" name="updated_by" value="{{ auth()->id() }}">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                @endforeach
+
                           </tbody>
 
                         </table>
                     </div>
                 </div>@else
-                No Course exam configured
+                   &nbsp; -- No Configuration Found.
                 @endif
             </div>
         </div>
@@ -105,7 +173,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addCourseworkModalLabel">Add Course Exam</h5>
+                <h5 class="modal-title" id="addCourseworkModalLabel">Add Semester Exam Configuration</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -119,9 +187,13 @@
                         </ul>
                     </div>
                 @endif
-                <form method="POST" action="{{ route('course.exam_result.store', ['courseId' => $course->id]) }}">
+                <form method="POST" action="{{ route('course.store', ['courseId' => $course->id]) }}">
                     @csrf
                 
+                    <div class="form-group">
+                        <strong>Title:</strong>
+                        <input type="text" name="exam_title" class="form-control" value="Final Semester Exam" readonly>
+                    </div>
                     <div class="form-group">
                         <strong>Max Score:</strong>
                         <input type="number" name="max_score" placeholder="Enter max score" class="form-control">

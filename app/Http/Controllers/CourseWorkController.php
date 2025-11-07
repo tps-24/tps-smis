@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseWork;
-use App\Models\CourseworkResult;
 use App\Models\Course;
 use App\Models\Semester;
 use App\Models\AssessmentType;
-use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
@@ -204,31 +202,6 @@ class CourseWorkController extends Controller
         return redirect()->back()->with('success', 'Coursework and related results deleted successfully.');
     }
 
-
-    function detectBrowser($userAgent)
-    {
-        if (strpos($userAgent, 'Edg/') !== false) {
-            return 'Microsoft Edge';
-        } elseif (strpos($userAgent, 'Chrome/') !== false) {
-            return 'Google Chrome';
-        } elseif (strpos($userAgent, 'Firefox/') !== false) {
-            return 'Mozilla Firefox';
-        } elseif (strpos($userAgent, 'Safari/') !== false) {
-            return 'Safari';
-        } else {
-            return 'Unknown';
-        }
-    }
-
-
-
-    public function getCourseworksxx($semesterId){
-        
-    Log::info("Fetching courseworks for semester ID: {$semesterId}");
-        $semester = Semester::findOrFail($semesterId);
-        return response()->json($semester->courseWorks);
-    }
-
     public function getCourseworks($semesterId, $courseId)
     {
         Log::info("Fetching courseworks for semester ID: {$semesterId} and course Id: {$courseId} ");
@@ -247,8 +220,5 @@ class CourseWorkController extends Controller
     
         return response()->json($courseworks);
     }
-
-
-     
 
 }
