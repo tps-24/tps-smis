@@ -5,16 +5,16 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\WeaponModel;
 use App\Models\WeaponType;
-use App\Models\Category;
+use App\Models\WeaponCategory;
 
 class WeaponModelsTableSeeder extends Seeder
 {
     public function run(): void
     {
         // Ensure categories exist
-        $firearm   = Category::firstOrCreate(['name' => 'Firearm'], ['description' => 'Guns and related weapons']);
-        $explosive = Category::firstOrCreate(['name' => 'Explosive'], ['description' => 'Grenades, mines, bombs']);
-        $ammo      = Category::firstOrCreate(['name' => 'Ammunition'], ['description' => 'Bullets, shells, magazines']);
+        $firearm   = WeaponCategory::firstOrCreate(['name' => 'Firearm'], ['description' => 'Guns and related weapons']);
+        $explosive = WeaponCategory::firstOrCreate(['name' => 'Explosive'], ['description' => 'Grenades, mines, bombs']);
+        $ammo      = WeaponCategory::firstOrCreate(['name' => 'Ammunition'], ['description' => 'Bullets, shells, magazines']);
 
         // Ensure weapon types exist
         $rifle   = WeaponType::firstOrCreate(['name' => 'Rifle'], ['description' => 'Long guns like AK-47, M16']);

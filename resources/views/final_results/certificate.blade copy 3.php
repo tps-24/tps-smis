@@ -71,39 +71,35 @@
         
         <!-- Layered Details -->
         <div class="details">
-            <p style="margin-bottom:10px;"><i>This is to certify that</i></p>
+            <p style="margin-bottom:30px;"><i>This is to certify that</i></p>
             <p style="font-size:25px; font-weight: bold;">
                 {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
             </p>
             <p>
-                has successfully attended and passed the <strong>BASIC RECRUIT COURSE NO.1/2024/2025</strong><br> 
+                has successfully attended and passed the <strong>SERGEANT COURSE NO.2/2024/2025</strong><br> 
                 held at <strong>Tanzania Police School-Moshi</strong>
             </p>
             <p>
-                From <strong>07 October 2024</strong> to <strong>21 November 2025</strong>.
+                From <strong>19 March 2025</strong> to <strong>30 May 2025</strong>.
             </p>
             <p style="text-align:left; margin-top:30px !important; font-size: 22px;"><i>The following subjects were completed:-</i></p>
             
             <ul>
-                <li>Basic Police Duties and Administration</li>
-                <li>Basic Community Policing and Social Work</li>
-                <li>Basic Criminal Law</li>
-                <li>Basic Law of Evidence</li>
-                <li>Basic Criminal Procedure</li>
-                <li>Basic Human Rights and Policing</li>
-                <li>Basic Criminal Investigation, Intelligence, and Forensic Science</li>
-                <li>Basic Communication Skills and Customer Care</li>
-                <li>Basic Radicalization, Violent Extremism, and Terrorism</li>
-                <li>Basic Public Health and Environmental Protection</li>
-                <li>Basic Gender Issues and Child Protection</li>
-                <li>Basic Road Traffic Control</li>
-                <li>Basic Public Order and Disaster Management</li>
-                <li>Basic Weapon Training</li>
-                <li>Basic Self Defense Skills</li>
-                <li>Basic Drill and Parade</li>
-                <li>Basic Field Craft and Safety Tactics</li>
+                <li>Police Duties and Administration</li>
+                <li>Human Rights and Policing</li>
+                <li>Police Leadership</li>
+                <li>Communication Skills and Customer Care</li>
+                <li>Traffic Control and Management</li>
+                <li>Criminal Investigation, Intelligence, and Forensic Science</li>
+                <li>Criminal Procedure</li>
+                <li>Law of Evidence</li>
+                <li>Criminal Law</li>
+                <li>Gender Issues and Child Protection</li>
+                <li>Public Health and Environmental Protection</li>
+                <li>Community Policing, Radicalization, Violent Extremism, and Terrorism</li>
+                <li>Drill and Parade</li>
+                <li>Military and Safety Training</li>
             </ul>
-            <br>
         </div>
     </div>
     @endforeach

@@ -15,9 +15,9 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
-            PermissionTableSeeder::class,
-            WeaponCategorySeeder::class,
-            WeaponTypesTableSeeder::class,
+            //PermissionTableSeeder::class,
+            //WeaponCategorySeeder::class,
+            //WeaponTypesTableSeeder::class,
             WeaponModelsTableSeeder::class,
             WeaponOwnershipTypeSeeder::class,
             // CreateAdminUserSeeder::class,
