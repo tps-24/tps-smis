@@ -181,18 +181,18 @@
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover align-middle">
                             <thead class="table-info">
-                                <tr id="coursework-headings">
+                                <tr id="exam-headings">
                                     <!-- Dynamic headings will load here -->
                                 </tr>
                             </thead>
-                            <tbody id="coursework-results">
+                            <tbody id="exam-results">
                                 <!-- Dynamic results or "No results found" message will load here -->
                             </tbody>
                         </table>
                     </div>
 
                     <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3" id="pagination-container">
+                    <div class="d-flex justify-content-end mt-3" id="exam-pagination">
                         <!-- Styled Bootstrap pagination links will dynamically load here -->
                     </div>
 
@@ -246,7 +246,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ]));
             examConfigLink.setAttribute('href', examConfigRoute.replace('COURSE_ID_PLACEHOLDER', courseId));
             examConfigButton.disabled = false;
-
             console.log(`Selected Course ID: ${courseId}, Semester ID: ${semesterId}`);
 
             // Optional: fetch and display exam results
@@ -257,7 +256,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to fetch and render coursework results
     function fetchSemesterExamResults(courseId, semesterId, page = 1) {
-    const apiUrl = `/tps-smis/semester_exam_results/${courseId}/${semesterId}?page=${page}`;
+        
+    const apiUrl = `/tps-smis/semester_exams/semester_exam_results/${courseId}/${semesterId}?page=${page}`;
     const headingsContainer = document.getElementById('exam-headings');
     const resultsContainer = document.getElementById('exam-results');
     const paginationContainer = document.getElementById('exam-pagination');
@@ -266,9 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Error: Necessary DOM elements are missing');
         return;
     }
-
     resultsContainer.innerHTML = `<tr><td colspan="7" class="text-center">Loading...</td></tr>`;
-
     fetch(apiUrl)
         .then(response => {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

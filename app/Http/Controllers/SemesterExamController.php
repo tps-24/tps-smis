@@ -76,7 +76,7 @@ class SemesterExamController extends Controller
         SemesterExam::create([
             'course_id'            => $course->id,
             'semester_id'          => $coursePivot->semester_id,
-            'exam_title'                => $request->exam_title,
+            //'exam_title'                => $request->exam_title,
             'max_score'            => $request->max_score,
             'exam_date'            => $request->exam_date,
             'session_programme_id' => $coursePivot->session_programme_id,

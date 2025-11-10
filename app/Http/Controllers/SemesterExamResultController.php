@@ -213,17 +213,15 @@ class SemesterExamResultController extends Controller
         ]);
     }
     
-    public function getExamResultsByCoursedd($courseId, $semesterId)
+    public function getExamResultsByCourse($courseId, $semesterId)
     {
-        dd($courseId, $semesterId);
         try {
             \Log::info("Fetching semester exam results for course ID: {$courseId}, semester ID: {$semesterId}");
-
             // Fetch the exam configuration for this course and semester
             $exam = DB::table('semester_exams')
                 ->where('course_id', $courseId)
                 ->where('semester_id', $semesterId)
-                ->select('id', 'exam_title')
+                //->select('id', 'exam_title')
                 ->first();
 
             if (!$exam) {
@@ -273,7 +271,7 @@ class SemesterExamResultController extends Controller
             ]);
         } catch (\Exception $e) {
             \Log::error('Error fetching semester exam results:', ['message' => $e->getMessage()]);
-            return response()->json(['message' => 'Internal Server Error'], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
