@@ -25,7 +25,7 @@
             <div class="card-header">
 
             </div>
-            @if ($enrollments->isEmpty())
+            @if ($courses->isEmpty())
             <div class="alert alert-info" role="alert">
                 No enrollments found. Please ensure students are enrolled in courses for the selected session programme.
             </div>
@@ -55,7 +55,6 @@
                                     <tr>
                                         <th>S/N</th>
                                         <th>Course</th>
-                                        <th>Session Programme</th>
                                         <th width="250px;">Actions</th>
                                     </tr>
                                 </thead>
@@ -64,20 +63,19 @@
                                     $i = 0;
                                     @endphp
                                     
-                                        @foreach ($enrollments as $enrollment)
+                                        @foreach ($courses as $course)
                                         <tr>
                                         <td>{{++$i}}.</td>
-                                        <td>{{$enrollment->course->courseName}}</td>
-                                        <td>{{$enrollment->sessionProgramme->session_programme_name}}</td>
+                                        <td>{{$course->courseName}}</td>
                                         <td>
-                                            <form id="generateResultsForm{{$enrollment->id}}"
-                                                action="{{route('final_results.session.generate',$enrollment->session_programme_id)}}"
+                                            <form id="generateResultsForm{{$course->id}}"
+                                                action="{{route('final_results.session.generate')}}"
                                                 method="post">
                                                 @csrf
-                                                <input type="text" value="{{$enrollment->course->id}}" name="course_id" id="" hidden>
+                                                <input type="text" value="{{$course->id}}" name="course_id" id="" hidden>
                                                 
                                                 <button type="button"
-                                                    onclick="confirmAction('generateResultsForm{{$enrollment->id}}', 'Generate Results',' results for {{$enrollment->sessionProgramme->session_programme_name}}','Generate')"
+                                                    onclick="confirmAction('generateResultsForm{{$course->id}}', 'Generate Results',' results for {{$course}}','Generate')"
                                                     class="btn btn-sm btn-primary">Generate</button>
                                             </form>
 

@@ -58,6 +58,7 @@ use App\Http\Controllers\WeaponModelController;
 use App\Http\Controllers\WeaponBorrowerController;
 use App\Http\Controllers\BorrowedWeaponController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
@@ -294,7 +295,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('final_results/create-generate', [FinalResultController::class, 'createGenerate'])->name('final_results.createGenerate');
     Route::get('final_results/generate/{sessionId}', [FinalResultController::class, 'generate'])->name('final_results.generate');
     Route::get('final_results/generate-all', [FinalResultController::class, 'generateAll'])->name('final_results.generate.all');
-    Route::post('final_results/generate/{sessionId}', [FinalResultController::class, 'generate'])->name('final_results.session.generate');
+    Route::post('final_results/generate', [FinalResultController::class, 'generate'])->name('final_results.session.generate');
     Route::get('final_results/return/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'returnResults'])->name('final_results.return');
     Route::get('final_results/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'getResults'])->name('final_results');
     Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
@@ -447,6 +448,10 @@ Route::group(['middleware' => ['auth']], function () {
     // Route::get('course/courseworks/create/{courseId}',[SemesterExamController::class,'create'])->name('course.coursework.create');
     // Route::get('course/courseworks/{courseId}',[SemesterExamController::class,'getCourse'])->name('course.coursework');
     Route::post('course/semester_exams/store/{courseId}', [SemesterExamController::class, 'store'])->name('course.semester_exams.store');
+    Route::get('/staff/filter', [TaskController::class, 'filterStaff'])->name('staff.filter');
+    Route::get('/tasks/{task}/assign', [TaskController::class, 'assignForm'])->name('tasks.assign');
+    Route::post('/tasks/{task}/assign', [TaskController::class, 'assignStaff'])->name('tasks.assign.store');
+
 
     Route::resource('grading_systems', GradingSystemController::class);
     Route::resource('grade_mappings', GradeMappingController::class);
@@ -464,6 +469,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('patrol-areas', PatrolAreaController::class);
     Route::resource('attendences', AttendenceController::class);
     Route::resource('audit-logs', AuditLogController::class);
+    Route::resource('tasks', TaskController::class);
+
 
     Route::controller(RefereeController::class)->prefix('referee')->group(function () {
         Route::get('/referee/delete/{refereeId}', 'destroy')->name('referees.delete');

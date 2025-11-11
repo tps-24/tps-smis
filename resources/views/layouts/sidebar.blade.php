@@ -158,6 +158,12 @@
                                 <span class="menu-text">Time Sheet</span>
                             </a>
                         </li>
+                        
+                        @can('staff-list')
+                            <li>
+                                <a href="{{ route('tasks.index') }}">Mpango Kazi</a>
+                            </li>
+                        @endcan()
 
 
                         <!-- <li>

@@ -33,7 +33,7 @@ class CourseExamResultImport implements ToCollection
             $this->num++;
 
             // Skip the first 4 rows (e.g., headers or meta-info)
-            if ($this->num <= 6) {
+            if ($this->num <= 5) {
                 continue;
             }
 
@@ -45,7 +45,7 @@ class CourseExamResultImport implements ToCollection
 
                 //$names =  explode(" ", $row[1]);
                 //$student = Student::where('first_name', $names[0])->where('middle_name', $names[1])->where('last_name', $names[2])->where('session_programme_id', 4)->first();
-                $student = Student::where('force_number', $row[1])->first();
+                $student = Student::where('force_number', trim($row[1]))->first();
                 if (! $student) {
                     Log::error("Error creating exam of ". $row[1]);
                 }

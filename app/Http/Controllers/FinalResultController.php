@@ -95,10 +95,20 @@ class FinalResultController extends Controller
 
     public function createGenerate()
     {
+        
         $sessionProgrammeId = session('selected_session', 1);
         $enrollments  = Enrollment::where('session_programme_id', $sessionProgrammeId)->get();
+        $session_programme = SessionProgramme::find($sessionProgrammeId);
         $finalResults = FinalResult::with(['student', 'semester', 'course'])->get();
-        return view('final_results.generate', compact('finalResults', 'enrollments'));
+        $programme =  $session_programme->programme;
+        // $sessionProgramme = SessionProgramme::findOrFail(session('selected_session', 4));
+        $courses  = $programme->courses()
+        //->wherePivot('semester_id', 2)
+                ->wherePivot('session_programme_id', $sessionProgrammeId)
+                ->orderBy('course_type', 'ASC')
+                ->get();
+            // return $courses;   
+        return view('final_results.generate', compact('finalResults', 'courses'));
     }
 
     public function store(Request $request)

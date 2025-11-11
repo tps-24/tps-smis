@@ -54,6 +54,7 @@
             font-size: 23px;
             margin: 2px 0;
             font-weight: bold; /* Make the text bold */
+           /* font-style: italic; /* Italicize the text */
         }
 
         .details ul li::before {
@@ -71,7 +72,7 @@
         
         <!-- Layered Details -->
         <div class="details">
-            <p style="margin-bottom:10px;"><i>This is to certify that</i></p>
+            <p style="margin-top:30px; margin-bottom:20px;"><i>This is to certify that</i></p>
             <p style="font-size:25px; font-weight: bold;">
                 {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
             </p>
@@ -81,34 +82,32 @@
             </p>
             <p>
                 From <strong>{{ \Carbon\Carbon::parse($session_programme->startDate)->format('d F Y') }}</strong>
-                 to <strong>{{ \Carbon\Carbon::parse($session_programme->endDate)->format('d F Y') }}</strong>
+                 to <strong>{{ \Carbon\Carbon::parse($session_programme->endDate)->format('d F Y') }}.</strong>
 
 
-            <p style="text-align:left; margin-top:30px !important; font-size: 22px;"><i>The following subjects were completed:-</i></p>
+            <p style="text-align:left; margin-top:30px !important; font-size: 22px;">The following subjects were completed:-</p>
             
             <ul>
 
-                @foreach($programme_courses as $programme_course)
+                <!-- @foreach($programme_courses as $programme_course)
                     <li>{{ $programme_course->course->courseName }}</li>                                                                                                            
-                @endforeach
-
-                <!-- <li>Basic Police Duties and Administration</li>
-                <li>Basic Community Policing and Social Work</li>
+                @endforeach -->
+                <li>Basic Drills, Parade and Self-defence Techniques and Endurance Training</li>
+                <li>Firearms Training</li>               
+                <li>Basic Police Duties and Administration</li>
+                <li>Basic Policing Law and Human Rights</li>
                 <li>Basic Criminal Law</li>
-                <li>Basic Law of Evidence</li>
+                <li>Basic Communication Skills and ICT</li>
                 <li>Basic Criminal Procedure</li>
-                <li>Basic Human Rights and Policing</li>
-                <li>Basic Criminal Investigation, Intelligence, and Forensic Science</li>
-                <li>Basic Communication Skills and Customer Care</li>
-                <li>Basic Radicalization, Violent Extremism, and Terrorism</li>
-                <li>Basic Public Health and Environmental Protection</li>
-                <li>Basic Gender Issues and Child Protection</li>
+                <li>Basic Community Policing and Social Work</li>
+                <li>Basic Law of Evidence</li>
+                <li>Basic Criminal Investigation and Intelligence</li>
                 <li>Basic Road Traffic Control</li>
+                 <li>Basic Gender Issues and Child Protection</li> 
+                <li>Basic Radicalization, Violent Extremism, and Terrorism</li>
                 <li>Basic Public Order and Disaster Management</li>
-                <li>Basic Weapon Training</li>
-                <li>Basic Self Defense Skills</li>
-                <li>Basic Drill and Parade</li>
-                <li>Basic Field Craft and Safety Tactics</li> -->
+                <li>Basic Public Health and Environmental Conservation</li>
+                <li>Basic Field Craft and Military Tactics</li> 
             </ul>
             <br>
         </div>

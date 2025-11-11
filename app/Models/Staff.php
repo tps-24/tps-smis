@@ -85,4 +85,17 @@ class Staff extends Model
     {
         return $this->hasMany(WorkExperience::class,'user_id');
     }
+
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class)
+            ->withPivot('assigned_at', 'start_time', 'end_time', 'is_active', 'region', 'district')
+            ->withTimestamps();
+    }
+
+    public function currentLoad()
+    {
+        return $this->tasks()->wherePivot('is_active', true)->count();
+    }
+
 }
