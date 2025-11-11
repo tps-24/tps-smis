@@ -8,9 +8,8 @@
         "framework"
     ],
     "license": "MIT",
-
     "require": {
-        "php": "^8.2",
+        "php": "^8.2.12",
         "barryvdh/laravel-dompdf": "^3.1",
         "intervention/image": "^3.11",
         "laravel/framework": "^11.0",
@@ -46,6 +45,7 @@
         }
     },
     "scripts": {
+        "check-php": "@php -r \"if (version_compare(PHP_VERSION, '8.2.12', '<')) { echo 'PHP >= 8.2.12 required!\\n'; exit(1); } else { echo 'PHP version OK: ' . PHP_VERSION . '\\n'; }\"",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -63,7 +63,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"/opt/lampp/bin/php artisan serve\" \"/opt/lampp/bin/php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
         ]
     },
     "extra": {
@@ -75,6 +75,9 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform": {
+            "php": "8.2.12"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true

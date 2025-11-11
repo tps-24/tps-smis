@@ -69,13 +69,13 @@
                                         <td>{{$course->courseName}}</td>
                                         <td>
                                             <form id="generateResultsForm{{$course->id}}"
-                                                action="{{route('final_results.session.generate')}}"
+                                                action="{{route('final_results.session.generate', $sessionProgrammeId)}}"
                                                 method="post">
                                                 @csrf
                                                 <input type="text" value="{{$course->id}}" name="course_id" id="" hidden>
                                                 
                                                 <button type="button"
-                                                    onclick="confirmAction('generateResultsForm{{$course->id}}', 'Generate Results',' results for {{$course}}','Generate')"
+                                                    onclick="confirmAction('generateResultsForm{{$course->id}}', 'Generate Results',' results for {{$course->courseName}}','Generate')"
                                                     class="btn btn-sm btn-primary">Generate</button>
                                             </form>
 

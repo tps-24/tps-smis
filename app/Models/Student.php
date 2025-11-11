@@ -19,7 +19,7 @@ class Student extends Model
         'next_kin_relationship', 'next_kin_address', 'next_of_kin', 'profile_complete', 'photo',
         'status', 'enrollment_status', 'approved_at', 'rejected_at', 'reject_reason', 'approved_by',
         'rejected_by', 'transcript_printed', 'certificate_printed', 'printed_by',
-        'reprint_reason', 'beat_exclusion_vitengo_id', 'beat_emergency', 'bank_name', 'account_number', 'study_level_id', 'dismissed_by',
+        'reprint_reason', 'beat_exclusion_vitengo_id', 'beat_emergency', 'bank_name', 'account_number', 'study_level_id', 'dismissed_by','registration_number',
     ];
 
     public function user()
@@ -47,6 +47,10 @@ class Student extends Model
         return $this->belongsTo(Programme::class);
     }
 
+    public function sessionProgramme()
+    {
+        return $this->belongsTo(SessionProgramme::class);
+    }
     public function vitengo()
     {
         return $this->belongsTo(Vitengo::class);

@@ -108,7 +108,7 @@ class FinalResultController extends Controller
                 ->orderBy('course_type', 'ASC')
                 ->get();
             // return $courses;   
-        return view('final_results.generate', compact('finalResults', 'courses'));
+        return view('final_results.generate', compact('finalResults', 'courses','sessionProgrammeId'));
     }
 
     public function store(Request $request)
@@ -211,27 +211,28 @@ class FinalResultController extends Controller
 
     public function generate(Request $request, $sessionProgrammeId)
     {
+        
         $enrollment   = Enrollment::where('session_programme_id', $sessionProgrammeId)->where('course_id', $request->course_id)->first();
-        $semesterExam = SemesterExam::where('course_id', $request->course_id)->where('semester_id', $enrollment->semester_id)->get();
-        if ($semesterExam->isEmpty()) {
+        $semesterExam = SemesterExam::where('course_id', $request->course_id)->where('session_programme_id', $sessionProgrammeId)->first();
+        $sessionProgramme = SessionProgramme::find($sessionProgrammeId);
+        if (!$semesterExam) {
             return redirect()->back()->with('info', 'Course Exam is not configured.');
         }
         $semesterExamId = $semesterExam->first()->id;
         $courseId       = $request->course_id;
-        $students       = $enrollment->sessionProgramme->students; //->where('force_number', 'J.9425')->values();
-
+        $students       = $sessionProgramme->students; //->where('force_number', 'J.9425')->values();
         foreach ($students as $student) {
             $resultData = $this->finalResultService->calculateFinalResult(
                 $student->id,
                 $semesterExamId,
-                $enrollment->semester_id,
+                $semesterExam->semester_id,
                 $courseId
             );
 
             $resultData = array_merge($resultData, [
                 'student_id'  => $student->id,
-                'semester_id' => $enrollment->semester_id,
-                'course_id'   => $enrollment->course_id,
+                'semester_id' => $semesterExam->semester_id,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+                'course_id'   => $request->course_id,
             ]);
 
             $finalResult = FinalResult::updateOrCreate(
@@ -250,14 +251,14 @@ class FinalResultController extends Controller
         //     $resultData['semester_id'] = $enrollment->semester_id;
         //     $resultData['course_id']   = $enrollment->course_id;
 
-            $finalResult = FinalResult::updateOrCreate(
-                [
-                    'student_id'  => $enrollment->student_id,
-                    'semester_id' => $enrollment->semester_id,
-                    'course_id'   => $enrollment->course_id,
-                ],
-                $resultData
-            );
+            // $finalResult = FinalResult::updateOrCreate(
+            //     [
+            //         'student_id'  => $enrollment->student_id,
+            //         'semester_id' => $semesterExam->semester_id,
+            //         'course_id'   => $request->course_id,
+            //     ],
+            //     $resultData
+            // );
         
 
         return redirect()->route('final_results.index')
@@ -536,18 +537,17 @@ class FinalResultController extends Controller
     public function generateAll()
 {
     $sessionProgrammeId = session('selected_session', 1);
-    $sessionProgramme = SessionProgramme::with(['students'])->findOrFail($sessionProgrammeId);
-
+    $sessionProgramme = SessionProgramme::findOrFail($sessionProgrammeId);
     // Get all enrollments (i.e., courses assigned to this sessionProgramme)
     $enrollments = Enrollment::where('session_programme_id', $sessionProgrammeId)->get();
 
-    if ($enrollments->isEmpty()) {
+    if (!$sessionProgramme->programmeCourseSemesters) {
         return redirect()->back()->with('info', 'No courses are assigned to this session.');
     }
 
-    foreach ($enrollments as $enrollment) {
-        $courseId = $enrollment->course_id;
-        $semesterId = $enrollment->semester_id;
+    foreach ($sessionProgramme->programmeCourseSemesters as $courseSemester) {
+        $courseId = $courseSemester->course_id;
+        $semesterId = $courseSemester->semester_id;
 
         // Ensure the exam exists for this course & semester
         $semesterExam = SemesterExam::where('course_id', $courseId)
@@ -555,7 +555,7 @@ class FinalResultController extends Controller
             ->first();
 
         if (!$semesterExam) {
-            \Log::warning("Skipped course during final result generation: {$enrollment->course} (Course ID: {$courseId}, Semester ID: {$semesterId})");
+            \Log::warning("Skipped course during final result generation: {$courseSemester->course->courseName} (Course ID: {$courseId}, Semester ID: {$semesterId})");
             // Skip this course if exam not configured
             continue;
         }

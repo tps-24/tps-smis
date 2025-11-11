@@ -45,8 +45,9 @@ class UpdateStudentDetails implements ToCollection
             }
 
             // --- Student Lookup ---
+            //Log::info($row[21]);
             $student = !empty($row[0])
-                ? Student::where('force_number', $row[0])->first()
+                ? Student::where('force_number', trim($row[0]))->first()
                 : Student::where([
                     ['first_name', '=', $row[2]],
                     ['middle_name', '=', $row[3]],
@@ -103,8 +104,8 @@ class UpdateStudentDetails implements ToCollection
                 'height'         => $row[17] ?? $student->height,
                 'account_number' => $row[18] ?? $student->account_number,
                 'bank_name'      => $row[19] ?? $student->bank_name,
+                'registration_number' =>$row[21] ?? $student->registration_number
             ]);
-
             $student->save(); // More semantic than update()
         }
     }

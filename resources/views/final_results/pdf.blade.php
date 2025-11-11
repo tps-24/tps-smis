@@ -178,7 +178,7 @@
 @foreach($students as $student)
     <div class="container">
         <div class="header">
-            <img src="{{ url('resources/assets/images/logo.png') }}" alt="Logo" class="logo">
+            <img src="{{ url('resources/assets/images/tps_logo.jpeg') }}" alt="Logo" class="logo">
             <img src="{{ url('storage/app/public/' . $student->photo) }}" alt="Profile Photo" class="profile-photo">
             <h1>THE UNITED REPUBLIC OF TANZANIA</h1>
             <h2>MINISTRY OF HOME AFFAIRS</h2>
@@ -207,9 +207,9 @@
                         <td>{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</td>
                         <td>{{ \Carbon\Carbon::parse($student->dob)->format('d/m/Y') }}</td>
                         <td>{{ $student->gender }}</td>
-                        <td>{{ $student->admittedStudent->registration_number ?? ''}}</td>
-                        <td>{{ $student->admittedStudent->admitted_date ?? ''}}</td>
-                        <td>{{ $student->admittedStudent->completion_date ?? ''}}</td>
+                        <td>{{ $student->registration_number ?? ''}}</td>
+                        <td>{{ \Carbon\Carbon::parse($student->sessionProgramme->startDate)->format('d/m/Y') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($student->sessionProgramme->endDate)->format('d/m/Y') }}</td>
                     </tr>
                     <tr>
                         <th colspan="3">Programme/Course Followed (Accredited by NACTE)</th>
