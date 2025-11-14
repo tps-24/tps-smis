@@ -20,7 +20,7 @@
 @include('layouts.sweet_alerts.index')
 
 
-<h4 class="mb-4">Mpango Kazi: Assign Staff to Task <span class="text-primary">{{ $task->title }}</span></h4>
+<h4 class="mb-4">Mpango Kazi: <span class="text-primary">{{ $task->title }}</span></h4>
 
 <!-- 🌍 Region & District Selection -->
 <form method="GET" action="{{ route('tasks.assign', $task->id) }}" class="row g-3 mb-4">
@@ -36,8 +36,8 @@
     </select>
   </div>
   <div class="col-md-4">
-    <label><strong>District</strong></label>
-    <select name="district_id" id="district-select" class="form-control" required>
+    <label><strong>District (Optional)</strong></label>
+    <select name="district_id" id="district-select" class="form-control">
       <option value="">-- Select District --</option>
       @foreach($districts as $district)
         <option value="{{ $district->id }}"
@@ -49,11 +49,11 @@
     </select>
   </div>
   <div class="col-md-4 d-flex align-items-end">
-    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-arrow-down"></i> Proceed to Filter Staff</button>
+    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-arrow-down"></i> Proceed to Staff Selection</button>
   </div>
 </form>
 
-@if(request('region_id') && request('district_id'))
+@if(request('region_id'))
 <!-- 🔍 Staff Filtering -->
 <form method="GET" action="{{ route('tasks.assign', $task->id) }}" class="row g-3 mb-4">
   <input type="hidden" name="region_id" value="{{ request('region_id') }}">
@@ -79,7 +79,7 @@
   </div>
   <div class="col-md-4">
     <label>Search by Name</label>
-    <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="e.g. John">
+    <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="e.g. Tweve">
   </div>
   <div class="col-md-2 d-flex align-items-end">
     <button type="submit" class="btn btn-secondary btn-sm"><i class="fa fa-filter"></i> Filter</button>
@@ -87,11 +87,16 @@
 </form>
 
 <!-- ✅ Staff Assignment Form -->
-<form method="POST" action="{{ route('tasks.assign.store', $task->id) }}">
+<form id="assignForm" method="POST" action="{{ route('tasks.assign.store', $task->id) }}">
   @csrf
   <input type="hidden" name="region_id" value="{{ request('region_id') }}">
   <input type="hidden" name="district_id" value="{{ request('district_id') }}">
   <input type="hidden" name="assigned_by" value="{{ auth()->id() }}">
+
+  
+  <div class="text-center mt-3 mb-3">
+    <strong>Selected Staff:</strong> <span id="selected-count">0</span>
+  </div>
 
   <div class="text-center mt-3 mb-3">
     <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-paper-plane"></i> Assign Selected Staff</button>
@@ -99,20 +104,43 @@
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th><input type="checkbox" id="select-all"></th>
-        <th>Name</th>
-        <th>Designation</th>
-        <th>Rank</th>
-        <th>Status</th>
+        <th><input type="checkbox" id="select-all">&nbsp;All</th>
+        <th>
+          <a href="{{ route('tasks.assign', array_merge(['task' => $task->id], request()->all(), ['sort' => 'forceNumber', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+            Force No {!! request('sort') === 'forceNumber' ? (request('direction') === 'asc' ? '↑' : '↓') : '' !!}
+          </a>
+        </th>
+        <th>
+          <a href="{{ route('tasks.assign', array_merge(['task' => $task->id], request()->all(), ['sort' => 'firstName', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+            Name {!! request('sort') === 'firstName' ? (request('direction') === 'asc' ? '↑' : '↓') : '' !!}
+          </a>
+        </th>
+        <th>
+          <a href="{{ route('tasks.assign', array_merge(['task' => $task->id], request()->all(), ['sort' => 'designation', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+            Designation {!! request('sort') === 'designation' ? (request('direction') === 'asc' ? '↑' : '↓') : '' !!}
+          </a>
+        </th>
+        <th>
+          <a href="{{ route('tasks.assign', array_merge(['task' => $task->id], request()->all(), ['sort' => 'rank', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+            Rank {!! request('sort') === 'rank' ? (request('direction') === 'asc' ? '↑' : '↓') : '' !!}
+          </a>
+        </th>
+        <th>
+          <a href="{{ route('tasks.assign', array_merge(['task' => $task->id], request()->all(), ['sort' => 'status', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+            Status {!! request('sort') === 'status' ? (request('direction') === 'asc' ? '↑' : '↓') : '' !!}
+          </a>
+        </th>
       </tr>
     </thead>
+
     <tbody>
       @forelse($staff as $member)
         <tr>
           <td><input type="checkbox" name="staff_ids[]" value="{{ $member->id }}"></td>
-          <td>{{ $member->name }}</td>
-          <td>{{ $member->designation }}</td>
+          <td>{{ $member->forceNumber }}</td>
           <td>{{ $member->rank }}</td>
+          <td>{{ $member->firstName }} {{ $member->middleName }} {{ $member->lastName }}</td>
+          <td>{{ $member->designation }}</td>
           <td><span class="badge bg-{{ $member->status === 'active' ? 'success' : 'danger' }}">{{ ucfirst($member->status) }}</span></td>
         </tr>
       @empty
@@ -127,6 +155,7 @@
 
 @section('scripts')
 <script>
+//filter districts based on region selection
 document.addEventListener('DOMContentLoaded', function () {
   const regionSelect = document.getElementById('region-select');
   const districtSelect = document.getElementById('district-select');
@@ -148,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
   filterDistricts(); // initial load
 });
 
-
+//Select All Checkboxes
 document.addEventListener('DOMContentLoaded', function () {
   const selectAll = document.getElementById('select-all');
   const checkboxes = document.querySelectorAll('input[name="staff_ids[]"]');
@@ -166,5 +195,43 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+
+//Count staff selected
+document.addEventListener('DOMContentLoaded', function () {
+  const selectAll = document.getElementById('select-all');
+  const checkboxes = document.querySelectorAll('input[name="staff_ids[]"]');
+  const countDisplay = document.getElementById('selected-count');
+
+  function updateCount() {
+    const count = Array.from(checkboxes).filter(cb => cb.checked).length;
+    countDisplay.textContent = count;
+  }
+
+  if (selectAll) {
+    selectAll.addEventListener('change', function () {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateCount();
+    });
+  }
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', function () {
+      if (!cb.checked && selectAll.checked) selectAll.checked = false;
+      updateCount();
+    });
+  });
+
+  updateCount(); // initialize
+});
+
+//Form submission validation
+  document.getElementById('assignForm').addEventListener('submit', function(e) {
+    const selected = document.querySelectorAll('input[name="staff_ids[]"]:checked');
+    if (selected.length === 0) {
+      e.preventDefault();
+      alert('Please select at least one staff member before submitting.');
+    }
+  });
 </script>
 @endsection

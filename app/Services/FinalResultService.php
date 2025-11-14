@@ -21,12 +21,12 @@ class FinalResultService
             ->whereHas('semesterExam', function ($query) use ($courseId) {
                 $query->where('course_id', $courseId);
             })
-            ->exists();
+            ->exists();         
         // If there are no coursework results or exam results, mark as Incomplete
         if (! $hasCourseworkResults || ! $hasExamResults) {
             return [
                 'total_score' => null,
-                'grade'       => 'Inc',
+                'grade'       => 'I',
             ];
         }
         // Calculate total coursework score
@@ -48,13 +48,13 @@ class FinalResultService
         $totalExamScore = $examResults->sum('score');
 
         // Calculate total score
-        $totalScore = $totalCourseworkScore + $totalExamScore;
+        $totalScore = (float)$totalCourseworkScore + (float)$totalExamScore;
                                                                     // Determine grade
         $gradeMapping = GradeMapping::where('grading_system_id', 1) // Assuming 1 as the grading system ID for this example
-            ->where('min_score', '<=', $totalScore)
-            ->where('max_score', '>=', $totalScore)
+            ->where('min_score', '<=', (float)$totalScore)
+            ->where('max_score', '>=', (float)$totalScore)
             ->first();
-
+        
         $grade = $gradeMapping ? $gradeMapping->grade : 'I';
 
         return [

@@ -6,7 +6,11 @@ use App\Models\Staff;
 use App\Models\Task;
 use App\Models\Region;
 use App\Models\District;
+use Illuminate\Support\Facades\Auth;
+use DB;
 use Illuminate\Http\Request;
+use App\Exports\AssignedStaffExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TaskController extends Controller
 {
@@ -46,20 +50,33 @@ class TaskController extends Controller
         return redirect()->route('tasks.assign', $task->id)->with('success', 'Task created! Now assign staff.');
     }
 
-
-    public function assignFormxx(Task $task)
-    {
-        $staff = Staff::where('status', 'active')->get();
-        return view('staffs.tasks.assign', compact('task', 'staff'));
-    }
     public function assignForm(Request $request, Task $task)
     {
+        $activeTaskIds = Task::whereIn('status', ['active', 'scheduled', 'overdue'])->pluck('id');
+
+        $busyStaffIds = DB::table('staff_task')
+            ->whereIn('task_id', $activeTaskIds)
+            ->pluck('staff_id');
+
         $staff = Staff::query()
+            ->whereNotIn('id', $busyStaffIds)
             ->where('status', 'active')
-            ->when($request->search, fn($q) => $q->where('name', 'like', '%' . $request->search . '%'))
             ->when($request->designation, fn($q) => $q->where('designation', $request->designation))
             ->when($request->rank, fn($q) => $q->where('rank', $request->rank))
+            ->when($request->search, function ($q) use ($request) {
+                    $search = $request->search;
+                    $q->where(function ($query) use ($search) {
+                        $query->where('firstName', 'like', "%$search%")
+                            ->orWhere('middleName', 'like', "%$search%")
+                            ->orWhere('lastName', 'like', "%$search%");
+                    });
+                })
+            ->when($request->sort, function ($q) use ($request) {
+                $direction = $request->direction === 'desc' ? 'desc' : 'asc';
+                $q->orderBy($request->sort, $direction);
+            })
             ->get();
+
 
         return view('staffs.tasks.assign', [
             'task' => $task,
@@ -73,6 +90,12 @@ class TaskController extends Controller
 
     public function assignStaff(Request $request, Task $task)
     {
+        $request->validate([
+            'staff_ids' => 'required|array|min:1',
+            'staff_ids.*' => 'exists:staff,id',
+            'region_id' => 'required|exists:regions,id',
+        ]);
+
         foreach ($request->staff_ids as $id) {
             $task->staff()->attach($id, [
                 'region_id' => $request->region_id,
@@ -81,11 +104,15 @@ class TaskController extends Controller
                 'end_time' => $request->end_time,
                 'assigned_at' => now(),
                 'is_active' => true,
+                'assigned_by' => Auth::id(),
             ]);
         }
 
-        return redirect()->route('staffs.tasks.index')->with('success', 'Staff assigned successfully!');
+        return redirect()
+            ->route('tasks.staff', ['task' => $task->id, 'region_id' => $request->region_id])
+            ->with('success', 'Staff assigned successfully!');
     }
+
 
     /**
      * Display the specified resource.
@@ -94,6 +121,31 @@ class TaskController extends Controller
     {
         //
     }
+
+    public function showStaff(Request $request, Task $task)
+    {
+        $selectedRegion = $request->region_id;
+
+        // Eager load staff with pivot data
+        $task->load('staff');
+
+        // Extract unique region IDs from pivot
+        $regionIds = $task->staff->pluck('pivot.region_id')->unique()->filter();
+
+        // Map region IDs to region names
+        $regionMap = Region::whereIn('id', $regionIds)->orderBy('name')->pluck('name', 'id');
+
+        // Filter staff by selected region (if any)
+        $filteredStaff = $selectedRegion
+            ? $task->staff->filter(fn($member) => $member->pivot->region_id == $selectedRegion)
+            : collect();
+
+        // Group filtered staff by region name
+        $grouped = $filteredStaff->groupBy(fn($member) => $regionMap[$member->pivot->region_id] ?? 'Unknown Region');
+
+        return view('staffs.tasks.show', compact('task', 'regionMap', 'grouped', 'selectedRegion'));
+    }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -119,6 +171,17 @@ class TaskController extends Controller
         $task->update($request->only('title', 'description', 'priority', 'due_date'));
 
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully!');
+    }
+
+    public function exportAssignedStaff(Request $request, Task $task)
+    {
+        $task->load('staff');
+
+        $regionIds = $task->staff->pluck('pivot.region_id')->unique()->filter();
+        $regionMap = Region::whereIn('id', $regionIds)->orderBy('name')->pluck('name', 'id');
+        $selectedRegion = $request->region_id;
+
+        return Excel::download(new AssignedStaffExport($task, $regionMap, $selectedRegion), 'assigned_staff.xlsx');
     }
 
 

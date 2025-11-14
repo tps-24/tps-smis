@@ -19,30 +19,30 @@ class UpdateStudentDetails implements ToCollection
 
         foreach ($rows as $row) {
             $num++;
-            if ($num <= 3) continue; // Skip headers
+            if ($num <= 5) continue; // Skip headers
 
             // --- Validation ---
-            $validator = Validator::make([
-                'first_name'   => $row[2] ?? null,
-                'middle_name'  => $row[3] ?? null,
-                'last_name'    => $row[4] ?? null,
-                'company_id'   => $this->getCompanyId($row[6]) ?? null,
-                'platoon'      => $row[7] ?? null,
-                'force_number' => $row[0] ?? null,
-            ], [
-                'first_name'   => 'required|string|max:255',
-                'middle_name'  => 'required|string|max:255',
-                'last_name'    => 'required|string|max:255',
-                'company_id'   => 'required',
-                'platoon'      => 'required',
-                'force_number' => 'nullable|string|max:20',
-            ]);
+            // $validator = Validator::make([
+            //     'first_name'   => $row[2] ?? null,
+            //     'middle_name'  => $row[3] ?? null,
+            //     'last_name'    => $row[4] ?? null,
+            //     'company_id'   => $this->getCompanyId($row[6]) ?? null,
+            //     'platoon'      => $row[7] ?? null,
+            //     'force_number' => $row[0] ?? null,
+            // ], [
+            //     'first_name'   => 'required|string|max:255',
+            //     'middle_name'  => 'required|string|max:255',
+            //     'last_name'    => 'required|string|max:255',
+            //     'company_id'   => 'required',
+            //     'platoon'      => 'required',
+            //     'force_number' => 'nullable|string|max:20',
+            // ]);
 
-            if ($validator->fails()) {
-                $this->errors[] = "Row $num: " . implode(', ', $validator->errors()->all());
-                Log::error("Row $num validation failed: " . json_encode($validator->errors()->all()));
-                continue;
-            }
+            // if ($validator->fails()) {
+            //     $this->errors[] = "Row $num: " . implode(', ', $validator->errors()->all());
+            //     Log::error("Row $num validation failed: " . json_encode($validator->errors()->all()));
+            //     continue;
+            // }
 
             // --- Student Lookup ---
             //Log::info($row[21]);

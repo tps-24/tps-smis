@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('staff_id')->constrained()->onDelete('cascade');
             $table->foreignId('task_id')->constrained()->onDelete('cascade');
             $table->foreignId('region_id')->constrained('regions');
-            $table->foreignId('district_id')->constrained('districts');
+            $table->foreignId('district_id')->constrained('districts')->nullable();
             // Assignment metadata
             $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();
