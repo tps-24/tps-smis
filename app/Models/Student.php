@@ -34,7 +34,7 @@ class Student extends Model
 
     public function studyLevel()
     {
-        return $this->belongsTo(studyLevel::class, 'studyLevel_id');
+        return $this->belongsTo(studyLevel::class, 'study_level_id');
     }
 
     public function finalResults()

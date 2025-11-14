@@ -133,7 +133,7 @@ class PermissionTableSeeder extends Seeder
            ['name' => 'teacher_on_duty-create', 'description' => 'Create new Teacher On duty'],
            ['name' => 'teacher_on_duty-edit', 'description' => 'Edit Teacher on duty'],
            ['name' => 'teacher_on_duty-delete', 'description' => 'Delete Teacher on duty'],
-            */
+            
            ['name' => 'post-view', 'description' => 'View Post'],
            ['name' => 'post-create', 'description' => 'Create new Post'],
            ['name' => 'post-edit', 'description' => 'Edit Post'],
@@ -143,6 +143,11 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'vitengo-create', 'description' => 'Create new Kitengo'],
             ['name' => 'vitengo-edit', 'description' => 'Edit Vitengo'],
             ['name' => 'vitengo-delete', 'description' => 'Delete Vitengo'],
+            */
+            ['name' => 'weapon-view', 'description' => 'Weapon Vitengo'],
+            ['name' => 'weapon-create', 'description' => 'Create new Weapon'],
+            ['name' => 'weapon-edit', 'description' => 'Edit Weapon'],
+            ['name' => 'weapon-delete', 'description' => 'Delete Weapon'],            
             // Add other permissions here with descriptions
         ];
 

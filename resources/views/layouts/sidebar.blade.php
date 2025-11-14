@@ -158,7 +158,7 @@
                                 <span class="menu-text">Time Sheet</span>
                             </a>
                         </li>
-                        
+
                         @can('staff-list')
                             <li>
                                 <a href="{{ route('tasks.index') }}">Mpango Kazi</a>
@@ -167,8 +167,8 @@
 
 
                         <!-- <li>
-                                    <a href="">Staff Resume</a>
-                                    </li> -->
+                                        <a href="">Staff Resume</a>
+                                        </li> -->
 
                     </ul>
                 </li>
@@ -267,8 +267,8 @@
                             </li>
                         @endcan()
                         <!-- <li>
-                                    <a href="#">My Courses</a> For Teacher
-                                </li>-->
+                                        <a href="#">My Courses</a> For Teacher
+                                    </li>-->
                         <li>
                             <a href="{{ route('coursework_results.index') }}">Coursework (CA)</a> <!-- For Teacher-->
                         </li>
@@ -331,46 +331,68 @@
                 </li>
             @endcan()
             @can('announcement-list')
+                @php
+                    // Check if any condition is met to display the "Announcements" menu
+                    $isStudentEnrolled = auth()->user()->student
+                        && auth()->user()->student->sessionProgramme
+                        && auth()->user()->student->sessionProgramme->endDate
+                        && auth()->user()->student->sessionProgramme->endDate > \Carbon\Carbon::today();
+
+                    $showAnnouncementsMenu = $isStudentEnrolled || auth()->user()->hasRole('Sir Major') || auth()->user()->hasRole('OC Coy') || auth()->user()->hasRole('Chief Instructor') || auth()->user()->hasAnyRole('Admin|Super Administrator');
+                @endphp
+
+                @if ($showAnnouncementsMenu)
+                    <li>
+                        <a href="{{ route('announcements.index') }}">
+                            <i class="bi bi-send"></i>
+                            <span class="menu-text">Announcements</span>
+                        </a>
+                    </li>
+                @endif
+            @endcan
+
+            @php
+                // You can apply similar logic for the "Download Center"
+                $showDownloadCenter = $isStudentEnrolled || auth()->user()->hasRole('Sir Major') || auth()->user()->hasRole('OC Coy') || auth()->user()->hasRole('Chief Instructor') || auth()->user()->hasAnyRole('Admin|Super Administrator');
+            @endphp
+
+            @if ($showDownloadCenter)
                 <li>
-                    <a href="{{ route('announcements.index') }}">
-                        <i class="bi bi-send"></i>
-                        <span class="menu-text">Announcements</span>
+                    <a href="{{ route('downloads.index') }}">
+                        <i class="bi bi-download"></i>
+                        <span class="menu-text">Download Center</span>
                     </a>
                 </li>
-            @endcan()
-            <li>
-                <a href="{{ route('downloads.index') }}">
-                    <i class="bi bi-download"></i>
-                    <span class="menu-text">Download Center</span>
-                </a>
-            </li>
+            @endif
 
-            <li>
+
+            <!-- <li>
                 <a href="{{ route('timetable.index') }}">
                     <i class="bi bi-calendar2"></i>
                     <span class="menu-text">Timetable</span>
                 </a>
-            </li>
-            <li class="treeview">
-                <a href="!#">
-                    <i class="bi bi-shield"></i> <!-- Changed icon -->
-                    <span class="menu-text">Weapons</span>
-                </a>
-                <ul class="treeview-menu">
-                    <li>
-                        <a href="{{ route('weapon-models.index')}}">Models</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('weapon-borrowing.index')}}">Borrowing</a>
-                    </li>
-                    @can('report-list')
+            </li> -->
+            @can('weapon-view')
+                <li class="treeview">
+                    <a href="!#">
+                        <i class="bi bi-shield"></i> <!-- Changed icon -->
+                        <span class="menu-text">Weapons</span>
+                    </a>
+                    <ul class="treeview-menu">
                         <li>
-                            <a href="{{ route('weapons.summary') }}">Summary</a>
+                            <a href="{{ route('weapon-models.index')}}">Models</a>
                         </li>
-                    @endcan
-                </ul>
-            </li>
-
+                        <li>
+                            <a href="{{ route('weapon-borrowing.index')}}">Borrowing</a>
+                        </li>
+                        @can('report-list')
+                            <li>
+                                <a href="{{ route('weapons.summary') }}">Summary</a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
+            @endcan
             @can('mps-list')
                 <li class="treeview">
                     <a href="!#">
@@ -403,59 +425,78 @@
 
 
             @can('leave-list')
-                <li class="treeview">
-                    <a href="#">
-                        <i class="bi bi-mouse3"></i>
-                        <span class="menu-text">Leave(s)</span>
-                    </a>
-                    <ul class="treeview-menu">
-                        @auth
-                            {{-- Student --}}
-                            @role('Student')
-                            <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for
-                                    Leave</a></li>
-                            @endrole
+                @php
+                    // Check if any role or condition is met to display the menu
+                    $isStudentEnrolled = auth()->user()->student
+                        && auth()->user()->student->sessionProgramme
+                        && auth()->user()->student->sessionProgramme->endDate
+                        && auth()->user()->student->sessionProgramme->endDate > \Carbon\Carbon::today();
 
-                            {{-- Sir Major --}}
-                            @role('Sir Major')
-                            <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a>
-                            </li>
-                            @endrole
+                    // Check if the user is any of the roles eligible to view the leave menu
+                    $showLeaveMenu = $isStudentEnrolled || auth()->user()->hasRole('Sir Major') || auth()->user()->hasRole('OC Coy') || auth()->user()->hasRole('Chief Instructor') || auth()->user()->hasAnyRole('Admin|Super Administrator');
+                @endphp
 
-                            {{-- OC Coy --}}
-                            @role('OC Coy')
-                            <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC
-                                    Panel</a></li>
-                            @endrole
+                @if ($showLeaveMenu)
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="bi bi-mouse3"></i>
+                            <span class="menu-text">Leave(s)</span>
+                        </a>
+                        <ul class="treeview-menu">
+                            @auth
+                                {{-- Student Role --}}
+                                @role('Student')
+                                @if ($isStudentEnrolled)
+                                    <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for
+                                            Leave</a></li>
+                                @endif
+                                @endrole
 
-                            {{-- Chief Instructor --}}
-                            @role('Chief Instructor')
-                            <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i>
-                                    Chief Instructor Panel</a></li>
-                            @endrole
+                                {{-- Sir Major Role --}}
+                                @role('Sir Major')
+                                <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a>
+                                </li>
+                                @endrole
 
-                            {{-- Admins (see all) --}}
-                            @hasanyrole('Admin|Super Administrator')
-                            <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for
-                                    Leave</a></li>
-                            <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a>
-                            </li>
-                            <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC
-                                    Panel</a></li>
-                            <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i>
-                                    Chief Instructor Panel</a></li>
-                            @endhasanyrole
-                        @else
-                            <li><a href="{{ url('/') }}"><i class="bi bi-bar-chart-line"></i> Dashboard</a></li>
-                        @endauth
-                        @can('report-list')
-                            <li>
-                                <a href="{{ route('reports.leaves') }}">Summary</a>
-                            </li>
-                        @endcan
-                    </ul>
-                </li>
+                                {{-- OC Coy Role --}}
+                                @role('OC Coy')
+                                <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC
+                                        Panel</a></li>
+                                @endrole
+
+                                {{-- Chief Instructor Role --}}
+                                @role('Chief Instructor')
+                                <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i>
+                                        Chief Instructor Panel</a></li>
+                                @endrole
+
+                                {{-- Admin & Super Administrator Roles --}}
+                                @hasanyrole('Admin|Super Administrator')
+                                @if ($isStudentEnrolled)
+                                    <li><a href="{{ route('leave-requests.create') }}"><i class="bi bi-pencil-square"></i> Apply for
+                                            Leave</a></li>
+                                @endif
+                                <li><a href="{{ route('leave-requests.index') }}"><i class="bi bi-inbox"></i> Sir Major Panel</a>
+                                </li>
+                                <li><a href="{{ route('leave-requests.oc-panel') }}"><i class="bi bi-person-video3"></i> OC
+                                        Panel</a></li>
+                                <li><a href="{{ route('leave-requests.chief-instructor') }}"><i class="bi bi-person-badge"></i>
+                                        Chief Instructor Panel</a></li>
+                                @endhasanyrole
+                            @else
+                                <li><a href="{{ url('/') }}"><i class="bi bi-bar-chart-line"></i> Dashboard</a></li>
+                            @endauth
+
+                            {{-- Report Access --}}
+                            @can('report-list')
+                                <li><a href="{{ route('reports.leaves') }}"><i class="bi bi-file-earmark-pdf"></i> Leave Summary</a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endif
             @endcan
+
 
 
             @can('beat-list')

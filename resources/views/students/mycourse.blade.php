@@ -83,23 +83,16 @@
                                         <th>Course Name</th>
                                         <th>Course Type</th>
                                         <th>Credit Weight</th>
-                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $i = 1; @endphp
                                     @foreach ($semesterCourses as $course)
                                         <tr>
-                                            <td>{{ $i++ }}</td>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td>{{ $course->courseCode }}</td>
                                             <td>{{ $course->courseName }}</td>
                                             <td>{{ $course->pivot->course_type }}</td>
                                             <td>{{ $course->pivot->credit_weight }}</td>
-                                            <td>
-                                                {{-- Add any buttons or actions here --}}
-                                                {{-- Example: --}}
-                                                {{-- <a href="{{ route('courses.show', $course->id) }}" class="btn btn-primary btn-sm">View</a> --}}
-                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
