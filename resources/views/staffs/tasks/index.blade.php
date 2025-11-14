@@ -39,7 +39,9 @@
                   <th scope="col"><strong>No</strong></th>
                   <th scope="col"><strong>Task Title</strong></th>
                   <th scope="col"><strong>Priority</strong></th>
+                  <th scope="col"><strong>Start Date</strong></th>
                   <th scope="col"><strong>Due Date</strong></th>
+                  <th scope="col"><strong>Status</strong></th>
                   <th scope="col"><strong>Created At</strong></th>
                   <th scope="col" width="280px"><strong>Actions</strong></th>
                 </tr>
@@ -55,11 +57,16 @@
                       {{ ucfirst($task->priority) }}
                     </span>
                   </td>
+                  <td>{{ optional($task->start_date)->format('d M Y') ?? '—' }}</td>
                   <td>{{ optional($task->due_date)->format('d M Y') ?? '—' }}</td>
+                  <td>{{ $task->status }}</td>
                   <td>{{ $task->created_at->format('d M Y') }}</td>
                   <td>
-                    <a class="btn btn-info btn-sm" href="{{ route('tasks.assign', $task->id) }}">
+                    <a class="btn btn-secondary btn-sm" href="{{ route('tasks.assign', $task->id) }}">
                       <i class="fa fa-users"></i> Assign
+                    </a>
+                    <a href="{{ route('tasks.staff', $task->id) }}" class="btn btn-sm btn-info">
+                      View
                     </a>
                     <a class="btn btn-primary btn-sm" href="{{ route('tasks.edit', $task->id) }}">
                       <i class="fa-solid fa-pen-to-square"></i> Edit

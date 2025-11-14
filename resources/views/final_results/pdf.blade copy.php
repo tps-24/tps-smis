@@ -85,7 +85,7 @@
         }
         th, td {
             border: 1px solid black;
-            padding: 3px;
+            padding: px;
             text-align: left;
         }
         .results-container {

@@ -15,7 +15,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\Snappy\Facades\SnappyPdf;
-use App\Models\AdmittedStudent;
+use App\Models\CourseworkResult;
+use App\Models\SemesterExamResult;
 use App\Models\ProgrammeCourseSemester;
 use Illuminate\Support\Facades\Auth;
 
@@ -211,16 +212,15 @@ class FinalResultController extends Controller
 
     public function generate(Request $request, $sessionProgrammeId)
     {
-        
-        $enrollment   = Enrollment::where('session_programme_id', $sessionProgrammeId)->where('course_id', $request->course_id)->first();
         $semesterExam = SemesterExam::where('course_id', $request->course_id)->where('session_programme_id', $sessionProgrammeId)->first();
         $sessionProgramme = SessionProgramme::find($sessionProgrammeId);
         if (!$semesterExam) {
             return redirect()->back()->with('info', 'Course Exam is not configured.');
         }
-        $semesterExamId = $semesterExam->first()->id;
+        $semesterExamId = $semesterExam->id;
         $courseId       = $request->course_id;
         $students       = $sessionProgramme->students; //->where('force_number', 'J.9425')->values();
+        $i = 0;
         foreach ($students as $student) {
             $resultData = $this->finalResultService->calculateFinalResult(
                 $student->id,
@@ -228,7 +228,9 @@ class FinalResultController extends Controller
                 $semesterExam->semester_id,
                 $courseId
             );
-
+            if($resultData ['grade'] == 'I'){
+                $i++;
+            }
             $resultData = array_merge($resultData, [
                 'student_id'  => $student->id,
                 'semester_id' => $semesterExam->semester_id,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -236,6 +238,11 @@ class FinalResultController extends Controller
             ]);
 
             $finalResult = FinalResult::updateOrCreate(
+                [
+                'student_id' => $student->id,
+                'semester_id' => $semesterExam->semester_id,
+                'course_id' => $request->course_id,
+                ],
                 $resultData
             );
         }
@@ -260,7 +267,7 @@ class FinalResultController extends Controller
             //     $resultData
             // );
         
-
+\Log::info("Total incomplete results generated: $i");
         return redirect()->route('final_results.index')
             ->with('success', 'Final results generated successfully.');
     }
@@ -492,7 +499,8 @@ class FinalResultController extends Controller
             ->where('course_id', $courseId)
             ->where('semester_id', $semesterId)
             ->whereHas('student', function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId);
+                $query->where('session_programme_id', $selectedSessionId)
+                ->where('status', 'approved');
             })
             ->paginate($perPage);
 
@@ -561,14 +569,16 @@ class FinalResultController extends Controller
         }
 
         $semesterExamId = $semesterExam->id;
-
+        
         foreach ($sessionProgramme->students as $student) {
+            
             $resultData = $this->finalResultService->calculateFinalResult(
                 $student->id,
                 $semesterExamId,
                 $semesterId,
                 $courseId
             );
+
 
             $resultData = array_merge($resultData, [
                 'student_id'  => $student->id,
@@ -586,7 +596,7 @@ class FinalResultController extends Controller
             );
         }
     }
-
+    
     return redirect()->route('final_results.index')
         ->with('success', 'Final results for all students and courses generated successfully.');
 }

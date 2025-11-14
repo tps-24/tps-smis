@@ -86,31 +86,6 @@ Route::group(['middleware' => ['auth', 'verified', 'check_active_session']], fun
     // Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
 });
 
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
-
-// Route::controller(BeatController::class)->prefix('beats')->group(function () {
-//     Route::get('/', 'index');
-//     Route::get('companies/{beatType}','companies');
-//     Route::get('companies/{companyId}/areas','get_companies_area');
-//     Route::get('companies/{companyId}/patrol_areas','get_companies_patrol_area');
-//     Route::get('/store', 'store');
-//     Route::get('/show_guards/{area_id}', 'show_guards_beats');
-//     Route::get('/show_patrol/{area_id}', 'show_patrol_beats');
-//     Route::get('/show_patrol_areas', 'list_patrol_areas')->name('beats.show_patrol_areas');
-//     Route::put('/update/{area_id}', 'update_area');
-//     Route::put('/update_patrol_area/{patrol_area_id}', 'update_patrol_area');
-
-//     Route::get('/list-guards/{area_id}', 'list_guards');
-//     Route::get('/list-patrol/{patrolArea_id}', 'list_patrol');
-//     Route::get('/list-patrol-guards/{patrolArea_id}', 'list_patrol_guards');
-//     Route::put('/approve', 'approve_presence');
-//     Route::get('/downloadPdf/{company_id}/{beatType}/{day}', 'generateTodayPdf')->name('beats.downloadPdf');
-// });
-
 Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {});
 
 // Route::middleware(['auth', 'checkCourseInstructor'])->group(function () {
@@ -451,6 +426,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/staff/filter', [TaskController::class, 'filterStaff'])->name('staff.filter');
     Route::get('/tasks/{task}/assign', [TaskController::class, 'assignForm'])->name('tasks.assign');
     Route::post('/tasks/{task}/assign', [TaskController::class, 'assignStaff'])->name('tasks.assign.store');
+    Route::get('/tasks/{task}/staff', [TaskController::class, 'showStaff'])->name('tasks.staff');
+    Route::get('/tasks/{task}/staff/export', [TaskController::class, 'exportAssignedStaff'])->name('tasks.staff.export');
 
 
     Route::resource('grading_systems', GradingSystemController::class);
