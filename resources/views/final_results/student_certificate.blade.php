@@ -117,6 +117,10 @@
                                             </thead>
                                             <tbody>
                                                 @foreach($company->students as $i => $student)
+                                                @php
+                                                 if ($student->enrollment_status == 0)
+                                                    continue;
+                                                @endphp
                                                     <tr>
                                                         <td>
                                                             <input class="form-check-input student-checkbox" type="checkbox"
