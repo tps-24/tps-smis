@@ -103,6 +103,8 @@ Route::middleware(['auth', 'check.student.status'])->group(function () {
     Route::get('/students/courses', [StudentController::class, 'myCourses'])->name('students.myCourses');
     Route::get('/student/home', [StudentController::class, 'dashboard'])->name('students.dashboard');
     Route::get('/students/courseworks', [CourseworkResultController::class, 'coursework'])->name('students.coursework');
+        Route::get('/courseworks/student/{studentId}', [CourseworkResultController::class, 'studentCoursework'])->name('student.courseworks');
+
     Route::get('/students/exam-results', [FinalResultController::class, 'showExamResults'])->name('students.final_results');
     // Route::resource('students', StudentController::class);
 
@@ -273,12 +275,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('final_results/generate/{sessionProgrammeId}', [FinalResultController::class, 'generate'])->name('final_results.session.generate');
     Route::get('final_results/return/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'returnResults'])->name('final_results.return');
     Route::get('final_results/semester/{semesterId}/course/{courseId}', [FinalResultController::class, 'getResults'])->name('final_results');
+    Route::get('final_results/student/{studentId}', [FinalResultController::class, 'getStudentResults'])->name('student.final_results');
     Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
     Route::post('/students/bulk-update-students', [StudentController::class, 'updateStudents'])->name('student.updateStudents');
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('staff.profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); // Not yet, needs email config
-    Route::post('users/search', [UserController::class, 'search'])->name('users.search');
+    Route::get('users/search', [UserController::class, 'search'])->name('users.search');
 
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');
     Route::post('/students/{id}/approve', [StudentController::class, 'approveStudent'])->name('students.approve');

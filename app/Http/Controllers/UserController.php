@@ -39,32 +39,35 @@ class UserController extends Controller
     }
 
     public function search(Request $request)
-    {
-        // $roleName = $request->role;
-        // $roleExists = Role::where('id', $roleName)->exists();
-        // dd($roleExists);
+{
+    $users = User::query();
 
-
-        $users = User::whereHas('roles', function($query) use ($request) {
+    // Filter by role if provided
+    if ($request->role) {
+        $users->whereHas('roles', function ($query) use ($request) {
             $query->where('id', $request->role);
-        })->orderBy('name');
-
-        // dd($users);
-    
-        if ($request->name) {
-            $users = $users->where(function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->name . '%')
-                      ->orWhere('email', 'like', '%' . $request->name . '%');
-            });
-        }
-    
-        $roles = Role::all();
-    
-        $users = $users->latest()->paginate(20);
-    
-        return view('users.index', compact('users', 'roles'))
-            ->with('i', ($request->input('page', 1) - 1) * 20);
+        });
     }
+
+    // Filter by name/email if provided
+    if ($request->name) {
+        $users->where(function ($query) use ($request) {
+            $query->where('name', 'like', '%' . $request->name . '%')
+                  ->orWhere('email', 'like', '%' . $request->name . '%');
+        });
+    }
+
+    // Apply ordering and pagination
+    $users = $users->orderBy('name')
+                   ->paginate(20)
+                   ->appends($request->all()); // 👈 keep filters in pagination links
+
+    $roles = Role::all();
+
+    return view('users.index', compact('users', 'roles'))
+        ->with('i', ($request->input('page', 1) - 1) * 20);
+}
+
     
     
     /**

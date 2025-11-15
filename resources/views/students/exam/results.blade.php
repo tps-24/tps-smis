@@ -48,13 +48,17 @@
 <div class="row gx-4">
     <div class="col-sm-12">
         <div class="card mb-3">
-            <div class="card-header">
+                    <div class="card-header">
                 @if (session('success'))
-                    <div class="alert alert-success">
-                        <p>{{ session('success') }}</p>
-                    </div>
+                <div class="alert alert-success">
+                    <p>{{ session('success') }}</p>
+                </div>
                 @endif
             </div>
+        <div class=" d-flex justify-content-between card-header mb-3">
+            <h4>Final Results for {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->last_name }}</h4>
+            <a href="{{ route('student.courseworks', $student->id) }}" class="btn btn-sm btn-primary">Coursework</a>
+        </div>
 
             <div class="card-body">
                 {{-- Tabs --}}
