@@ -32,7 +32,11 @@
                 <!-- Left: Upload Staff -->
                 <div class="d-flex col-auto gap-2">
                     @can('student-create')
-                        <a href="{{ route('uploadStaff') }}" class="btn btn-sm btn-primary">Upload Staff</a>
+                    <a href="{{ route('uploadStaff') }}" class="btn btn-sm btn-primary">Upload Staff</a>
+                    @endcan
+
+                    @can('student-edit')
+                    <a href="{{ route('updateStaffs') }}" class="btn btn-sm btn-secondary">Update Staff(s)</a>
                     @endcan
                 </div>
 
@@ -67,13 +71,9 @@
                     @endcan
                 </div>
             </div>
-
-
+        
             <!-- Search container -->
-
-
-
-
+            <div class="card mt-3">
             <div class="card-body">
                 <div class="table-outer">
                     <div class="table-responsive">

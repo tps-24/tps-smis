@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\Department;
 use App\Models\NextOfKin;
 use App\Imports\BulkImportStaff;
+use App\Imports\UpdateStaffDetails;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Services\AuditLoggerService;
@@ -280,6 +281,36 @@ class StaffController extends Controller
     return redirect()->route('staffs.index')->with('success', 'Staff updated successfully.');
 }
 
+
+    public function updateStaffs(Request $request)
+    {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
+        // Check if a session is selected
+        $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
+            return redirect()->back()->withErrors('Please select a session before updating students.');
+        }
+
+        $import = new UpdateStaffDetails();
+
+        try {
+            Excel::import($import, $request->file('staffs_file'));
+
+            // Return with success, warnings, and errors
+            return redirect()->back()->with([
+                'success'  => 'Staff details updated successfully!',
+                'warnings' => $import->warnings,
+                'errors'   => $import->errors,
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors('An error occurred: ' . $e->getMessage());
+        }
+    }
 
 
     /**
