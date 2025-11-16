@@ -27,6 +27,7 @@ class FinalResultController extends Controller
     public function __construct(FinalResultService $finalResultService)
     {
         $this->middleware('permission:generate-results')->only(['createGenerate', 'generate','returnResults']);
+        $this->middleware('permission:student-coursework-list')->only(['getStudentResults']);
         $this->finalResultService = $finalResultService;
     }
 
@@ -290,7 +291,8 @@ class FinalResultController extends Controller
 
         // Pass only students to the view
         $pdf = Pdf::loadView('final_results.pdf', compact('students'))
-            ->setPaper('a4', 'landscape');
+            ->setPaper('a4', 'landscape')
+            ->setOption('margin-bottom', '20mm'); 
 
 
         return $pdf->stream('final_results.pdf');
@@ -512,6 +514,37 @@ class FinalResultController extends Controller
             'course'  => $course ?? [],
             'results' => $finalResults, // Laravel automatically includes pagination structure
         ]);
+    }
+
+    public function getStudentResults(Request $request, $studentId)
+    {
+        // Check if a session ID has been submitted
+        if (request()->has('session_id')) {
+            // Store the selected session ID in the session
+            session(['selected_session' => request()->session_id]);
+        }
+        
+        $perPage = 10;
+        // Fetch final results with related student info
+        $selectedSessionId = session('selected_session');
+        if (! $selectedSessionId) {
+            $selectedSessionId = 4;
+        }
+        $student = Student::find($studentId);
+
+        $results = FinalResult::with([
+            'semester',
+            'course',
+            //'semesterExam.course.programmes'
+        ])
+        ->where('student_id', $student->id)
+        ->get();
+        // Group results by semester
+        $groupedBySemester = $results->groupBy(function ($result) {
+            return $result->semester->id;
+        });
+
+        return view('students.exam.results', compact('groupedBySemester','student'));
     }
 
     public function returnResults($semesterId, $courseId)

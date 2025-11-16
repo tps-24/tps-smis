@@ -63,11 +63,23 @@
                     </div>
 
                     <div class="d-flex justify-content-end mt-3 gap-2">
-                        @can('student-coursework-list')
-                        <form action="{{ route('student.final_results', $student->id) }}" method="get">
-                            <button type="submit" class="btn  btn-dark">Academic Results</button>
-                        </form>
+                        @can('beat-edit')
+                        @if($student->beat_status != 6)
+                            @if ($student->beat_status == 4 && $student->pendingSafari()->exists()  )
+                                <form action="{{ route('returnSafariStudent', $student->pendingSafari()->first()->id) }}"
+                                    method="POST">
+                                    @csrf
+                                    @method('PUT') <!-- Spoofing PUT request -->
+                                    <button type="submit" class="btn btn-primary">Return</button>
+                                </form>
+
+                            @else
+                                <button class="btn  btn-dark" data-bs-toggle="modal"
+                                    data-bs-target="#SafariDetails">To Safari</button>
+                            @endif
+                            @endif
                         @endcan
+
                         @can('beat-edit')
                             <a class="btn btn-{{ $student->fast_status == 0 ? 'secondary' : 'primary' }}"
                                 href="{{ route('updateFastingStatus', ['studentId' => $student->id, 'fastingStatus' => $student->fast_status == 0 ? 1 : 0]) }}">

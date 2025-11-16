@@ -26,9 +26,9 @@
         
       </div>
       <div class="col-12 d-flex justify-content-center">
-          <form class="d-flex" action="{{route('users.search')}}" method="POST">
+          <form class="d-flex" action="{{route('users.search')}}" method="GET">
               @csrf
-              @method("POST")
+              @method("GET")
               <div class="d-flex gap-2">
                 <label for="">Filter </label>
                   <!-- Name Search -->
