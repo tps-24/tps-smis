@@ -63,7 +63,27 @@
     </style>
 </head>
 <body>
+    @php
+function pdf_safe($string) {
+    // Replace known unsupported characters with safe versions
+    $replace = [
+        "′" => "'",     // prime symbol → normal apostrophe
+        "″" => '"',     // double prime → normal quote
+        "“" => '"', 
+        "”" => '"',
+        "‘" => "'",
+        "’" => "'",
+    ];
+
+    return strtr($string, $replace);
+}
+@endphp
+
     @foreach($students as $student)
+                                                    @php
+                                                 if ($student->enrollment_status == 0)
+                                                    continue;
+                                                @endphp
     <div class="certificate-container">
         <!-- Full-Page Image -->
         <div class="certificate-image">
@@ -74,7 +94,7 @@
         <div class="details">
             <p style="margin-top:30px; margin-bottom:20px;"><i>This is to certify that</i></p>
             <p style="font-size:25px; font-weight: bold;">
-                {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
+                {{ $student->force_number }} {{ $student->rank }} {{ pdf_safe($student->first_name) }} {{ pdf_safe($student->middle_name) }} {{ pdf_safe($student->last_name) }}
             </p>
             <p>
                 has successfully attended and passed the <strong>{{ $session_programme->session_programme_name }}</strong><br> 
