@@ -19,6 +19,11 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class CourseworkResultController extends Controller
 {
+
+        public function __construct()
+    {
+        $this->middleware('permission:student-coursework-list')->only(['studentCoursework']);
+    }
     /**
      * Display a listing of the resource.
      */

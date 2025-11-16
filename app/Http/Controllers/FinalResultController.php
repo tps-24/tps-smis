@@ -27,6 +27,7 @@ class FinalResultController extends Controller
     public function __construct(FinalResultService $finalResultService)
     {
         $this->middleware('permission:generate-results')->only(['createGenerate', 'generate','returnResults']);
+        $this->middleware('permission:student-coursework-list')->only(['getStudentResults']);
         $this->finalResultService = $finalResultService;
     }
 
@@ -290,7 +291,8 @@ class FinalResultController extends Controller
 
         // Pass only students to the view
         $pdf = Pdf::loadView('final_results.pdf', compact('students'))
-            ->setPaper('a4', 'landscape');
+            ->setPaper('a4', 'landscape')
+            ->setOption('margin-bottom', '20mm'); 
 
 
         return $pdf->stream('final_results.pdf');

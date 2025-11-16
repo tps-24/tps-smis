@@ -63,10 +63,11 @@
                     </div>
 
                     <div class="d-flex justify-content-end mt-3 gap-2">
+                        @can('student-coursework-list')
                         <form action="{{ route('student.final_results', $student->id) }}" method="get">
                             <button type="submit" class="btn  btn-dark">Academic Results</button>
                         </form>
-
+                        @endcan
                         @can('beat-edit')
                             <a class="btn btn-{{ $student->fast_status == 0 ? 'secondary' : 'primary' }}"
                                 href="{{ route('updateFastingStatus', ['studentId' => $student->id, 'fastingStatus' => $student->fast_status == 0 ? 1 : 0]) }}">
