@@ -44,14 +44,14 @@ class FinalResultController extends Controller
             $selectedSessionId = 1;
         }
 
-        $students   = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
+        $students   = Student::where('session_programme_id', $selectedSessionId)->where('enrollment_status', 1)->orderBy('company_id')->orderBy('platoon')->paginate(20);
         $companiesy = Company::all();
 
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId);
         })
             ->with(['students' => function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId)->orderBy('platoon');
+                $query->where('session_programme_id', $selectedSessionId)->where('enrollment_status', 1)->orderBy('platoon');
             }])
             ->get();
 
@@ -467,7 +467,7 @@ class FinalResultController extends Controller
             $selectedSessionId = 1;
         }
 
-        $students   = Student::where('session_programme_id', $selectedSessionId)->orderBy('company_id')->orderBy('platoon')->paginate(20);
+        $students   = Student::where('session_programme_id', $selectedSessionId)->where('enrollment_status', 1)->orderBy('company_id')->orderBy('platoon')->paginate(20);
         $companiesy = Company::all();
 
         $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
@@ -475,6 +475,7 @@ class FinalResultController extends Controller
         })
             ->with(['students' => function ($query) use ($selectedSessionId, $request, $companyId) {
                 $query->where('session_programme_id', $selectedSessionId)
+                    ->where('enrollment_status', 1)
                     ->where('company_id', $companyId)
                     ->where('platoon', $request->platoon);
             }])

@@ -278,6 +278,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('final_results/student/{studentId}', [FinalResultController::class, 'getStudentResults'])->name('student.final_results');
     Route::post('/staff/bulkimport', [StaffController::class, 'import'])->name('staff.bulkimport');
     Route::post('/students/bulk-update-students', [StudentController::class, 'updateStudents'])->name('student.updateStudents');
+    Route::post('/staffs/bulk-update-staffs', [StaffController::class, 'updateStaffs'])->name('staffs.updateStaffs');
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('staff.profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
     Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); // Not yet, needs email config
