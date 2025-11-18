@@ -53,20 +53,19 @@
             <form id="changeStatusForm"  action="{{ route('staff.change_status') }}" method="post">
               @csrf
               <select 
-                  name="status" 
-                  class="form-control bg-success text-white" 
-                  onchange="confirmAction('changeStatusForm', 'Change Status', 'Status', 'Change')">
-                  
-                  @php
-                      $statuses = ['active', 'leave', 'study', 'trip', 'dismissed'];
-                  @endphp
+    name="status" 
+    class="form-control bg-success text-white" 
+    onchange="confirm('changeStatusForm', 'Change Status', 'Status', 'Change', '{{ $staff->status }}')">
+    @php
+        $statuses = ['active', 'leave', 'safari', 'secondment'];
+    @endphp
+    @foreach ($statuses as $status)
+        <option value="{{ $status }}" {{ $staff->status === $status ? 'selected' : '' }}>
+            {{ ucfirst($status) }}
+        </option>
+    @endforeach
+</select>
 
-                  @foreach ($statuses as $status)
-                      <option value="{{ $status }}" {{ $staff->status === $status ? 'selected' : '' }}>
-                          {{ ucfirst($status) }}
-                      </option>
-                  @endforeach
-              </select>
 
                 <input type="text" name="staff_id" value="{{ $staff->id }}" hidden>
             </form>
@@ -341,8 +340,141 @@
     </div>
 </div>
 <!-- Row ends -->
-
 <script>
-  
+  function confirm(formId, itemTitle, message, action, currentStatus) {
+    // Determine label and whether to show description
+    const isActive = currentStatus === 'active';
+    const dateLabel = isActive ? 'Start Date' : 'End Date';
+    const dateId = isActive ? 'swal-start-date' : 'swal-end-date';
+
+    Swal.fire({
+      title: itemTitle,
+      html: `
+        <p style="margin-bottom: 15px; font-size: 14px; color: #555;">
+          Are you sure you want to <strong>${action}</strong> ${message}?
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
+          ${isActive ? `
+            <label for="swal-description" style="font-weight: 600; color: #333;">Description</label>
+            <textarea id="swal-description" class="swal-input" placeholder="Enter description"></textarea>
+          ` : ''}
+
+          <label for="${dateId}" style="font-weight: 600; color: #333;">${dateLabel}</label>
+          <input type="date" id="${dateId}" class="swal-input" value="${new Date().toISOString().split('T')[0]}"/>
+        </div>
+      `,
+      icon: 'warning',
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Yes, ' + action,
+      cancelButtonText: 'No, cancel!',
+      customClass: {
+        popup: 'swal-popup-custom',
+        confirmButton: 'swal-btn-confirm',
+        cancelButton: 'swal-btn-cancel'
+      },
+      preConfirm: () => {
+        if (isActive) {
+          const description = document.getElementById('swal-description').value.trim();
+          if (!description) {
+            Swal.showValidationMessage('Description is required!');
+            return false;
+          }
+        }
+        const dateValue = document.getElementById(dateId).value;
+        if (!dateValue) {
+          Swal.showValidationMessage(`${dateLabel} is required!`);
+          return false;
+        }
+
+        return { description: isActive ? document.getElementById('swal-description').value.trim() : null, dateValue };
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const form = document.getElementById(formId);
+
+        if (isActive) {
+          const descInput = document.createElement('input');
+          descInput.type = 'hidden';
+          descInput.name = 'description';
+          descInput.value = result.value.description;
+          form.appendChild(descInput);
+        }
+
+        const dateInput = document.createElement('input');
+        dateInput.type = 'hidden';
+        dateInput.name = isActive ? 'start_date' : 'end_date';
+        dateInput.value = result.value.dateValue;
+        form.appendChild(dateInput);
+
+        form.submit();
+      }
+    });
+  }
 </script>
+
+
+<style>
+  /* SweetAlert2 custom styles */
+  .swal-popup-custom {
+    border-radius: 14px;
+    font-family: 'Segoe UI', sans-serif;
+    padding: 25px 25px 20px 25px;
+    max-width: 480px;
+  }
+
+  .swal-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+    font-size: 14px;
+    transition: all 0.25s ease;
+  }
+
+  .swal-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+  }
+
+  .swal-btn-confirm {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    border-radius: 10px !important;
+    padding: 12px 25px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease;
+  }
+
+  .swal-btn-confirm:hover {
+    background-color: #45a049 !important;
+    transform: translateY(-1px);
+  }
+
+  .swal-btn-cancel {
+    background-color: #f44336 !important;
+    color: white !important;
+    border-radius: 10px !important;
+    padding: 12px 25px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease;
+  }
+
+  .swal-btn-cancel:hover {
+    background-color: #e53935 !important;
+    transform: translateY(-1px);
+  }
+
+  /* Placeholder styling */
+  .swal-input::placeholder {
+    color: #aaa;
+  }
+</style>
+
+
+
  @endsection

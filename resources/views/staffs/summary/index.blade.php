@@ -44,8 +44,8 @@
       $cardTypes = [
         ['key' => 'active', 'label' => 'Active', 'color' => 'primary'],
         ['key' => 'leave', 'label' => 'Leave', 'color' => 'success'],
-        ['key' => 'study', 'label' => 'Study', 'color' => 'info'],
-        ['key' => 'dismissed', 'label' => 'Dismissed', 'color' => 'danger'],
+        ['key' => 'safari', 'label' => 'Safari', 'color' => 'info'],
+        ['key' => 'secondment', 'label' => 'Secondment', 'color' => 'danger'],
       ];
     @endphp
 
@@ -136,16 +136,15 @@
     total: "Total Staff",
     active: "Active Staff",
     leave: "Staff on Leave",
-    study: "Staff on Study",
-    dismissed: "Dismissed Staff"
+    safari: "Staff on Safari",
+    secondment: "Secondment Staff"
   };
 
   const statusIcons = {
     active: `<span class="badge badge-active">✔ Active</span>`,
     leave: `<span class="badge badge-leave">🏖 On Leave</span>`,
-    study: `<span class="badge badge-study">📘 Study</span>`,
-    trip: `<span class="badge badge-trip">✈ Trip</span>`,
-    dismissed: `<span class="badge badge-dismissed">❌ Dismissed</span>`
+    safari: `<span class="badge badge-trip">✈ Trip</span>`,
+    secondment: `<span class="badge badge-dismissed">❌ Secondment</span>`
   };
 
   function showStaffs(type = 'total', page = 1) {

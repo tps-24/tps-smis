@@ -456,6 +456,7 @@ class FinalResultController extends Controller
 
     public function search(Request $request, $companyId)
 {
+    $search = null;
     // Store selected session
     if ($request->has('session_id')) {
         session(['selected_session' => $request->session_id]);
@@ -509,7 +510,7 @@ class FinalResultController extends Controller
             }
         }])
         ->get();
-
+    
     return view('final_results.student_certificate', compact('students', 'companies', 'selectedSessionId', 'search'));
 }
 

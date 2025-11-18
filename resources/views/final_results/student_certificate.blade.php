@@ -1,4 +1,46 @@
 @extends('layouts.main')
+@section('style')
+<style>
+    /* Remove Bootstrap pill/tab backgrounds */
+.nav-link {
+    background: transparent !important;
+    border: none !important;
+    color: #555;
+    position: relative;
+    font-weight: 500;
+    padding-bottom: 8px;
+}
+
+/* Hover */
+.nav-link:hover {
+    color: #000;
+}
+
+/* Active underline */
+.nav-link.active {
+    color: #0d6efd;
+}
+
+.nav-link.active::after {
+    content: "";
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    background: #0d6efd;
+    border-radius: 2px;
+}
+
+/* Make tabs scrollable if they overflow */
+.nav.nav-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+}
+
+</style>
+@endsection
 @section('scrumb')
     <!-- Scrumb starts -->
     <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
@@ -71,33 +113,28 @@
                     <div class="card my-3">
                         <div class="col-12 col-md-6">
                             <form action="{{ route('students.search_certificate', $company->id) }}" method="GET">
-    <div class="row align-items-center">
-        <label class="col-auto mb-0">Filter</label>
-        
-        <!-- Search -->
-        <div class="col">
-            <input type="text" name="search" 
-                   value="{{ $search ?? '' }}" 
-                   placeholder="Search by name or force number" 
-                   class="form-control" style="max-width: 300px; margin-right:10px;">
-        </div>
-        
-        <!-- Platoon filter -->
-        <div class="col">
-            <select onchange="this.form.submit()" class="form-select" name="platoon">
-                <option value="">Platoons</option>
-                @foreach($company->platoons as $platoon)
-                    <option value="{{ $platoon->id }}" {{ request('platoon') == $platoon->id ? 'selected' : '' }}>
-                        {{ $platoon->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-</form>
+                                @csrf
 
-</form>
-
+                                <div class="d-flex gap-2">
+                                    <label class=" mb-0">Filter</label>
+                                    <div >
+                                        <input type="text" name="search" value="{{ $search ?? '' }}"
+                                            placeholder="Search by name or force number" class="form-control"
+                                            style="max-width: 300px; margin-right:10px;">
+                                    </div>
+                                    <div >
+                                        <select onchange="this.form.submit()" class="form-select" name="platoon" required>
+                                            <option value="" selected disabled>Select Platoon</option>
+                                            @for ($i = 1; $i < 15; $i++)
+                                                <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
+                                                    {{ $i }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                 <a href="{{ route('students.search_certificate', $company->id) }}" class="btn btn-secondary">Reset</a> 
+                                </div>
+                            </form>
                         </div>
 
 
@@ -129,10 +166,6 @@
                                             </thead>
                                             <tbody>
                                                 @foreach($company->students as $i => $student)
-                                                @php
-                                                 if ($student->enrollment_status == 0)
-                                                    continue;
-                                                @endphp
                                                     <tr>
                                                         <td>
                                                             <input class="form-check-input student-checkbox" type="checkbox"

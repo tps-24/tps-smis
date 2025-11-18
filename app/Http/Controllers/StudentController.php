@@ -311,7 +311,6 @@ class StudentController extends Controller
         public function myCourses()
     {
         $userId = auth()->id();
-
         // Get the student model for the logged-in user
         $student = Student::where('user_id', $userId)->first();
 
