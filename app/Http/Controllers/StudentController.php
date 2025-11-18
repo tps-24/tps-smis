@@ -468,7 +468,7 @@ class StudentController extends Controller
         // Update all other fields safely
         $fields = [
             'email', 'phone', 'dob', 'blood_group', 'education_level',
-            'nin', 'home_region', 'entry_region', 'height', 'weight',
+            'home_region', 'entry_region', 'height', 'weight',
             'account_number', 'bank_name', 'profession', 'vitengo_id', 'next_of_kin'
         ];
 

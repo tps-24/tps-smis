@@ -120,7 +120,7 @@
 
     <div class="col-md-6">
         <div class="info-label">Study Level:</div>
-        <p class="mb-2">{{ $student->studyLevel->studyLevelName }}</p>
+        <p class="mb-2">{{ $student->studyLevel->studyLevelName ?? ''}}</p>
     </div>
 
     <div class="col-md-6">

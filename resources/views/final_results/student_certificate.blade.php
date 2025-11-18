@@ -69,35 +69,23 @@
                     aria-labelledby="tab-{{ $company->id }}">
 
                     <div class="card my-3">
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-3">
                             <form action="{{ route('students.search_certificate', $company->id) }}" method="GET">
-    <div class="row align-items-center">
-        <label class="col-auto mb-0">Filter</label>
-        
-        <!-- Search -->
-        <div class="col">
-            <input type="text" name="search" 
-                   value="{{ $search ?? '' }}" 
-                   placeholder="Search by name or force number" 
-                   class="form-control" style="max-width: 300px; margin-right:10px;">
-        </div>
-        
-        <!-- Platoon filter -->
-        <div class="col">
-            <select onchange="this.form.submit()" class="form-select" name="platoon">
-                <option value="">Platoons</option>
-                @foreach($company->platoons as $platoon)
-                    <option value="{{ $platoon->id }}" {{ request('platoon') == $platoon->id ? 'selected' : '' }}>
-                        {{ $platoon->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-</form>
-
-</form>
-
+                                @csrf
+                                <div class="row align-items-center">
+                                    <label class="col-auto mb-0">Filter by Platoon</label>
+                                    <div class="col">
+                                        <select onchange="this.form.submit()" class="form-select" name="platoon" required>
+                                            <option value="" selected disabled>Select Platoon</option>
+                                            @for ($i = 1; $i < 15; $i++)
+                                                <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
+                                                    {{ $i }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
 
 
@@ -129,10 +117,6 @@
                                             </thead>
                                             <tbody>
                                                 @foreach($company->students as $i => $student)
-                                                @php
-                                                 if ($student->enrollment_status == 0)
-                                                    continue;
-                                                @endphp
                                                     <tr>
                                                         <td>
                                                             <input class="form-check-input student-checkbox" type="checkbox"

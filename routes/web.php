@@ -426,7 +426,6 @@ Route::group(['middleware' => ['auth']], function () {
     // Route::get('course/courseworks/create/{courseId}',[SemesterExamController::class,'create'])->name('course.coursework.create');
     // Route::get('course/courseworks/{courseId}',[SemesterExamController::class,'getCourse'])->name('course.coursework');
     Route::post('course/semester_exams/store/{courseId}', [SemesterExamController::class, 'store'])->name('course.semester_exams.store');
-    Route::get('/staff/filter', [TaskController::class, 'filterStaff'])->name('staff.filter');
     Route::get('/tasks/{task}/assign', [TaskController::class, 'assignForm'])->name('tasks.assign');
     Route::post('/tasks/{task}/assign', [TaskController::class, 'assignStaff'])->name('tasks.assign.store');
     Route::get('/tasks/{task}/staff', [TaskController::class, 'showStaff'])->name('tasks.staff');
