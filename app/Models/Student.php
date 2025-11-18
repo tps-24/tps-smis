@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Support\Facades\Log;
 use Auth;
 use Illuminate\Database\Eloquent\Model;
 
@@ -99,7 +99,6 @@ class Student extends Model
     {
         $programmeCourses = $this->programme->courses(); // Fixed here
         $optionalCourses = $this->optionalCourseEnrollments();
-
         // return $programmeCourses->merge($optionalCourses);
         return $programmeCourses;
     }
@@ -151,8 +150,9 @@ class Student extends Model
     public function getGPAAttribute()
     {
         $results = $this->finalResults;
-
-        $courses = $this->courses; // Retrieve ALL courses
+        $programme_sessionId = session('selected_session',4);
+        $sessionProgramme = SessionProgramme::find( $programme_sessionId); 
+        $programmeCourseSemesters = $sessionProgramme->programmeCourseSemesters;// Retrieve ALL courses
         $semester_one_total_credit_weight = 0;
         $semester_one_total_grade_credit = 0;
         $semester_two_total_credit_weight = 0;
@@ -160,23 +160,22 @@ class Student extends Model
         foreach ($results as $result) {
             if ($result->semester_id == 1) {
                 $semester_one_total_credit_weight += $this->getGradePoint($result->grade) * $result->course->programmes->first()->pivot->credit_weight;
-            } elseif ($result->semester_id == 2) {
+            } elseif ($result->semester_id == 2) {               
                 $semester_two_total_credit_weight += $this->getGradePoint($result->grade) * $result->course->programmes->first()->pivot->credit_weight;
             }
-
         }
+        
         // dd($semester_one_total_credit_weight);
-        foreach ($courses as $course) {
-            if ($course->semesters->first()->pivot->semester_id == 1) {
-                $semester_one_total_grade_credit += $course->pivot->credit_weight;
+        foreach ($programmeCourseSemesters as $programmeCourseSemester) {
+            if ($programmeCourseSemester->course->semesters->first()->pivot->semester_id == 1) {
+                $semester_one_total_grade_credit += $programmeCourseSemester->course->semesters->first()->pivot->credit_weight;
             }
             // Ensure no null error
-            elseif ($course->semesters->first()->pivot->semester_id == 2) {
-                $semester_two_total_grade_credit += $course->pivot->credit_weight;
+            elseif ($programmeCourseSemester->course->semesters->first()->pivot->semester_id == 2) {
+                $semester_two_total_grade_credit += $programmeCourseSemester->course->semesters->first()->pivot->credit_weight;
             }
 
         }
-
         // Calculation of gpa for each semester
         // $semesterOneGPA = $semester_one_total_grade_credit == 0 ? 0 : $semester_one_total_credit_weight / $semester_one_total_grade_credit;
         // $semesterTwoGPA = $semester_two_total_grade_credit == 0 ? 0 : $semester_two_total_credit_weight / $semester_two_total_grade_credit;

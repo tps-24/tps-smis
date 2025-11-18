@@ -144,7 +144,7 @@ class PermissionTableSeeder extends Seeder
             ['name' => 'vitengo-edit', 'description' => 'Edit Vitengo'],
             ['name' => 'vitengo-delete', 'description' => 'Delete Vitengo'],
             */
-            ['name' => 'weapon-view', 'description' => 'Weapon Vitengo'],
+            ['name' => 'weapon-view', 'description' => 'List Weapon'],
             ['name' => 'weapon-create', 'description' => 'Create new Weapon'],
             ['name' => 'weapon-edit', 'description' => 'Edit Weapon'],
             ['name' => 'weapon-delete', 'description' => 'Delete Weapon'],            

@@ -1,360 +1,243 @@
 @extends('layouts.main')
 
 @section('scrumb')
-<!-- Scrumb starts -->
-<nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
+<nav class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#" id="homee">Home</a></li>
-                <li class="breadcrumb-item"><a href="#">Semester Exam Results </a></li>
+                <li class="breadcrumb-item"><a href="#">Semester Exam Results</a></li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    <a href="#" id="breadcrumbCourse">Semester Exam Results Lists for ...</a>
+                    <a href="#" id="breadcrumbCourse">Semester Exam Results List</a>
                 </li>
-
             </ol>
         </nav>
     </div>
 </nav>
-<!-- Scrumb ends -->
 @endsection
 
 @section('content')
-@session('success')
-<div class="alert alert-success alert-dismissible " role="alert">
-    {{ $value }}
-</div>
-@endsession
-@php use Illuminate\Support\Js; @endphp
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
 <div class="row gx-4">
+
+    <!-- Left section: Semester tabs and courses -->
     <div class="col-sm-3">
         <div class="card mb-3">
             <div class="card-header">
-                <!-- Semester Tabs -->
                 <ul class="nav nav-tabs" id="semesterTabs" role="tablist">
                     @foreach ($semesters as $key => $semester)
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link {{ $key == 0 ? 'active bg-success text-white' : '' }}"
-                            id="tab-{{ $semester->id }}" data-bs-toggle="tab"
-                            data-bs-target="#semester-{{ $semester->id }}" type="button" role="tab"
-                            aria-controls="semester-{{ $semester->id }}"
-                            aria-selected="{{ $key == 0 ? 'true' : 'false' }}">
-                            {{ $semester->semester_name }}
-                        </button>
-                    </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $key == 0 ? 'active bg-success text-white' : '' }}"
+                                    id="tab-{{ $semester->id }}"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#semester-{{ $semester->id }}"
+                                    type="button">
+                                {{ $semester->semester_name }}
+                            </button>
+                        </li>
                     @endforeach
                 </ul>
             </div>
-
             <div class="card-body">
-                <!-- Tab Content for Semesters -->
                 <div class="tab-content" id="semesterTabsContent">
                     @foreach ($semesters as $key => $semester)
-                    <div class="tab-pane fade {{ $key == 0 ? 'show active' : '' }}" id="semester-{{ $semester->id }}"
-                        role="tabpanel" aria-labelledby="tab-{{ $semester->id }}">
-
-                        <h5>Courses for {{ $semester->semester_name }}</h5>
-                        @if ($semester->courses->isNotEmpty())
-                        <ul>
-                            @foreach ($semester->courses as $course)
-                            <li>
-                                <a href="#" class="course-link" data-course-id="{{ $course->id }}" data-semester-id="{{ $semester->id }}" data-course-name="{{ $course->courseName }}">
-                                    {{ $course->courseName }}
-                                </a>
-                            </li>
-                            @endforeach
-                        </ul>
-                        @else
-                        <p>No courses available for this semester.</p>
-                        @endif
-                    </div>
+                        <div class="tab-pane fade {{ $key == 0 ? 'show active' : '' }}"
+                             id="semester-{{ $semester->id }}">
+                            <h5>Courses for {{ $semester->semester_name }}</h5>
+                            @if ($semester->courses->isNotEmpty())
+                                <ul>
+                                    @foreach ($semester->courses as $course)
+                                        <li>
+                                            <a href="#"
+                                               class="course-link"
+                                               data-course-id="{{ $course->id }}"
+                                               data-semester-id="{{ $semester->id }}"
+                                               data-course-name="{{ $course->courseName }}">
+                                               {{ $course->courseName }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p>No courses available for this semester.</p>
+                            @endif
+                        </div>
                     @endforeach
                 </div>
             </div>
         </div>
     </div>
 
-    <style>
-    /* Default Tabs */
-    .nav-link {
-        color: black;
-        /* Default text color */
-    }
-
-    /* Active Semester Tab */
-    .nav-link.active {
-        color: #28a745;
-        /* Green text for the active semester tab */
-    }
-
-    /* Default Course Links */
-    .course-link {
-        text-decoration: none;
-        color: black;
-        /* Default text color for course links */
-    }
-
-    /* Selected Course Link */
-    .course-link.selected {
-        color: darkblue;
-        /* Light blue text for the selected course */
-        font-weight: bold;
-        /* Optional: Make it stand out more */
-    }
-    </style>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Highlight the active semester tab
-        document.querySelectorAll('#semesterTabs .nav-link').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('#semesterTabs .nav-link').forEach(link => link
-                    .classList.remove('active', 'bg-success', 'text-white'));
-                this.classList.add('active', 'bg-success', 'text-white');
-            });
-        });
-
-        // Highlight the selected course
-        document.querySelectorAll('.course-link').forEach(course => {
-            course.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent default link behavior
-                document.querySelectorAll('.course-link').forEach(link => link.classList.remove(
-                    'selected'));
-                this.classList.add('selected');
-            });
-        });
-    });
-    </script>
-
-    <!-- Left section ends-->
-
-
-    <!-- Right section starts-->
+    <!-- Right section: Exam results -->
     <div class="col-sm-9">
         <div class="card mb-3">
-            <div class="card-header">
-                <div class="pull-right">
-                    <span style="font-size:30px !important">Semester Exam Results</span>
-                    <!-- <h6>Here display the course choosen</h6> -->
-
-                    <!-- <button disabled id="add_btn" class="btn btn-success mb-2"
-                        style="float:right !important; margin-right:1%;">
-                        <a href="" id="add_link" style="color:white;"> <i class="fa fa-plus"></i> Upload SE Results</a>
-                    </button>
-
-                    <button disabled id="ca_configuration_btn" class="btn btn-success mb-2"
-                        style="float:right !important; margin-right:1%;">
-                        <a href="" id="ca_configuration_link" style="color:white;"> <i class="fa fa-plus"></i> SE Configurations</a>
-                    </button> -->
-
-
-                <div class="pull-right d-flex flex-wrap align-items-center justify-content-end" style="gap: 10px;">
-                    <!-- Upload Exam Button -->
-                    <button disabled id="upload_exam_btn" class="btn btn-success" style="margin-right: 1%;">
-                        <a href="" id="upload_exam_link" style="color: white; text-decoration: none;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span style="font-size: 26px;">Semester Exam Results</span>
+                <div class="d-flex gap-2">
+                    <button disabled id="upload_exam_btn" class="btn btn-success">
+                        <a href="" id="upload_exam_link" class="text-white text-decoration-none">
                             <i class="fa fa-plus"></i> Upload SE Results
                         </a>
                     </button>
-
-                    <!-- Exam Configuration Button -->
                     <button disabled id="exam_configuration_btn" class="btn btn-success">
-                        <a href="" id="exam_configuration_link" style="color: white; text-decoration: none;">
-                            <i class="fa fa-plus"></i> SE Configurations
+                        <a href="" id="exam_configuration_link" class="text-white text-decoration-none">
+                            <i class="fa fa-cog"></i> SE Configurations
                         </a>
                     </button>
                 </div>
-                </div>
-
             </div>
+
             <div class="card-body">
-                <div class="table-outer">
+                <!-- Search Form -->
+                <form id="search-form" class="d-flex justify-content-end mb-3">
+                    <input id="search-input" name="search" class="form-control"
+                           placeholder="Search by name or force number" style="max-width: 350px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle">
-                            <thead class="table-info">
-                                <tr id="exam-headings">
-                                    <!-- Dynamic headings will load here -->
-                                </tr>
-                            </thead>
-                            <tbody id="exam-results">
-                                <!-- Dynamic results or "No results found" message will load here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3" id="exam-pagination">
-                        <!-- Styled Bootstrap pagination links will dynamically load here -->
-                    </div>
-
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-info">
+                            <tr id="exam-headings"></tr>
+                        </thead>
+                        <tbody id="exam-results"></tbody>
+                    </table>
                 </div>
+
+                <div id="exam-pagination" class="d-flex justify-content-end mt-3"></div>
             </div>
         </div>
     </div>
-    <!-- Right section ends-->
+
 </div>
-<!-- Row ends -->
 @endsection
 
 @section('scripts')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
 
-<script>
-    function updateSelectedCourse(courseName) {
-    document.getElementById('breadcrumbCourse').textContent = 'Semester Exam Results List for ' + courseName;
-}
-    // Call the function if a course is pre-selected
-    @if($selectedCourse)
-        updateSelectedCourse(@json($selectedCourse->courseName));
-    @endif
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Attach event listeners for all course links
-    document.querySelectorAll('.course-link').forEach(function(link) {
-        link.addEventListener('click', function(e) {
+    // Highlight selected course + store selected ID
+    document.querySelectorAll(".course-link").forEach(link => {
+        link.addEventListener("click", function(e) {
             e.preventDefault();
 
-            const courseId = this.getAttribute('data-course-id');
-            const semesterId = this.getAttribute('data-semester-id');
+            const courseId = this.dataset.courseId;
+            const semesterId = this.dataset.semesterId;
+            const courseName = this.dataset.courseName;
+            window.currentCourseId = courseId;
+            window.currentSemesterId = semesterId;
 
-            // Upload Exam Button
-            const uploadExamLink = document.getElementById('upload_exam_link');
-            const uploadExamButton = document.getElementById('upload_exam_btn');
-            const uploadExamRoute = @json(route('exam.upload_explanation', [
-                'courseId' => 'COURSE_ID_PLACEHOLDER',
-                'semesterId' => 'SEMESTER_ID_PLACEHOLDER'
-            ]));
-            uploadExamLink.setAttribute('href', uploadExamRoute
-                .replace('COURSE_ID_PLACEHOLDER', courseId)
-                .replace('SEMESTER_ID_PLACEHOLDER', semesterId));
-            uploadExamButton.disabled = false;
+            // Update breadcrumb
+            document.getElementById('breadcrumbCourse').textContent =
+                `Semester Exam Results List for ${courseName}`;
 
-            // Exam Configuration Button
-            const examConfigLink = document.getElementById('exam_configuration_link');
-            const examConfigButton = document.getElementById('exam_configuration_btn');
-            const examConfigRoute = @json(route('exam.configure', [
-                'courseId' => 'COURSE_ID_PLACEHOLDER'
-            ]));
-            examConfigLink.setAttribute('href', examConfigRoute.replace('COURSE_ID_PLACEHOLDER', courseId));
-            examConfigButton.disabled = false;
-            console.log(`Selected Course ID: ${courseId}, Semester ID: ${semesterId}`);
+            // Highlight selected course
+            document.querySelectorAll('.course-link').forEach(a => a.classList.remove('selected'));
+            this.classList.add('selected');
 
-            // Optional: fetch and display exam results
-            fetchSemesterExamResults(courseId, semesterId);
+            // Enable buttons
+            const uploadRoute = @json(route('exam.upload_explanation', ['courseId'=>'COURSE_ID', 'semesterId'=>'SEM_ID']));
+            document.getElementById("upload_exam_link").href =
+                uploadRoute.replace("COURSE_ID", courseId).replace("SEM_ID", semesterId);
+            document.getElementById("upload_exam_btn").disabled = false;
+
+            const configRoute = @json(route('exam.configure', ['courseId'=>'COURSE_ID']));
+            document.getElementById("exam_configuration_link").href =
+                configRoute.replace("COURSE_ID", courseId);
+            document.getElementById("exam_configuration_btn").disabled = false;
+
+            // Fetch exam results
+            fetchExamResults(courseId, semesterId, 1);
         });
     });
 
-
-    // Function to fetch and render coursework results
-    function fetchSemesterExamResults(courseId, semesterId, page = 1) {
-        
-    const apiUrl = `/tps-smis/semester_exams/semester_exam_results/${courseId}/${semesterId}?page=${page}`;
-    const headingsContainer = document.getElementById('exam-headings');
-    const resultsContainer = document.getElementById('exam-results');
-    const paginationContainer = document.getElementById('exam-pagination');
-
-    if (!headingsContainer || !resultsContainer || !paginationContainer) {
-        console.error('Error: Necessary DOM elements are missing');
-        return;
-    }
-    resultsContainer.innerHTML = `<tr><td colspan="7" class="text-center">Loading...</td></tr>`;
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Fetched Semester Exam Data:', data);
-
-            if (!data.results || !data.results.data || Object.keys(data.results.data).length === 0) {
-                headingsContainer.innerHTML = '';
-                resultsContainer.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-muted text-center">No results found for this exam.</td>
-                    </tr>
-                `;
-                paginationContainer.innerHTML = '';
-                return;
-            }
-
-            const perPage = data.results.per_page && !isNaN(data.results.per_page) ? data.results.per_page : 10;
-
-            headingsContainer.innerHTML = `
-                <th>#</th>
-                <th>Force Number</th>
-                <th>Student Name</th>
-                <th style="text-align: center;">Exam Score</th>
-                <th style="text-align: center;">Actions</th>
-            `;
-            resultsContainer.innerHTML = '';
-
-            page = parseInt(page, 10);
-            if (isNaN(page) || page <= 0) page = 1;
-
-            const startIndex = (page - 1) * perPage + 1;
-            let rowIndex = startIndex;
-
-            Object.entries(data.results.data).forEach(([studentId, studentResult]) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="text-align: center;">${rowIndex++}</td>
-                    <td style="text-align: center;">${studentResult.student.force_number}</td>
-                    <td>${studentResult.student.first_name} ${studentResult.student.middle_name || ''} ${studentResult.student.last_name}</td>
-                    <td style="text-align: center;">${studentResult.exam_score ?? '-'}</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-info btn-sm">View</button>
-                        <button class="btn btn-primary btn-sm">Edit</button>
-                    </td>
-                `;
-                resultsContainer.appendChild(row);
-            });
-
-            paginationContainer.innerHTML = `
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-end">
-                        ${data.results.links.map(link => {
-                            const page = link.url ? new URL(link.url, window.location.origin).searchParams.get('page') : null;
-                            return `
-                                <li class="page-item ${link.active ? 'active' : ''}">
-                                    <a class="page-link" href="#" data-page="${page}">
-                                        ${link.label}
-                                    </a>
-                                </li>
-                            `;
-                        }).join('')}
-                    </ul>
-                </nav>
-            `;
-
-            document.querySelectorAll('.page-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const page = this.getAttribute('data-page');
-                    if (page) fetchSemesterExamResults(courseId, semesterId, page);
-                });
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching semester exam results:', error);
-            resultsContainer.innerHTML = `
-                <tr>
-                    <td colspan="7" class="text-danger text-center">Failed to load results. Please try again later.</td>
-                </tr>
-            `;
-        });
-}
-
-
+    // Search form submit
+    document.getElementById("search-form").addEventListener("submit", function(e){
+        e.preventDefault();
+        if(window.currentCourseId && window.currentSemesterId){
+            fetchExamResults(window.currentCourseId, window.currentSemesterId, 1);
+        }
+    });
 
 });
+
+// Fetch function for exam results with search & pagination
+function fetchExamResults(courseId, semesterId, page = 1){
+    const search = document.getElementById("search-input").value.trim();
+    const url = `/tps-smis/semester_exams/semester_exam_results/${courseId}/${semesterId}?page=${page}&search=${encodeURIComponent(search)}`;
+
+    const head = document.getElementById("exam-headings");
+    const body = document.getElementById("exam-results");
+    const pagination = document.getElementById("exam-pagination");
+
+    body.innerHTML = `<tr><td colspan="7" class="text-center">Loading...</td></tr>`;
+
+    fetch(url)
+    .then(res => res.json())
+    .then(data => {
+        if(!data.results || Object.keys(data.results.data).length === 0){
+            head.innerHTML = "";
+            body.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No results found.</td></tr>`;
+            pagination.innerHTML = "";
+            return;
+        }
+
+        // Table headings
+        head.innerHTML = `
+            <th>#</th>
+            <th>Force Number</th>
+            <th>Student Name</th>
+            <th style="text-align:center;">Exam Score</th>
+            <th style="text-align:center;">Actions</th>
+        `;
+
+        // Table body
+        body.innerHTML = "";
+        const perPage = data.results.per_page || 10;
+        const startIndex = (page - 1) * perPage + 1;
+        let rowIndex = startIndex;
+
+        Object.values(data.results.data).forEach(studentResult => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="text-align:center;">${rowIndex++}</td>
+                <td style="text-align:center;">${studentResult.student.force_number}</td>
+                <td>${studentResult.student.first_name} ${studentResult.student.middle_name ?? ""} ${studentResult.student.last_name}</td>
+                <td style="text-align:center;">${studentResult.exam_score ?? "-"}</td>
+                <td style="text-align:center;">
+                    <button class="btn btn-info btn-sm">View</button>
+                    <button class="btn btn-primary btn-sm">Edit</button>
+                </td>
+            `;
+            body.appendChild(row);
+        });
+
+        // Pagination
+        pagination.innerHTML = `
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-end">
+                    ${data.results.links.map(link => {
+                        const pageNum = link.url ? new URL(link.url, window.location.origin).searchParams.get("page") : null;
+                        return `<li class="page-item ${link.active ? "active" : ""}">
+                                    <a href="#" class="page-link" data-page="${pageNum}">${link.label}</a>
+                                </li>`;
+                    }).join("")}
+                </ul>
+            </nav>
+        `;
+
+        document.querySelectorAll(".page-link").forEach(link => {
+            link.addEventListener("click", function(e){
+                e.preventDefault();
+                const p = this.dataset.page;
+                if(p) fetchExamResults(courseId, semesterId, p);
+            });
+        });
+
+    }).catch(err=>{
+        console.error(err);
+        body.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Failed to load results.</td></tr>`;
+        pagination.innerHTML = "";
+    });
+}
 </script>
 @endsection

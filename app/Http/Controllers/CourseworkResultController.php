@@ -147,84 +147,98 @@ class CourseworkResultController extends Controller
         }
     }
 
-    public function getResultsByCourse($courseId)
-    {
-        try {
-            \Log::info("Fetching results for course ID: {$courseId}");
-            // Fetch all coursework configurations for the given course
-            $courseworks = DB::table('courseworks')
-                ->where('course_id', $courseId)
-                ->select('id', 'coursework_title')
-                ->get();
+    public function getResultsByCourse(Request $request, $courseId)
+{
+    try {
+        \Log::info("Fetching results for course ID: {$courseId}");
 
-            // Fetch coursework results by linking through the coursework table
-            $results = DB::table('coursework_results')
-                ->join('students', 'coursework_results.student_id', '=', 'students.id')
-                ->join('courseworks', 'coursework_results.coursework_id', '=', 'courseworks.id') // Establish the relationship
-                ->where('courseworks.course_id', $courseId)                                      // Filter based on course_id in the coursework table
-                ->select(
-                    'coursework_results.student_id',
-                    'students.force_number',
-                    'students.first_name',
-                    'students.middle_name',
-                    'students.last_name',
-                    DB::raw('SUM(coursework_results.score) as total_cw') // Calculate total CW
-                )
-                ->groupBy(
-                    'coursework_results.student_id',
-                    'students.force_number',
-                    'students.first_name',
-                    'students.middle_name',
-                    'students.last_name'
-                )
-                ->orderByDesc('total_cw') // Sort by total CW
-                ->paginate(10);           // Paginate results
+        // Optional search query
+        $search = $request->input('search');
 
-            // Format results for the frontend
-            $groupedResults = collect($results->items())->map(function ($studentResult) use ($courseworks) {
-                $scores = DB::table('coursework_results')
-                    ->where('student_id', $studentResult->student_id)
-                    ->whereIn('coursework_id', $courseworks->pluck('id'))
-                    ->pluck('score', 'coursework_id'); // Map scores by coursework ID
+        // Fetch all courseworks for the course
+        $courseworks = DB::table('courseworks')
+            ->where('course_id', $courseId)
+            ->select('id', 'coursework_title')
+            ->get();
 
-                return [
-                    'student'  => [
-                        'force_number' => $studentResult->force_number,
-                        'first_name'   => $studentResult->first_name,
-                        'middle_name'  => $studentResult->middle_name,
-                        'last_name'    => $studentResult->last_name,
-                    ],
-                    'scores'   => $scores,
-                    'total_cw' => $studentResult->total_cw,
-                ];
+        // Base query for results
+        $resultsQuery = DB::table('coursework_results')
+            ->join('students', 'coursework_results.student_id', '=', 'students.id')
+            ->join('courseworks', 'coursework_results.coursework_id', '=', 'courseworks.id')
+            ->where('courseworks.course_id', $courseId)
+            ->select(
+                'coursework_results.student_id',
+                'students.force_number',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                DB::raw('SUM(coursework_results.score) as total_cw')
+            )
+            ->groupBy(
+                'coursework_results.student_id',
+                'students.force_number',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name'
+            )
+            ->orderByDesc('total_cw');
+
+        // Apply search filter if provided
+        if ($search) {
+            $resultsQuery->where(function ($q) use ($search) {
+                $q->where('students.force_number', 'like', "%{$search}%")
+                  ->orWhere('students.first_name', 'like', "%{$search}%")
+                  ->orWhere('students.middle_name', 'like', "%{$search}%")
+                  ->orWhere('students.last_name', 'like', "%{$search}%");
             });
-
-            // Handle empty results
-            if ($groupedResults->isEmpty()) {
-                return response()->json([
-                    'courseworks' => $courseworks ?? [],
-                    'results'     => [
-                        'data'  => [],
-                        'links' => [],
-                    ],
-                    'message'     => 'No results found for this course.',
-                ]);
-            }
-
-            // Return formatted JSON response
-            return response()->json([
-                'courseworks' => $courseworks ?? [],
-                'results'     => [
-                    'data'  => $groupedResults,
-                    'links' => $results->toArray()['links'], // Include pagination links
-                ],
-            ]);
-        } catch (\Exception $e) {
-            // Log and return error
-            \Log::error('Error fetching coursework results:', ['message' => $e->getMessage()]);
-            return response()->json(['message' => 'Internal Server Error'], 500);
         }
+
+        // Paginate results
+        $results = $resultsQuery->paginate(10);
+
+        $currentPage = $results->currentPage();
+        $perPage = $results->perPage();
+
+        // Format results with scores and serial numbers
+        $groupedResults = collect($results->items())->map(function ($studentResult, $index) use ($courseworks, $currentPage, $perPage) {
+            $scores = DB::table('coursework_results')
+                ->where('student_id', $studentResult->student_id)
+                ->whereIn('coursework_id', $courseworks->pluck('id'))
+                ->pluck('score', 'coursework_id');
+
+            return [
+                'serial_number' => ($currentPage - 1) * $perPage + $index + 1,
+                'student' => [
+                    'force_number' => $studentResult->force_number,
+                    'first_name'   => $studentResult->first_name,
+                    'middle_name'  => $studentResult->middle_name,
+                    'last_name'    => $studentResult->last_name,
+                ],
+                'scores'   => $scores,
+                'total_cw' => $studentResult->total_cw,
+            ];
+        });
+
+        return response()->json([
+            'courseworks' => $courseworks ?? [],
+            'results' => [
+                'data' => $groupedResults,
+                'links' => $results->toArray()['links'],
+                'pagination' => [
+                    'current_page' => $currentPage,
+                    'per_page'     => $perPage,
+                    'total'        => $results->total(),
+                    'courseId' => $courseId,
+                ],
+            ],
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error('Error fetching coursework results:', ['message' => $e->getMessage()]);
+        return response()->json(['message' => 'Internal Server Error'], 500);
     }
+}
+
 
    public function coursework()
 {
