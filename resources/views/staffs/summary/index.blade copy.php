@@ -27,8 +27,9 @@
     font-size: 0.9em;
   }
   .badge-leave { background-color: #ffc107; color: #000; }
+  .badge-study { background-color: #17a2b8; color: #fff; }
   .badge-trip { background-color: #6610f2; color: #fff; }
-  .badge-secondment { background-color: #17a2b8; color: #fff; }
+  .badge-dismissed { background-color: #dc3545; color: #fff; }
   .badge-active { background-color: #28a745; color: #fff; }
 </style>
 
@@ -41,30 +42,10 @@
   <div class="row">
     @php
       $cardTypes = [
-        [
-          'key' => 'active',
-          'label' => 'Active',
-          'color' => 'primary',
-          'icon' => '<span class="badge badge-active badge-status">✔ Active</span>'
-        ],
-        [
-          'key' => 'leave',
-          'label' => 'Leave',
-          'color' => 'success',
-          'icon' => '<span class="badge badge-leave badge-status">🏖 On Leave</span>'
-        ],
-        [
-          'key' => 'trip',
-          'label' => 'Safari',
-          'color' => 'info',
-          'icon' => '<span class="badge badge-trip badge-status">✈ Safari</span>'
-        ],
-        [
-          'key' => 'secondment',
-          'label' => 'Secondment',
-          'color' => 'danger',
-          'icon' => '<span class="badge badge-secondment badge-status">📘 Secondment</span>'
-        ],
+        ['key' => 'active', 'label' => 'Active', 'color' => 'primary'],
+        ['key' => 'leave', 'label' => 'Leave', 'color' => 'success'],
+        ['key' => 'study', 'label' => 'Study', 'color' => 'info'],
+        ['key' => 'dismissed', 'label' => 'Dismissed', 'color' => 'danger'],
       ];
     @endphp
 
@@ -75,7 +56,7 @@
         onclick="showStaffs('{{ $type['key'] }}')">
         <div class="card-body text-center">
           <h5>{{ $type['label'] }}</h5>
-          <p class="fs-4">{{ isset($stats[$type['key']]) ? $stats[$type['key']]->count() : 0 }}</p>
+          <p class="fs-4">{{ $stats[$type['key']]->count() ?? 0 }}</p>
         </div>
       </button>
     </div>
@@ -106,6 +87,9 @@
         <option value="SSP">Senior Superintendent of Police (SSP)</option>
         <option value="ACP">Assistant Commissioner of Police (ACP)</option>
         <option value="SACP">Senior Assistant Commissioner of Police (SACP)</option>
+        <!-- <option value="DCP">Deputy Commissioner of Police (DCP)</option>
+        <option value="CP">Commissioner of Police (CP)</option>
+        <option value="IGP">Inspector General of Police (IGP)</option> -->
       </select>
     </div>
     <input type="hidden" name="status" id="filterStatus" value="">
@@ -126,7 +110,7 @@
 
   <div class="table-responsive">
     <table class="table table-striped table-bordered align-middle">
-      <thead class="table-secondary">
+      <thead class="table-dark">
         <tr>
           <th>SNo</th>
           <th>Force Number</th>
@@ -146,24 +130,29 @@
 
 @section('scripts')
 <script>
-  const cardTypes = @json($cardTypes);
-
   let currentFilterType = 'active';
 
-  const labels = cardTypes.reduce((acc, type) => {
-    acc[type.key] = `${type.label} Staff`;
-    return acc;
-  }, { total: "Total Staff" });
+  const labels = {
+    total: "Total Staff",
+    active: "Active Staff",
+    leave: "Staff on Leave",
+    study: "Staff on Study",
+    dismissed: "Dismissed Staff"
+  };
 
-  const statusIcons = cardTypes.reduce((acc, type) => {
-    acc[type.key] = type.icon;
-    return acc;
-  }, {});
+  const statusIcons = {
+    active: `<span class="badge badge-active">✔ Active</span>`,
+    leave: `<span class="badge badge-leave">🏖 On Leave</span>`,
+    study: `<span class="badge badge-study">📘 Study</span>`,
+    trip: `<span class="badge badge-trip">✈ Trip</span>`,
+    dismissed: `<span class="badge badge-dismissed">❌ Dismissed</span>`
+  };
 
   function showStaffs(type = 'total', page = 1) {
     currentFilterType = type;
     document.getElementById('filterStatus').value = type;
 
+    // Highlight active card
     document.querySelectorAll('.status-card').forEach(card => {
       card.classList.remove('active-card');
     });
@@ -176,20 +165,21 @@
     const params = new URLSearchParams(formData).toString();
     const url = `{{ url('staff/filter') }}?${params}&page=${page}`;
 
+    // Show loader
     document.getElementById('loading').style.display = 'block';
 
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        const staffs = data.staffs?.data || [];
+        const staffs = data.staffs.data;
         const container = document.getElementById('studentTableContainer');
         const title = document.getElementById('studentTableTitle');
         const body = document.getElementById('studentTableBody');
 
-        title.textContent = `${labels[type] ?? "Staff"} (${data.staffs?.total ?? 0})`;
+        title.textContent = labels[type] ?? "Staff";
         body.innerHTML = '';
 
-        let startIndex = (data.staffs?.current_page - 1) * data.staffs?.per_page;
+        let startIndex = (data.staffs.current_page - 1) * data.staffs.per_page;
 
         if (staffs.length === 0) {
           body.innerHTML = `
@@ -209,7 +199,7 @@
                 <td>${statusIcons[staff.status] ?? staff.status}</td>
                 <td>
                   <a href="/tps-smis/staffs/${staff.id}" class="btn btn-sm btn-outline-primary">View Profile</a>
-                  </td>
+                </td>
               </tr>
             `;
           });
@@ -225,41 +215,33 @@
       });
   }
 
-function renderPagination(data, type) {
-  const paginationContainer = document.getElementById('pagination-container');
-  const links = data.staffs?.links || [];
+  function renderPagination(data, type) {
+    const paginationContainer = document.getElementById('pagination-container');
+    paginationContainer.innerHTML = `
+      <nav>
+        <ul class="pagination justify-content-end flex-wrap mb-0">
+          ${data.staffs.links.map(link => {
+            const page = link.url ? new URL(link.url).searchParams.get('page') : null;
+            const label = link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»');
 
-  if (!links.length) {
-    paginationContainer.innerHTML = '';
-    return;
-  }
+            return `
+              <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${page}">${label}</a>
+              </li>
+            `;
+          }).join('')}
+        </ul>
+      </nav>
+    `;
 
-  paginationContainer.innerHTML = `
-    <nav>
-      <ul class="pagination justify-content-end flex-wrap mb-0">
-        ${links.map(link => {
-          const page = link.url ? new URL(link.url).searchParams.get('page') : null;
-          const label = link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»');
-
-          return `
-            <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
-              <a class="page-link" href="#" data-page="${page}">${label}</a>
-            </li>
-          `;
-        }).join('')}
-      </ul>
-    </nav>
-  `;
-
-  paginationContainer.querySelectorAll('.page-link').forEach(link => {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      const page = this.getAttribute('data-page');
-      if (page) showStaffs(currentFilterType, parseInt(page));
+    paginationContainer.querySelectorAll('.page-link').forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const page = this.getAttribute('data-page');
+        if (page) showStaffs(currentFilterType, parseInt(page));
+      });
     });
-  });
-}
-
+  }
 
   document.getElementById('staffFilterForm').addEventListener('submit', function (e) {
     e.preventDefault();

@@ -1,85 +1,109 @@
 <?php
 
 namespace App\Imports;
+
 use App\Models\Staff;
 use App\Models\User;
-use Carbon\Carbon;
-use Hash;
 use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Concerns\ToCollection;
 
-class BulkImportStaff implements ToCollection,ToModel
+class UpdateStaffDetails implements ToCollection
 {
-    private $num = 0;
-    /**
-     * @param Collection $collection
-     */
-    public function collection(Collection $collection)
-    {
-    }
+    public array $errors = [];
+    public array $warnings = [];
 
-    public function model(array $row)
+    public function collection(Collection $rows)
     {
-        $this->num++;
-        if ($this->num > 5) {
-            if (empty($row[1])) {
-                return;  // or you can use continue; depending on where the loop is
+        $num = 0;
+
+        foreach ($rows as $row) {
+            $num++;
+            if ($num <= 5) continue; // Skip header rows
+
+            // --- Validate required fields ---
+            if (empty($row[0]) || empty($row[1]) || empty($row[2]) || empty($row[4])) {
+                $this->warnings[] = "Row $num: Missing required fields (FORCE NUMBER, RANK, FIRST NAME, LAST NAME)";
+                Log::warning("Row $num skipped: missing required fields");
+                continue;
             }
-            $user = new User();
-            $user->name = $row[3]. " ". $row[4]. " ".$row[5];
-            $user->email = $row[6] == null? trim(strtolower($row[3]).".".strtolower($row[5])."@tpf.go.tz") : trim($row[6]);
-            $user->password= Hash::make(strtoupper($row[5]));
-       
-            $user->save();
-            $user->assignRole([6]);
 
-            $staff = new Staff();
-            $staff->forceNumber = $row[0];
-            $staff->rank = $row[1];
-            $staff->nin = $row[2];
-            $staff->firstName = $row[3];
-            $staff->middleName = $row[4];
-            $staff->lastName = $row[5];
-            $staff->email = $row[6] == null? trim(strtolower($row[3]).".".strtolower($row[5])."@tpf.go.tz") : trim($row[6]);
-            $staff->gender = $row[7];   
-            $staff->user_id = $user->id;
-            $staff->created_by = "1";
-            
-            //$staff->DoB = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[8]))->format('Y-m-d');
-            $staff->company_id = $this->getCompanyId($row[9]);
-            $staff->maritalStatus = $row[10];
-            $staff->religion = $row[11];
-            $staff->tribe = $row[12];
-            $staff->phoneNumber = $row[13];
-            
-            $staff->currentAddress = $row[14];
-            $staff->permanentAddress = $row[15];
-            $staff->department_id = $row[16];
-            $staff->designation = $row[17];
-            // $staff->educationLevel = $row[18];
-            // $staff->contractType = $row[19];
-            // $staff->joiningDate = $row[20];
-            // $staff->location = $row[21];
-            // $staff->nextofkinFullName = $row[22];
-            // $staff->nextofkinRelationship = $row[23];
-            // $staff->nextofkinPhoneNumber = $row[24];
-            // $staff->nextofkinPysicalAddress = $row[25];
+            // --- Lookup staff by FORCE NUMBER ---
+            $staff = Staff::where('forceNumber', trim($row[0]))->first();
 
-            $staff->save();
+            // --- If staff not found, create User + Staff ---
+            if (!$staff) {
+                try {
+                    // Create User account
+                    $user = new User();
+                    $user->name = trim($row[2]) . " " . trim($row[3]) . " " . trim($row[4]); // First + Middle + Last
+                    $user->email = empty($row[6])
+                        ? strtolower(trim($row[2])) . "." . strtolower(trim($row[4])) . "@tpf.go.tz"
+                        : trim($row[6]);
+                    $user->password = Hash::make(strtoupper(trim($row[4]))); // Last name as password
+                    $user->save();
 
-        }
-    }
-    private function getCompanyId($companyName){
-        if($companyName == 'HQ'){
-            return "1";
-        }elseif($companyName == 'A'){
-            return "2";
-        }elseif($companyName == 'B'){
-            return "3";
-        }elseif($companyName == 'C'){
-            return "4";
+                    // Assign default role (id = 6)
+                    $user->assignRole([6]);
+
+                    // Create Staff record linked to User
+                    $staff = new Staff();
+                    $staff->forceNumber   = trim($row[0]);
+                    $staff->rank          = trim($row[1]);
+                    $staff->firstName     = trim($row[2]);
+                    $staff->middleName    = trim($row[3]);
+                    $staff->lastName      = trim($row[4]);
+                    $staff->gender        = trim($row[5]);
+                    $staff->email         = $user->email;
+                    $staff->user_id       = $user->id; // link staff to user
+                    $staff->save();
+
+                    Log::info("Row $num: Created new staff {$row[0]} with user account {$user->email}");
+                } catch (\Exception $e) {
+                    $this->errors[] = "Row $num: Failed to create staff/user {$row[0]} — " . $e->getMessage();
+                    Log::error("Row $num create failed for {$row[0]}: " . $e->getMessage());
+                }
+                continue; // move to next row
+            }
+
+            // --- Build update data dynamically ---
+            $map = [
+                1  => 'rank',
+                2  => 'firstName',
+                3  => 'middleName',
+                4  => 'lastName',
+                5  => 'gender',
+                6  => 'designation',
+                7  => 'phoneNumber',
+                8  => 'DoB',
+                9  => 'maritalStatus',
+                10 => 'bloodGroup',
+                11 => 'religion',
+                12 => 'tribe',
+                13 => 'educationLevel',
+                14 => 'nextofkinFullName',
+                15 => 'nextofkinPhoneNumber',
+                16 => 'nextofkinPysicalAddress',
+                17 => 'nextofkinCity',
+                18 => 'nextofkinState',
+            ];
+
+            $updateData = [];
+            foreach ($map as $index => $field) {
+                if (isset($row[$index]) && $row[$index] !== null && $row[$index] !== '') {
+                    $updateData[$field] = trim($row[$index]);
+                }
+            }
+
+            try {
+                $staff->fill($updateData);
+                $staff->save();
+                Log::info("Row $num: Updated staff {$row[0]}");
+            } catch (\Exception $e) {
+                $this->errors[] = "Row $num: Failed to update staff {$row[0]} — " . $e->getMessage();
+                Log::error("Row $num update failed for {$row[0]}: " . $e->getMessage());
+            }
         }
     }
 }
