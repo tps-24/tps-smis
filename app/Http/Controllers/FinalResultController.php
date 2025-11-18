@@ -455,66 +455,102 @@ class FinalResultController extends Controller
     }
 
     public function search(Request $request, $companyId)
-    {
-        // Check if a session ID has been submitted
-        if (request()->has('session_id')) {
-            // Store the selected session ID in the session
-            session(['selected_session' => request()->session_id]);
-        }
-        
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 1;
-        }
+{
+    // Store selected session
+    if ($request->has('session_id')) {
+        session(['selected_session' => $request->session_id]);
+    }
 
-        $students   = Student::where('session_programme_id', $selectedSessionId)->where('enrollment_status', 1)->orderBy('company_id')->orderBy('platoon')->paginate(20);
-        $companiesy = Company::all();
+    $selectedSessionId = session('selected_session', 1);
 
-        $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
+    // Students query (for pagination)
+    $students = Student::where('session_programme_id', $selectedSessionId)
+        ->where('enrollment_status', 1)
+        ->orderBy('company_id')
+        ->orderBy('platoon');
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $students->where(function ($query) use ($search) {
+            $query->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('middle_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('force_number', 'like', "%{$search}%");
+        });
+    }
+
+    if ($request->filled('platoon')) {
+        $students->where('platoon', $request->platoon);
+    }
+
+    $students = $students->paginate(20);
+
+    // Get all companies in the current session
+    $companies = Company::whereHas('students', function ($query) use ($selectedSessionId) {
             $query->where('session_programme_id', $selectedSessionId);
         })
-            ->with(['students' => function ($query) use ($selectedSessionId, $request, $companyId) {
-                $query->where('session_programme_id', $selectedSessionId)
-                    ->where('enrollment_status', 1)
-                    ->where('company_id', $companyId)
-                    ->where('platoon', $request->platoon);
-            }])
-            ->get();
-        return view('final_results.student_certificate', compact('students', 'companies', 'selectedSessionId'));
+        ->with(['students' => function ($query) use ($selectedSessionId, $request, $companyId) {
+            $query->where('session_programme_id', $selectedSessionId)
+                  ->where('enrollment_status', 1)
+                  ->where('company_id', $companyId);
 
-    }
+            if ($request->filled('platoon')) {
+                $query->where('platoon', $request->platoon);
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                      ->orWhere('middle_name', 'like', "%{$search}%")
+                      ->orWhere('last_name', 'like', "%{$search}%")
+                      ->orWhere('force_number', 'like', "%{$search}%");
+                });
+            }
+        }])
+        ->get();
+
+    return view('final_results.student_certificate', compact('students', 'companies', 'selectedSessionId', 'search'));
+}
+
+
 
     public function getResults($semesterId, $courseId, Request $request)
-    {
-        // Check if a session ID has been submitted
-        if (request()->has('session_id')) {
-            // Store the selected session ID in the session
-            session(['selected_session' => request()->session_id]);
-        }
-        
-        $perPage = 10;
-        // Fetch final results with related student info
-        $selectedSessionId = session('selected_session');
-        if (! $selectedSessionId) {
-            $selectedSessionId = 4;
-        }
-        $finalResults = FinalResult::with('student')
-            ->where('course_id', $courseId)
-            ->where('semester_id', $semesterId)
-            ->whereHas('student', function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId)
-                ->where('status', 'approved');
-            })
-            ->paginate($perPage);
-
-        // Get course information (optional, not used in rendering results table)
-        $course = Course::find($courseId);
-
-        return response()->json([
-            'course'  => $course ?? [],
-            'results' => $finalResults, // Laravel automatically includes pagination structure
-        ]);
+{
+    // Handle session selection
+    if ($request->has('session_id')) {
+        session(['selected_session' => $request->session_id]);
     }
+
+    $perPage = 10;
+    $selectedSessionId = session('selected_session', 4);
+
+    $search = $request->query('search', ''); // Get search term from query
+
+    $finalResults = FinalResult::with('student')
+        ->where('course_id', $courseId)
+        ->where('semester_id', $semesterId)
+        ->whereHas('student', function ($query) use ($selectedSessionId, $search) {
+            $query->where('session_programme_id', $selectedSessionId)
+                  ->where('status', 'approved');
+
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                      ->orWhere('middle_name', 'like', "%{$search}%")
+                      ->orWhere('last_name', 'like', "%{$search}%")
+                      ->orWhere('force_number', 'like', "%{$search}%");
+                });
+            }
+        })
+        ->paginate($perPage);
+
+    return response()->json([
+        'course'  => Course::find($courseId),
+        'results' => $finalResults,
+    ]);
+}
+
 
     public function getStudentResults(Request $request, $studentId)
     {

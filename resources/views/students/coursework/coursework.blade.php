@@ -57,10 +57,13 @@
                 @endif
             </div>
         <div class=" d-flex justify-content-between card-header mb-3">
-            <h4>Final Results for {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->last_name }}</h4>
+            <h4>Coursework Results for {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->last_name }}</h4>
             <a href="{{ route('student.final_results', $student->id) }}" class="btn btn-sm btn-primary">Final Results</a>
         </div>
             <div class="card-body">
+                @if ($groupedBySemester->isEmpty())
+                    No courseworks
+                @endif
                 <ul class="nav nav-tabs" id="semesterTab" role="tablist">
                     @foreach($groupedBySemester as $semesterId => $results)
                         <li class="nav-item" role="presentation">

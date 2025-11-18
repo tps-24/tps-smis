@@ -1,7 +1,6 @@
 @extends('layouts.main')
 
 @section('scrumb')
-<!-- Scrumb starts -->
 <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
@@ -13,438 +12,250 @@
         </nav>
     </div>
 </nav>
-<!-- Scrumb ends -->
 @endsection
 
 @section('content')
-@session('success')
-<div class="alert alert-success alert-dismissible " role="alert">
-    {{ $value }}
-</div>
-@endsession
 
 <div class="row gx-4">
+
+    <!-- Left side -->
     <div class="col-sm-3">
-    <div class="card mb-3">
-        <div class="card-header">
-            <!-- Semester Tabs -->
-            <ul class="nav nav-tabs" id="semesterTabs" role="tablist">
-                @foreach ($semesters as $key => $semester)
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $key == 0 ? 'active bg-success text-white' : '' }}" id="tab-{{ $semester->id }}"
-                        data-bs-toggle="tab" data-bs-target="#semester-{{ $semester->id }}" type="button" role="tab"
-                        aria-controls="semester-{{ $semester->id }}"
-                        aria-selected="{{ $key == 0 ? 'true' : 'false' }}">
-                        {{ $semester->semester_name }}
-                    </button>
-                </li>
-                @endforeach
-            </ul>
-        </div>
-
-        <div class="card-body">
-            <!-- Tab Content for Semesters -->
-            <div class="tab-content" id="semesterTabsContent">
-                @foreach ($semesters as $key => $semester)
-                <div class="tab-pane fade {{ $key == 0 ? 'show active' : '' }}" id="semester-{{ $semester->id }}"
-                    role="tabpanel" aria-labelledby="tab-{{ $semester->id }}">
-                    <h5>Courses for {{ $semester->semester_name }}</h5>
-                    @if ($semester->courses->isNotEmpty())
-                    <ul>
-                        @foreach ($semester->courses as $course)
-                        <li>
-                            <a href="#" class="course-link" data-course-id="{{ $course->id }}">
-                                {{ $course->courseName }}
-                            </a>
-                        </li>
-                        @endforeach
-                    </ul>
-                    @else
-                    <p>No courses available for this semester.</p>
-                    @endif
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-  /* Default Tabs */
-.nav-link {
-    color: black; /* Default text color */
-}
-
-/* Active Semester Tab */
-.nav-link.active {
-    color: #28a745; /* Green text for the active semester tab */
-}
-
-/* Default Course Links */
-.course-link {
-    text-decoration: none;
-    color: black; /* Default text color for course links */
-}
-
-/* Selected Course Link */
-.course-link.selected {
-    color: darkblue; /* Light blue text for the selected course */
-    font-weight: bold; /* Optional: Make it stand out more */
-}
-
-@media (max-width: 768px) {
-    .pull-right {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    span {
-        font-size: 1.5rem; /* Adjust for smaller screens */
-        margin-bottom: 10px;
-    }
-
-    button {
-        width: 100%; /* Full-width buttons on smaller devices */
-        margin: 5px 0;
-    }
-}
-
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Highlight the active semester tab
-        document.querySelectorAll('#semesterTabs .nav-link').forEach(tab => {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('#semesterTabs .nav-link').forEach(link => link.classList.remove('active', 'bg-success', 'text-white'));
-                this.classList.add('active', 'bg-success', 'text-white');
-            });
-        });
-
-        // Highlight the selected course
-        document.querySelectorAll('.course-link').forEach(course => {
-            course.addEventListener('click', function (e) {
-                e.preventDefault(); // Prevent default link behavior
-                document.querySelectorAll('.course-link').forEach(link => link.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
-    });
-</script>
-
-    <!-- Left section ends-->
-
-
-    <!-- Right section starts-->
-    <div class="col-sm-9">
         <div class="card mb-3">
             <div class="card-header">
-            <span style="font-size: 1.875rem; text-align: left;">Coursework Results</span> <!-- Equivalent to 30px -->
-            <div class="pull-right d-flex flex-wrap align-items-center justify-content-end" style="gap: 10px;">
-                <!-- Button for Upload Coursework -->
-                <button disabled id="add_btn" class="btn btn-success" style="margin-right: 1%;">
-                    <a href="" id="add_link" style="color: white; text-decoration: none;">
-                        <i class="fa fa-plus"></i> Upload Coursework
-                    </a>
-                </button>
-
-                <!-- Button for CA Configurations -->
-                <button disabled id="ca_configuration_btn" class="btn btn-success">
-                    <a href="" id="ca_configuration_link" style="color: white; text-decoration: none;">
-                        <i class="fa fa-plus"></i> CA Configurations
-                    </a>
-                </button>
+                <ul class="nav nav-tabs" id="semesterTabs" role="tablist">
+                    @foreach ($semesters as $key => $semester)
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {{ $key == 0 ? 'active bg-success text-white' : '' }}"
+                                id="tab-{{ $semester->id }}"
+                                data-bs-toggle="tab"
+                                data-bs-target="#semester-{{ $semester->id }}"
+                                type="button">
+                            {{ $semester->semester_name }}
+                        </button>
+                    </li>
+                    @endforeach
+                </ul>
             </div>
 
-
-                <!-- <button id="export-btn" class="btn btn-secondary btn-sm" style="margin-top:-50px;">Export to Excel</button> -->
-
-            </div>
             <div class="card-body">
-                <div class="table-outer">
+                <div class="tab-content" id="semesterTabsContent">
+                    @foreach ($semesters as $key => $semester)
+                    <div class="tab-pane fade {{ $key == 0 ? 'show active' : '' }}"
+                         id="semester-{{ $semester->id }}">
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle">
-                            <thead class="table-info">
-                                <tr id="coursework-headings">
-                                    <!-- Dynamic headings will load here -->
-                                </tr>
-                            </thead>
-                            <tbody id="coursework-results">
-                                <!-- Dynamic results or "No results found" message will load here -->
-                            </tbody>
-                        </table>
+                        <h5>Courses for {{ $semester->semester_name }}</h5>
+
+                        @if ($semester->courses->isNotEmpty())
+                            <ul>
+                                @foreach ($semester->courses as $course)
+                                <li>
+                                    <a href="#" class="course-link"
+                                       data-course-id="{{ $course->id }}">
+                                        {{ $course->courseName }}
+                                    </a>
+                                </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p>No courses available for this semester.</p>
+                        @endif
+
                     </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3" id="pagination-container">
-                        <!-- Styled Bootstrap pagination links will dynamically load here -->
-                    </div>
-
+                    @endforeach
                 </div>
             </div>
         </div>
     </div>
-    <!-- Right section ends-->
-</div>
-<!-- Row ends -->
 
+    <!-- Right side -->
+    <div class="col-sm-9">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span style="font-size: 26px;">Coursework Results</span>
+
+                <div class="d-flex" style="gap: 10px;">
+                    <button disabled id="add_btn" class="btn btn-success">
+                        <a href="" id="add_link" class="text-white text-decoration-none">
+                            <i class="fa fa-plus"></i> Upload Coursework
+                        </a>
+                    </button>
+
+                    <button disabled id="ca_configuration_btn" class="btn btn-success">
+                        <a href="" id="ca_configuration_link" class="text-white text-decoration-none">
+                            <i class="fa fa-cog"></i> CA Configurations
+                        </a>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+
+                <!-- Search Form (SUBMIT ONLY) -->
+                <form id="search-form" class="d-flex justify-content-end mb-3">
+                    <input id="search-input"
+                           name="search"
+                           class="form-control"
+                           placeholder="Search by name or force number"
+                           style="max-width: 350px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-info">
+                            <tr id="coursework-headings"></tr>
+                        </thead>
+                        <tbody id="coursework-results"></tbody>
+                    </table>
+                </div>
+
+                <div id="pagination-container" class="d-flex justify-content-end mt-3"></div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
 
 @endsection
 
+
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Attach event listeners for all course links
-    document.querySelectorAll('.course-link').forEach(function(link) {
-        link.addEventListener('click', function(e) {
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Highlight selected course + store selected ID
+    document.querySelectorAll(".course-link").forEach(link => {
+        link.addEventListener("click", function (e) {
             e.preventDefault();
 
-            // Get the course ID
-            const courseId = this.getAttribute('data-course-id');
+            let courseId = this.dataset.courseId;
+            window.currentCourseId = courseId;
 
-            // Enable buttons and update their links dynamically
-            const addLink = document.getElementById('add_link');
-            const addButton = document.getElementById('add_btn');
-            const uploadExplanationRoute = @json(route('coursework.upload_explanation', [
-                'courseId' => 'COURSE_ID_PLACEHOLDER'
-            ]));
-            addLink.setAttribute('href', uploadExplanationRoute.replace('COURSE_ID_PLACEHOLDER',
-                courseId));
-            addButton.disabled = false;
+            document.querySelectorAll('.course-link')
+                .forEach(a => a.classList.remove('selected'));
+            this.classList.add('selected');
 
-            const caConfigurationLink = document.getElementById('ca_configuration_link');
-            const caConfigurationButton = document.getElementById('ca_configuration_btn');
-            const caConfigurationRoute = @json(route('course.coursework', ['courseId' =>
-                'COURSE_ID_PLACEHOLDER'
-            ]));
-            caConfigurationLink.setAttribute('href', caConfigurationRoute.replace(
-                'COURSE_ID_PLACEHOLDER', courseId));
-            caConfigurationButton.disabled = false;
+            // Enable buttons
+            const uploadRoute = @json(route('coursework.upload_explanation', ['courseId' => 'CID']));
+            document.getElementById("add_link").href = uploadRoute.replace("CID", courseId);
+            document.getElementById("add_btn").disabled = false;
 
-            console.log(`Selected Course ID: ${courseId}`);
+            const configRoute = @json(route('course.coursework', ['courseId' => 'CID']));
+            document.getElementById("ca_configuration_link").href = configRoute.replace("CID", courseId);
+            document.getElementById("ca_configuration_btn").disabled = false;
 
-            // Fetch and display results for the selected course
-            fetchCourseworkResults(courseId);
+            fetchCourseworkResults(courseId, 1);
         });
     });
 
-    function fetchCourseworkResults(courseworkId, page = 1) {
-    const apiUrl = `/tps-smis/coursework_results/coursework/${courseworkId}?page=${page}`;
-    const headingsContainer = document.getElementById('coursework-headings');
-    const resultsContainer = document.getElementById('coursework-results');
-    const paginationContainer = document.getElementById('pagination-container');
+    // SEARCH ONLY WHEN FORM SUBMITTED
+    document.getElementById("search-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        if (window.currentCourseId) {
+            fetchCourseworkResults(window.currentCourseId, 1);
+        }
+    });
 
-    if (!headingsContainer || !resultsContainer || !paginationContainer) {
-        console.error('Error: Necessary DOM elements are missing');
-        return;
-    }
+});
 
-    // Show a loading indicator (optional)
-    resultsContainer.innerHTML = `<tr><td colspan="7" class="text-center">Loading...</td></tr>`;
+// MAIN FETCH FUNCTION (Supports Search + Pagination)
+function fetchCourseworkResults(courseId, page = 1) {
 
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
+    const searchValue = document.getElementById("search-input").value.trim();
+    const url = `/tps-smis/coursework_results/coursework/${courseId}?page=${page}&search=${encodeURIComponent(searchValue)}`;
+
+    const head = document.getElementById("coursework-headings");
+    const body = document.getElementById("coursework-results");
+    const pagination = document.getElementById("pagination-container");
+
+    body.innerHTML = `<tr><td colspan="7" class="text-center">Loading...</td></tr>`;
+
+    fetch(url)
+        .then(res => res.json())
         .then(data => {
-            console.log('Fetched Data:', data);
 
-            // Handle cases where no results are found
-            if (!data.results || !data.results.data || Object.keys(data.results.data).length === 0) {
-                headingsContainer.innerHTML = '';
-                resultsContainer.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-muted text-center">No results found for this coursework.</td>
-                    </tr>
+            if (!data.results || !data.results.data.length) {
+                head.innerHTML = "";
+                body.innerHTML = `
+                    <tr><td colspan="7" class="text-center text-muted">No results found.</td></tr>
                 `;
-                paginationContainer.innerHTML = '';
+                pagination.innerHTML = "";
                 return;
             }
 
-            // Check if `per_page` exists and is a valid number
-            const perPage = data.results.per_page && !isNaN(data.results.per_page) ? data.results.per_page : 10;  // Default to 10 if not available
-
-            // Clear previous content
-            headingsContainer.innerHTML = `
+            // Reset table
+            head.innerHTML = `
                 <th>#</th>
-                <th>Force Number</th>
+                <th>Force No.</th>
                 <th>Student Name</th>
             `;
-            resultsContainer.innerHTML = '';
 
-            // Add dynamic coursework headings
-            data.courseworks.forEach(coursework => {
-                const heading = document.createElement('th');
-                heading.style.textAlign = 'center';
-                heading.innerText = coursework.coursework_title;
-                headingsContainer.appendChild(heading);
+            // Add coursework headings
+            data.courseworks.forEach(cw => {
+                head.innerHTML += `<th class="text-center">${cw.coursework_title}</th>`;
             });
 
-            const totalHeading = document.createElement('th');
-            totalHeading.style.textAlign = 'center';
-            totalHeading.innerText = 'Total CW';
-            headingsContainer.appendChild(totalHeading);
+            head.innerHTML += `<th class="text-center">Total</th>`;
+            head.innerHTML += `<th class="text-center">Actions</th>`;
 
-            const actionsHeading = document.createElement('th');
-            actionsHeading.style.textAlign = 'center';
-            actionsHeading.innerText = 'Actions';
-            headingsContainer.appendChild(actionsHeading);
-
-            // Ensure the page number is a valid integer
-            page = parseInt(page, 10);
-            if (isNaN(page) || page <= 0) {
-                page = 1;  // Default to page 1 if invalid
-            }
-
-            // Calculate the startIndex for serial numbers
-            const startIndex = (page - 1) * perPage + 1;
-
-            let rowIndex = startIndex;
-            Object.entries(data.results.data).forEach(([studentId, studentResult]) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="text-align: center;">${rowIndex++}</td>
-                    <td style="text-align: center;">${studentResult.student.force_number}</td>
-                    <td>${studentResult.student.first_name} ${studentResult.student.middle_name || ''} ${studentResult.student.last_name}</td>
+            body.innerHTML = "";
+            
+            let start = (data.results.pagination.current_page - 1) * data.results.pagination.per_page + 1;
+            console.log(data.results.pagination.current_page )
+            Object.values(data.results.data).forEach((row, index) => {
+                let html = `
+                    <tr>
+                        <td class="text-center">${start + index}</td>
+                        <td class="text-center">${row.student.force_number}</td>
+                        <td>${row.student.first_name} ${row.student.middle_name ?? ""} ${row.student.last_name}</td>
                 `;
 
-                data.courseworks.forEach(coursework => {
-                    const score = studentResult.scores[coursework.id] || '-';
-                    row.innerHTML += `<td style="text-align: center;">
-                                        ${score}
-                                    </td>
-                                `;
-
+                data.courseworks.forEach(cw => {
+                    let score = row.scores[cw.id] ?? "-";
+                    html += `<td class="text-center">${score}</td>`;
                 });
-                row.innerHTML += `
-                    <td style="text-align: center;">${studentResult.total_cw}</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-info btn-sm">View</button>
-                        <button class="btn btn-primary btn-sm">Edit</button>
-                    </td>
+
+                html += `
+                        <td class="text-center">${row.total_cw}</td>
+                        <td class="text-center">
+                            <button class="btn btn-info btn-sm">View</button>
+                            <button class="btn btn-primary btn-sm">Edit</button>
+                        </td>
+                    </tr>
                 `;
-                resultsContainer.appendChild(row);
+
+                body.innerHTML += html;
             });
 
-            // Render pagination links dynamically
-            paginationContainer.innerHTML = `
-                <nav aria-label="Page navigation">
+            // Pagination
+            pagination.innerHTML = `
+                <nav>
                     <ul class="pagination justify-content-end">
-                        ${data.results.links.map(link => {
-                            const page = link.url ? new URL(link.url, window.location.origin).searchParams.get('page') : null;
-
-                            return `
-                                <li class="page-item ${link.active ? 'active' : ''}">
-                                    <a class="page-link" href="#" data-page="${page}">
-                                        ${link.label}
-                                    </a>
-                                </li>
-                            `;
-                        }).join('')}
+                        ${data.results.links.map(link => `
+                            <li class="page-item ${link.active ? "active" : ""}">
+                                <a href="#" class="page-link" data-page="${link.url ? new URL(link.url).searchParams.get("page") : ""}">
+                                    ${link.label}
+                                </a>
+                            </li>
+                        `).join("")}
                     </ul>
                 </nav>
             `;
 
-            // Attach event listeners for pagination links
-            document.querySelectorAll('.page-link').forEach(link => {
-                link.addEventListener('click', function(e) {
+            // Pagination Click
+            document.querySelectorAll(".page-link").forEach(link => {
+                link.addEventListener("click", function (e) {
                     e.preventDefault();
-                    const page = this.getAttribute('data-page');
-                    if (page) fetchCourseworkResults(courseworkId, page);
+                    let p = this.dataset.page;
+                    if (p) fetchCourseworkResults(courseId, p);
                 });
             });
-        })
-        .catch(error => {
-            console.error('Error fetching results:', error);
 
-            resultsContainer.innerHTML = `
-                <tr>
-                    <td colspan="7" class="text-danger text-center">Failed to load results. Please try again later.</td>
-                </tr>
-            `;
         });
 }
-
-
-});
 </script>
 
-<script>
-    // Function to export results to Excel
-function exportToExcel(courseworkId) {
-    const tableData = [];
-
-    // Define table headers based on the specified format
-    tableData.push([
-        'S/N',
-        'Full Name',
-        'Sex',
-        'Examination Number',
-        'Individual Assignment',
-        'Group Assignment',
-        'Test',
-        'Total'
-    ]);
-
-    // Fetch results from the server
-    fetch(`/tps-smis/coursework_results/coursework/${courseworkId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            let rowIndex = 1; // Initialize the serial number
-            data.results.data.forEach(studentResult => {
-                const fullName = `${studentResult.student.first_name} ${studentResult.student.middle_name || ''} ${studentResult.student.last_name}`;
-                const row = [
-                    rowIndex++, // Serial number
-                    fullName.trim(), // Full Name
-                    studentResult.student.sex || '-', // Sex
-                    studentResult.student.force_number, // Examination Number
-                    studentResult.scores['individual_assignment'] || '-', // Individual Assignment
-                    studentResult.scores['group_assignment'] || '-', // Group Assignment
-                    studentResult.scores['test'] || '-', // Test
-                    studentResult.total_cw || '-', // Total
-                ];
-                tableData.push(row); // Add row to table data
-            });
-
-            // Use SheetJS to create and download Excel file
-            const worksheet = XLSX.utils.aoa_to_sheet(tableData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
-            XLSX.writeFile(workbook, 'Coursework_Results.xlsx');
-        })
-        .catch(error => {
-            console.error('Error exporting results:', error);
-            alert('Failed to export results. Please try again later.');
-        });
-}
-
-// Attach event listener to the Export button
-document.getElementById('export-btn').addEventListener('click', function () {
-    // Dynamically fetch the courseworkId from a hidden input or dataset
-    const courseworkId = document.getElementById('export-btn').dataset.courseworkId;
-
-    // If courseworkId is not available, throw an error
-    if (!courseworkId) {
-        console.error('Error: courseworkId is not defined');
-        alert('Coursework ID is missing. Cannot export results.');
-        return;
-    }
-
-    // Call the export function with the courseworkId
-    exportToExcel(courseworkId);
-});
-
-</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 @endsection

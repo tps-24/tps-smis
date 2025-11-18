@@ -23,7 +23,7 @@ class SemesterExamResultController extends Controller
      * Display a listing of the resource.
      */
 
-     public function index(Request $request)
+    public function index(Request $request)
     {
         // Handle session selection
         if ($request->has('session_id')) {
@@ -43,28 +43,32 @@ class SemesterExamResultController extends Controller
             $user->hasRole('Chief Instructor') ||
             $user->hasRole('Head of Department')
         ) {
-            $semesters = Semester::with(['courses' => function ($query) use ($selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId);
-            }])->get();
-        }
-        elseif ($user->hasRole('Instructor')) {
-            $semesters = Semester::with(['courses' => function ($query) use ($userId, $selectedSessionId) {
-                $query->where('session_programme_id', $selectedSessionId)
-                    ->whereHas('courseInstructors', function ($subQuery) use ($userId) {
-                        $subQuery->where('user_id', $userId);
-                    });
-            }])->get();
-        }
-        else {
+            $semesters = Semester::with([
+                'courses' => function ($query) use ($selectedSessionId) {
+                    $query->where('session_programme_id', $selectedSessionId);
+                }
+            ])->get();
+        } elseif ($user->hasRole('Instructor')) {
+            $semesters = Semester::with([
+                'courses' => function ($query) use ($userId, $selectedSessionId) {
+                    $query->where('session_programme_id', $selectedSessionId)
+                        ->whereHas('courseInstructors', function ($subQuery) use ($userId) {
+                            $subQuery->where('user_id', $userId);
+                        });
+                }
+            ])->get();
+        } else {
             $semesters = [];
         }
 
         // Optional semester filter for tab activation
         $selectedSemesterId = $request->get('semester_id');
-        $selectedSemester = $selectedSemesterId ? Semester::with(['courses' => function ($query) use ($selectedSessionId) {
+        $selectedSemester = $selectedSemesterId ? Semester::with([
+            'courses' => function ($query) use ($selectedSessionId) {
                 $query->where('session_programme_id', $selectedSessionId);
-            }])->find($selectedSemesterId) : null;
-        
+            }
+        ])->find($selectedSemesterId) : null;
+
         $selectedCourseId = $request->get('course_id');
         $selectedCourse = $selectedCourseId ? Course::find($selectedCourseId) : null;
 
@@ -78,7 +82,7 @@ class SemesterExamResultController extends Controller
         ));
     }
 
-  public function showExamResults2()
+    public function showExamResults2()
     {
         // Get the authenticated student
         $user = Auth::user();
@@ -90,8 +94,8 @@ class SemesterExamResultController extends Controller
             'semesterExam.course',
             'semesterExam.course.programmes'
         ])
-        ->where('student_id', $student->id)
-        ->get();
+            ->where('student_id', $student->id)
+            ->get();
         // Group results by semester
         $groupedBySemester = $results->groupBy(function ($result) {
             return $result->semesterExam->semester->id;
@@ -116,7 +120,7 @@ class SemesterExamResultController extends Controller
     public function store(Request $request, $courseId)
     {
         //return $request->all();
-        $course      = Course::findOrFail($courseId);
+        $course = Course::findOrFail($courseId);
         $coursePivot = $course->semesters[0]->pivot;
         $request->validate([
             'max_score' => 'required|integer|min:1',
@@ -128,13 +132,13 @@ class SemesterExamResultController extends Controller
         ]);
 
         SemesterExam::create([
-            'course_id'            => $course->id,
-            'semester_id'          => $coursePivot->semester_id,
-            'assessment_type_id'   => $request->assessment_type_id,
-            'max_score'            => $request->max_score,
-            'exam_date'            => $request->exam_date,
+            'course_id' => $course->id,
+            'semester_id' => $coursePivot->semester_id,
+            'assessment_type_id' => $request->assessment_type_id,
+            'max_score' => $request->max_score,
+            'exam_date' => $request->exam_date,
             'session_programme_id' => $coursePivot->session_programme_id,
-            'created_by'           => $request->user()->id,
+            'created_by' => $request->user()->id,
         ]);
 
         return redirect()->back()->with('success', 'Course Exam configured successfully.');
@@ -172,7 +176,7 @@ class SemesterExamResultController extends Controller
         //
     }
 
-   
+
     public function getExamResultsByCourseold($courseId, $semesterId)
     {
         // Handle session selection
@@ -188,11 +192,11 @@ class SemesterExamResultController extends Controller
             ->first();
 
         // Fetch paginated semester exam results
-        $results =  SemesterExamResult::whereHas('semesterExam', function ($query) use ($courseId, $semesterId, $selectedSessionId) {
-                $query->where('course_id', $courseId)
-                    ->where('semester_id', $semesterId)
-                    ->where('session_programme_id', $selectedSessionId);
-            })
+        $results = SemesterExamResult::whereHas('semesterExam', function ($query) use ($courseId, $semesterId, $selectedSessionId) {
+            $query->where('course_id', $courseId)
+                ->where('semester_id', $semesterId)
+                ->where('session_programme_id', $selectedSessionId);
+        })
             ->with(['student', 'semesterExam'])
             ->paginate(10);
 
@@ -207,21 +211,21 @@ class SemesterExamResultController extends Controller
 
         // Return JSON with paginator included
         return response()->json([
-            'course'          => $course ?? [],
+            'course' => $course ?? [],
             'hasFinalResults' => $hasFinalResults,
-            'results'         => $results, // send paginator directly
+            'results' => $results, // send paginator directly
         ]);
     }
-    
-    public function getExamResultsByCourse($courseId, $semesterId)
+
+    public function getExamResultsByCourse(Request $request, $courseId, $semesterId)
     {
         try {
-            \Log::info("Fetching semester exam results for course ID: {$courseId}, semester ID: {$semesterId}");
-            // Fetch the exam configuration for this course and semester
+            $search = $request->query('search', '');
+
+            // Fetch exam config
             $exam = DB::table('semester_exams')
                 ->where('course_id', $courseId)
                 ->where('semester_id', $semesterId)
-                //->select('id', 'exam_title')
                 ->first();
 
             if (!$exam) {
@@ -234,10 +238,18 @@ class SemesterExamResultController extends Controller
                 ]);
             }
 
-            // Fetch student scores for this exam
+            // Fetch exam results with search
             $results = DB::table('semester_exam_results')
                 ->join('students', 'semester_exam_results.student_id', '=', 'students.id')
                 ->where('semester_exam_results.semester_exam_id', $exam->id)
+                ->when($search, function ($query, $search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('students.first_name', 'like', "%{$search}%")
+                            ->orWhere('students.middle_name', 'like', "%{$search}%")
+                            ->orWhere('students.last_name', 'like', "%{$search}%")
+                            ->orWhere('students.force_number', 'like', "%{$search}%");
+                    });
+                })
                 ->select(
                     'semester_exam_results.student_id',
                     'students.force_number',
@@ -249,7 +261,6 @@ class SemesterExamResultController extends Controller
                 ->orderByDesc('semester_exam_results.score')
                 ->paginate(10);
 
-            // Format results for frontend
             $groupedResults = collect($results->items())->map(function ($studentResult) {
                 return [
                     'student' => [
@@ -274,5 +285,4 @@ class SemesterExamResultController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
 }
