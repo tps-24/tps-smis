@@ -3,15 +3,22 @@
 namespace App\Imports;
 
 use App\Models\Staff;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
 class UpdateStaffDetails implements ToCollection
 {
-    public $errors = [];
-    public $warnings = [];
+    public array $errors = [];
+    public array $warnings = [];
+
+    // Counters
+    public int $created = 0;
+    public int $updated = 0;
+    public int $skipped = 0;
+    public int $failed  = 0;
 
     public function collection(Collection $rows)
     {
@@ -19,90 +26,95 @@ class UpdateStaffDetails implements ToCollection
 
         foreach ($rows as $row) {
             $num++;
-            if ($num <= 5) continue; // Skip headers
+            if ($num <= 5) continue; // Skip header rows
 
-            $staff = !empty($row[0])
-                ? Staff::where('force_number', trim($row[0]))->first()
-                : Staff::where([
-                    ['first_name', '=', $row[2]],
-                    ['middle_name', '=', $row[3]],
-                    ['last_name', '=', $row[4]],
-                    ['company_id', '=', $this->getCompanyId($row[6])],
-                    ['platoon', '=', $row[7]],
-                ])->first();
+            // --- Validate required fields ---
+            if (empty($row[0]) || empty($row[1]) || empty($row[2]) || empty($row[4])) {
+                $this->warnings[] = "Row $num: Missing required fields (FORCE NUMBER, RANK, FIRST NAME, LAST NAME)";
+                Log::warning("Row $num skipped: missing required fields");
+                $this->skipped++;
+                continue;
+            }
+
+            // --- Lookup staff by FORCE NUMBER ---
+            $staff = Staff::where('forceNumber', trim($row[0]))->first();
 
             if (!$staff) {
-                $this->warnings[] = "Row $num: Staff not found.";
-                Log::warning("Row $num staff not found: " . json_encode($row));
-                continue;
-            }
+                try {
+                    // Create User account
+                    $user = new User();
+                    $user->name = trim($row[2]) . " " . trim($row[3]) . " " . trim($row[4]);
+                    $user->email = empty($row[6])
+                        ? strtolower(trim($row[2])) . "." . strtolower(trim($row[4])) . "@tpf.go.tz"
+                        : trim($row[6]);
+                    $user->password = Hash::make(strtoupper(trim($row[4])));
+                    $user->save();
+                    $user->assignRole([6]);
 
-            // --- Session Check ---
-            try {
-                $selectedSessionId = $this->getSessionId();
-            } catch (\Exception $e) {
-                $this->errors[] = "Row $num: " . $e->getMessage();
-                continue;
-            }
+                    // Create Staff record linked to User
+                    $staff = new Staff();
+                    $staff->forceNumber = trim($row[0]);
+                    $staff->rank        = trim($row[1]);
+                    $staff->firstName   = trim($row[2]);
+                    $staff->middleName  = trim($row[3]);
+                    $staff->lastName    = trim($row[4]);
+                    $staff->gender      = trim($row[5]);
+                    $staff->email       = $user->email;
+                    $staff->user_id     = $user->id;
+                    $staff->save();
 
-            if ($staff->session_programme_id != $selectedSessionId) {
-                $this->warnings[] = "Row $num: Session mismatch.";
-                Log::warning("Row $num session mismatch: " . json_encode($row));
-                continue;
-            }
-
-            // --- NIN Conflict Check ---
-            if (!empty($row[10])) {
-                $ninConflict = Staff::where('nin', $row[10])
-                    ->where('id', '!=', $staff->id)
-                    ->exists();
-
-                if ($ninConflict) {
-                    $this->errors[] = "Row $num: NIN already exists for another staff.";
-                    Log::error("Row $num duplicate NIN: " . json_encode($row));
-                    continue;
+                    $this->created++;
+                    Log::info("Row $num: Created new staff {$row[0]} with user {$user->email}");
+                } catch (\Exception $e) {
+                    $this->errors[] = "Row $num: Failed to create staff/user {$row[0]} — " . $e->getMessage();
+                    Log::error("Row $num create failed for {$row[0]}: " . $e->getMessage());
+                    $this->failed++;
                 }
-                $staff->nin = $row[10];
+                continue;
             }
 
-            // --- Update Fields Conditionally ---
-            $staff->fill([
-                'force_number'   => $row[0] ?? $staff->force_number,
-                'phone'          => $row[8] ?? $staff->phone,
-                'dob'            => $row[9] ?? $staff->dob,
-                'blood_group'    => $row[11] ?? $staff->blood_group,
-                'home_region'    => $row[12] ?? $staff->home_region,
-                'entry_region'   => $row[13] ?? $staff->entry_region,
-                'education_level'=> $row[14] ?? $staff->education_level,
-                'profession'     => $row[15] ?? $staff->profession,
-                'weight'         => $row[16] ?? $staff->weight,
-                'height'         => $row[17] ?? $staff->height,
-                'account_number' => $row[18] ?? $staff->account_number,
-                'bank_name'      => $row[19] ?? $staff->bank_name,
-                'registration_number' =>$row[21] ?? $staff->registration_number
-            ]);
-            $staff->save(); // More semantic than update()
-        }
-    }
+            // --- Build update data dynamically ---
+            $map = [
+                1  => 'rank',
+                2  => 'firstName',
+                3  => 'middleName',
+                4  => 'lastName',
+                5  => 'gender',
+                6  => 'designation',
+                7  => 'phoneNumber',
+                8  => 'DoB',
+                9  => 'maritalStatus',
+                10 => 'bloodGroup',
+                11 => 'religion',
+                12 => 'tribe',
+                13 => 'educationLevel',
+                14 => 'nextofkinFullName',
+                15 => 'nextofkinPhoneNumber',
+                16 => 'nextofkinPysicalAddress',
+                17 => 'nextofkinCity',
+                18 => 'nextofkinState',
+            ];
 
-    private function getCompanyId($companyName)
-    {
-        $mapping = [
-            'HQ' => 1,
-            'A'  => 2,
-            'B'  => 3,
-            'C'  => 4,
-            'D'  => 5,
-        ];
-        return $mapping[strtoupper(trim($companyName))] ?? null;
-    }
+            $updateData = [];
+            foreach ($map as $index => $field) {
+                if (isset($row[$index]) && $row[$index] !== null && $row[$index] !== '') {
+                    $updateData[$field] = trim($row[$index]);
+                }
+            }
 
-    private function getSessionId()
-    {
-        $selectedSessionId = session('selected_session');
-        if (!$selectedSessionId) {
-            throw new \Exception('Please select a session.');
+            try {
+                $staff->fill($updateData);
+                $staff->save();
+                $this->updated++;
+                Log::info("Row $num: Updated staff {$row[0]}");
+            } catch (\Exception $e) {
+                $this->errors[] = "Row $num: Failed to update staff {$row[0]} — " . $e->getMessage();
+                Log::error("Row $num update failed for {$row[0]}: " . $e->getMessage());
+                $this->failed++;
+            }
         }
-        return $selectedSessionId;
+
+        // --- Final summary log ---
+        Log::info("Import summary: {$this->created} created, {$this->updated} updated, {$this->skipped} skipped, {$this->failed} failed.");
     }
 }

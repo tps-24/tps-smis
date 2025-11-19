@@ -63,7 +63,27 @@
     </style>
 </head>
 <body>
+    @php
+function pdf_safe($string) {
+    // Replace known unsupported characters with safe versions
+    $replace = [
+        "′" => "'",     // prime symbol → normal apostrophe
+        "″" => '"',     // double prime → normal quote
+        "“" => '"', 
+        "”" => '"',
+        "‘" => "'",
+        "’" => "'",
+    ];
+
+    return strtr($string, $replace);
+}
+@endphp
+
     @foreach($students as $student)
+                                                    @php
+                                                 if ($student->enrollment_status == 0)
+                                                    continue;
+                                                @endphp
     <div class="certificate-container">
         <!-- Full-Page Image -->
         <div class="certificate-image">
@@ -72,9 +92,9 @@
         
         <!-- Layered Details -->
         <div class="details">
-            <p style="margin-top:30px; margin-bottom:20px;"><i>This is to certify that</i></p>
+            <p style="margin-top:30px; margin-bottom:90px;"><i>This is to certify that</i></p>
             <p style="font-size:25px; font-weight: bold;">
-                {{ $student->force_number }} {{ $student->rank }} {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
+                {{ $student->force_number }} {{ $student->rank }} {{ pdf_safe($student->first_name) }} {{ pdf_safe($student->middle_name) }} {{ pdf_safe($student->last_name) }}
             </p>
             <p>
                 has successfully attended and passed the <strong>{{ $session_programme->session_programme_name }}</strong><br> 
@@ -92,22 +112,16 @@
                 <!-- @foreach($programme_courses as $programme_course)
                     <li>{{ $programme_course->course->courseName }}</li>                                                                                                            
                 @endforeach -->
-                <li>Basic Drills, Parade and Self-defence Techniques and Endurance Training</li>
-                <li>Firearms Training</li>               
-                <li>Basic Police Duties and Administration</li>
-                <li>Basic Policing Law and Human Rights</li>
-                <li>Basic Criminal Law</li>
-                <li>Basic Communication Skills and ICT</li>
-                <li>Basic Criminal Procedure</li>
-                <li>Basic Community Policing and Social Work</li>
-                <li>Basic Law of Evidence</li>
-                <li>Basic Criminal Investigation and Intelligence</li>
-                <li>Basic Road Traffic Control</li>
-                 <li>Basic Gender Issues and Child Protection</li> 
-                <li>Basic Radicalization, Violent Extremism, and Terrorism</li>
-                <li>Basic Public Order and Disaster Management</li>
-                <li>Basic Public Health and Environmental Conservation</li>
-                <li>Basic Field Craft and Military Tactics</li> 
+                <li>FIRST CALL</li>
+                <li>REVEILLE</li>               
+                <li>ATTENTION</li>
+                <li>FORWAR/CHARGE</li>
+                <li>TATTOO</li>
+                <li>TAPS</li>
+                <li>RETREAT</li>
+                <li>RECALL</li>
+                <li>ASSEMBLY</li>
+            
             </ul>
             <br>
         </div>

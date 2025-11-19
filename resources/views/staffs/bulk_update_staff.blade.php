@@ -28,6 +28,12 @@
     <div class="alert alert-success">
         ✅ {{ $successMessage }}
     </div>
+     <ul>
+        <li>Created: {{ session('created') }}</li>
+        <li>Updated: {{ session('updated') }}</li>
+        <li>Skipped: {{ session('skipped') }}</li>
+        <li>Failed: {{ session('failed') }}</li>
+    </ul>
 @endif
 
 @if (!empty($importWarnings))
@@ -52,6 +58,7 @@
     </div>
 @endif
 
+
 <div class="d-flex justify-content-between align-items-center mt-4">
     <a href="{{ route('staffDownloadSample') }}" class="btn btn-sm btn-success">
         <i class="bi bi-download"></i>&nbsp;Download Sample for Updating Staffs
@@ -63,9 +70,14 @@
 </div>
 
 <div class="mt-4 d-flex justify-content-end">
-    <form method="POST" action="{{ url('staffs/bulk-update-staffs') }}" enctype="multipart/form-data" class="d-flex gap-2">
-        @csrf
-        <input required type="file" name="staffs_file" class="form-control form-control-sm" style="height: 30px; width: 60%;">
+    <form method="POST" action="{{ route('staff.bulkUpdate') }}" enctype="multipart/form-data" class="d-flex gap-2">
+    @csrf
+        <input required type="file" name="staffs_file" accept=".xlsx,.csv"
+            class="form-control form-control-sm @error('staffs_file') is-invalid @enderror"
+            style="height: 30px; width: 60%;">
+            @error('staffs_file')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         <button type="submit" class="btn btn-primary btn-sm" title="Upload by CSV/Excel file" style="height: 30px;">
             <i class="bi bi-upload"></i>&nbsp;Upload Updates
         </button>

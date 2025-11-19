@@ -111,7 +111,7 @@
                     aria-labelledby="tab-{{ $company->id }}">
 
                     <div class="card my-3">
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-3">
                             <form action="{{ route('students.search_certificate', $company->id) }}" method="GET">
                                 @csrf
 
@@ -123,7 +123,7 @@
                                             style="max-width: 300px; margin-right:10px;">
                                     </div>
                                     <div >
-                                        <select onchange="this.form.submit()" class="form-select" name="platoon" required>
+                                        <select onchange="this.form.submit()" class="form-select" name="platoon" >
                                             <option value="" selected disabled>Select Platoon</option>
                                             @for ($i = 1; $i < 15; $i++)
                                                 <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
