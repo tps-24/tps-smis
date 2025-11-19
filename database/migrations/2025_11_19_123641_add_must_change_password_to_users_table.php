@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('must_change_password')->default(true);
+            $table->boolean('must_change_password')->default(true)->after('remember_token');
         });
     }
 
