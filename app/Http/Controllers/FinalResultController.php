@@ -510,7 +510,7 @@ class FinalResultController extends Controller
             }
         }])
         ->get();
-
+    
     return view('final_results.student_certificate', compact('students', 'companies', 'selectedSessionId', 'search'));
 }
 

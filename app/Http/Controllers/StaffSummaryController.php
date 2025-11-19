@@ -26,10 +26,9 @@ class StaffSummaryController extends Controller
         $stats = [
             'total' => Staff::all(),
             'active' => Staff::where('status', 'active')->get(),
-            'dismissed' => Staff::where('status', 'dismissed')->get(),
-            'study' => Staff::where('status', 'study')->get(),
+            'secondment' => Staff::where('status', 'secondment')->get(),
+            'safari' => Staff::where('status', 'safari')->get(),
             'leave' => Staff::where('status', 'leave')->get(),
-            'trip' => Staff::where('status', 'trip')->get(),
         ];
 
         return view('staffs.summary.index', compact('stats'));
@@ -38,7 +37,7 @@ class StaffSummaryController extends Controller
     public function filterStaff(Request $request)
     {
         $type = $request->get('type', 'total'); // optional type filter, default total
-        $validTypes = ['active', 'study', 'leave', 'trip', 'dismissed'];
+        $validTypes = ['active', 'leave', 'safari', 'secondment'];
 
         $query = Staff::query();
 

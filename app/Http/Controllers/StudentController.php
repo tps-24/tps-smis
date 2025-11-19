@@ -311,7 +311,6 @@ class StudentController extends Controller
         public function myCourses()
     {
         $userId = auth()->id();
-
         // Get the student model for the logged-in user
         $student = Student::where('user_id', $userId)->first();
 
@@ -490,7 +489,7 @@ class StudentController extends Controller
 
     public function profileComplete(Request $request, $id)
     {
-        // dd($request->file('photo'));
+        // dd($request->file('photo'));`````````````````````````````````
         $student = Student::findOrFail($id);
         $request->validate([
             //'education_level' => 'required',

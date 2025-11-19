@@ -21,8 +21,7 @@ use App\Imports\UpdateStaffDetails;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Services\AuditLoggerService;
-use Illuminate\Support\Facades\Log;
-
+use App\Models\StaffStatus;
 class StaffController extends Controller
 {
     function __construct()
@@ -623,14 +622,47 @@ $school = School::updateOrCreate(
 
         return redirect()->back()->with('success', 'School or Professional deleted successfully.');
     }
-    public function change_status(Request $request){
-        $status = $request->status;
-        $staff = Staff::find($request->staff_id);
-        if( !$staff){
-            return redirect()->back()->with('info','Staff is not found.');
-        }
-        $staff->status = $status;
-        $staff->save();
-        return redirect()->route('staffs.summary.index')->with('success','Status changed successfully.');
+   public function change_status(Request $request)
+{
+    $status = $request->status;
+    $staff = Staff::find($request->staff_id);
+
+    if (!$staff) {
+        return redirect()->back()->with('info', 'Staff is not found.');
     }
+
+    // If staff's current status is not active, update the previous StaffStatus record's end_date only
+    if ($staff->status !== 'active') {
+        $previousRecord = StaffStatus::where('staff_id', $staff->id)
+            ->whereNull('end_date')
+            ->latest()
+            ->first();
+
+        if ($previousRecord) {
+            $previousRecord->end_date = now();
+            $previousRecord->save();
+        }
+
+        return redirect()->route('staffs.summary.index')
+            ->with('success', 'Previous status record updated successfully.');
+    }
+
+    // If staff's current status is active, update status and create a new StaffStatus record
+    $previousStatus = $staff->status;
+    $staff->status = $status;
+    $staff->save();
+
+    StaffStatus::create([
+        'description' =>$request->description,
+        'staff_id' => $staff->id,
+        'previous_status' => $previousStatus,
+        'current_status' => $status,
+        'start_date' => $request->start_date ?? now(),
+        'end_date' => null,
+        'user_id' => $request->user()->id,
+    ]);
+
+    return redirect()->route('staffs.summary.index')
+        ->with('success', 'Status changed and new record created successfully.');
+}
 }

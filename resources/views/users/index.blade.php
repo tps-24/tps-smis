@@ -36,7 +36,7 @@
                       placeholder="Name(Optional)">
                   <!-- Company Dropdown -->
                   <select onchange="this.form.submit()" class="form-select me-2" name="role"
-                      required>
+                      >
                       <option value="" selected disabled>Select Role</option>
                       @foreach ($roles as $role)
                       <option value="{{ $role->id }}"

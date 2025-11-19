@@ -46,13 +46,12 @@
 
 @section('content')
 
-<div class="row gx-4">
-    @if ($pending_message)
-        <div class="alert alert-warning">
-            {{ $pending_message }}
-        </div>
-    @endif
-</div>
+@if (session('pending_message'))
+    <div class="alert alert-warning">
+        {{ session('pending_message') }}
+    </div>
+@endif
+
 
 @php
     $student = auth()->user()->student;
@@ -120,7 +119,7 @@
 
     <div class="col-md-6">
         <div class="info-label">Study Level:</div>
-        <p class="mb-2">{{ $student->studyLevel->studyLevelName ?? ''}}</p>
+        <p class="mb-2">{{ $student->programme->studyLevel->description }}</p>
     </div>
 
     <div class="col-md-6">

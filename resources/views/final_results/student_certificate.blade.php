@@ -1,4 +1,46 @@
 @extends('layouts.main')
+@section('style')
+<style>
+    /* Remove Bootstrap pill/tab backgrounds */
+.nav-link {
+    background: transparent !important;
+    border: none !important;
+    color: #555;
+    position: relative;
+    font-weight: 500;
+    padding-bottom: 8px;
+}
+
+/* Hover */
+.nav-link:hover {
+    color: #000;
+}
+
+/* Active underline */
+.nav-link.active {
+    color: #0d6efd;
+}
+
+.nav-link.active::after {
+    content: "";
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    background: #0d6efd;
+    border-radius: 2px;
+}
+
+/* Make tabs scrollable if they overflow */
+.nav.nav-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+}
+
+</style>
+@endsection
 @section('scrumb')
     <!-- Scrumb starts -->
     <nav data-mdb-navbar-init class="navbar navbar-expand-lg bg-body-tertiary bscrumb">
@@ -72,10 +114,16 @@
                         <div class="col-12 col-md-3">
                             <form action="{{ route('students.search_certificate', $company->id) }}" method="GET">
                                 @csrf
-                                <div class="row align-items-center">
-                                    <label class="col-auto mb-0">Filter by Platoon</label>
-                                    <div class="col">
-                                        <select onchange="this.form.submit()" class="form-select" name="platoon" required>
+
+                                <div class="d-flex gap-2">
+                                    <label class=" mb-0">Filter</label>
+                                    <div >
+                                        <input type="text" name="search" value="{{ $search ?? '' }}"
+                                            placeholder="Search by name or force number" class="form-control"
+                                            style="max-width: 300px; margin-right:10px;">
+                                    </div>
+                                    <div >
+                                        <select onchange="this.form.submit()" class="form-select" name="platoon" >
                                             <option value="" selected disabled>Select Platoon</option>
                                             @for ($i = 1; $i < 15; $i++)
                                                 <option value="{{ $i }}" {{ request('platoon') == $i ? 'selected' : '' }}>
@@ -84,6 +132,7 @@
                                             @endfor
                                         </select>
                                     </div>
+                                 <a href="{{ route('students.search_certificate', $company->id) }}" class="btn btn-secondary">Reset</a> 
                                 </div>
                             </form>
                         </div>

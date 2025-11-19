@@ -41,30 +41,10 @@
   <div class="row">
     @php
       $cardTypes = [
-        [
-          'key' => 'active',
-          'label' => 'Active',
-          'color' => 'primary',
-          'icon' => '<span class="badge badge-active badge-status">✔ Active</span>'
-        ],
-        [
-          'key' => 'leave',
-          'label' => 'Leave',
-          'color' => 'success',
-          'icon' => '<span class="badge badge-leave badge-status">🏖 On Leave</span>'
-        ],
-        [
-          'key' => 'trip',
-          'label' => 'Safari',
-          'color' => 'info',
-          'icon' => '<span class="badge badge-trip badge-status">✈ Safari</span>'
-        ],
-        [
-          'key' => 'secondment',
-          'label' => 'Secondment',
-          'color' => 'danger',
-          'icon' => '<span class="badge badge-secondment badge-status">📘 Secondment</span>'
-        ],
+        ['key' => 'active', 'label' => 'Active', 'color' => 'primary'],
+        ['key' => 'leave', 'label' => 'Leave', 'color' => 'success'],
+        ['key' => 'safari', 'label' => 'Safari', 'color' => 'info'],
+        ['key' => 'secondment', 'label' => 'Secondment', 'color' => 'danger'],
       ];
     @endphp
 
@@ -150,15 +130,20 @@
 
   let currentFilterType = 'active';
 
-  const labels = cardTypes.reduce((acc, type) => {
-    acc[type.key] = `${type.label} Staff`;
-    return acc;
-  }, { total: "Total Staff" });
+  const labels = {
+    total: "Total Staff",
+    active: "Active Staff",
+    leave: "Staff on Leave",
+    safari: "Staff on Safari",
+    secondment: "Secondment Staff"
+  };
 
-  const statusIcons = cardTypes.reduce((acc, type) => {
-    acc[type.key] = type.icon;
-    return acc;
-  }, {});
+  const statusIcons = {
+    active: `<span class="badge badge-active">✔ Active</span>`,
+    leave: `<span class="badge badge-leave">🏖 On Leave</span>`,
+    safari: `<span class="badge badge-trip">✈ Trip</span>`,
+    secondment: `<span class="badge badge-dismissed">❌ Secondment</span>`
+  };
 
   function showStaffs(type = 'total', page = 1) {
     currentFilterType = type;
