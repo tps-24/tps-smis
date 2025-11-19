@@ -146,6 +146,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/update-beat-status-to-safari/{studentId}', [StudentController::class, 'toSafari'])->name('students.toSafari');
     Route::get('/update-beat-status-back-from-safari/{studentId}', [StudentController::class, 'BackFromsafari'])->name('students.BackFromsafari');
     Route::get('/students/approve/{studentId}', [StudentController::class, 'approve'])->name('students.approve');
+    Route::post('/students/update-passwords', [StudentController::class, 'updatePasswords'])->name('students.update.passwords');
+
     // Route::get('/coursework/upload_explanation/{courseId}', [CourseworkResultController::class, 'create_import'])->name('coursework.upload_explanation');
 
     Route::post('/beats/{id}', [BeatController::class, 'update'])->name('beat.update');
@@ -280,7 +282,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/staffs/bulk-update-staffs', [StaffController::class, 'bulkUpdate'])->name('staff.bulkUpdate');
     Route::get('/staff/profile/{id}', [StaffController::class, 'profile'])->name('staff.profile');
     Route::get('/student/profile/{id}', [StudentController::class, 'profile'])->name('profile');
-    Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword'); // Not yet, needs email config
+    Route::get('/profile/change-password/{id}', [UserController::class, 'changePassword'])->name('changePassword');
+    Route::post('/profile/change-password/{id}', [UserController::class, 'updatePassword'])->name('updatePassword');
     Route::get('users/search', [UserController::class, 'search'])->name('users.search');
 
     Route::get('assign-courses/{id}', [ProgrammeCourseSemesterController::class, 'assignCourse'])->name('assign-courses.assignCourse');

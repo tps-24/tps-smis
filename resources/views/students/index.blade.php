@@ -18,6 +18,22 @@
 
 @section('content')
 @include('layouts.sweet_alerts.index')
+@if(session('status'))
+    <div class="alert alert-success">
+        {{ session('status') }}
+    </div>
+@endif
+
+@if($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+    
 <div class="row flex-nowrap overflow-auto align-items-center g-2 justify-content-between">
     <!-- Left: Upload / Update -->
     <div class="d-flex col-auto gap-2">
@@ -65,6 +81,12 @@
                 <i class="bi bi-download"></i> Sheet
             </a>
             @endif
+            <form action="{{ route('students.update.passwords') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-danger">
+                    Reset Passwords
+                </button>
+            </form>
             <a class="btn btn-success btn-sm flex-shrink-0" href="{{ url('students/create') }}">
                 <i class="fa fa-plus"></i> Create students
             </a>

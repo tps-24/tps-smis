@@ -210,7 +210,7 @@
                                                                         <span class="input-group-text">
                                                                             <i class="bi bi-envelope"></i>
                                                                         </span>
-                                                                        <input type="email" class="form-control static-field" id="yourEmail" value="{{$student->email ?? ''}}" Disabled>
+                                                                        <input type="email" class="form-control static-field" id="yourEmail" value="{{$student->email ?? $userEmail }}" Disabled>
                                                                         <input type="email" name="email" class="form-control editable-field d-none" id="yourEmail" value="{{$student->email ?? ''}}">
                                                                     </div>
                                                                 </div>

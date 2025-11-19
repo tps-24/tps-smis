@@ -125,11 +125,36 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */   
 
-   public function changePassword($id): View
-   {
-       $user = User::find($id);
-       return view('users.changePassword',compact('user'));
-   }
+    public function changePassword($id): View
+    {
+        $user = User::findOrFail($id);
+        return view('users.changePassword',compact('user'));
+    }
+
+    // Handle the password update
+    public function updatePassword(Request $request, $id)
+    {
+        $request->validate([
+            'current_password' => ['required'],
+            'password' => ['required', 'confirmed', 'min:8'],
+        ]);
+
+        $user = User::findOrFail($id);
+
+        // Check current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        // Update password
+        $user->password = Hash::make($request->password);
+        $user->must_change_password = false;
+        $user->save();
+
+        return redirect('/')->with('status', 'Password changed successfully.');
+    }
+
+
     
     /**
      * Show the form for editing the specified resource.

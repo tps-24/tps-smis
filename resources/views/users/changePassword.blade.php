@@ -6,7 +6,7 @@
   border-radius: 30% !important;
 }
 .profile-header {
-    background-image: url('/tps-rms/resources/assets/images/profile/bg-profile.jpg');
+    background-image: url('/tps-smis/resources/assets/images/profile/bg-profile.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -43,7 +43,7 @@
         <div class="card mb-4">
           <div class="card-body back">
             <div class="profile-header"> 
-              <img src="/tps-rms/resources/assets/images/profile/avatar.jpg" alt="Profile Picture" />
+              <img src="/tps-smis/resources/assets/images/profile/avatar.jpg" alt="Profile Picture" />
             </div>
 
             <div class="d-flex justify-content-end mt-3">
@@ -56,6 +56,21 @@
 </div>
 
 <div class="row gx-4">
+  @if(session('status'))
+      <div class="alert alert-success">
+          {{ session('status') }}
+      </div>
+  @endif
+
+  @if($errors->any())
+      <div class="alert alert-danger">
+          <ul class="mb-0">
+              @foreach($errors->all() as $error)
+                  <li>{{ $error }}</li>
+              @endforeach
+          </ul>
+      </div>
+  @endif
     <div class="col-sm-12 col-12">
         <div class="card mb-4">
             <div class="card-body">
@@ -72,69 +87,52 @@
                           <div class="row align-items-end">
                             <div class="col-xl-4 col-sm-6 col-12">
                               <div class="p-3">
-                                <img src="/tps-rms/resources/assets/images/login.svg" alt="Contact Us" class="img-fluid" width="300" height="320">
+                                <img src="/tps-smis/resources/assets/images/login.svg" alt="Contact Us" class="img-fluid" width="300" height="320">
                               </div>
                             </div>
                             <div class="col-sm-4 col-12">
                               <div class="card border mb-3">
                                 <div class="card-body">
 
-                                  <div class="mb-3">
-                                    <label class="form-label" for="currentPwd">Current password <span
-                                        class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                      <input type="password" id="currentPwd" placeholder="Enter Current password"
-                                        class="form-control">
-                                      <button class="btn btn-outline-secondary" type="button">
-                                        <i class="bi bi-eye text-black"></i>
-                                      </button>
+                                  <form action="{{ route('updatePassword', auth()->id()) }}" method="POST">
+                                    @csrf
+
+                                    <div class="mb-3">
+                                        <label class="form-label" for="currentPwd">Current password <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" name="current_password" id="currentPwd" placeholder="Enter Current password" class="form-control" required>
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="bi bi-eye text-black"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                  </div>
 
-                                  <div class="mb-3">
-                                    <label class="form-label" for="newPwd">New password <span
-                                        class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                      <input type="password" id="newPwd" class="form-control"
-                                        placeholder="Your password must be 8-20 characters long.">
-                                      <button class="btn btn-outline-secondary" type="button">
-                                        <i class="bi bi-eye text-black"></i>
-                                      </button>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="newPwd">New password <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" name="password" id="newPwd" class="form-control" placeholder="Your password must be 8-20 characters long." required>
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="bi bi-eye text-black"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                  </div>
 
-                                  <div class="mb-3">
-                                    <label class="form-label" for="confNewPwd">Confirm new password <span
-                                        class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                      <input type="password" id="confNewPwd" placeholder="Confirm new password"
-                                        class="form-control">
-                                      <button class="btn btn-outline-secondary" type="button">
-                                        <i class="bi bi-eye text-black"></i>
-                                      </button>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="confNewPwd">Confirm new password <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" name="password_confirmation" id="confNewPwd" placeholder="Confirm new password" class="form-control" required>
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="bi bi-eye text-black"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                  </div>
 
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <!-- Row ends -->
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <a class="btn btn-outline-dark" href="{{ url('/') }}">Cancel</a>
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
+                                </form>
 
-                        </div>
-                      </div>
-                      <!-- Tab content end -->
-
-                    </div>
-                    <!-- Custom tabs end -->
-
-                    <!-- Buttons start -->
-                    <div class="d-flex gap-2 justify-content-end">
-                      <a class="btn btn-outline-dark" href="{{ url('/') }}"> Cancel</a>
-                      
-                      <button type="button" class="btn btn-primary">Update</button>
-                    </div>
-                    <!-- Buttons end -->
 
                   </div>
                 </div>

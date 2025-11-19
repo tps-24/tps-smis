@@ -15,6 +15,7 @@ use App\Models\StudentDismissal;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Hash;
+// use Illuminate\Support\Facades\Hash;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Services\AuditLoggerService;
+
 // Namespace for the Log facade
 
 //use Barryvdh\DomPDF\Facade as PDF;
@@ -370,6 +372,7 @@ class StudentController extends Controller
         $safari_types = SafariType::all();
         $vitengo = Vitengo::all(); // or ->pluck('name', 'id') if you prefer
 
+        $userEmail = $student->user ? $student->user->email : 'N/A';
         $lockups = DB::table('m_p_s')
             ->where('student_id', $student->id)
             ->orderByDesc('arrested_at')
@@ -381,7 +384,7 @@ class StudentController extends Controller
                         ->where('student_dismissals.student_id', $student->id)
                         ->latest('dismissed_at')
                         ->first();
-        return view('students.show', compact('student', 'safari_types', 'vitengo', 'lockups', 'dismissal'));
+        return view('students.show', compact('student', 'safari_types', 'vitengo', 'lockups', 'dismissal', 'userEmail'));
     }
     /**
      * Show the form for editing the specified resource.
@@ -475,6 +478,49 @@ class StudentController extends Controller
 
         return redirect()->back()->with('success', 'Student information updated successfully!');
     }
+
+    public function updatePasswords(Request $request)
+    {
+        if ($request->has('session_id')) {
+            session(['selected_session' => $request->session_id]);
+        }
+
+        $selectedSessionId = session('selected_session', 1);
+
+        if (! $selectedSessionId) {
+            return redirect()->back()->withErrors('Please select a session before resetting students password.');
+        }
+
+        $students = Student::with('user')
+            ->where('session_programme_id', $selectedSessionId)
+            ->get();
+
+        if ($students->isEmpty()) {
+            return back()->withErrors('No students found for this programme.');
+        }
+
+        $count = 0;
+
+        foreach ($students as $student) {
+            if ($student->user) {
+                $student->user->password = Hash::make(strtoupper($student->last_name));
+                $student->user->must_change_password = true; // force change on next login
+                $student->user->save();
+
+                $count++;
+
+                // Log each reset to default logs
+                Log::info("Password reset for user_id={$student->user->id}, student_id={$student->id}, programme={$selectedSessionId}");
+            }
+        }
+
+        // Log summary
+        Log::info("Bulk password reset completed: {$count} students in programme {$selectedSessionId}");
+
+        return back()->with('status', "Passwords resetted successfully for {$count} students in selected session programme {$selectedSessionId}.");
+    }
+
+
 
 
     /**
