@@ -149,9 +149,8 @@ class Student extends Model
 
     public function getGPAAttribute()
     {
-        $results = $this->finalResults;
-        $programme_sessionId = session('selected_session',4);
-        $sessionProgramme = SessionProgramme::find( $programme_sessionId); 
+        $results = $this->finalResults;        
+        $sessionProgramme = $results[0]->student->sessionProgramme; 
         $programmeCourseSemesters = $sessionProgramme->programmeCourseSemesters;// Retrieve ALL courses
         $semester_one_total_credit_weight = 0;
         $semester_one_total_grade_credit = 0;
@@ -163,6 +162,7 @@ class Student extends Model
             } elseif ($result->semester_id == 2) {               
                 $semester_two_total_credit_weight += $this->getGradePoint($result->grade) * $result->course->programmes->first()->pivot->credit_weight;
             }
+            
         }
         
         // dd($semester_one_total_credit_weight);
@@ -172,6 +172,7 @@ class Student extends Model
             }
             // Ensure no null error
             elseif ($programmeCourseSemester->course->semesters->first()->pivot->semester_id == 2) {
+                
                 $semester_two_total_grade_credit += $programmeCourseSemester->course->semesters->first()->pivot->credit_weight;
             }
 
@@ -200,7 +201,7 @@ class Student extends Model
         // Average the truncated semester GPAs and truncate the final result
         $averageGPA = ($semesterOneGPA + $semesterTwoGPA) / 2;
         $overallGPA = $this->truncateToDecimal($averageGPA, 1);
-
+        
         return collect([
             'semesterOneGPA' => $semesterOneGPA,
             'semesterTwoGPA' => $semesterTwoGPA,
